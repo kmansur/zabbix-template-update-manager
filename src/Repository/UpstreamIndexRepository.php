@@ -2,9 +2,13 @@
 
 namespace Modules\ZabbixTemplateUpdateManager\Repository;
 
+use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
 use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use RuntimeException;
 use Throwable;
+
+require_once dirname(__DIR__).'/Support/ProjectVersion.php';
+require_once dirname(__DIR__).'/Support/ZabbixVersion.php';
 
 final class UpstreamIndexRepository {
 
@@ -12,13 +16,25 @@ final class UpstreamIndexRepository {
 	private const CACHE_TTL = 900;
 	private const MAX_INDEX_BYTES = 5242880;
 	private const BASE_URL = 'https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/upstream-index/indexes';
-	private const USER_AGENT = 'Zabbix-Template-Update-Manager/0.1.0-dev';
 
 	private string $cacheDir;
 
 	public function __construct(?string $cacheDir = null) {
 		$this->cacheDir = $cacheDir ?? rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
 			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager';
+	}
+
+	public static function endpointForVersion(string $zabbixVersion): ?string {
+		$line = ZabbixVersion::line($zabbixVersion);
+		return $line === null ? null : self::BASE_URL.'/'.rawurlencode($line).'.json';
+	}
+
+	public static function transportCapabilities(): array {
+		return [
+			'curl' => function_exists('curl_init'),
+			'allow_url_fopen' => filter_var((string) ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOLEAN),
+			'openssl' => extension_loaded('openssl')
+		];
 	}
 
 	public function load(string $zabbixVersion): array {
@@ -40,7 +56,12 @@ final class UpstreamIndexRepository {
 		}
 
 		try {
-			$content = $this->fetch(self::BASE_URL.'/'.rawurlencode($line).'.json');
+			$endpoint = self::endpointForVersion($zabbixVersion);
+			if ($endpoint === null) {
+				throw new RuntimeException('Unable to build the upstream index endpoint.');
+			}
+
+			$content = $this->fetch($endpoint);
 			$index = self::decodeIndex($content, $line);
 			$this->writeCache($cacheFile, $content);
 			$index['runtime'] = [
@@ -61,7 +82,7 @@ final class UpstreamIndexRepository {
 			}
 
 			throw new RuntimeException(
-				'Unable to retrieve the upstream template index.',
+				'Unable to retrieve the upstream template index: '.$exception->getMessage(),
 				0,
 				$exception
 			);
@@ -181,43 +202,78 @@ final class UpstreamIndexRepository {
 	}
 
 	private function fetch(string $url): string {
+		$errors = [];
+
 		if (function_exists('curl_init')) {
-			$handle = curl_init($url);
-			if ($handle === false) {
-				throw new RuntimeException('Unable to initialize cURL.');
+			try {
+				return $this->fetchWithCurl($url);
 			}
-
-			curl_setopt_array($handle, [
-				CURLOPT_RETURNTRANSFER => true,
-				CURLOPT_FOLLOWLOCATION => false,
-				CURLOPT_CONNECTTIMEOUT => 5,
-				CURLOPT_TIMEOUT => 10,
-				CURLOPT_USERAGENT => self::USER_AGENT,
-				CURLOPT_SSL_VERIFYPEER => true,
-				CURLOPT_SSL_VERIFYHOST => 2
-			]);
-
-			$content = curl_exec($handle);
-			$status = (int) curl_getinfo($handle, CURLINFO_RESPONSE_CODE);
-			$error = curl_error($handle);
-			curl_close($handle);
-
-			if (!is_string($content) || $status !== 200) {
-				throw new RuntimeException(sprintf('Upstream index request failed with HTTP %d: %s', $status, $error));
+			catch (Throwable $exception) {
+				$errors[] = 'cURL: '.$this->sanitizeTransportError($exception->getMessage());
 			}
-
-			if (strlen($content) > self::MAX_INDEX_BYTES) {
-				throw new RuntimeException('The upstream index response exceeds the size limit.');
-			}
-
-			return $content;
+		}
+		else {
+			$errors[] = 'cURL: extension unavailable';
 		}
 
+		if (filter_var((string) ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOLEAN)) {
+			try {
+				return $this->fetchWithStream($url);
+			}
+			catch (Throwable $exception) {
+				$errors[] = 'stream: '.$this->sanitizeTransportError($exception->getMessage());
+			}
+		}
+		else {
+			$errors[] = 'stream: allow_url_fopen disabled';
+		}
+
+		throw new RuntimeException('All HTTP transports failed. '.implode(' | ', $errors));
+	}
+
+	private function fetchWithCurl(string $url): string {
+		$handle = curl_init($url);
+		if ($handle === false) {
+			throw new RuntimeException('Unable to initialize cURL.');
+		}
+
+		curl_setopt_array($handle, [
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_FOLLOWLOCATION => false,
+			CURLOPT_CONNECTTIMEOUT => 5,
+			CURLOPT_TIMEOUT => 10,
+			CURLOPT_USERAGENT => ProjectVersion::userAgent(),
+			CURLOPT_SSL_VERIFYPEER => true,
+			CURLOPT_SSL_VERIFYHOST => 2
+		]);
+
+		$content = curl_exec($handle);
+		$status = (int) curl_getinfo($handle, CURLINFO_RESPONSE_CODE);
+		$error = curl_error($handle);
+		curl_close($handle);
+
+		if (!is_string($content) || $status !== 200) {
+			throw new RuntimeException(sprintf(
+				'HTTP %d%s',
+				$status,
+				$error !== '' ? ' - '.$error : ''
+			));
+		}
+
+		if (strlen($content) > self::MAX_INDEX_BYTES) {
+			throw new RuntimeException('The upstream index response exceeds the size limit.');
+		}
+
+		return $content;
+	}
+
+	private function fetchWithStream(string $url): string {
 		$context = stream_context_create([
 			'http' => [
 				'method' => 'GET',
 				'timeout' => 10,
-				'header' => "User-Agent: ".self::USER_AGENT."\r\n"
+				'ignore_errors' => true,
+				'header' => "User-Agent: ".ProjectVersion::userAgent()."\r\n"
 			],
 			'ssl' => [
 				'verify_peer' => true,
@@ -226,8 +282,20 @@ final class UpstreamIndexRepository {
 		]);
 
 		$content = @file_get_contents($url, false, $context, 0, self::MAX_INDEX_BYTES + 1);
-		if (!is_string($content)) {
-			throw new RuntimeException('Unable to retrieve the upstream index with the PHP stream client.');
+		$status = 0;
+		if (isset($http_response_header[0])
+				&& preg_match('#^HTTP/\S+\s+(\d{3})#', (string) $http_response_header[0], $matches) === 1) {
+			$status = (int) $matches[1];
+		}
+
+		if (!is_string($content) || $status !== 200) {
+			$error = error_get_last();
+			$detail = is_array($error) ? (string) ($error['message'] ?? '') : '';
+			throw new RuntimeException(sprintf(
+				'HTTP %d%s',
+				$status,
+				$detail !== '' ? ' - '.$detail : ''
+			));
 		}
 
 		if (strlen($content) > self::MAX_INDEX_BYTES) {
@@ -235,5 +303,11 @@ final class UpstreamIndexRepository {
 		}
 
 		return $content;
+	}
+
+	private function sanitizeTransportError(string $message): string {
+		$message = preg_replace('/[\r\n\t]+/', ' ', $message) ?? '';
+		$message = trim($message);
+		return strlen($message) > 300 ? substr($message, 0, 300).'…' : $message;
 	}
 }
