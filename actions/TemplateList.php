@@ -9,6 +9,7 @@ use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateVersionComparator;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamMatcher;
+use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
 use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use Throwable;
 
@@ -17,6 +18,7 @@ require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateVersionComparator.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamMatcher.php';
+require_once dirname(__DIR__).'/src/Support/ProjectVersion.php';
 require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
 
 class TemplateList extends CController {
@@ -34,19 +36,28 @@ class TemplateList extends CController {
 	}
 
 	protected function doAction(): void {
+		$canAdminister = in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true);
+		$zabbixVersion = ZabbixVersion::current();
+
 		$data = [
 			'title' => _('Zabbix Template Update Manager'),
-			'version' => '0.1.0-dev',
-			'status' => _('Read-only inventory, upstream identity and version comparison'),
-			'zabbix_version' => ZabbixVersion::current(),
+			'version' => ProjectVersion::current(),
+			'status' => _('Laboratory beta: inventory, comparison, controlled update and rollback'),
+			'zabbix_version' => $zabbixVersion,
 			'zabbix_supported' => ZabbixVersion::isSupported(),
-			'can_compare' => in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true),
+			'can_compare' => $canAdminister,
+			'show_diagnostics' => $canAdminister,
 			'templates' => [],
 			'summary' => TemplateInventoryService::emptySummary(),
 			'upstream_summary' => UpstreamMatcher::emptySummary(),
 			'version_summary' => TemplateVersionComparator::emptySummary(),
 			'upstream_source' => null,
 			'upstream_runtime' => null,
+			'upstream_diagnostics' => [
+				'endpoint' => UpstreamIndexRepository::endpointForVersion($zabbixVersion),
+				'transports' => UpstreamIndexRepository::transportCapabilities(),
+				'detail' => null
+			],
 			'inventory_error' => null,
 			'upstream_error' => null,
 			'upstream_warning' => null
@@ -100,6 +111,9 @@ class TemplateList extends CController {
 			$data['upstream_error'] = _(
 				'Unable to check the official upstream template index. The local inventory remains available.'
 			);
+			if ($data['show_diagnostics']) {
+				$data['upstream_diagnostics']['detail'] = self::diagnosticMessage($exception);
+			}
 		}
 
 		$versionComparison = TemplateVersionComparator::attach($data['templates']);
@@ -107,5 +121,11 @@ class TemplateList extends CController {
 		$data['version_summary'] = $versionComparison['summary'];
 
 		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	private static function diagnosticMessage(Throwable $exception): string {
+		$message = trim($exception->getMessage());
+		$message = preg_replace('/[\r\n\t]+/', ' ', $message) ?? '';
+		return strlen($message) > 600 ? substr($message, 0, 600).'…' : $message;
 	}
 }
