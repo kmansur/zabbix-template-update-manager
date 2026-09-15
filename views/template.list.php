@@ -187,6 +187,31 @@ if ($data['upstream_warning'] !== null) {
 
 if ($data['upstream_error'] !== null) {
 	$page->addItem(new CTag('p', true, $data['upstream_error']));
+
+	if (!empty($data['show_diagnostics']) && is_array($data['upstream_diagnostics'])) {
+		$transports = is_array($data['upstream_diagnostics']['transports'] ?? null)
+			? $data['upstream_diagnostics']['transports']
+			: [];
+		$diagnosticTable = (new CTableInfo())
+			->setHeader([
+				_('Requested index'),
+				_('cURL'),
+				_('allow_url_fopen'),
+				_('OpenSSL'),
+				_('Failure detail')
+			])
+			->addRow([
+				$data['upstream_diagnostics']['endpoint'] ?? '—',
+				!empty($transports['curl']) ? _('Available') : _('Unavailable'),
+				!empty($transports['allow_url_fopen']) ? _('Enabled') : _('Disabled'),
+				!empty($transports['openssl']) ? _('Available') : _('Unavailable'),
+				$data['upstream_diagnostics']['detail'] ?? '—'
+			]);
+
+		$page
+			->addItem(new CTag('h4', true, _('Upstream diagnostics')))
+			->addItem($diagnosticTable);
+	}
 }
 
 $page
