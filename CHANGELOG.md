@@ -9,73 +9,40 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Initial project structure.
 - Zabbix frontend module manifest.
 - Initial template update menu.
-- Initial template list controller and view.
 - Runtime detection for supported Zabbix 7.x and 8.x major versions.
-- Basic GitHub Actions validation workflow.
-- Manifest validation, read-only guard and Zabbix version unit tests.
-- Repository agent/development rules in `AGENTS.md`.
 - Read-only installed-template inventory using the native Zabbix `template.get` API service.
 - Inventory metadata for UUID, vendor, vendor version, template groups and directly linked host count.
-- Unit tests for the template repository query contract and inventory normalization.
 - Compact official-upstream template indexes generated from the canonical Zabbix Git repository.
 - Runtime upstream-index retrieval with strict validation, 15-minute cache and stale-cache fallback.
 - UUID-based upstream identity matching with explicit fail-closed states.
-- Python tests for deterministic upstream-index generation.
-- PHP tests for upstream index validation and UUID matching.
-- Upstream index provenance for repeated official UUID definitions, including all source paths and distinct content SHA-256 hashes.
 - Read-only comparison of installed and official upstream `vendor.version` values.
-- Explicit version states for current templates, available updates, installed-newer versions, missing versions and uncomparable formats.
-- Unit tests that verify numeric vendor-version comparison across revisions and release lines.
-- Canonical raw-source smoke test in the upstream-index workflow using an exact immutable source commit.
-- Canonical path-specific commit-history smoke test against `git.zabbix.com` before runtime historical lookup is enabled.
+- Canonical raw-source and path-history smoke tests against `git.zabbix.com`.
 - Safe official-template source retrieval from `git.zabbix.com` by validated commit and path.
 - Per-template read-only content comparison through Zabbix `configuration.importcompare`.
-- Isolation of the selected template UUID from official YAML bundles that contain multiple templates.
-- Inclusion of only referenced template-group and discovered host-group definitions in comparison input.
-- Read-only change summaries for added, updated and removed entities, including per-entity counts.
-- Conservative content states for current matches, local modifications, newer-upstream previews and historical-baseline requirements.
-- On-demand historical baseline lookup by stable UUID plus installed `vendor.version`, using canonical path history pinned to the current immutable upstream commit.
-- Historical baseline comparison through `configuration.importcompare` for outdated official templates.
-- Separate outdated-template states for updates with no detected local modifications and updates with detected local modifications.
-- Capped historical scans with explicit `history_limit_reached` semantics instead of claiming a baseline does not exist after an incomplete scan.
-- Three-way BASE / LOCAL / UPSTREAM field analysis built from two native `configuration.importcompare` results sharing the same LOCAL pivot.
-- Stable UUID-based extraction of normalized import-comparison entities, with unique-field fallback and fail-closed handling of ambiguous identities.
-- Three-way classifications for upstream-only changes, local customizations that current upstream would overwrite, converged changes, real conflicts and unresolved states.
-- Native comparison-page summary and field detail table showing BASE, LOCAL and UPSTREAM values without enabling any write action.
-- Bounded three-way detail output while retaining complete summary counts.
-- Normalized update-preview analysis for added/removed entities, updated fields, unresolved identities and affected entities.
-- Conservative update review-priority classification that keeps technical severity separate from three-way comparison coverage.
+- Historical baseline lookup by stable UUID plus installed `vendor.version` from canonical path history.
+- Three-way BASE / LOCAL / UPSTREAM field analysis with upstream-only, local-overwrite, converged, conflict and unresolved classifications.
+- Conservative update review-priority classification that keeps technical severity separate from three-way coverage.
 - Exact directly linked host count as known impact breadth, without arbitrary host-count severity thresholds.
-- Native comparison-page review-priority summary for updates, including technical severity, coverage and normalized operation counts.
-- Dedicated documentation for update review priority and known impact semantics.
-- Local immutable historical-baseline cache keyed by current upstream commit, canonical source path, stable UUID and installed vendor metadata.
-- SHA-256 integrity validation and atomic private-file writes for cached historical baseline sources.
-- Unit coverage for source URL validation, path traversal rejection, history response validation, historical baseline selection, baseline-cache identity/integrity, document isolation, nested import-comparison summaries, entity extraction, three-way classification semantics, update-preview normalization, conservative risk classification and import-comparison rules.
+- Local immutable historical-baseline cache with SHA-256 validation and private atomic writes.
+- Native one-template YAML export service backed by Zabbix `configuration.export`.
+- Private local template backup repository with exact byte count and SHA-256 verification.
+- Deterministic JSON backup manifests recording template identity and export provenance.
+- Template backup service combining native export with local rollback-artifact persistence.
+- Dedicated backup/rollback architecture documentation.
+- Unit coverage for upstream identity/version/source/history, baseline cache, import comparison, three-way analysis, update risk, native export contract and backup artifact integrity.
 
 ### Changed
 
-- Formatted the initial PHP frontend files and added final newlines.
 - The initial page now displays the detected Zabbix version and compatibility state.
 - The template page now renders an inventory summary and installed-template table using native Zabbix components.
-- The read-only guard now rejects generic Zabbix API write-method calls and `DBexecute()`.
-- CI now executes every `tests/unit/*Test.php` test automatically.
-- Inventory wording now clarifies that results are templates visible to the current user.
-- The previous vendor-classification column is replaced by authoritative upstream UUID identity status.
-- `Linked to hosts` summary wording now explicitly means templates linked to one or more hosts.
-- Upstream index generation now merges repeated UUID definitions when identity metadata agrees instead of assuming every UUID occurs in only one YAML file.
-- Repeated UUIDs with conflicting identity metadata continue to fail index generation.
-- Upstream index generation now uses the canonical full Zabbix Git repository so historical maintenance tags remain resolvable.
-- The template table now distinguishes installed vendor version, available upstream vendor version and version-comparison state.
-- Upstream source-path validation now explicitly rejects `.` and `..` traversal segments.
-- Official template names are links to the read-only content-comparison action for eligible Zabbix administrators and super administrators.
-- Content differences are classified as local modifications only when the installed vendor version equals the current official upstream vendor version or when the installed content is compared against a resolved historical official baseline of the same vendor version.
-- Differences against a newer upstream version remain an update preview when no historical official baseline can be established safely.
-- The comparison page now keeps current-upstream update changes separate from installed-content differences against the historical baseline.
-- When a historical baseline is available, the comparison page now distinguishes local/upstream overlap instead of treating every local customization as the same risk.
-- A three-way conflict is limited to the case where the same normalized field has distinct BASE, LOCAL and UPSTREAM states; the result remains a review signal rather than an automatic update-safety decision.
-- Overall update review priority is now forced to `Unknown` when three-way local-overlap coverage is unavailable or unresolved, even when technical severity can be estimated.
+- The read-only guard rejects Zabbix API write methods and direct database writes while allowing read-only export/comparison operations.
+- Official identity is determined by UUID, not vendor metadata alone.
+- Version comparison is numeric and independent from identity matching.
+- Successful historical baseline resolution reuses a validated local cache on subsequent comparisons instead of rescanning canonical path history every time.
+- Content differences are classified as local modifications only against the current matching official version or a resolved historical official baseline of the same vendor version.
+- Overall update review priority is forced to `Unknown` when three-way local-overlap coverage is unavailable or unresolved.
 - Direct host count is presented as impact context rather than being used to inflate technical severity.
-- Successful historical baseline resolution now reuses a validated local cache on subsequent comparisons instead of rescanning canonical path history every time.
+- Backup artifacts use template IDs rather than names for filesystem paths and are written as private local files.
 
 ## [0.1.0-dev] - 2026-09-14
 
