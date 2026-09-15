@@ -63,6 +63,12 @@ final class TemplateUpdatePreflightService {
 			return $result;
 		}
 
+		if ($result['template']['templateid'] !== $templateId
+				|| !preg_match('/^[a-f0-9]{32}$/', $result['template']['uuid'])) {
+			$result['reason'] = 'template_identity_mismatch';
+			return $result;
+		}
+
 		$readiness = is_array($analysis['update_readiness'] ?? null)
 			? $analysis['update_readiness']
 			: null;
