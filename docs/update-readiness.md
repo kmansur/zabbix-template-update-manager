@@ -10,7 +10,9 @@ It does **not** answer:
 
 > Is this template safe to update automatically?
 
-During the current milestone `write_enabled` is always `false`. The strongest positive state is only `candidate_for_backup`, meaning the analysis gate is complete enough to create and verify a rollback artifact before any future write-enabled workflow.
+During the current milestone `write_enabled` is always `false`. The strongest positive state is only `candidate_for_backup`, meaning the analysis gate is complete enough to create a rollback artifact before any future write-enabled workflow.
+
+`write_enabled = false` refers specifically to Zabbix configuration mutation. The backup step is allowed to write private local files under the module's persistent backup directory; it still does not change the monitored Zabbix configuration.
 
 ## Required evidence
 
@@ -83,7 +85,7 @@ All of the following are true:
 This means only that the next allowed workflow step is:
 
 ```text
-create and verify rollback backup
+create rollback backup
 ```
 
 It is deliberately **not** called `safe`, `approved`, `ready_to_import` or similar.
@@ -113,9 +115,17 @@ UpdateReadinessEvaluator
         +-- review_high
         +-- review_medium
         +-- candidate_for_backup
+                              |
+                              v
+                   POST rollback-backup action
+                              |
+                              v
+              persistent YAML + JSON manifest
 ```
 
-Even `candidate_for_backup` remains inside the read-only milestone. The backend backup foundation exists, but no backup/update button or `configuration.import` action is enabled yet.
+When `candidate_for_backup` is reached, the native comparison page exposes a CSRF-protected POST action that exports the currently installed template and stores a persistent local rollback artifact. That action does not advance directly to an update and does not alter Zabbix configuration.
+
+A future milestone must independently inventory and revalidate the stored artifact before it can count as a verified rollback prerequisite.
 
 ## Host impact
 
@@ -125,10 +135,10 @@ Indirect/inherited impact remains a separate future analysis problem.
 
 ## Safety invariant
 
-Every result includes:
+Every readiness result includes:
 
 ```text
 write_enabled = false
 ```
 
-That invariant is intentional and should remain until the project explicitly enters a separately reviewed write-enabled milestone with backup verification, confirmation, controlled import, post-import validation and rollback.
+That invariant remains intentional for Zabbix configuration writes. A separately reviewed write-enabled milestone must still add stored-backup verification, explicit confirmation, controlled configuration write/import, post-write validation and rollback.
