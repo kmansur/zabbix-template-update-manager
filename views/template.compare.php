@@ -445,7 +445,7 @@ if (is_array($data['update_readiness'])
 		$backupAction = (new CUrl('zabbix.php'))
 			->setArgument('action', 'ztum.template.backup')
 			->getUrl();
-		$backupForm = (new CForm())
+		$backupForm = (new CForm('post'))
 			->setId('ztum-template-backup-form')
 			->setAction($backupAction)
 			->addItem([
