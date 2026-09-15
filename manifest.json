@@ -17,6 +17,10 @@
         },
         "ztum.template.backup": {
             "class": "TemplateBackup"
+        },
+        "ztum.template.backups": {
+            "class": "TemplateBackupList",
+            "view": "template.backup.list"
         }
     }
 }
