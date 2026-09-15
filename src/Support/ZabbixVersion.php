@@ -22,6 +22,18 @@ final class ZabbixVersion {
 		return (int) $matches[1];
 	}
 
+	public static function line(?string $version = null): ?string {
+		if ($version === null) {
+			$version = self::current();
+		}
+
+		if (!preg_match('/^(\d+)\.(\d+)/', $version, $matches)) {
+			return null;
+		}
+
+		return (int) $matches[1].'.'.(int) $matches[2];
+	}
+
 	public static function isSupported(?string $version = null): bool {
 		$major = self::major($version);
 
