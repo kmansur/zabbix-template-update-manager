@@ -4,6 +4,28 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.2] - 2026-09-15
+
+### Added
+
+- Runtime project-version source backed by the root `VERSION` file.
+- Administrator-only upstream diagnostics showing the requested index endpoint, cURL availability, `allow_url_fopen`, OpenSSL availability and bounded failure detail.
+- HTTP transport fallback: when cURL is available but fails, the upstream index loader can also try the PHP stream transport when `allow_url_fopen` is enabled.
+- Regression coverage preventing the inventory page and upstream HTTP user agent from falling back to the stale `0.1.0-dev` literal.
+
+### Fixed
+
+- The inventory header no longer displays the hard-coded `0.1.0-dev`; it now reports the actual packaged version.
+- The upstream HTTP user agent now tracks the packaged version instead of the stale development version.
+- Upstream repository failures now retain a bounded diagnostic cause for administrators while continuing to fail closed for official-template identity.
+
+### Test-release status
+
+- First Zabbix 7.x runtime inventory pass observed successfully.
+- Upstream index retrieval still requires runtime validation; beta.2 adds diagnostics specifically for this stage.
+- Zabbix 8.x runtime validation remains pending.
+- Production use is not recommended.
+
 ## [0.1.0-beta.1] - 2026-09-15
 
 ### Added
