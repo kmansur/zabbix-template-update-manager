@@ -12,6 +12,7 @@ function assertPreflight($expected, $actual, string $message): void {
 }
 
 $backupSha = hash('sha256', 'current-template-export');
+$upstreamContentSha = hash('sha256', 'official-upstream-source');
 $analysis = [
 	'template' => [
 		'templateid' => '12345',
@@ -20,7 +21,14 @@ $analysis = [
 		'technical_name' => 'Linux by Zabbix agent',
 		'vendor_version' => '7.0-3',
 		'upstream_vendor_version' => '7.0-8',
-		'host_count' => 37
+		'host_count' => 37,
+		'upstream' => [
+			'name' => 'Linux by Zabbix agent',
+			'technical_name' => 'Linux by Zabbix agent',
+			'vendor_name' => 'Zabbix',
+			'vendor_version' => '7.0-8',
+			'content_sha256s' => [$upstreamContentSha]
+		]
 	],
 	'comparison_error' => null,
 	'upstream_source' => [
@@ -49,13 +57,16 @@ $analysis = [
 $service = new TemplateUpdatePreflightService(static fn(string $templateId): array => $analysis);
 $result = $service->run('12345');
 
-assertPreflight('passed', $result['status'], 'Fresh backup_verified analysis should pass the read-only preflight.');
-assertPreflight(false, $result['write_enabled'], 'Passing preflight must never enable Zabbix configuration writes.');
-assertPreflight('await_write_enabled_milestone', $result['next_step'], 'Passing preflight must stop before any write milestone.');
+assertPreflight('passed', $result['status'], 'Fresh backup_verified analysis should pass preflight.');
+assertPreflight(false, $result['write_enabled'], 'Passing preflight must never enable Zabbix configuration writes by itself.');
+assertPreflight('controlled_update_confirmation', $result['next_step'], 'Passing preflight must advance only to explicit controlled-update confirmation.');
 assertPreflight('12345', $result['template']['templateid'], 'Preflight must preserve template identity.');
 assertPreflight('f8f7908280354f2abeed07dc788c3747', $result['template']['uuid'], 'Preflight must normalize the template UUID.');
 assertPreflight('0123456789abcdef0123456789abcdef01234567', $result['candidate']['commit'], 'Preflight must bind the exact upstream commit.');
 assertPreflight('templates/os/linux/template_os_linux.yaml', $result['candidate']['path'], 'Preflight must bind the exact upstream path.');
+assertPreflight($upstreamContentSha, $result['candidate']['content_sha256'], 'Preflight must bind the validated upstream content fingerprint.');
+assertPreflight('Zabbix', $result['candidate']['vendor_name'], 'Preflight must bind upstream vendor identity.');
+assertPreflight('Linux by Zabbix agent', $result['candidate']['technical_name'], 'Preflight must bind upstream technical identity.');
 assertPreflight($backupSha, $result['rollback']['sha256'], 'Preflight must bind the verified rollback fingerprint.');
 assertPreflight($backupSha, $result['rollback']['current_export_sha256'], 'Rollback fingerprint must match the fresh current export.');
 assertPreflight(37, $result['direct_host_count'], 'Direct host count must remain impact context.');
@@ -74,6 +85,16 @@ $badCandidate = $analysis;
 $badCandidate['upstream_source']['commit'] = 'release/7.0';
 $result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $badCandidate))->run('12345');
 assertPreflight('blocked_candidate', $result['status'], 'A non-immutable upstream identity must fail closed.');
+
+$missingCandidateIdentity = $analysis;
+$missingCandidateIdentity['template']['upstream']['vendor_name'] = '';
+$result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $missingCandidateIdentity))->run('12345');
+assertPreflight('blocked_candidate', $result['status'], 'Incomplete upstream candidate identity must fail closed.');
+
+$ambiguousContent = $analysis;
+$ambiguousContent['template']['upstream']['content_sha256s'] = [$upstreamContentSha, hash('sha256', 'variant')];
+$result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $ambiguousContent))->run('12345');
+assertPreflight('blocked_candidate', $result['status'], 'Multiple official content variants must fail closed before update.');
 
 $staleBackup = $analysis;
 $staleBackup['backup_verification']['current_export']['sha256'] = hash('sha256', 'changed-template-export');
@@ -100,7 +121,7 @@ try {
 catch (RuntimeException $exception) {
 	$threw = true;
 }
-assertPreflight(true, $threw, 'Preflight must reject any read-only readiness result that unexpectedly enables writes.');
+assertPreflight(true, $threw, 'Preflight must reject readiness that unexpectedly enables writes.');
 
 $threw = false;
 try {

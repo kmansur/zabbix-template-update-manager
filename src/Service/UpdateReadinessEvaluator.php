@@ -3,13 +3,12 @@
 namespace Modules\ZabbixTemplateUpdateManager\Service;
 
 /**
- * Evaluates whether an official template update has enough proven read-only
- * evidence to advance to the next review step.
+ * Evaluates whether an official template update has enough proven comparison
+ * evidence to advance through review, backup and controlled preflight.
  *
- * This is deliberately not an update authorization engine. During the current
- * milestone write_enabled is always false. The strongest positive result is
- * backup_verified, meaning that comparison evidence is complete and a valid
- * rollback artifact exactly matches a fresh export of the installed template.
+ * This evaluator never authorizes a configuration write by itself.
+ * write_enabled remains false even at backup_verified; the separate preflight
+ * and controlled-update services must still rerun and bind fresh evidence.
  */
 final class UpdateReadinessEvaluator {
 
@@ -113,7 +112,7 @@ final class UpdateReadinessEvaluator {
 		if (is_array($backupVerification) && ($backupVerification['status'] ?? null) === 'current_match'
 				&& !empty($backupVerification['current_match'])) {
 			$result['status'] = 'backup_verified';
-			$result['next_step'] = 'await_write_enabled_milestone';
+			$result['next_step'] = 'run_controlled_preflight';
 			$result['backup_verified'] = true;
 			return $result;
 		}

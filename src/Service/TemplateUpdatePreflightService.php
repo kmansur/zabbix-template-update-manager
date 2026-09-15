@@ -7,12 +7,12 @@ use RuntimeException;
 require_once __DIR__.'/TemplateUpdateAnalysisService.php';
 
 /**
- * Recomputes the complete update analysis and converts it into a deterministic
- * preflight result for a future write-enabled milestone.
+ * Recomputes the complete update analysis and converts it into deterministic
+ * evidence for the controlled update gate.
  *
  * This service never enables or performs a Zabbix configuration write. A
- * passing result only proves that the current read-only prerequisites were
- * freshly re-evaluated and that the rollback artifact still matches LOCAL.
+ * passing result only proves that the current prerequisites were freshly
+ * re-evaluated and that the rollback artifact still matches LOCAL.
  */
 final class TemplateUpdatePreflightService {
 
@@ -80,7 +80,7 @@ final class TemplateUpdatePreflightService {
 		}
 
 		if (!empty($readiness['write_enabled'])) {
-			throw new RuntimeException('Read-only readiness unexpectedly enabled configuration writes.');
+			throw new RuntimeException('Readiness unexpectedly enabled configuration writes.');
 		}
 
 		$candidate = $this->candidateDescriptor($analysis, $template);
@@ -103,13 +103,17 @@ final class TemplateUpdatePreflightService {
 		$result['rollback'] = $rollback;
 
 		$evidence = [
-			'schema_version' => 1,
+			'schema_version' => 3,
 			'templateid' => $result['template']['templateid'],
 			'uuid' => $result['template']['uuid'],
 			'installed_version' => $result['template']['installed_version'],
 			'available_version' => $result['template']['available_version'],
 			'upstream_commit' => $candidate['commit'],
 			'upstream_path' => $candidate['path'],
+			'upstream_content_sha256' => $candidate['content_sha256'],
+			'upstream_name' => $candidate['name'],
+			'upstream_technical_name' => $candidate['technical_name'],
+			'upstream_vendor_name' => $candidate['vendor_name'],
 			'rollback_sha256' => $rollback['sha256'],
 			'current_export_sha256' => $rollback['current_export_sha256'],
 			'direct_host_count' => $result['direct_host_count']
@@ -121,7 +125,7 @@ final class TemplateUpdatePreflightService {
 		}
 
 		$result['status'] = 'passed';
-		$result['next_step'] = 'await_write_enabled_milestone';
+		$result['next_step'] = 'controlled_update_confirmation';
 		$result['reason'] = null;
 		$result['evidence_sha256'] = hash('sha256', $encoded);
 
@@ -130,22 +134,40 @@ final class TemplateUpdatePreflightService {
 
 	private function candidateDescriptor(array $analysis, array $template): ?array {
 		$source = is_array($analysis['upstream_source'] ?? null) ? $analysis['upstream_source'] : [];
+		$upstream = is_array($template['upstream'] ?? null) ? $template['upstream'] : [];
 		$commit = strtolower(trim((string) ($source['commit'] ?? '')));
 		$path = trim((string) ($analysis['source_path'] ?? ''));
 		$uuid = self::normalizeUuid((string) ($template['uuid'] ?? ''));
 		$availableVersion = trim((string) ($template['upstream_vendor_version'] ?? ''));
+		$name = trim((string) ($upstream['name'] ?? ''));
+		$technicalName = trim((string) ($upstream['technical_name'] ?? ''));
+		$vendorName = trim((string) ($upstream['vendor_name'] ?? ''));
+		$hashes = is_array($upstream['content_sha256s'] ?? null) ? $upstream['content_sha256s'] : [];
+		$hashes = array_values(array_unique(array_map(
+			static fn($hash): string => strtolower(trim((string) $hash)),
+			$hashes
+		)));
+		$contentSha256 = count($hashes) === 1 ? $hashes[0] : '';
 
 		if (!preg_match('/^[a-f0-9]{40}$/', $commit)
 				|| !self::isSafeTemplatePath($path)
 				|| !preg_match('/^[a-f0-9]{32}$/', $uuid)
-				|| $availableVersion === '') {
+				|| !preg_match('/^[a-f0-9]{64}$/', $contentSha256)
+				|| $availableVersion === ''
+				|| $name === ''
+				|| $technicalName === ''
+				|| $vendorName === '') {
 			return null;
 		}
 
 		return [
 			'commit' => $commit,
 			'path' => $path,
+			'content_sha256' => $contentSha256,
 			'uuid' => $uuid,
+			'name' => $name,
+			'technical_name' => $technicalName,
+			'vendor_name' => $vendorName,
 			'vendor_version' => $availableVersion
 		];
 	}

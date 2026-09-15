@@ -1,0 +1,68 @@
+<?php
+
+namespace Modules\ZabbixTemplateUpdateManager\Actions;
+
+use CController;
+use CControllerResponseData;
+use CControllerResponseFatal;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;
+use Throwable;
+
+require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';
+
+/**
+ * Performs one explicitly confirmed official-template update.
+ *
+ * Native CSRF validation remains enabled. The action is restricted to Zabbix
+ * super administrators and delegates all fail-closed preflight/write/validation
+ * logic to TemplateControlledUpdateService.
+ */
+class TemplateUpdate extends CController {
+
+	protected function checkInput(): bool {
+		$ret = $this->validateInput([
+			'templateid' => 'required|db hosts.hostid',
+			'evidence_sha256' => 'required|string',
+			'confirm' => 'required|in 1'
+		]);
+
+		if (!$ret) {
+			$this->setResponse(new CControllerResponseFatal());
+		}
+
+		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		return $this->getUserType() === USER_TYPE_SUPER_ADMIN;
+	}
+
+	protected function doAction(): void {
+		$templateId = (string) $this->getInput('templateid');
+		$data = [
+			'title' => _('Template update result'),
+			'templateid' => $templateId,
+			'result' => null,
+			'operation_error' => null
+		];
+
+		try {
+			$data['result'] = (new TemplateControlledUpdateService())->execute(
+				$templateId,
+				(string) $this->getInput('evidence_sha256')
+			);
+		}
+		catch (Throwable $exception) {
+			error_log(sprintf(
+				'[Zabbix Template Update Manager] Controlled update failed for template %s: %s',
+				$templateId,
+				$exception->getMessage()
+			));
+			$data['operation_error'] = _(
+				'The controlled update could not be completed. Review frontend logs and re-open the template comparison before retrying. If the import had already started, verify the current template state before taking any further action.'
+			);
+		}
+
+		$this->setResponse(new CControllerResponseData($data));
+	}
+}

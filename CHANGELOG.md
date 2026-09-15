@@ -18,7 +18,7 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Read-only comparison of installed and official upstream `vendor.version` values.
 - Canonical raw-source and path-history smoke tests against `git.zabbix.com`.
 - Safe official-template source retrieval from `git.zabbix.com` by validated commit and path.
-- Per-template read-only content comparison through Zabbix `configuration.importcompare`.
+- Per-template content comparison through Zabbix `configuration.importcompare`.
 - Historical baseline lookup by stable UUID plus installed `vendor.version` from canonical path history.
 - Three-way BASE / LOCAL / UPSTREAM field analysis with upstream-only, local-overwrite, converged, conflict and unresolved classifications.
 - Conservative update review-priority classification that keeps technical severity separate from three-way coverage.
@@ -28,9 +28,9 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Private local template backup repository with exact byte count and SHA-256 verification.
 - Deterministic JSON backup manifests recording template identity and export provenance.
 - Template backup service combining native export with local rollback-artifact persistence.
-- Read-only update readiness gate with explicit blocked/review/candidate workflow states.
+- Update readiness gate with explicit blocked/review/candidate/verified workflow states.
 - Fail-closed readiness blockers for missing baseline, unresolved analysis, three-way conflict and local-customization overwrite risk.
-- Explicit `candidate_for_backup` state as the strongest positive analysis result before rollback verification; it never enables Zabbix configuration writes.
+- Explicit `candidate_for_backup` state before rollback verification.
 - Native comparison-page readiness summary showing the required next workflow step.
 - CSRF-protected POST action for creating a persistent rollback backup from the currently installed template.
 - Native comparison-page **Create rollback backup** control shown when readiness reaches `candidate_for_backup`.
@@ -46,20 +46,25 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Native inventory links from visible templates to their rollback backup history without scanning backup storage on the main inventory page.
 - Backup-history action contract coverage enforcing role restrictions, bounded repository inspection, no fresh export, no filesystem path disclosure and no write controls.
 - Reusable `TemplateUpdateAnalysisService` that rebuilds the complete current-upstream, historical-baseline, three-way, risk, readiness and rollback-verification pipeline from a numeric template ID.
-- Static orchestration coverage ensuring the comparison controller delegates to the reusable analysis service and that the service remains configuration-read-only.
-- Fail-closed `TemplateUpdatePreflightService` that freshly recomputes authoritative update analysis and requires `backup_verified` before producing a passing read-only preflight result.
-- Deterministic preflight evidence SHA-256 binding template identity, immutable upstream commit/path, installed/available versions, verified rollback fingerprint, fresh current-export fingerprint and direct-host impact context.
-- Dedicated update-preflight documentation defining why preflight evidence is diagnostic only and can never replace fresh server-side revalidation before a future write.
+- Fail-closed `TemplateUpdatePreflightService` that freshly recomputes authoritative update analysis and requires `backup_verified` before producing a passing non-write preflight result.
+- Deterministic preflight evidence SHA-256 binding template identity, immutable upstream commit/path, validated upstream source hash, installed/available versions, verified rollback fingerprint, fresh current-export fingerprint and direct-host impact context.
 - CSRF-protected native update-preflight action and evidence view for outdated official templates.
-- Inventory preflight controls that rerun server-side evidence without enabling a configuration write.
+- Comparison/inventory preflight controls that rerun server-side evidence without performing a configuration write.
+- Immutable update-candidate reconstruction that re-fetches exact commit/path source and validates SHA-256 against the upstream index before import.
+- `TemplateConfigurationImportService` as the single approved `configuration.import` boundary, reusing the same rules as `configuration.importcompare`.
+- `TemplateControlledUpdateService` with fresh preflight rerun, evidence-fingerprint TOCTOU protection, candidate revalidation, controlled import and post-import validation.
+- Super-administrator-only CSRF-protected update action with explicit confirmation checkbox.
+- Post-import validation that requires current vendor version, official UUID match, current-upstream content equality and zero remaining import-comparison differences.
+- Native controlled-update result page showing whether a write occurred, candidate fingerprints and post-import validation status.
+- CI controlled-write guard enforcing exactly one configuration-import call site and prohibiting other Zabbix API/direct-database write paths.
+- Dedicated controlled-update documentation and updated preflight documentation.
+- Unit/contract coverage for candidate source binding, preflight content hashes, stale evidence blocking, write-boundary isolation, post-import validation and validation exceptions after import.
 - Dedicated backup/rollback and update-readiness architecture documentation.
-- Unit coverage for upstream identity/version/source/history, baseline cache, import comparison, three-way analysis, update risk/readiness, native export contract, backup artifact integrity, tamper detection and current-state backup verification.
 
 ### Changed
 
 - The initial page now displays the detected Zabbix version and compatibility state.
 - The template page now renders an inventory summary and installed-template table using native Zabbix components.
-- The read-only guard rejects Zabbix API write methods and direct database writes while allowing read-only export/comparison operations.
 - Official identity is determined by UUID, not vendor metadata alone.
 - Version comparison is numeric and independent from identity matching.
 - Successful historical baseline resolution reuses a validated local cache on subsequent comparisons instead of rescanning canonical path history every time.
@@ -68,12 +73,14 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Direct host count is presented as impact context rather than being used to inflate technical severity.
 - Backup artifacts use template IDs rather than names for filesystem paths and are written as private local files.
 - Runtime rollback backups moved from temporary development storage to persistent `/var/lib/zabbix-template-update-manager/backups` storage.
-- The milestone is described as read-only with respect to **Zabbix configuration**; persistent rollback-artifact files are the only intentional frontend-triggered local write.
-- Readiness never labels an update safe or ready-to-import; medium/high risk remains manual-review state and all Zabbix configuration write operations stay disabled.
+- Medium/high technical risk remains manual-review state; the initial controlled automatic update path is limited to `none`/`low` risk with complete three-way evidence.
 - After `candidate_for_backup`, the comparison page revalidates the newest stored artifact and advances only an exact current export match to `backup_verified`.
-- `backup_verified` still keeps `write_enabled = false` and has no configuration-write action attached to it.
-- The main template inventory exposes rollback-history navigation only to administrator/super-administrator users while leaving artifact inspection to the dedicated history page.
-- `TemplateCompare` is now a thin frontend controller; read-only update-analysis orchestration lives in `src/Service/TemplateUpdateAnalysisService.php` so the same fresh analysis path can be reused by a future server-side update preflight.
+- `backup_verified` still keeps evaluator `write_enabled = false`; it now advances to the separate fresh controlled-preflight gate rather than directly authorizing a write.
+- Preflight binds full upstream identity plus one unambiguous upstream content SHA-256 and remains a non-write evidence gate.
+- Configuration writes are no longer globally disabled: exactly one reviewed `API::Configuration()->import()` boundary is permitted for the explicitly confirmed controlled update flow.
+- The old read-only CI guard has evolved into a controlled-write guard while retaining its historical filename `tests/read_only_guard.php`.
+- The comparison page itself remains read-only and now links verified backups to controlled preflight.
+- `TemplateCompare` remains a thin frontend controller; update-analysis orchestration lives in `src/Service/TemplateUpdateAnalysisService.php` so comparison and write preflight use the same authoritative analysis path.
 
 ## [0.1.0-dev] - 2026-09-14
 
