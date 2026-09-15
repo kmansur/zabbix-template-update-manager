@@ -33,7 +33,7 @@ The inventory currently displays:
 - number of directly linked hosts;
 - upstream identity status.
 
-Upstream identity is verified by UUID against compact indexes generated from the official `zabbix/zabbix` repository. `vendor_name = Zabbix` alone is never treated as proof that a template is official.
+Upstream identity is verified by UUID against compact indexes generated from the canonical Zabbix Git repository. `vendor_name = Zabbix` alone is never treated as proof that a template is official.
 
 Current upstream identity states:
 
@@ -47,7 +47,7 @@ The module intentionally does **not** classify a template as current, outdated, 
 
 ## Upstream index architecture
 
-Querying every official YAML file from the Zabbix repository on every page load would require hundreds of remote requests. Instead, the project builds compact UUID indexes with GitHub Actions from the official Zabbix repository mirror maintained by the Zabbix organization.
+Querying every official YAML file from the Zabbix repository on every page load would require hundreds of remote requests. Instead, the project builds compact UUID indexes with GitHub Actions from the canonical full Zabbix Git repository.
 
 The official repository can legitimately package the same template UUID in more than one YAML bundle (for example, shared VMware child templates). The index therefore merges repeated UUID definitions when their technical identity and vendor metadata agree, retains every official source path, and records SHA-256 hashes for each distinct content variant. A repeated UUID with conflicting identity metadata still fails index generation.
 
@@ -60,13 +60,16 @@ Supported index lines are built for:
 
 The index records its exact source ref, source commit and commit date. For active release branches, the `release/<major.minor>` branch is preferred. If an old non-LTS line no longer has an active release branch, the latest matching maintenance tag is used. For 8.0 prereleases, `master` is accepted only when the source version file confirms the 8.0 line.
 
+The canonical repository is required for index generation because it contains the complete ref/tag history. The GitHub repository maintained by the Zabbix organization mirrors master and supported release branches and remains useful as a public browsing/reference mirror.
+
 The Zabbix frontend downloads one compact JSON index and caches it locally for 15 minutes. If refresh fails, a previously cached index can be used as stale read-only data. If no index is available, the local inventory still works and upstream status fails closed as `Repository unavailable`.
 
-Canonical Zabbix source:
+Canonical Zabbix source and clone URL:
 
 - <https://git.zabbix.com/projects/ZBX/repos/zabbix/>
+- `https://git.zabbix.com/scm/zbx/zabbix.git`
 
-Official GitHub mirror used by the index builder:
+Official GitHub mirror:
 
 - <https://github.com/zabbix/zabbix>
 

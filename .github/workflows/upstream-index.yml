@@ -43,7 +43,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          SOURCE_REPO='https://github.com/zabbix/zabbix.git'
+          # The canonical repository contains the full tag history. The GitHub
+          # mirror intentionally exposes only master and supported releases.
+          SOURCE_REPO='https://git.zabbix.com/scm/zbx/zabbix.git'
           mkdir -p build/upstream
 
           resolve_ref() {
@@ -68,6 +70,7 @@ jobs:
               return 0
             fi
 
+            echo "Unable to resolve an official source ref for Zabbix ${line}." >&2
             return 1
           }
 
@@ -78,12 +81,15 @@ jobs:
             local source_dir
             local commit
             local commit_date
+            local major
+            local minor
 
             ref="$(resolve_ref "$line")"
             safe_line="${line//./-}"
             source_dir="/tmp/zabbix-${safe_line}"
             rm -rf "$source_dir"
 
+            echo "Building Zabbix ${line} index from ${ref}."
             git clone --depth 1 --branch "$ref" --filter=blob:none --sparse "$SOURCE_REPO" "$source_dir"
             git -C "$source_dir" sparse-checkout set templates include
 
