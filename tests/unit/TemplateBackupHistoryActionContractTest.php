@@ -66,7 +66,7 @@ assertBackupHistoryContract(false, str_contains($view, 'new CButton'), 'History 
 assertBackupHistoryContract(false, str_contains($view, 'CSRF_TOKEN_NAME'), 'Read-only history view must not contain a write form or CSRF token.');
 assertBackupHistoryContract(
 	true,
-	str_contains($view, "if ($data['repository_status'] === 'repository_unavailable')"),
+	str_contains($view, "if (\$data['repository_status'] === 'repository_unavailable')"),
 	'History view must distinguish an unavailable repository from a genuinely empty backup history.'
 );
 assertBackupHistoryContract(
