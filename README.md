@@ -6,16 +6,18 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.1**
+Current version: **0.1.0-beta.2**
 
 This version is intended for **laboratory testing**.
 
 - Implementation: ready for laboratory testing.
-- Automation validation: green on the release snapshot commit.
-- Field validation: pending on real Zabbix 7.x and 8.x lab instances.
+- Automation validation: must be green for the beta snapshot commit.
+- Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-The fixed laboratory snapshot is published as branch `release/0.1.0-beta.1`. A formal Git tag/GitHub Release is intentionally deferred until the first runtime validation pass is complete.
+Beta.2 fixes runtime version reporting and adds administrator-only upstream transport diagnostics so failures reaching the official index can be distinguished from template-matching failures.
+
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.2` after the beta.2 branch is merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -49,7 +51,9 @@ ZTUM currently provides:
 - explicit super-administrator rollback review;
 - fresh recovery backup before rollback;
 - explicit controlled rollback;
-- post-rollback validation.
+- post-rollback validation;
+- runtime module-version reporting from the repository `VERSION` file;
+- administrator-only diagnostics for upstream index endpoint and PHP HTTP transport capabilities.
 
 ## Safety model
 
@@ -97,8 +101,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.1
-git checkout -B release/0.1.0-beta.1 origin/release/0.1.0-beta.1
+git fetch origin release/0.1.0-beta.2
+git checkout -B release/0.1.0-beta.2 origin/release/0.1.0-beta.2
 cat VERSION
 git rev-parse HEAD
 ```
@@ -106,7 +110,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.1
+0.1.0-beta.2
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -122,11 +126,13 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.1**, enable the module and open:
+Confirm version **0.1.0-beta.2**, enable the module and open:
 
 ```text
 Data collection → Template updates
 ```
+
+If the upstream index cannot be loaded, an administrator/super administrator should now see an **Upstream diagnostics** table showing the requested index URL, cURL availability, `allow_url_fopen`, OpenSSL availability and a bounded failure detail. This is diagnostic information only; the module still fails closed and does not guess official identity when the repository cannot be reached.
 
 For the exact beta test sequence, including update and rollback validation, follow [`docs/lab-test-plan.md`](docs/lab-test-plan.md).
 
