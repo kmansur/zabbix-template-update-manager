@@ -76,12 +76,40 @@ final class TemplateRollbackService {
 			return $this->blockedResult('blocked_evidence_changed', $preflight, null, null);
 		}
 
-		$template = is_array($preflight['template'] ?? null) ? $preflight['template'] : null;
-		$currentExport = is_array($preflight['current_export'] ?? null) ? $preflight['current_export'] : null;
+		// Re-run the complete rollback preflight immediately before preparing the
+		// target/recovery artifacts. This second pass is still configuration-read-only.
+		$secondPreflight = ($this->preflightRunner)($templateId, $manifestFile);
+		if (!is_array($secondPreflight)
+				|| ($secondPreflight['status'] ?? null) !== 'ready'
+				|| !hash_equals($freshEvidence, strtolower((string) ($secondPreflight['evidence_sha256'] ?? '')))) {
+			return $this->blockedResult(
+				'blocked_evidence_changed',
+				is_array($secondPreflight) ? $secondPreflight : $preflight,
+				null,
+				null
+			);
+		}
+
+		$template = is_array($secondPreflight['template'] ?? null) ? $secondPreflight['template'] : null;
+		$currentExport = is_array($secondPreflight['current_export'] ?? null)
+			? $secondPreflight['current_export']
+			: null;
 		if ($template === null || $currentExport === null) {
 			throw new RuntimeException('Rollback preflight omitted current template/export evidence.');
 		}
 
+		// Load and revalidate the selected target while it is still guaranteed to
+		// be inside the same bounded history window used by the confirmation page.
+		// The import later consumes these validated in-memory bytes. Creating the
+		// recovery backup cannot mutate this already loaded target content.
+		$artifact = ($this->artifactLoader)($templateId, $manifestFile);
+		if (!is_array($artifact)) {
+			throw new RuntimeException('Rollback target loader returned invalid data.');
+		}
+		$this->assertTargetMatchesPreflight($artifact, $secondPreflight);
+
+		// Persist the current state before restoring the older target. The recovery
+		// artifact must prove that no current-template drift occurred after preflight.
 		$recoveryBackup = ($this->recoveryBackupCreator)($template);
 		if (!is_array($recoveryBackup)) {
 			throw new RuntimeException('Recovery backup creation returned invalid data.');
@@ -98,29 +126,11 @@ final class TemplateRollbackService {
 				|| $currentBytes !== $recoveryBytes) {
 			return $this->blockedResult(
 				'blocked_current_changed',
-				$preflight,
+				$secondPreflight,
 				$recoveryBackup,
-				null
+				$artifact
 			);
 		}
-
-		$secondPreflight = ($this->preflightRunner)($templateId, $manifestFile);
-		if (!is_array($secondPreflight)
-				|| ($secondPreflight['status'] ?? null) !== 'ready'
-				|| !hash_equals($freshEvidence, strtolower((string) ($secondPreflight['evidence_sha256'] ?? '')))) {
-			return $this->blockedResult(
-				'blocked_evidence_changed',
-				is_array($secondPreflight) ? $secondPreflight : $preflight,
-				$recoveryBackup,
-				null
-			);
-		}
-
-		$artifact = ($this->artifactLoader)($templateId, $manifestFile);
-		if (!is_array($artifact)) {
-			throw new RuntimeException('Rollback target loader returned invalid data.');
-		}
-		$this->assertTargetMatchesPreflight($artifact, $secondPreflight);
 
 		($this->importer)($artifact);
 
