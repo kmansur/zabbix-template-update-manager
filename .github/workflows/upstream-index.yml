@@ -149,6 +149,58 @@ jobs:
           grep -q '^zabbix_export:' /tmp/ztum-upstream-source.yaml
           echo "Verified canonical raw source at ${commit:0:12}: ${path}"
 
+      - name: Verify canonical commit history endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          commit="$(python - <<'PY'
+          import json
+          with open('build/upstream/7.0.json', encoding='utf-8') as handle:
+              print(json.load(handle)['source']['commit'])
+          PY
+          )"
+          endpoint='https://git.zabbix.com/rest/api/1.0/projects/ZBX/repos/zabbix/commits'
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --connect-timeout 10 \
+            --max-time 30 \
+            --retry 2 \
+            --retry-delay 2 \
+            --user-agent 'Zabbix-Template-Update-Manager/0.1.0-dev' \
+            --get \
+            --data-urlencode 'path=templates/os/linux/template_os_linux.yaml' \
+            --data-urlencode "until=${commit}" \
+            --data-urlencode 'followRenames=true' \
+            --data-urlencode 'limit=5' \
+            "$endpoint" \
+            --output /tmp/ztum-template-commits.json
+
+          python - <<'PY'
+          import json
+          import re
+
+          with open('/tmp/ztum-template-commits.json', encoding='utf-8') as handle:
+              data = json.load(handle)
+
+          values = data.get('values')
+          if not isinstance(values, list) or not values:
+              raise SystemExit('canonical history endpoint returned no commits')
+
+          for commit in values:
+              commit_id = commit.get('id', '')
+              if not re.fullmatch(r'[0-9a-f]{40}', commit_id):
+                  raise SystemExit(f'invalid commit id: {commit_id!r}')
+
+          print(f"Verified canonical history endpoint with {len(values)} commits")
+          for commit in values:
+              print(commit['id'][:12], commit.get('message', '').splitlines()[0])
+          PY
+
       - name: Publish index branch
         shell: bash
         run: |
