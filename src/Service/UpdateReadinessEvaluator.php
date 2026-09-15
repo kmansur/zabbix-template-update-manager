@@ -8,8 +8,8 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
  *
  * This is deliberately not an update authorization engine. During the current
  * milestone write_enabled is always false. The strongest positive result is
- * only candidate_for_backup, meaning that the comparison gate is complete
- * enough to create/verify a rollback artifact and continue manual review.
+ * backup_verified, meaning that comparison evidence is complete and a valid
+ * rollback artifact exactly matches a fresh export of the installed template.
  */
 final class UpdateReadinessEvaluator {
 
@@ -18,12 +18,14 @@ final class UpdateReadinessEvaluator {
 		?array $historicalBaseline,
 		?array $threeWayAnalysis,
 		?array $updatePreview,
-		?array $updateRisk
+		?array $updateRisk,
+		?array $backupVerification = null
 	): array {
 		$result = [
 			'status' => 'not_applicable',
 			'next_step' => 'none',
 			'candidate_for_backup' => false,
+			'backup_verified' => false,
 			'write_enabled' => false,
 			'blockers' => [],
 			'review_flags' => [],
@@ -105,6 +107,14 @@ final class UpdateReadinessEvaluator {
 			$result['status'] = 'review_medium';
 			$result['next_step'] = 'manual_change_review';
 			$result['review_flags'][] = 'medium_technical_risk';
+			return $result;
+		}
+
+		if (is_array($backupVerification) && ($backupVerification['status'] ?? null) === 'current_match'
+				&& !empty($backupVerification['current_match'])) {
+			$result['status'] = 'backup_verified';
+			$result['next_step'] = 'await_write_enabled_milestone';
+			$result['backup_verified'] = true;
 			return $result;
 		}
 

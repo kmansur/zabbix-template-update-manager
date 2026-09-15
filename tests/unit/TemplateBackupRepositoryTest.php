@@ -20,7 +20,7 @@ function removeTemplateBackupTree(string $path): void {
 			continue;
 		}
 		$child = $path.DIRECTORY_SEPARATOR.$entry;
-		if (is_dir($child)) {
+		if (is_dir($child) && !is_link($child)) {
 			removeTemplateBackupTree($child);
 		}
 		else {
@@ -55,6 +55,9 @@ $template = [
 ];
 
 try {
+	$emptyInspection = $repository->inspectForTemplate('12345');
+	assertTemplateBackup('no_backup', $emptyInspection['status'], 'Missing template backup directory must be reported as no_backup.');
+
 	$artifact = $repository->store($template, $export);
 	assertTemplateBackup('12345', $artifact['templateid'], 'Backup must preserve template ID metadata.');
 	assertTemplateBackup($export['sha256'], $artifact['sha256'], 'Backup must preserve exact export SHA-256.');
@@ -70,7 +73,16 @@ try {
 	if (DIRECTORY_SEPARATOR === '/') {
 		assertTemplateBackup(0600, fileperms($artifact['source_path']) & 0777, 'Backup YAML should be private mode 0600.');
 		assertTemplateBackup(0600, fileperms($artifact['manifest_path']) & 0777, 'Backup manifest should be private mode 0600.');
+		assertTemplateBackup(0700, fileperms(dirname($artifact['source_path'])) & 0777, 'Per-template backup directory should be private mode 0700.');
 	}
+
+	$inspection = $repository->inspectForTemplate('12345');
+	assertTemplateBackup('ok', $inspection['status'], 'Stored backup must be discoverable through bounded inspection.');
+	assertTemplateBackup(1, $inspection['scanned'], 'Exactly one backup should be inspected in this fixture.');
+	assertTemplateBackup(1, $inspection['valid'], 'Untampered backup must pass integrity inspection.');
+	assertTemplateBackup(0, $inspection['invalid'], 'Untampered backup must not be classified invalid.');
+	assertTemplateBackup('valid', $inspection['artifacts'][0]['status'] ?? null, 'Newest artifact must be individually marked valid.');
+	assertTemplateBackup($export['sha256'], $inspection['artifacts'][0]['sha256'] ?? null, 'Inspection must preserve the validated source fingerprint.');
 
 	$badExport = $export;
 	$badExport['sha256'] = str_repeat('0', 64);
@@ -93,6 +105,20 @@ try {
 		$threw = true;
 	}
 	assertTemplateBackup(true, $threw, 'Invalid template IDs must not influence backup paths.');
+
+	@file_put_contents($artifact['source_path'], $source."tampered\n");
+	if (DIRECTORY_SEPARATOR === '/') {
+		@chmod($artifact['source_path'], 0600);
+	}
+	$tamperedInspection = $repository->inspectForTemplate('12345');
+	assertTemplateBackup(0, $tamperedInspection['valid'], 'Tampered newest artifact must no longer validate.');
+	assertTemplateBackup(1, $tamperedInspection['invalid'], 'Tampered newest artifact must be counted as invalid.');
+	assertTemplateBackup('invalid', $tamperedInspection['artifacts'][0]['status'] ?? null, 'Tampered artifact must fail closed.');
+	assertTemplateBackup(
+		true,
+		in_array($tamperedInspection['artifacts'][0]['reason'] ?? null, ['source_size_mismatch', 'source_hash_mismatch'], true),
+		'Tampering must be detected by source size or SHA-256 validation.'
+	);
 }
 finally {
 	removeTemplateBackupTree($root);
