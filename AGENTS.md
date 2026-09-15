@@ -23,6 +23,8 @@ Current development version: `0.1.0-dev`.
 8. Never pass unvalidated user input to shell commands, Git commands, repository URLs or refs.
 9. Prefer official Zabbix APIs and supported frontend extension points over internal workarounds.
 10. Fail closed when the Zabbix version or an upstream template identity cannot be determined safely.
+11. Do not classify a template as official from `vendor_name` alone. Official identity requires an upstream UUID match.
+12. Do not classify a template as current/outdated from UUID identity alone. Version/content comparison is a separate stage.
 
 ## Architecture
 
@@ -30,9 +32,10 @@ Current development version: `0.1.0-dev`.
 - `Module.php` integrates with the native Zabbix frontend.
 - `actions/` contains controllers.
 - `views/` contains native Zabbix views.
-- `src/` contains reusable domain and service code.
+- `src/` contains reusable domain, repository and service code.
+- `tools/` contains deterministic development/index-generation tools.
 - `tests/` contains deterministic validation and unit tests.
-- `.github/workflows/` contains CI.
+- `.github/workflows/` contains CI and upstream-index automation.
 
 Keep controllers thin. Put comparison, repository, inventory and update logic in `src/` services/classes rather than in views or controllers.
 
@@ -42,7 +45,30 @@ Use the frontend `ZABBIX_VERSION` constant as the runtime source for Zabbix vers
 
 Supported major versions are explicit and currently limited to 7 and 8. Do not silently treat future major versions as supported.
 
+Use the detected `major.minor` release line for upstream-index selection.
+
 Avoid duplicating the entire codebase into Zabbix 7 and Zabbix 8 variants. Add version-specific compatibility classes only when a real incompatibility is proven.
+
+## Upstream identity
+
+The authoritative initial identity key is the Zabbix template UUID.
+
+Upstream indexes are generated from the official `zabbix/zabbix` repository and must record:
+
+- source line;
+- source ref;
+- exact source commit;
+- commit date;
+- YAML path;
+- template UUID;
+- technical/visible names;
+- vendor metadata.
+
+Index generation must fail on malformed or duplicate UUIDs.
+
+Runtime repository URLs are fixed project constants. Do not make arbitrary repository URLs user-controllable during the current milestone.
+
+If the remote index cannot be validated, use only a previously validated stale cache. If no validated cache exists, mark upstream identity as unavailable rather than guessing.
 
 ## UI/UX
 
@@ -95,7 +121,9 @@ At minimum run:
 find . -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 php tests/validate_manifest.php
 php tests/read_only_guard.php
-php tests/unit/ZabbixVersionTest.php
+for test in tests/unit/*Test.php; do php "$test"; done
+python -m py_compile tools/build_upstream_index.py
+python tests/test_build_upstream_index.py
 ```
 
 A meaningful bug fix should add or strengthen an automated regression check whenever practical.

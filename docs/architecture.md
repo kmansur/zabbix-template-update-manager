@@ -11,33 +11,42 @@ The project is designed as a native Zabbix frontend module.
 3. Prefer Zabbix native frontend components.
 4. Keep the initial implementation read-only.
 5. Never modify templates during discovery or comparison.
-6. Identify templates primarily by UUID when upstream matching is introduced.
-7. Detect local modifications before proposing updates.
-8. Use Zabbix API capabilities whenever possible.
-9. Support Zabbix 7.x and 8.x.
-10. Design repository providers independently from the comparison engine.
+6. Identify official templates primarily by UUID.
+7. Treat vendor metadata as metadata, not proof of upstream identity.
+8. Detect local modifications before proposing updates.
+9. Use Zabbix API capabilities whenever possible.
+10. Support Zabbix 7.x and 8.x.
+11. Design repository providers independently from the comparison engine.
+12. Fail closed when runtime or upstream identity cannot be verified safely.
 
-## Current inventory architecture
+## Current architecture
 
 ```text
 Frontend action (TemplateList)
           |
-          v
-TemplateRepository
-          |
-          v
-API::Template()->get()
-          |
-          v
-TemplateInventoryService
-          |
-          v
-Native Zabbix view (CTableInfo)
+          +------------------------------+
+          |                              |
+          v                              v
+TemplateRepository             UpstreamIndexRepository
+          |                              |
+          v                              v
+API::Template()->get()        compact upstream JSON index
+          |                              |
+          v                              |
+TemplateInventoryService                |
+          |                              |
+          +--------------+---------------+
+                         |
+                         v
+                  UpstreamMatcher
+                         |
+                         v
+              Native Zabbix CTableInfo view
 ```
 
 ### TemplateRepository
 
-Responsible only for retrieving the minimum read-only dataset required by the inventory:
+Retrieves the minimum read-only local dataset required by the inventory:
 
 - template ID;
 - technical and visible name;
@@ -50,65 +59,117 @@ It does not access the database directly.
 
 ### TemplateInventoryService
 
-Responsible for deterministic normalization and summary logic. It does not decide whether a template is actually official upstream.
+Normalizes local records and produces inventory summary information.
 
-`vendor_name = Zabbix` is treated only as vendor metadata. Official identity will later require an upstream UUID match.
+`vendor_name = Zabbix` is only vendor metadata. It does not classify a template as official.
+
+### Upstream index generation
+
+A GitHub Actions workflow builds compact indexes from the official `zabbix/zabbix` GitHub mirror.
+
+The generator parses official YAML exports and stores only identity metadata needed by the module:
+
+- template UUID;
+- technical name;
+- visible name;
+- vendor name;
+- vendor version;
+- source YAML path.
+
+Each index also records:
+
+- Zabbix release line;
+- source Git ref;
+- exact source commit;
+- source commit date;
+- canonical Zabbix Git URL;
+- official GitHub mirror URL.
+
+The index builder rejects duplicate or malformed template UUIDs.
+
+### Source-ref policy
+
+For a requested Zabbix release line:
+
+1. prefer `release/<major.minor>` if the branch exists;
+2. otherwise use the latest `<major.minor>.*` maintenance tag;
+3. for 8.0 prereleases only, allow `master` when `include/version.h` confirms major/minor 8.0;
+4. otherwise fail index generation.
+
+This avoids silently comparing against an unrelated development branch.
+
+### UpstreamIndexRepository
+
+The runtime frontend retrieves one compact JSON index from the project's `upstream-index` branch.
+
+Runtime rules:
+
+- HTTPS only;
+- fixed repository URL, not user-provided;
+- 10-second request timeout;
+- maximum index size 5 MiB;
+- strict schema/line/UUID validation;
+- 15-minute local cache;
+- stale-cache fallback when refresh fails;
+- no token or Git client required on the Zabbix frontend host.
+
+If no valid index is available, upstream identity fails closed while the local template inventory remains usable.
+
+### UpstreamMatcher
+
+Matches local templates against the upstream map by normalized UUID only.
+
+Current states:
+
+- `official_match`;
+- `not_found`;
+- `no_uuid`;
+- `invalid_uuid`;
+- `repository_unavailable`.
+
+It deliberately does not decide whether an update is available. Version comparison and three-way content analysis are separate later milestones.
 
 ### Frontend
 
 Responsible for:
 
-- template inventory;
-- filters;
-- status display;
-- detailed comparison;
-- risk display;
-- configuration.
+- inventory summary;
+- upstream source metadata;
+- identity summary;
+- per-template identity state;
+- future filters, diff, risk and configuration.
 
-### Repository provider
-
-Responsible for retrieving upstream templates.
-
-Initial provider:
-
-- Official Zabbix repository
-
-Future providers may include:
-
-- GitHub
-- GitLab
-- local Git repositories
-- private repositories
-- community templates
+The view uses native Zabbix components and does not add a UI framework.
 
 ### Comparison engine
 
-Responsible for:
+Future responsibilities:
 
-- version comparison
-- UUID matching
-- content comparison
-- local modification detection
-- upstream modification detection
-- conflict detection
+- version comparison;
+- `configuration.importcompare` integration;
+- local modification detection;
+- upstream modification detection;
+- conflict detection;
+- three-way comparison where required.
 
 ### Risk analyzer
 
-Classifies changes as:
+Future classifications:
 
-- low
-- medium
-- high
-- conflict
+- low;
+- medium;
+- high;
+- conflict.
 
 ### Update engine
 
-Not enabled during the initial read-only phase.
+Not enabled during the read-only phase.
 
 Future responsibilities:
 
-- backup
-- import comparison
-- template update
-- validation
-- rollback
+- backup/export;
+- reviewed update;
+- explicit confirmation;
+- controlled import;
+- post-import validation;
+- rollback.
