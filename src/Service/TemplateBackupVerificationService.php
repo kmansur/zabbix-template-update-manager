@@ -100,13 +100,12 @@ final class TemplateBackupVerificationService {
 
 		$currentUuid = strtolower(str_replace('-', '', trim((string) ($template['uuid'] ?? ''))));
 		$artifactUuid = strtolower(trim((string) ($artifact['uuid'] ?? '')));
-		if ($currentUuid !== '' && $artifactUuid !== '' && $currentUuid !== $artifactUuid) {
+		if ($currentUuid !== $artifactUuid) {
 			return false;
 		}
 
-		$currentTechnicalName = trim((string) ($template['technical_name'] ?? ''));
-		if ($currentTechnicalName !== ''
-				&& $currentTechnicalName !== (string) ($artifact['technical_name'] ?? '')) {
+		if (trim((string) ($template['technical_name'] ?? ''))
+				!== (string) ($artifact['technical_name'] ?? '')) {
 			return false;
 		}
 
