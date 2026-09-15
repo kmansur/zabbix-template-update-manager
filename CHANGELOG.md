@@ -26,6 +26,14 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Read-only comparison of installed and official upstream `vendor.version` values.
 - Explicit version states for current templates, available updates, installed-newer versions, missing versions and uncomparable formats.
 - Unit tests that verify numeric vendor-version comparison across revisions and release lines.
+- Canonical raw-source smoke test in the upstream-index workflow using an exact immutable source commit.
+- Safe official-template source retrieval from `git.zabbix.com` by validated commit and path.
+- Per-template read-only content comparison through Zabbix `configuration.importcompare`.
+- Isolation of the selected template UUID from official YAML bundles that contain multiple templates.
+- Inclusion of only referenced template-group and discovered host-group definitions in comparison input.
+- Read-only change summaries for added, updated and removed entities, including per-entity counts.
+- Conservative content states for current matches, local modifications, newer-upstream previews and historical-baseline requirements.
+- Unit coverage for source URL validation, path traversal rejection, document isolation, nested import-comparison summaries, classification semantics and import-comparison rules.
 
 ### Changed
 
@@ -41,6 +49,10 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Repeated UUIDs with conflicting identity metadata continue to fail index generation.
 - Upstream index generation now uses the canonical full Zabbix Git repository so historical maintenance tags remain resolvable.
 - The template table now distinguishes installed vendor version, available upstream vendor version and version-comparison state.
+- Upstream source-path validation now explicitly rejects `.` and `..` traversal segments.
+- Official template names are links to the read-only content-comparison action for eligible Zabbix administrators and super administrators.
+- Content differences are classified as local modifications only when the installed vendor version equals the current official upstream version.
+- Differences against a newer upstream version are reported only as an update preview until a historical official baseline matching the installed version is available.
 
 ## [0.1.0-dev] - 2026-09-14
 
