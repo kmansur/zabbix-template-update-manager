@@ -13,15 +13,18 @@ use RuntimeException;
 final class TemplateBackupRepository {
 
 	private const MAX_EXPORT_BYTES = 20971520;
+	private const DEFAULT_BACKUP_DIR = '/var/lib/zabbix-template-update-manager/backups';
 
 	private string $backupDir;
 	private $clock;
 
 	public function __construct(?string $backupDir = null, ?callable $clock = null) {
-		$this->backupDir = $backupDir ?? rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
-			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager'
-			.DIRECTORY_SEPARATOR.'backups';
+		$this->backupDir = $backupDir ?? self::DEFAULT_BACKUP_DIR;
 		$this->clock = $clock ?? static fn(): int => time();
+	}
+
+	public static function defaultBackupDirectory(): string {
+		return self::DEFAULT_BACKUP_DIR;
 	}
 
 	public function store(array $template, array $export): array {
@@ -66,7 +69,10 @@ final class TemplateBackupRepository {
 
 		$templateDir = $this->backupDir.DIRECTORY_SEPARATOR.'template-'.$templateId;
 		if (!$this->ensureDirectory($templateDir)) {
-			throw new RuntimeException('Unable to create the private template backup directory.');
+			throw new RuntimeException(sprintf(
+				'Unable to create the persistent template backup directory below %s.',
+				$this->backupDir
+			));
 		}
 
 		$stamp = gmdate('Ymd\THis\Z', $timestamp);
@@ -119,13 +125,13 @@ final class TemplateBackupRepository {
 
 	private function ensureDirectory(string $directory): bool {
 		if (is_dir($directory)) {
-			return true;
+			return is_writable($directory);
 		}
 		if (!@mkdir($directory, 0700, true) && !is_dir($directory)) {
 			return false;
 		}
 		@chmod($directory, 0700);
-		return true;
+		return is_writable($directory);
 	}
 
 	private function writePrivateFile(string $path, string $content): bool {
