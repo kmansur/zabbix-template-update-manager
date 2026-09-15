@@ -65,7 +65,8 @@ $readinessStatusLabels = [
 	'blocked_local_overwrite' => _('Blocked — local customization overwrite risk'),
 	'review_high' => _('Manual high-risk review required'),
 	'review_medium' => _('Manual review required'),
-	'candidate_for_backup' => _('Candidate for backup and continued review')
+	'candidate_for_backup' => _('Candidate for backup and continued review'),
+	'backup_verified' => _('Rollback backup verified')
 ];
 
 $readinessNextStepLabels = [
@@ -78,7 +79,16 @@ $readinessNextStepLabels = [
 	'resolve_risk_analysis' => _('Resolve risk analysis'),
 	'manual_high_risk_review' => _('Perform manual high-risk change review'),
 	'manual_change_review' => _('Perform manual change review'),
-	'create_and_verify_backup' => _('Create and verify rollback backup')
+	'create_and_verify_backup' => _('Create and verify rollback backup'),
+	'await_write_enabled_milestone' => _('No configuration-write step is enabled in this milestone')
+];
+
+$backupVerificationLabels = [
+	'no_backup' => _('No rollback backup found'),
+	'repository_unavailable' => _('Backup repository unavailable'),
+	'latest_invalid' => _('Newest rollback backup is invalid'),
+	'current_mismatch' => _('Rollback backup does not match current installed export'),
+	'current_match' => _('Rollback backup matches current installed export')
 ];
 
 $entityLabels = [
@@ -368,6 +378,59 @@ if ($data['update_risk_error'] !== null) {
 	$page->addItem(new CTag('p', true, $data['update_risk_error']));
 }
 
+if (is_array($data['backup_verification'])) {
+	$backupVerification = $data['backup_verification'];
+	$backupStatus = (string) ($backupVerification['status'] ?? 'repository_unavailable');
+	$latestBackup = is_array($backupVerification['latest'] ?? null) ? $backupVerification['latest'] : [];
+	$latestSha = (string) ($latestBackup['sha256'] ?? '');
+	$latestCreatedAt = (string) ($latestBackup['created_at'] ?? '');
+	$latestBytes = array_key_exists('bytes', $latestBackup) ? (int) $latestBackup['bytes'] : null;
+
+	$backupVerificationTable = (new CTableInfo())
+		->setHeader([
+			_('Verification state'),
+			_('Latest backup'),
+			_('SHA-256'),
+			_('Bytes'),
+			_('Scanned'),
+			_('Valid'),
+			_('Invalid')
+		])
+		->addRow([
+			$backupVerificationLabels[$backupStatus] ?? _('Unknown'),
+			$latestCreatedAt !== '' ? $latestCreatedAt : '—',
+			$latestSha !== '' ? substr($latestSha, 0, 16) : '—',
+			$latestBytes !== null ? $latestBytes : '—',
+			(int) ($backupVerification['scanned'] ?? 0),
+			(int) ($backupVerification['valid'] ?? 0),
+			(int) ($backupVerification['invalid'] ?? 0)
+		]);
+
+	$page
+		->addItem(new CTag('h4', true, _('Rollback backup verification')))
+		->addItem($backupVerificationTable);
+
+	if ($backupStatus === 'current_match') {
+		$page->addItem(new CTag('p', true, _(
+			'The newest rollback artifact passed manifest, path, size, permission and SHA-256 validation and matches a fresh export of the currently installed template exactly.'
+		)));
+	}
+	elseif ($backupStatus === 'current_mismatch') {
+		$page->addItem(new CTag('p', true, _(
+			'The newest intact rollback artifact does not match the current installed template export. It is treated as stale and does not satisfy the rollback prerequisite.'
+		)));
+	}
+	elseif ($backupStatus === 'latest_invalid') {
+		$page->addItem(new CTag('p', true, _(
+			'The newest rollback artifact failed integrity validation. The module does not silently fall back to an older backup.'
+		)));
+	}
+}
+
+if ($data['backup_verification_error'] !== null) {
+	$page->addItem(new CTag('p', true, $data['backup_verification_error']));
+}
+
 if (is_array($data['update_readiness'])
 		&& ($data['update_readiness']['status'] ?? 'not_applicable') !== 'not_applicable') {
 	$readiness = $data['update_readiness'];
@@ -393,6 +456,12 @@ if (is_array($data['update_readiness'])
 		->addItem($readinessTable);
 
 	switch ($readinessStatus) {
+		case 'backup_verified':
+			$readinessText = _(
+				'The comparison evidence is complete and the newest rollback artifact exactly matches the current installed template export. This proves the rollback prerequisite only; it does not authorize an update.'
+			);
+			break;
+
 		case 'candidate_for_backup':
 			$readinessText = _(
 				'The read-only comparison gate has enough authoritative evidence to advance to creating and verifying a rollback backup. This is not an update authorization, and no update action is enabled.'
@@ -438,7 +507,7 @@ if (is_array($data['update_readiness'])
 	$page
 		->addItem(new CTag('p', true, $readinessText))
 		->addItem(new CTag('p', true, _(
-			'During the current milestone the strongest positive state is only “candidate for backup”. Zabbix configuration write/import operations remain disabled by design.'
+			'Even when the rollback backup is verified, Zabbix configuration write/import operations remain disabled by design in this milestone.'
 		)));
 
 	if ($readinessStatus === 'candidate_for_backup' && is_array($data['template'])) {
@@ -508,6 +577,6 @@ $page
 	->addItem(new CTag('h4', true, _('Interpretation')))
 	->addItem(new CTag('p', true, $interpretation))
 	->addItem(new CTag('p', true, _(
-		'This page uses configuration.importcompare only. Historical lookup, three-way analysis, risk/readiness analysis and source retrieval are read-only and do not import, update or delete Zabbix configuration.'
+		'This page uses configuration.importcompare and configuration.export only. Historical lookup, three-way analysis, risk/readiness analysis, rollback verification and source retrieval do not import, update or delete Zabbix configuration.'
 	)))
 	->show();
