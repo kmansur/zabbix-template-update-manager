@@ -10,6 +10,10 @@
         "ztum.templates": {
             "class": "TemplateList",
             "view": "template.list"
+        },
+        "ztum.template.compare": {
+            "class": "TemplateCompare",
+            "view": "template.compare"
         }
     }
 }

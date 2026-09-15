@@ -95,8 +95,16 @@ foreach ($data['templates'] as $template) {
 		$templateName .= ' ('.$template['technical_name'].')';
 	}
 
+	$templateCell = $templateName;
+	if ($data['can_compare'] && ($template['upstream_status'] ?? null) === 'official_match') {
+		$compareUrl = (new CUrl('zabbix.php'))
+			->setArgument('action', 'ztum.template.compare')
+			->setArgument('templateid', $template['templateid']);
+		$templateCell = new CLink($templateName, $compareUrl);
+	}
+
 	$templateTable->addRow([
-		$templateName,
+		$templateCell,
 		$template['vendor_name'] !== '' ? $template['vendor_name'] : '—',
 		$template['vendor_version'] !== '' ? $template['vendor_version'] : '—',
 		($template['upstream_vendor_version'] ?? '') !== '' ? $template['upstream_vendor_version'] : '—',
@@ -159,8 +167,16 @@ $page
 	->addItem(new CTag('h4', true, _('Official template version summary')))
 	->addItem($versionTable)
 	->addItem(new CTag('p', true, _(
-		'Version status compares official vendor versions only. It does not yet detect local content modifications or determine update safety.'
-	)))
+		'Version status compares official vendor versions only. It does not by itself determine update safety.'
+	)));
+
+if ($data['can_compare']) {
+	$page->addItem(new CTag('p', true, _(
+		'For templates with an official UUID match, select the template name to run a read-only content comparison.'
+	)));
+}
+
+$page
 	->addItem(new CTag('h4', true, _('Visible templates')))
 	->addItem($templateTable)
 	->show();

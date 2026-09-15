@@ -28,4 +28,12 @@ final class TemplateRepository {
 	public function findAll(): array {
 		return API::Template()->get(self::queryOptions());
 	}
+
+	public function findById(string $templateId): ?array {
+		$options = self::queryOptions();
+		$options['templateids'] = [$templateId];
+		$records = API::Template()->get($options);
+
+		return $records !== [] ? reset($records) : null;
+	}
 }

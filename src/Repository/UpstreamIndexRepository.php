@@ -87,6 +87,10 @@ final class UpstreamIndexRepository {
 			throw new RuntimeException('The upstream index source line does not match the requested Zabbix line.');
 		}
 
+		if (!preg_match('/^[a-f0-9]{40}$/', (string) ($source['commit'] ?? ''))) {
+			throw new RuntimeException('The upstream index contains an invalid source commit.');
+		}
+
 		$templates = $data['templates'] ?? null;
 		if (!is_array($templates)) {
 			throw new RuntimeException('The upstream index template map is missing.');
@@ -105,7 +109,7 @@ final class UpstreamIndexRepository {
 				throw new RuntimeException('The upstream index contains a template without source paths.');
 			}
 			foreach ($paths as $path) {
-				if (!is_string($path) || !str_starts_with($path, 'templates/') || !str_ends_with($path, '.yaml')) {
+				if (!self::isValidTemplatePath($path)) {
 					throw new RuntimeException('The upstream index contains an invalid source path.');
 				}
 			}
@@ -122,6 +126,21 @@ final class UpstreamIndexRepository {
 		}
 
 		return $data;
+	}
+
+	public static function isValidTemplatePath($path): bool {
+		if (!is_string($path)
+				|| preg_match('#^templates/(?:[A-Za-z0-9._-]+/)*[A-Za-z0-9._-]+\.yaml$#D', $path) !== 1) {
+			return false;
+		}
+
+		foreach (explode('/', $path) as $segment) {
+			if ($segment === '.' || $segment === '..') {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private function cacheFile(string $line): string {
