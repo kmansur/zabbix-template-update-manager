@@ -37,13 +37,7 @@ final class UpstreamTemplateSourceRepository {
 			}
 
 			try {
-				$url = self::buildUrl($commit, $path);
-				return [
-					'content' => $this->fetchUrl($url),
-					'path' => $path,
-					'commit' => $commit,
-					'url' => $url
-				];
+				return $this->fetchAtCommit($commit, $path);
 			}
 			catch (Throwable $exception) {
 				$lastException = $exception;
@@ -55,6 +49,16 @@ final class UpstreamTemplateSourceRepository {
 			0,
 			$lastException
 		);
+	}
+
+	public function fetchAtCommit(string $commit, string $path): array {
+		$url = self::buildUrl($commit, $path);
+		return [
+			'content' => $this->fetchUrl($url),
+			'path' => $path,
+			'commit' => strtolower(trim($commit)),
+			'url' => $url
+		];
 	}
 
 	public static function buildUrl(string $commit, string $path): string {

@@ -4,7 +4,12 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
 
 final class ContentComparisonClassifier {
 
-	public static function classify(string $versionStatus, array $comparisonSummary): string {
+	public static function classify(
+		string $versionStatus,
+		array $comparisonSummary,
+		?string $historicalStatus = null,
+		?array $historicalSummary = null
+	): string {
 		$totalChanges = max(0, (int) ($comparisonSummary['total'] ?? 0));
 
 		if ($versionStatus === 'current') {
@@ -14,6 +19,13 @@ final class ContentComparisonClassifier {
 		}
 
 		if ($versionStatus === 'update_available') {
+			if ($historicalStatus === 'found' && is_array($historicalSummary)) {
+				$historicalChanges = max(0, (int) ($historicalSummary['total'] ?? 0));
+				return $historicalChanges === 0
+					? 'update_available_no_local_modifications'
+					: 'update_available_local_modifications';
+			}
+
 			return 'preview_against_newer_upstream';
 		}
 

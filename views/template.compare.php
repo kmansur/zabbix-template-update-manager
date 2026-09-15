@@ -13,9 +13,17 @@ $versionLabels = [
 $contentLabels = [
 	'matches_current_upstream' => _('Content matches current upstream'),
 	'local_modifications_detected' => _('Local modifications detected'),
+	'update_available_no_local_modifications' => _('Update available — no local modifications detected'),
+	'update_available_local_modifications' => _('Update available — local modifications detected'),
 	'preview_against_newer_upstream' => _('Preview against newer upstream'),
 	'historical_baseline_required' => _('Historical baseline required'),
 	'not_available' => _('Not available')
+];
+
+$baselineLabels = [
+	'found' => _('Historical baseline found'),
+	'not_found' => _('Historical baseline not found'),
+	'history_limit_reached' => _('Historical scan limit reached')
 ];
 
 $entityLabels = [
@@ -81,7 +89,7 @@ $summaryTable = (new CTableInfo())
 	->addRow([$summary['added'], $summary['updated'], $summary['removed'], $summary['total']]);
 
 $page
-	->addItem(new CTag('h4', true, _('Read-only import comparison summary')))
+	->addItem(new CTag('h4', true, _('Current upstream update preview')))
 	->addItem($summaryTable);
 
 if ($summary['by_entity'] !== []) {
@@ -97,7 +105,44 @@ if ($summary['by_entity'] !== []) {
 		]);
 	}
 
-	$page->addItem(new CTag('h4', true, _('Changes by entity')))->addItem($entityTable);
+	$page->addItem(new CTag('h4', true, _('Current-upstream changes by entity')))->addItem($entityTable);
+}
+
+if (is_array($data['historical_baseline'])) {
+	$baseline = $data['historical_baseline'];
+	$baselineStatus = (string) ($baseline['status'] ?? '');
+	$baselineTable = (new CTableInfo())
+		->setHeader([
+			_('Baseline status'),
+			_('Installed vendor version'),
+			_('Baseline commit'),
+			_('Commits examined')
+		])
+		->addRow([
+			$baselineLabels[$baselineStatus] ?? _('Unknown'),
+			(string) ($baseline['vendor_version'] ?? '—'),
+			($baseline['commit'] ?? '') !== '' ? substr((string) $baseline['commit'], 0, 12) : '—',
+			(int) ($baseline['commits_examined'] ?? 0)
+		]);
+
+	$page->addItem(new CTag('h4', true, _('Historical official baseline')))->addItem($baselineTable);
+
+	if ($baselineStatus === 'found') {
+		$historical = $data['historical_summary'];
+		$historicalTable = (new CTableInfo())
+			->setHeader([_('Added'), _('Updated'), _('Removed'), _('Total local differences')])
+			->addRow([
+				$historical['added'],
+				$historical['updated'],
+				$historical['removed'],
+				$historical['total']
+			]);
+		$page->addItem(new CTag('h4', true, _('Installed content vs historical baseline')))->addItem($historicalTable);
+	}
+}
+
+if ($data['historical_error'] !== null) {
+	$page->addItem(new CTag('p', true, $data['historical_error']));
 }
 
 switch ($data['content_status']) {
@@ -113,9 +158,21 @@ switch ($data['content_status']) {
 		);
 		break;
 
+	case 'update_available_no_local_modifications':
+		$interpretation = _(
+			'The installed template is older than upstream, and a historical official baseline matching the installed vendor version was found. The installed content matches that baseline, so no local modifications were detected. The changes in the current-upstream preview are upstream evolution, although operational update risk is not yet classified.'
+		);
+		break;
+
+	case 'update_available_local_modifications':
+		$interpretation = _(
+			'The installed template is older than upstream, and it differs from the historical official baseline matching its installed vendor version. Local modifications are therefore present. The module does not yet classify whether those local changes conflict with the newer upstream changes.'
+		);
+		break;
+
 	case 'preview_against_newer_upstream':
 		$interpretation = _(
-			'The installed template is older than the official upstream version. The differences above are a preview of what the newer upstream content would change; they do not yet prove local customization because a historical baseline of the installed version is required.'
+			'The installed template is older than the official upstream version. The differences above are an update preview. A matching historical baseline could not be established, so local customization is not inferred.'
 		);
 		break;
 
@@ -133,6 +190,6 @@ $page
 	->addItem(new CTag('h4', true, _('Interpretation')))
 	->addItem(new CTag('p', true, $interpretation))
 	->addItem(new CTag('p', true, _(
-		'This page uses configuration.importcompare only. It does not import, update or delete Zabbix configuration.'
+		'This page uses configuration.importcompare only. Historical lookup and source retrieval are read-only and do not import, update or delete Zabbix configuration.'
 	)))
 	->show();
