@@ -119,6 +119,36 @@ jobs:
           build_line '7.4'
           build_line '8.0'
 
+      - name: Verify canonical raw source endpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          commit="$(python - <<'PY'
+          import json
+          with open('build/upstream/7.0.json', encoding='utf-8') as handle:
+              print(json.load(handle)['source']['commit'])
+          PY
+          )"
+          path='templates/os/linux/template_os_linux.yaml'
+          url="https://git.zabbix.com/projects/ZBX/repos/zabbix/raw/${path}?at=${commit}"
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --connect-timeout 10 \
+            --max-time 30 \
+            --retry 2 \
+            --retry-delay 2 \
+            --user-agent 'Zabbix-Template-Update-Manager/0.1.0-dev' \
+            "$url" \
+            --output /tmp/ztum-upstream-source.yaml
+
+          grep -q '^zabbix_export:' /tmp/ztum-upstream-source.yaml
+          echo "Verified canonical raw source at ${commit:0:12}: ${path}"
+
       - name: Publish index branch
         shell: bash
         run: |
