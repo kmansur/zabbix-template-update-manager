@@ -440,6 +440,27 @@ if (is_array($data['update_readiness'])
 		->addItem(new CTag('p', true, _(
 			'During the current milestone the strongest positive state is only “candidate for backup”. Zabbix configuration write/import operations remain disabled by design.'
 		)));
+
+	if ($readinessStatus === 'candidate_for_backup' && is_array($data['template'])) {
+		$backupAction = (new CUrl('zabbix.php'))
+			->setArgument('action', 'ztum.template.backup')
+			->getUrl();
+		$backupForm = (new CForm('post'))
+			->setId('ztum-template-backup-form')
+			->setAction($backupAction)
+			->addItem([
+				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.backup')))->removeId(),
+				(new CVar('templateid', (string) $data['template']['templateid']))->removeId(),
+				new CSubmitButton(_('Create rollback backup'))
+			]);
+
+		$page
+			->addItem(new CTag('h4', true, _('Rollback backup')))
+			->addItem(new CTag('p', true, _(
+				'This action exports the currently installed template and stores a private persistent rollback artifact. It does not change the template.'
+			)))
+			->addItem($backupForm);
+	}
 }
 
 switch ($data['content_status']) {

@@ -1,7 +1,6 @@
 <?php
 
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateBackupRepository;
-use RuntimeException;
 
 require_once dirname(__DIR__, 2).'/src/Repository/TemplateBackupRepository.php';
 
@@ -30,6 +29,12 @@ function removeTemplateBackupTree(string $path): void {
 	}
 	@rmdir($path);
 }
+
+assertTemplateBackup(
+	'/var/lib/zabbix-template-update-manager/backups',
+	TemplateBackupRepository::defaultBackupDirectory(),
+	'Runtime backups must default to persistent storage, never the system temporary directory.'
+);
 
 $root = sys_get_temp_dir().DIRECTORY_SEPARATOR.'ztum-backup-test-'.getmypid().'-'.bin2hex(random_bytes(4));
 $clock = static fn(): int => 1789438800;
