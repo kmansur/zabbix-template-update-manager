@@ -44,6 +44,11 @@ assertBackupHistoryContract(
 	'Rollback backup history must remain bounded to at most 50 inspected artifacts.'
 );
 assertBackupHistoryContract(
+	true,
+	str_contains($controller, "'repository_status' => 'repository_unavailable'"),
+	'Rollback backup history must default to a fail-closed repository-unavailable state.'
+);
+assertBackupHistoryContract(
 	false,
 	str_contains($controller, 'TemplateBackupService'),
 	'Rollback backup history controller must not create backups.'
@@ -59,6 +64,16 @@ assertBackupHistoryContract(false, str_contains($view, 'manifest_path'), 'Histor
 assertBackupHistoryContract(false, str_contains($view, 'new CSubmitButton'), 'History view must not expose submit actions.');
 assertBackupHistoryContract(false, str_contains($view, 'new CButton'), 'History view must not expose action buttons.');
 assertBackupHistoryContract(false, str_contains($view, 'CSRF_TOKEN_NAME'), 'Read-only history view must not contain a write form or CSRF token.');
+assertBackupHistoryContract(
+	true,
+	str_contains($view, "if ($data['repository_status'] === 'repository_unavailable')"),
+	'History view must distinguish an unavailable repository from a genuinely empty backup history.'
+);
+assertBackupHistoryContract(
+	true,
+	str_contains($view, 'No conclusion about stored backup availability can be made.'),
+	'Unavailable repository messaging must fail closed instead of claiming that no backups exist.'
+);
 assertBackupHistoryContract(
 	true,
 	str_contains($listView, "setArgument('action', 'ztum.template.backups')"),
