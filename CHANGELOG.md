@@ -42,6 +42,9 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Fresh installed-template export verification against the newest intact rollback artifact.
 - Explicit `backup_verified` readiness state when the newest artifact exactly matches the current installed export.
 - Native comparison-page rollback verification summary including stored-artifact counts and current-match state.
+- Administrator-only rollback backup history page with a bounded metadata-only view of the newest 50 artifacts for one template.
+- Native inventory links from visible templates to their rollback backup history without scanning backup storage on the main inventory page.
+- Backup-history action contract coverage enforcing role restrictions, bounded repository inspection, no fresh export, no filesystem path disclosure and no write controls.
 - Dedicated backup/rollback and update-readiness architecture documentation.
 - Unit coverage for upstream identity/version/source/history, baseline cache, import comparison, three-way analysis, update risk/readiness, native export contract, backup artifact integrity, tamper detection and current-state backup verification.
 
@@ -62,6 +65,7 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Readiness never labels an update safe or ready-to-import; medium/high risk remains manual-review state and all Zabbix configuration write operations stay disabled.
 - After `candidate_for_backup`, the comparison page revalidates the newest stored artifact and advances only an exact current export match to `backup_verified`.
 - `backup_verified` still keeps `write_enabled = false` and has no configuration-write action attached to it.
+- The main template inventory exposes rollback-history navigation only to administrator/super-administrator users while leaving artifact inspection to the dedicated history page.
 
 ## [0.1.0-dev] - 2026-09-14
 

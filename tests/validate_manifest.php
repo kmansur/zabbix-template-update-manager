@@ -58,7 +58,8 @@ foreach ($expected as $key => $value) {
 $expectedActions = [
 	'ztum.templates' => ['class' => 'TemplateList', 'view' => 'template.list'],
 	'ztum.template.compare' => ['class' => 'TemplateCompare', 'view' => 'template.compare'],
-	'ztum.template.backup' => ['class' => 'TemplateBackup']
+	'ztum.template.backup' => ['class' => 'TemplateBackup'],
+	'ztum.template.backups' => ['class' => 'TemplateBackupList', 'view' => 'template.backup.list']
 ];
 
 foreach ($expectedActions as $actionName => $expectedAction) {
@@ -86,7 +87,9 @@ $requiredFiles = [
 	$root.'/views/template.list.php',
 	$root.'/actions/TemplateCompare.php',
 	$root.'/views/template.compare.php',
-	$root.'/actions/TemplateBackup.php'
+	$root.'/actions/TemplateBackup.php',
+	$root.'/actions/TemplateBackupList.php',
+	$root.'/views/template.backup.list.php'
 ];
 
 foreach ($requiredFiles as $file) {

@@ -12,7 +12,7 @@ Current version:
 
 The current milestone is read-only with respect to Zabbix configuration. The module can inventory templates, verify upstream identity, compare official vendor versions, preview current upstream content with Zabbix `configuration.importcompare`, resolve historical official baselines, perform three-way BASE / LOCAL / UPSTREAM overlap analysis, classify update review priority and expose a fail-closed readiness gate.
 
-When the gate reaches `candidate_for_backup`, an administrator can create a persistent local rollback backup of the currently installed template. That action writes only private backup files; it does not import, update, replace or delete Zabbix configuration.
+When the gate reaches `candidate_for_backup`, an administrator can create a persistent local rollback backup of the currently installed template. The module then re-reads the newest artifact, verifies its integrity, compares it with a fresh native export of the currently installed template and can advance readiness to `backup_verified` when the fingerprints match exactly. Administrators can also inspect bounded rollback-backup history metadata per template. None of these steps imports, updates, replaces or deletes Zabbix configuration.
 
 ## Target versions
 
@@ -37,7 +37,7 @@ The inventory currently displays:
 - upstream identity status;
 - vendor-version comparison status.
 
-For Zabbix administrators and super administrators, an official UUID match can also be opened in a detailed content-comparison page.
+For Zabbix administrators and super administrators, an official UUID match can also be opened in a detailed content-comparison page. The inventory also exposes a separate read-only rollback-backup history link for templates, without scanning backup storage while rendering the main template table.
 
 Upstream identity is verified by UUID against compact indexes generated from the canonical Zabbix Git repository. `vendor_name = Zabbix` alone is never treated as proof that a template is official.
 
@@ -158,9 +158,10 @@ Possible readiness states include:
 - `blocked_local_overwrite`;
 - `review_high`;
 - `review_medium`;
-- `candidate_for_backup`.
+- `candidate_for_backup`;
+- `backup_verified`.
 
-`candidate_for_backup` is the strongest current state. It is deliberately not called safe, approved or ready-to-import.
+`candidate_for_backup` means the comparison/risk gate has enough authoritative evidence to create a rollback artifact. `backup_verified` is stronger: the newest persistent artifact passed repository integrity checks and exactly matches a fresh export of the currently installed template. Even `backup_verified` keeps `write_enabled = false`; it is deliberately not called safe, approved or ready-to-import.
 
 More detail: [`docs/update-risk.md`](docs/update-risk.md) and [`docs/update-readiness.md`](docs/update-readiness.md).
 
@@ -191,9 +192,27 @@ sudo install -d -o www-data -g www-data -m 0700 \
 
 Confirm the real PHP-FPM/Apache runtime user before applying that command. The module intentionally does not fall back to `/tmp`, and the directory should never be made world-writable.
 
-The stored YAML and manifest request mode `0600`; per-template directories request `0700`. A successful backup still does not authorize a template update.
+The stored YAML and manifest use private mode `0600` on Unix; per-template directories use `0700`. A successful backup still does not authorize a template update.
+
+After backup creation, the comparison workflow can re-read the newest artifact and verify manifest shape, template identity, source filename relationship, size, SHA-256 and Unix file mode. It then performs a fresh one-template `configuration.export()` and compares the exact byte count and fingerprint with the stored artifact. Only an exact current match advances readiness to `backup_verified`.
 
 More detail: [`docs/backup-and-rollback.md`](docs/backup-and-rollback.md).
+
+## Rollback backup history
+
+Zabbix administrators and super administrators can open a dedicated read-only rollback history page for a template from the main inventory.
+
+The history page deliberately performs only local repository inspection. It does **not** create a backup, trigger a fresh Zabbix export or call a configuration-write API. The view is bounded to the newest 50 manifest records and displays metadata such as:
+
+- creation timestamp;
+- integrity state;
+- recorded vendor version;
+- byte count;
+- shortened SHA-256 fingerprint;
+- YAML and JSON manifest basenames;
+- conservative validation failure reason when an artifact is invalid.
+
+Filesystem paths are not exposed. The page has no download, delete, restore or rollback actions. If more than 50 manifest records exist, the result is explicitly marked truncated and older artifacts remain on disk without being displayed.
 
 ## Upstream index architecture
 
@@ -261,13 +280,15 @@ No user-provided repository URL or Git ref is passed to the network clients.
 - Show affected hosts
 - Gate future update progression conservatively
 - Create persistent rollback backups before any future configuration write
+- Revalidate rollback artifacts against fresh current-template exports
+- Provide bounded read-only backup history metadata
 - Preserve the native Zabbix frontend experience
 
 ## Safety
 
 The current development phase is read-only with respect to Zabbix configuration.
 
-No template is modified or imported automatically. The only intentional local write currently exposed is persistent rollback-backup creation after the readiness gate reaches `candidate_for_backup`.
+No template is modified or imported automatically. The only intentional local write currently exposed is persistent rollback-backup creation after the readiness gate reaches `candidate_for_backup`. Backup verification and backup-history views only read local rollback artifacts and, when verification is required, perform native read-only configuration export.
 
 CI includes a read-only guard that rejects known Zabbix API write methods, template write operations and direct database write calls during this milestone. `configuration.importcompare` and `configuration.export` are explicitly permitted because they do not mutate Zabbix configuration.
 
@@ -289,68 +310,89 @@ TemplateInventoryService
       |                           |
       v                           v
 Local template inventory    Upstream index JSON
-                                  |
-                                  v
-                           UUID identity matcher
-                                  |
-                                  v
-                        Vendor version comparator
-                                  |
-                                  v
-                         Native inventory table
-                                  |
-                         select official template
-                                  |
-                 +----------------+----------------+
-                 |                                 |
-                 v                                 v
-      Current upstream YAML                 Local Zabbix state
-       by commit + path                           |
-                 |                                 |
-                 v                                 |
-      isolate selected UUID                       |
-                 |                                 |
-                 +---------------+-----------------+
-                                 |
-                                 v
-             configuration.importcompare (LOCAL -> UPSTREAM)
-                                 |
-                         current update preview
-                                 |
-                if installed version is older
-                                 |
-                                 v
-                canonical path commit history
-                                 |
-                                 v
-           historical YAML matching vendor.version
-                                 |
-                                 v
-             configuration.importcompare (LOCAL -> BASE)
-                                 |
-                     +-----------+-----------+
-                     |                       |
-                     v                       v
-            historical diff            current diff
-                     |                       |
-                     +-----------+-----------+
-                                 |
-                                 v
-                    ThreeWayChangeAnalyzer
-                                 |
-                                 v
-                    UpdateRiskAnalyzer
-                                 |
-                                 v
-                 UpdateReadinessEvaluator
-                                 |
-                    candidate_for_backup
-                                 |
-                                 v
-                   configuration.export
-                                 |
-                                 v
-               persistent rollback artifact
+      |                           |
+      |                           v
+      |                    UUID identity matcher
+      |                           |
+      |                           v
+      |                 Vendor version comparator
+      |                           |
+      +---------------------------+
+                  |
+                  v
+           Native inventory table
+             |             |
+             |             +--------------------------+
+             |                                        |
+             v                                        v
+ select official template                 rollback backup history
+             |                             metadata-only local scan
+             |
+     +-------+----------------+
+     |                        |
+     v                        v
+Current upstream YAML   Local Zabbix state
+ by commit + path              |
+     |                         |
+     v                         |
+isolate selected UUID          |
+     |                         |
+     +-----------+-------------+
+                 |
+                 v
+configuration.importcompare (LOCAL -> UPSTREAM)
+                 |
+         current update preview
+                 |
+    if installed version is older
+                 |
+                 v
+    canonical path commit history
+                 |
+                 v
+historical YAML matching vendor.version
+                 |
+                 v
+configuration.importcompare (LOCAL -> BASE)
+                 |
+        +--------+--------+
+        |                 |
+        v                 v
+ historical diff      current diff
+        |                 |
+        +--------+--------+
+                 |
+                 v
+      ThreeWayChangeAnalyzer
+                 |
+                 v
+       UpdateRiskAnalyzer
+                 |
+                 v
+    UpdateReadinessEvaluator
+                 |
+       candidate_for_backup
+                 |
+                 v
+       configuration.export
+                 |
+                 v
+   persistent rollback artifact
+                 |
+                 v
+ validate newest stored artifact
+                 |
+                 v
+ fresh configuration.export
+                 |
+                 v
+ exact byte count + SHA-256 match
+                 |
+                 v
+         backup_verified
+                 |
+                 v
+        write_enabled = false
 ```
 
 ## Development validation
@@ -378,8 +420,10 @@ CI validates:
 - content-state classification semantics;
 - update-preview normalization, risk and readiness semantics;
 - native one-template export contract;
-- backup artifact integrity and persistent-default path;
+- backup artifact integrity, persistent-default path and tamper detection;
+- fresh-current-export rollback verification semantics;
 - backup action manifest/POST/CSRF/role contract;
+- rollback-history action registration, administrator restriction, bounded inspection and metadata-only UI contract;
 - deterministic upstream-index generation;
 - handling of equivalent/repeated UUID definitions and rejection of conflicting identity metadata;
 - canonical raw-file and commit-history endpoint reachability before publishing refreshed indexes.
