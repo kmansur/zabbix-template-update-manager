@@ -48,7 +48,9 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Exact directly linked host count as known impact breadth, without arbitrary host-count severity thresholds.
 - Native comparison-page review-priority summary for updates, including technical severity, coverage and normalized operation counts.
 - Dedicated documentation for update review priority and known impact semantics.
-- Unit coverage for source URL validation, path traversal rejection, history response validation, historical baseline selection, document isolation, nested import-comparison summaries, entity extraction, three-way classification semantics, update-preview normalization, conservative risk classification and import-comparison rules.
+- Local immutable historical-baseline cache keyed by current upstream commit, canonical source path, stable UUID and installed vendor metadata.
+- SHA-256 integrity validation and atomic private-file writes for cached historical baseline sources.
+- Unit coverage for source URL validation, path traversal rejection, history response validation, historical baseline selection, baseline-cache identity/integrity, document isolation, nested import-comparison summaries, entity extraction, three-way classification semantics, update-preview normalization, conservative risk classification and import-comparison rules.
 
 ### Changed
 
@@ -66,13 +68,14 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - The template table now distinguishes installed vendor version, available upstream vendor version and version-comparison state.
 - Upstream source-path validation now explicitly rejects `.` and `..` traversal segments.
 - Official template names are links to the read-only content-comparison action for eligible Zabbix administrators and super administrators.
-- Content differences are classified as local modifications only when the installed vendor version equals the current official upstream version or when the installed content is compared against a resolved historical official baseline of the same vendor version.
+- Content differences are classified as local modifications only when the installed vendor version equals the current official upstream vendor version or when the installed content is compared against a resolved historical official baseline of the same vendor version.
 - Differences against a newer upstream version remain an update preview when no historical official baseline can be established safely.
 - The comparison page now keeps current-upstream update changes separate from installed-content differences against the historical baseline.
 - When a historical baseline is available, the comparison page now distinguishes local/upstream overlap instead of treating every local customization as the same risk.
 - A three-way conflict is limited to the case where the same normalized field has distinct BASE, LOCAL and UPSTREAM states; the result remains a review signal rather than an automatic update-safety decision.
 - Overall update review priority is now forced to `Unknown` when three-way local-overlap coverage is unavailable or unresolved, even when technical severity can be estimated.
 - Direct host count is presented as impact context rather than being used to inflate technical severity.
+- Successful historical baseline resolution now reuses a validated local cache on subsequent comparisons instead of rescanning canonical path history every time.
 
 ## [0.1.0-dev] - 2026-09-14
 
