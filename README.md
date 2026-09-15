@@ -10,7 +10,9 @@ Current version:
 
 `0.1.0-dev`
 
-The current milestone is strictly read-only. The module can inventory templates, verify upstream identity, compare official vendor versions, preview current upstream content with Zabbix `configuration.importcompare`, resolve historical official baselines for outdated templates and perform three-way BASE / LOCAL / UPSTREAM overlap analysis. It must not modify templates or other Zabbix configuration yet.
+The current milestone is read-only with respect to Zabbix configuration. The module can inventory templates, verify upstream identity, compare official vendor versions, preview current upstream content with Zabbix `configuration.importcompare`, resolve historical official baselines, perform three-way BASE / LOCAL / UPSTREAM overlap analysis, classify update review priority and expose a fail-closed readiness gate.
+
+When the gate reaches `candidate_for_backup`, an administrator can create a persistent local rollback backup of the currently installed template. That action writes only private backup files; it does not import, update, replace or delete Zabbix configuration.
 
 ## Target versions
 
@@ -35,7 +37,7 @@ The inventory currently displays:
 - upstream identity status;
 - vendor-version comparison status.
 
-For Zabbix administrators and super administrators, an official UUID match can also be opened in a read-only content-comparison page.
+For Zabbix administrators and super administrators, an official UUID match can also be opened in a detailed content-comparison page.
 
 Upstream identity is verified by UUID against compact indexes generated from the canonical Zabbix Git repository. `vendor_name = Zabbix` alone is never treated as proof that a template is official.
 
@@ -140,9 +142,58 @@ Entity additions and removals are analyzed as existence/snapshot states rather t
 
 The native detail page shows summary counts plus BASE / LOCAL / UPSTREAM values for normalized changes. Detail rendering is bounded, while summary counters cover the complete analysis.
 
-A three-way conflict is a review signal, not a declaration that an update is impossible. Likewise, absence of conflicts is **not yet** an operational safety decision. Risk scoring, affected-host impact and controlled update behavior remain separate stages.
-
 More detail: [`docs/three-way-analysis.md`](docs/three-way-analysis.md).
+
+## Update review priority and readiness
+
+The current update preview is normalized into concrete additions, removals and field changes. Technical severity is kept separate from three-way comparison coverage and from host-impact breadth.
+
+The readiness gate then fails closed on missing historical baseline, unresolved identities, incomplete three-way coverage, confirmed conflicts or known local customizations that current upstream would overwrite.
+
+Possible readiness states include:
+
+- `blocked_baseline`;
+- `blocked_unresolved`;
+- `blocked_conflict`;
+- `blocked_local_overwrite`;
+- `review_high`;
+- `review_medium`;
+- `candidate_for_backup`.
+
+`candidate_for_backup` is the strongest current state. It is deliberately not called safe, approved or ready-to-import.
+
+More detail: [`docs/update-risk.md`](docs/update-risk.md) and [`docs/update-readiness.md`](docs/update-readiness.md).
+
+## Persistent rollback backup
+
+When the comparison page reaches `candidate_for_backup`, it can expose **Create rollback backup** to Zabbix administrators and super administrators.
+
+The action:
+
+1. uses HTTP POST and native Zabbix CSRF validation;
+2. reloads the selected template through the Zabbix API;
+3. exports exactly that installed template with `API::Configuration()->export()`;
+4. fingerprints the exact YAML bytes with SHA-256;
+5. stores the YAML plus a JSON manifest under persistent private storage.
+
+Default storage:
+
+```text
+/var/lib/zabbix-template-update-manager/backups/
+```
+
+A typical Debian/Ubuntu installation using the `www-data` PHP runtime account can prepare it with:
+
+```bash
+sudo install -d -o www-data -g www-data -m 0700 \
+  /var/lib/zabbix-template-update-manager/backups
+```
+
+Confirm the real PHP-FPM/Apache runtime user before applying that command. The module intentionally does not fall back to `/tmp`, and the directory should never be made world-writable.
+
+The stored YAML and manifest request mode `0600`; per-template directories request `0700`. A successful backup still does not authorize a template update.
+
+More detail: [`docs/backup-and-rollback.md`](docs/backup-and-rollback.md).
 
 ## Upstream index architecture
 
@@ -165,8 +216,6 @@ Before refreshed indexes are published, the workflow performs network smoke test
 
 - raw YAML retrieval by immutable commit;
 - path-specific commit history with immutable `until` commit.
-
-The historical endpoint smoke test has been verified against the Linux template history and returns full 40-character commit IDs from the canonical repository.
 
 The Zabbix frontend downloads one compact JSON index and caches it locally for 15 minutes. If refresh fails, a previously cached index can be used as stale read-only data. If no index is available, the local inventory still works and upstream status fails closed as `Repository unavailable`.
 
@@ -210,15 +259,17 @@ No user-provided repository URL or Git ref is passed to the network clients.
 - Display granular BASE / LOCAL / UPSTREAM differences
 - Estimate operational update risk
 - Show affected hosts
+- Gate future update progression conservatively
+- Create persistent rollback backups before any future configuration write
 - Preserve the native Zabbix frontend experience
 
 ## Safety
 
-The current development phase is read-only.
+The current development phase is read-only with respect to Zabbix configuration.
 
-No template will be modified or imported automatically.
+No template is modified or imported automatically. The only intentional local write currently exposed is persistent rollback-backup creation after the readiness gate reaches `candidate_for_backup`.
 
-CI includes a read-only guard that rejects known Zabbix API write methods, template write operations and direct database write calls during this milestone. `configuration.importcompare` is explicitly permitted because it only calculates an import preview.
+CI includes a read-only guard that rejects known Zabbix API write methods, template write operations and direct database write calls during this milestone. `configuration.importcompare` and `configuration.export` are explicitly permitted because they do not mutate Zabbix configuration.
 
 ## Architecture
 
@@ -262,7 +313,7 @@ Local template inventory    Upstream index JSON
                  +---------------+-----------------+
                                  |
                                  v
-             configuration.importcompare (B -> C)
+             configuration.importcompare (LOCAL -> UPSTREAM)
                                  |
                          current update preview
                                  |
@@ -275,7 +326,7 @@ Local template inventory    Upstream index JSON
            historical YAML matching vendor.version
                                  |
                                  v
-             configuration.importcompare (B -> A)
+             configuration.importcompare (LOCAL -> BASE)
                                  |
                      +-----------+-----------+
                      |                       |
@@ -288,7 +339,18 @@ Local template inventory    Upstream index JSON
                     ThreeWayChangeAnalyzer
                                  |
                                  v
-                 BASE / LOCAL / UPSTREAM detail
+                    UpdateRiskAnalyzer
+                                 |
+                                 v
+                 UpdateReadinessEvaluator
+                                 |
+                    candidate_for_backup
+                                 |
+                                 v
+                   configuration.export
+                                 |
+                                 v
+               persistent rollback artifact
 ```
 
 ## Development validation
@@ -297,7 +359,7 @@ CI validates:
 
 - PHP syntax;
 - `manifest.json` structure and action registration;
-- read-only constraints;
+- read-only Zabbix-configuration constraints;
 - Zabbix 7/8 runtime version detection;
 - template repository query contract;
 - template inventory normalization;
@@ -314,7 +376,10 @@ CI validates:
 - BASE / LOCAL / UPSTREAM field and entity-existence classification;
 - fail-closed behavior when the two native comparisons do not share an identical LOCAL pivot;
 - content-state classification semantics;
-- import-comparison rule coverage;
+- update-preview normalization, risk and readiness semantics;
+- native one-template export contract;
+- backup artifact integrity and persistent-default path;
+- backup action manifest/POST/CSRF/role contract;
 - deterministic upstream-index generation;
 - handling of equivalent/repeated UUID definitions and rejection of conflicting identity metadata;
 - canonical raw-file and commit-history endpoint reachability before publishing refreshed indexes.
