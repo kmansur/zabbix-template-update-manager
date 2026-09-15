@@ -85,6 +85,12 @@ $analysisError['comparison_error'] = 'failed';
 $result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $analysisError))->run('12345');
 assertPreflight('blocked_analysis', $result['status'], 'Comparison errors must block preflight.');
 
+$wrongTemplate = $analysis;
+$wrongTemplate['template']['templateid'] = '54321';
+$result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $wrongTemplate))->run('12345');
+assertPreflight('blocked_analysis', $result['status'], 'Analysis for a different template ID must fail closed.');
+assertPreflight('template_identity_mismatch', $result['reason'], 'Template identity mismatch must be explicit.');
+
 $unexpectedWrite = $analysis;
 $unexpectedWrite['update_readiness']['write_enabled'] = true;
 $threw = false;
