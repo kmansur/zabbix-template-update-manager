@@ -47,4 +47,9 @@ jobs:
         run: php tests/read_only_guard.php
 
       - name: Unit tests
-        run: php tests/unit/ZabbixVersionTest.php
+        shell: bash
+        run: |
+          set -euo pipefail
+          for test in tests/unit/*Test.php; do
+            php "$test"
+          done

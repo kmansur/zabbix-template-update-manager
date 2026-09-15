@@ -11,28 +11,59 @@ The project is designed as a native Zabbix frontend module.
 3. Prefer Zabbix native frontend components.
 4. Keep the initial implementation read-only.
 5. Never modify templates during discovery or comparison.
-6. Identify templates primarily by UUID.
+6. Identify templates primarily by UUID when upstream matching is introduced.
 7. Detect local modifications before proposing updates.
 8. Use Zabbix API capabilities whenever possible.
 9. Support Zabbix 7.x and 8.x.
 10. Design repository providers independently from the comparison engine.
 
-## Components
+## Current inventory architecture
+
+```text
+Frontend action (TemplateList)
+          |
+          v
+TemplateRepository
+          |
+          v
+API::Template()->get()
+          |
+          v
+TemplateInventoryService
+          |
+          v
+Native Zabbix view (CTableInfo)
+```
+
+### TemplateRepository
+
+Responsible only for retrieving the minimum read-only dataset required by the inventory:
+
+- template ID;
+- technical and visible name;
+- UUID;
+- vendor name/version;
+- template groups;
+- direct host-link count.
+
+It does not access the database directly.
+
+### TemplateInventoryService
+
+Responsible for deterministic normalization and summary logic. It does not decide whether a template is actually official upstream.
+
+`vendor_name = Zabbix` is treated only as vendor metadata. Official identity will later require an upstream UUID match.
 
 ### Frontend
 
 Responsible for:
 
-- template inventory
-- filters
-- status display
-- detailed comparison
-- risk display
-- configuration
-
-### Inventory service
-
-Responsible for discovering templates installed in Zabbix.
+- template inventory;
+- filters;
+- status display;
+- detailed comparison;
+- risk display;
+- configuration.
 
 ### Repository provider
 
