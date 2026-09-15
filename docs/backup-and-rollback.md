@@ -173,6 +173,23 @@ Current verification states are:
 
 Only `current_match` satisfies the current rollback prerequisite.
 
+## Read-only backup history
+
+Administrators and super administrators can open a separate **Rollback backups** view from the template inventory. This page deliberately reads backup metadata only and does not scan the backup repository for every template during the main inventory request.
+
+For the selected template, the history controller inspects at most the newest 50 generated manifests and shows:
+
+- creation time;
+- integrity state;
+- stored vendor version;
+- byte count;
+- SHA-256 prefix;
+- YAML basename;
+- manifest basename;
+- integrity failure reason when applicable.
+
+The controller removes absolute filesystem paths before data reaches the view. The page exposes no backup download, delete, restore or rollback action. It also does not create a fresh template export; current-state verification remains part of the comparison/readiness workflow rather than the history browser.
+
 ## Readiness progression
 
 When all comparison/risk evidence is complete and technical review priority is `none` or `low`, readiness first becomes:
@@ -253,11 +270,14 @@ Implemented now:
 - exact current-export fingerprint comparison;
 - `backup_verified` readiness state when the newest artifact exactly matches current installed state;
 - native comparison-page verification summary;
-- unit tests for export contract, artifact integrity, tamper detection, current-state verification and frontend backup-action security contract.
+- native metadata-only rollback backup history page, bounded to 50 manifests;
+- history-page path redaction and no download/delete/restore controls;
+- unit tests for export contract, artifact integrity, tamper detection, current-state verification, frontend backup-action security and history-page read-only boundaries.
 
 Not implemented yet:
 
-- a dedicated historical backup browser/download UI;
+- backup download/export through the frontend;
+- backup deletion/retention controls;
 - retention/cleanup policy;
 - configurable backup root directory;
 - rollback import;
