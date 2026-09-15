@@ -12,6 +12,7 @@ function assertPreflight($expected, $actual, string $message): void {
 }
 
 $backupSha = hash('sha256', 'current-template-export');
+$upstreamContentSha = hash('sha256', 'official-upstream-source');
 $analysis = [
 	'template' => [
 		'templateid' => '12345',
@@ -25,7 +26,8 @@ $analysis = [
 			'name' => 'Linux by Zabbix agent',
 			'technical_name' => 'Linux by Zabbix agent',
 			'vendor_name' => 'Zabbix',
-			'vendor_version' => '7.0-8'
+			'vendor_version' => '7.0-8',
+			'content_sha256s' => [$upstreamContentSha]
 		]
 	],
 	'comparison_error' => null,
@@ -62,6 +64,7 @@ assertPreflight('12345', $result['template']['templateid'], 'Preflight must pres
 assertPreflight('f8f7908280354f2abeed07dc788c3747', $result['template']['uuid'], 'Preflight must normalize the template UUID.');
 assertPreflight('0123456789abcdef0123456789abcdef01234567', $result['candidate']['commit'], 'Preflight must bind the exact upstream commit.');
 assertPreflight('templates/os/linux/template_os_linux.yaml', $result['candidate']['path'], 'Preflight must bind the exact upstream path.');
+assertPreflight($upstreamContentSha, $result['candidate']['content_sha256'], 'Preflight must bind the validated upstream content fingerprint.');
 assertPreflight('Zabbix', $result['candidate']['vendor_name'], 'Preflight must bind upstream vendor identity.');
 assertPreflight('Linux by Zabbix agent', $result['candidate']['technical_name'], 'Preflight must bind upstream technical identity.');
 assertPreflight($backupSha, $result['rollback']['sha256'], 'Preflight must bind the verified rollback fingerprint.');
@@ -87,6 +90,11 @@ $missingCandidateIdentity = $analysis;
 $missingCandidateIdentity['template']['upstream']['vendor_name'] = '';
 $result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $missingCandidateIdentity))->run('12345');
 assertPreflight('blocked_candidate', $result['status'], 'Incomplete upstream candidate identity must fail closed.');
+
+$ambiguousContent = $analysis;
+$ambiguousContent['template']['upstream']['content_sha256s'] = [$upstreamContentSha, hash('sha256', 'variant')];
+$result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $ambiguousContent))->run('12345');
+assertPreflight('blocked_candidate', $result['status'], 'Multiple official content variants must fail closed before update.');
 
 $staleBackup = $analysis;
 $staleBackup['backup_verification']['current_export']['sha256'] = hash('sha256', 'changed-template-export');
