@@ -8,6 +8,36 @@ use RuntimeException;
 final class UpstreamTemplateDocumentService {
 
 	public static function buildImportSource(array $document, string $expectedUuid, array $expectedRecord): array {
+		[$export, $template, $normalizedUuid] = self::locateTemplate($document, $expectedUuid);
+		self::assertIdentity($template, $expectedRecord, $normalizedUuid);
+		return self::buildMinimalSource($export, $template);
+	}
+
+	public static function buildHistoricalImportSource(
+		array $document,
+		string $expectedUuid,
+		string $expectedVendorVersion,
+		string $expectedVendorName = 'Zabbix'
+	): array {
+		[$export, $template] = self::locateTemplate($document, $expectedUuid);
+		$metadata = self::metadataFromTemplate($template);
+
+		if ($metadata['vendor_version'] !== trim($expectedVendorVersion)) {
+			throw new RuntimeException('The historical template vendor version does not match the requested baseline.');
+		}
+		if ($expectedVendorName !== '' && $metadata['vendor_name'] !== $expectedVendorName) {
+			throw new RuntimeException('The historical template vendor does not match the requested baseline.');
+		}
+
+		return self::buildMinimalSource($export, $template);
+	}
+
+	public static function templateMetadata(array $document, string $expectedUuid): array {
+		[, $template, $normalizedUuid] = self::locateTemplate($document, $expectedUuid);
+		return ['uuid' => $normalizedUuid] + self::metadataFromTemplate($template);
+	}
+
+	private static function locateTemplate(array $document, string $expectedUuid): array {
 		$expectedUuid = self::normalizeUuid($expectedUuid);
 		if (!preg_match('/^[a-f0-9]{32}$/', $expectedUuid)) {
 			throw new RuntimeException('The expected template UUID is invalid.');
@@ -34,9 +64,30 @@ final class UpstreamTemplateDocumentService {
 			throw new RuntimeException('The upstream source does not contain exactly one matching template UUID.');
 		}
 
-		$template = $matches[0];
-		self::assertIdentity($template, $expectedRecord, $expectedUuid);
+		return [$export, $matches[0], $expectedUuid];
+	}
 
+	private static function metadataFromTemplate(array $template): array {
+		$vendor = is_array($template['vendor'] ?? null) ? $template['vendor'] : [];
+		return [
+			'name' => trim((string) ($template['name'] ?? $template['template'] ?? '')),
+			'technical_name' => trim((string) ($template['template'] ?? '')),
+			'vendor_name' => trim((string) ($vendor['name'] ?? '')),
+			'vendor_version' => trim((string) ($vendor['version'] ?? ''))
+		];
+	}
+
+	private static function assertIdentity(array $template, array $expectedRecord, string $expectedUuid): void {
+		$actual = ['uuid' => $expectedUuid] + self::metadataFromTemplate($template);
+
+		foreach (['uuid', 'name', 'technical_name', 'vendor_name', 'vendor_version'] as $field) {
+			if ($actual[$field] !== trim((string) ($expectedRecord[$field] ?? ''))) {
+				throw new RuntimeException('The upstream source template identity does not match the validated index.');
+			}
+		}
+	}
+
+	private static function buildMinimalSource(array $export, array $template): array {
 		$minimalExport = [
 			'version' => $export['version']
 		];
@@ -78,23 +129,6 @@ final class UpstreamTemplateDocumentService {
 			'template_group_names' => $templateGroupNames,
 			'host_group_names' => $hostGroupNames
 		];
-	}
-
-	private static function assertIdentity(array $template, array $expectedRecord, string $expectedUuid): void {
-		$vendor = is_array($template['vendor'] ?? null) ? $template['vendor'] : [];
-		$actual = [
-			'uuid' => $expectedUuid,
-			'name' => trim((string) ($template['name'] ?? $template['template'] ?? '')),
-			'technical_name' => trim((string) ($template['template'] ?? '')),
-			'vendor_name' => trim((string) ($vendor['name'] ?? '')),
-			'vendor_version' => trim((string) ($vendor['version'] ?? ''))
-		];
-
-		foreach (['uuid', 'name', 'technical_name', 'vendor_name', 'vendor_version'] as $field) {
-			if ($actual[$field] !== trim((string) ($expectedRecord[$field] ?? ''))) {
-				throw new RuntimeException('The upstream source template identity does not match the validated index.');
-			}
-		}
 	}
 
 	private static function templateGroupNames(array $template): array {

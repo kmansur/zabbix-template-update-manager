@@ -8,8 +8,10 @@ use CControllerResponseFatal;
 use CImportReaderFactory;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateHistoryRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateSourceRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\ContentComparisonClassifier;
+use Modules\ZabbixTemplateUpdateManager\Service\HistoricalTemplateBaselineService;
 use Modules\ZabbixTemplateUpdateManager\Service\ImportCompareSummary;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateImportCompareService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
@@ -22,8 +24,10 @@ use Throwable;
 
 require_once dirname(__DIR__).'/src/Repository/TemplateRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
+require_once dirname(__DIR__).'/src/Repository/UpstreamTemplateHistoryRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamTemplateSourceRepository.php';
 require_once dirname(__DIR__).'/src/Service/ContentComparisonClassifier.php';
+require_once dirname(__DIR__).'/src/Service/HistoricalTemplateBaselineService.php';
 require_once dirname(__DIR__).'/src/Service/ImportCompareSummary.php';
 require_once dirname(__DIR__).'/src/Service/TemplateImportCompareService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
@@ -63,7 +67,10 @@ class TemplateCompare extends CController {
 			'source_path' => '',
 			'comparison_summary' => ImportCompareSummary::summarize([]),
 			'content_status' => 'not_available',
-			'comparison_error' => null
+			'comparison_error' => null,
+			'historical_baseline' => null,
+			'historical_summary' => ImportCompareSummary::summarize([]),
+			'historical_error' => null
 		];
 
 		if (!ZabbixVersion::isSupported($data['zabbix_version'])) {
@@ -96,7 +103,8 @@ class TemplateCompare extends CController {
 				return;
 			}
 
-			$sourceFile = (new UpstreamTemplateSourceRepository())->fetch($index['source'], $template['upstream']);
+			$sourceRepository = new UpstreamTemplateSourceRepository();
+			$sourceFile = $sourceRepository->fetch($index['source'], $template['upstream']);
 			$reader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
 			$document = $reader->read($sourceFile['content']);
 			$isolated = UpstreamTemplateDocumentService::buildImportSource(
@@ -104,13 +112,64 @@ class TemplateCompare extends CController {
 				$template['uuid'],
 				$template['upstream']
 			);
-			$diff = (new TemplateImportCompareService())->compare($isolated['source']);
+			$compareService = new TemplateImportCompareService();
+			$diff = $compareService->compare($isolated['source']);
 			$data['comparison_summary'] = ImportCompareSummary::summarize($diff);
 			$data['content_status'] = ContentComparisonClassifier::classify(
 				$template['version_status'],
 				$data['comparison_summary']
 			);
 			$data['source_path'] = $sourceFile['path'];
+
+			if (($template['version_status'] ?? null) === 'update_available'
+					&& ($template['vendor_version'] ?? '') !== '') {
+				try {
+					$baselineService = new HistoricalTemplateBaselineService(
+						static fn(string $path, string $until, int $limit): array
+							=> (new UpstreamTemplateHistoryRepository())->listCommits($path, $until, $limit),
+						static fn(string $commit, string $path): array
+							=> $sourceRepository->fetchAtCommit($commit, $path),
+						static function (string $source): array {
+							$historicalReader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
+							return $historicalReader->read($source);
+						}
+					);
+
+					$baseline = $baselineService->find(
+						$sourceFile['path'],
+						(string) ($index['source']['commit'] ?? ''),
+						$template['uuid'],
+						$template['vendor_version'],
+						(string) ($template['upstream']['vendor_name'] ?? 'Zabbix')
+					);
+
+					$baselineSource = $baseline['source'];
+					unset($baseline['source']);
+					$data['historical_baseline'] = $baseline;
+
+					if (($baseline['status'] ?? null) === 'found' && is_string($baselineSource)) {
+						$historicalDiff = $compareService->compare($baselineSource);
+						$data['historical_summary'] = ImportCompareSummary::summarize($historicalDiff);
+					}
+
+					$data['content_status'] = ContentComparisonClassifier::classify(
+						$template['version_status'],
+						$data['comparison_summary'],
+						(string) ($baseline['status'] ?? ''),
+						$data['historical_summary']
+					);
+				}
+				catch (Throwable $exception) {
+					error_log(sprintf(
+						'[Zabbix Template Update Manager] Historical baseline lookup failed for template %s: %s',
+						(string) $this->getInput('templateid'),
+						$exception->getMessage()
+					));
+					$data['historical_error'] = _(
+						'Unable to resolve the historical official baseline. The current-upstream comparison remains valid as an update preview.'
+					);
+				}
+			}
 		}
 		catch (Throwable $exception) {
 			error_log(sprintf(

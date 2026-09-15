@@ -10,7 +10,7 @@ Current version:
 
 `0.1.0-dev`
 
-The current milestone is strictly read-only. The module can inventory templates, verify upstream identity, compare official vendor versions and preview content differences with Zabbix `configuration.importcompare`. It must not modify templates or other Zabbix configuration yet.
+The current milestone is strictly read-only. The module can inventory templates, verify upstream identity, compare official vendor versions, preview current upstream content with Zabbix `configuration.importcompare` and resolve historical official baselines for outdated templates. It must not modify templates or other Zabbix configuration yet.
 
 ## Target versions
 
@@ -79,23 +79,43 @@ For an official UUID match, the module:
 
 The import-comparison rules enable `deleteMissing` where supported so that local-only entities are visible as **preview removals**. No delete operation is executed: `configuration.importcompare` is used only to calculate the preview.
 
+## Historical official baseline
+
+A current-upstream comparison alone cannot determine whether an outdated installed template was customized locally. Its differences may simply be normal evolution between two official template revisions.
+
+For an official template with `Update available`, the module therefore attempts a second, historical comparison:
+
+1. use the already validated current official YAML path;
+2. query path-specific commit history from the canonical `git.zabbix.com` REST endpoint, pinned with `until=<current upstream commit>` and `followRenames=true`;
+3. inspect commits newest to oldest, with a hard limit of 75 path commits;
+4. retrieve candidate YAML by immutable commit;
+5. locate the same stable template UUID;
+6. select the newest historical candidate whose `vendor.version` exactly equals the installed `vendor.version`;
+7. isolate that historical template and compare it with the installed template through `configuration.importcompare`.
+
+`vendor.version` is **not** converted into or assumed to be a Git tag. Values such as `7.0-3` are template metadata, so the baseline is resolved from actual path history.
+
+If the 75-commit safety limit is reached before the target version is found, the result is explicitly reported as `history_limit_reached`; the module does not claim that the historical version does not exist.
+
 Current content states:
 
-- `Content matches current upstream` — installed and upstream vendor versions are equal and the import comparison reports no changes;
-- `Local modifications detected` — installed and upstream vendor versions are equal, but the import comparison reports differences;
-- `Preview against newer upstream` — a newer upstream vendor version exists and the displayed differences describe what that newer version would change;
-- `Historical baseline required` — the installed version cannot safely be classified against the current upstream source without an official baseline matching the installed version;
+- `Content matches current upstream` — installed and current upstream vendor versions are equal and the import comparison reports no changes;
+- `Local modifications detected` — installed and current upstream vendor versions are equal, but the import comparison reports differences;
+- `Update available — no local modifications detected` — the installed template is older, a historical official baseline matching its installed vendor version was resolved, and the installed content matches that baseline;
+- `Update available — local modifications detected` — the installed template is older and differs from the resolved historical official baseline of the same vendor version;
+- `Preview against newer upstream` — a newer upstream version exists, but no historical baseline was established safely, so differences remain only an update preview;
+- `Historical baseline required` — the installed version state cannot yet be classified safely;
 - `Not available` — authoritative comparison prerequisites are not satisfied.
 
-A critical semantic boundary is preserved: **differences are classified as local modifications only when the installed vendor version equals the current official upstream vendor version**. If the installed version is older, differences may simply be normal upstream evolution. Detecting local customization in that case requires a historical official baseline matching the installed version and, eventually, a three-way comparison.
+This closes an important false-positive case: an outdated but unmodified official template is no longer labeled locally modified merely because the current Zabbix template has evolved.
 
-The current content-comparison page shows a summary by entity type rather than exposing update actions. Risk analysis, automatic conflict resolution and imports remain future work.
+The historical comparison does **not** yet perform field-level three-way conflict classification. When local modifications exist, the next stage must determine whether those local changes overlap the upstream changes and then classify operational risk.
 
 ## Upstream index architecture
 
 Querying every official YAML file from the Zabbix repository on every page load would require hundreds of remote requests. Instead, the project builds compact UUID indexes with GitHub Actions from the canonical full Zabbix Git repository.
 
-The official repository can legitimately package the same template UUID in more than one YAML bundle (for example, shared VMware child templates). The index therefore merges repeated UUID definitions when their technical identity and vendor metadata agree, retains every official source path, and records SHA-256 hashes for each distinct content variant. A repeated UUID with conflicting identity metadata still fails index generation.
+The official repository can legitimately package the same template UUID in more than one YAML bundle. The index therefore merges repeated UUID definitions when their technical identity and vendor metadata agree, retains every official source path, and records SHA-256 hashes for each distinct content variant. A repeated UUID with conflicting identity metadata still fails index generation.
 
 Supported index lines are built for:
 
@@ -108,7 +128,12 @@ The index records its exact source ref, source commit and commit date. For activ
 
 The canonical repository is required for index generation because it contains the complete ref/tag history. The GitHub repository maintained by the Zabbix organization mirrors master and supported release branches and remains useful as a public browsing/reference mirror.
 
-Before refreshed indexes are published, the workflow also performs a network smoke test against the canonical raw-file endpoint using an exact source commit from the generated index. This prevents the runtime content-comparison code from relying on an assumed raw URL format.
+Before refreshed indexes are published, the workflow performs network smoke tests against both canonical interfaces used at runtime:
+
+- raw YAML retrieval by immutable commit;
+- path-specific commit history with immutable `until` commit.
+
+The historical endpoint smoke test has been verified against the Linux template history and returns full 40-character commit IDs from the canonical repository.
 
 The Zabbix frontend downloads one compact JSON index and caches it locally for 15 minutes. If refresh fails, a previously cached index can be used as stale read-only data. If no index is available, the local inventory still works and upstream status fails closed as `Repository unavailable`.
 
@@ -123,18 +148,20 @@ Official GitHub mirror:
 
 ## Content-source safety
 
-Runtime upstream content retrieval is deliberately constrained:
+Runtime upstream content and history retrieval are deliberately constrained:
 
 - the remote host is fixed to `git.zabbix.com`;
-- the source commit must be a 40-character hexadecimal Git commit ID from the validated index;
+- source and history commits must be 40-character hexadecimal Git commit IDs;
 - source paths must remain below `templates/`, end in `.yaml` and cannot contain `.` or `..` traversal segments;
 - redirects are limited and must remain on the canonical Zabbix host;
 - TLS certificate and hostname verification remain enabled;
-- the response is limited to 10 MiB;
-- an upstream UUID with multiple distinct official content variants fails closed instead of selecting one silently;
-- the fetched template identity must match the validated UUID/name/vendor metadata before comparison.
+- source responses are limited to 10 MiB and history responses to 2 MiB;
+- historical scans are capped at 75 path commits;
+- an upstream UUID with multiple distinct current official content variants fails closed instead of selecting one silently;
+- the current fetched template identity must match the validated UUID/name/vendor metadata before comparison;
+- historical candidates must contain the same UUID and the exact requested installed vendor version.
 
-No user-provided repository URL, Git ref or source path is passed to the network client.
+No user-provided repository URL or Git ref is passed to the network clients.
 
 ## Initial goals
 
@@ -144,8 +171,9 @@ No user-provided repository URL, Git ref or source path is passed to the network
 - Compare installed vendor versions with upstream metadata
 - Preview installed templates against current upstream content
 - Detect local modifications when the installed version equals the official current version
-- Retrieve historical official baselines for outdated installed versions
-- Perform three-way comparison for local modifications versus upstream evolution
+- Resolve historical official baselines for outdated installed versions
+- Detect local modifications on outdated templates against the correct historical baseline
+- Perform three-way field-level comparison for local modifications versus upstream evolution
 - Display granular differences
 - Estimate update risk
 - Show affected hosts
@@ -192,7 +220,7 @@ Local template inventory    Upstream index JSON
                  +----------------+----------------+
                  |                                 |
                  v                                 v
-      Exact upstream YAML                 Local Zabbix state
+      Current upstream YAML                 Local Zabbix state
        by commit + path                           |
                  |                                 |
                  v                                 |
@@ -203,11 +231,21 @@ Local template inventory    Upstream index JSON
                                  v
                   configuration.importcompare
                                  |
-                                 v
-                    summary + classification
+                         current update preview
+                                 |
+                if installed version is older
                                  |
                                  v
-                   native comparison detail
+                canonical path commit history
+                                 |
+                                 v
+           historical YAML matching vendor.version
+                                 |
+                                 v
+                  configuration.importcompare
+                                 |
+                                 v
+              local-modification classification
 ```
 
 ## Development validation
@@ -225,13 +263,15 @@ CI validates:
 - vendor-version comparison;
 - upstream source commit/path validation;
 - rejection of path traversal segments;
+- canonical history URL construction and response validation;
+- historical baseline selection and incomplete-history semantics;
 - deterministic isolation of one target UUID from multi-template upstream bundles;
 - nested import-comparison summary logic;
 - content-state classification semantics;
 - import-comparison rule coverage;
 - deterministic upstream-index generation;
 - handling of equivalent/repeated UUID definitions and rejection of conflicting identity metadata;
-- canonical raw-file endpoint reachability before publishing refreshed indexes.
+- canonical raw-file and commit-history endpoint reachability before publishing refreshed indexes.
 
 Local checks:
 

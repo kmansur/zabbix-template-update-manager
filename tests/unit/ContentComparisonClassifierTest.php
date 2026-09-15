@@ -24,7 +24,17 @@ assertContentClass(
 assertContentClass(
 	'preview_against_newer_upstream',
 	ContentComparisonClassifier::classify('update_available', ['total' => 7]),
-	'An outdated template must be treated as a preview against newer upstream content.'
+	'An outdated template without a historical baseline must remain an update preview.'
+);
+assertContentClass(
+	'update_available_no_local_modifications',
+	ContentComparisonClassifier::classify('update_available', ['total' => 7], 'found', ['total' => 0]),
+	'A matching historical baseline with no differences must prove that no local modifications were detected.'
+);
+assertContentClass(
+	'update_available_local_modifications',
+	ContentComparisonClassifier::classify('update_available', ['total' => 7], 'found', ['total' => 2]),
+	'A matching historical baseline with differences must detect local modifications on an outdated template.'
 );
 assertContentClass(
 	'historical_baseline_required',
