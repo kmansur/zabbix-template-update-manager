@@ -48,6 +48,9 @@ jobs:
       - name: Validate manifest
         run: php tests/validate_manifest.php
 
+      - name: Validate version
+        run: php tests/validate_version.php
+
       - name: Enforce controlled-write boundary
         run: php tests/read_only_guard.php
 
