@@ -18,6 +18,8 @@ use Modules\ZabbixTemplateUpdateManager\Service\TemplateImportCompareService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateVersionComparator;
 use Modules\ZabbixTemplateUpdateManager\Service\ThreeWayChangeAnalyzer;
+use Modules\ZabbixTemplateUpdateManager\Service\UpdatePreviewAnalyzer;
+use Modules\ZabbixTemplateUpdateManager\Service\UpdateRiskAnalyzer;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamMatcher;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamTemplateDocumentService;
 use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
@@ -36,6 +38,8 @@ require_once dirname(__DIR__).'/src/Service/TemplateImportCompareService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateVersionComparator.php';
 require_once dirname(__DIR__).'/src/Service/ThreeWayChangeAnalyzer.php';
+require_once dirname(__DIR__).'/src/Service/UpdatePreviewAnalyzer.php';
+require_once dirname(__DIR__).'/src/Service/UpdateRiskAnalyzer.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamMatcher.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamTemplateDocumentService.php';
 require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
@@ -76,7 +80,10 @@ class TemplateCompare extends CController {
 			'historical_summary' => ImportCompareSummary::summarize([]),
 			'historical_error' => null,
 			'three_way_analysis' => null,
-			'three_way_error' => null
+			'three_way_error' => null,
+			'update_preview' => null,
+			'update_risk' => null,
+			'update_risk_error' => null
 		];
 
 		if (!ZabbixVersion::isSupported($data['zabbix_version'])) {
@@ -126,6 +133,22 @@ class TemplateCompare extends CController {
 				$data['comparison_summary']
 			);
 			$data['source_path'] = $sourceFile['path'];
+
+			if (($template['version_status'] ?? null) === 'update_available') {
+				try {
+					$data['update_preview'] = UpdatePreviewAnalyzer::analyze($currentDiff);
+				}
+				catch (Throwable $exception) {
+					error_log(sprintf(
+						'[Zabbix Template Update Manager] Update preview analysis failed for template %s: %s',
+						(string) $this->getInput('templateid'),
+						$exception->getMessage()
+					));
+					$data['update_risk_error'] = _(
+						'Unable to normalize the current update preview for risk analysis. The native import comparison summary remains available.'
+					);
+				}
+			}
 
 			if (($template['version_status'] ?? null) === 'update_available'
 					&& ($template['vendor_version'] ?? '') !== '') {
@@ -190,6 +213,26 @@ class TemplateCompare extends CController {
 					));
 					$data['historical_error'] = _(
 						'Unable to resolve the historical official baseline. The current-upstream comparison remains valid as an update preview.'
+					);
+				}
+			}
+
+			if (is_array($data['update_preview'])) {
+				try {
+					$data['update_risk'] = UpdateRiskAnalyzer::assess(
+						$data['update_preview'],
+						$data['three_way_analysis'],
+						(int) ($template['host_count'] ?? 0)
+					);
+				}
+				catch (Throwable $exception) {
+					error_log(sprintf(
+						'[Zabbix Template Update Manager] Update risk analysis failed for template %s: %s',
+						(string) $this->getInput('templateid'),
+						$exception->getMessage()
+					));
+					$data['update_risk_error'] = _(
+						'Unable to complete conservative update risk analysis. No update-safety conclusion is available.'
 					);
 				}
 			}

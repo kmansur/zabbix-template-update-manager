@@ -43,6 +43,20 @@ $threeWayClassLabels = [
 	'unresolved' => _('Unresolved')
 ];
 
+$riskLevelLabels = [
+	'none' => _('None'),
+	'low' => _('Low'),
+	'medium' => _('Medium'),
+	'high' => _('High'),
+	'conflict' => _('Conflict'),
+	'unknown' => _('Unknown')
+];
+
+$riskCoverageLabels = [
+	'complete' => _('Complete'),
+	'incomplete' => _('Incomplete')
+];
+
 $entityLabels = [
 	'templates' => _('Templates'),
 	'items' => _('Items'),
@@ -265,6 +279,71 @@ if ($data['three_way_error'] !== null) {
 	$page->addItem(new CTag('p', true, $data['three_way_error']));
 }
 
+if (is_array($data['update_risk']) && is_array($data['update_preview'])) {
+	$risk = $data['update_risk'];
+	$preview = $data['update_preview'];
+	$previewSummary = $preview['summary'];
+	$riskLevel = (string) ($risk['level'] ?? 'unknown');
+	$technicalLevel = (string) ($risk['technical_level'] ?? 'unknown');
+	$coverage = (string) ($risk['coverage'] ?? 'incomplete');
+
+	$riskTable = (new CTableInfo())
+		->setHeader([
+			_('Overall review priority'),
+			_('Technical severity'),
+			_('Three-way coverage'),
+			_('Directly linked hosts'),
+			_('Affected entities'),
+			_('Normalized changes')
+		])
+		->addRow([
+			$riskLevelLabels[$riskLevel] ?? _('Unknown'),
+			$riskLevelLabels[$technicalLevel] ?? _('Unknown'),
+			$riskCoverageLabels[$coverage] ?? _('Unknown'),
+			(int) ($risk['direct_host_count'] ?? 0),
+			(int) ($previewSummary['entities_affected'] ?? 0),
+			(int) ($previewSummary['total'] ?? 0)
+		]);
+
+	$operationTable = (new CTableInfo())
+		->setHeader([
+			_('Added entities'),
+			_('Removed entities'),
+			_('Updated fields'),
+			_('Unresolved identities')
+		])
+		->addRow([
+			(int) ($previewSummary['added'] ?? 0),
+			(int) ($previewSummary['removed'] ?? 0),
+			(int) ($previewSummary['updated_fields'] ?? 0),
+			(int) ($previewSummary['unresolved'] ?? 0)
+		]);
+
+	$page
+		->addItem(new CTag('h4', true, _('Update review priority and known impact')))
+		->addItem($riskTable)
+		->addItem($operationTable);
+
+	if ($riskLevel === 'unknown') {
+		$page->addItem(new CTag('p', true, _(
+			'Overall review priority is unknown because local-overlap coverage is incomplete. Technical severity is shown separately and must not be interpreted as an update-safety decision.'
+		)));
+	}
+	elseif ($riskLevel === 'conflict') {
+		$page->addItem(new CTag('p', true, _(
+			'The update preview contains at least one confirmed three-way conflict. Manual review is required before any future update action can be considered.'
+		)));
+	}
+
+	$page->addItem(new CTag('p', true, _(
+		'The host impact count currently represents only hosts directly linked to this template. Inherited or indirect template impact is not yet included, and host count does not artificially change technical severity.'
+	)));
+}
+
+if ($data['update_risk_error'] !== null) {
+	$page->addItem(new CTag('p', true, $data['update_risk_error']));
+}
+
 switch ($data['content_status']) {
 	case 'matches_current_upstream':
 		$interpretation = _(
@@ -280,19 +359,19 @@ switch ($data['content_status']) {
 
 	case 'update_available_no_local_modifications':
 		$interpretation = _(
-			'The installed template is older than upstream, and a historical official baseline matching the installed vendor version was found. The installed content matches that baseline, so no local modifications were detected. The changes in the current-upstream preview are upstream evolution, although operational update risk is not yet classified.'
+			'The installed template is older than upstream, and a historical official baseline matching the installed vendor version was found. The installed content matches that baseline, so no local modifications were detected. The review-priority section classifies the proposed upstream changes technically, but it does not authorize an update.'
 		);
 		break;
 
 	case 'update_available_local_modifications':
 		$interpretation = _(
-			'The installed template is older than upstream and differs from the historical official baseline. The three-way section, when available, shows whether those local differences are upstream-only, would be overwritten, have converged with upstream, or conflict with newer upstream values.'
+			'The installed template is older than upstream and differs from the historical official baseline. The three-way and review-priority sections show whether local differences would be overwritten, have converged, conflict with upstream or still require unresolved review.'
 		);
 		break;
 
 	case 'preview_against_newer_upstream':
 		$interpretation = _(
-			'The installed template is older than the official upstream version. The differences above are an update preview. A matching historical baseline could not be established, so local customization is not inferred.'
+			'The installed template is older than the official upstream version. The differences above are an update preview. A matching historical baseline could not be established, so local customization is not inferred and overall review priority remains unknown.'
 		);
 		break;
 
@@ -310,6 +389,6 @@ $page
 	->addItem(new CTag('h4', true, _('Interpretation')))
 	->addItem(new CTag('p', true, $interpretation))
 	->addItem(new CTag('p', true, _(
-		'This page uses configuration.importcompare only. Historical lookup, three-way analysis and source retrieval are read-only and do not import, update or delete Zabbix configuration.'
+		'This page uses configuration.importcompare only. Historical lookup, three-way analysis, risk analysis and source retrieval are read-only and do not import, update or delete Zabbix configuration.'
 	)))
 	->show();
