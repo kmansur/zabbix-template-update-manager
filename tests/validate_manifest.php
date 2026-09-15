@@ -57,15 +57,25 @@ foreach ($expected as $key => $value) {
 
 $expectedActions = [
 	'ztum.templates' => ['class' => 'TemplateList', 'view' => 'template.list'],
-	'ztum.template.compare' => ['class' => 'TemplateCompare', 'view' => 'template.compare']
+	'ztum.template.compare' => ['class' => 'TemplateCompare', 'view' => 'template.compare'],
+	'ztum.template.backup' => ['class' => 'TemplateBackup']
 ];
 
 foreach ($expectedActions as $actionName => $expectedAction) {
 	$action = $manifest['actions'][$actionName] ?? null;
-	if (!is_array($action)
-			|| ($action['class'] ?? null) !== $expectedAction['class']
-			|| ($action['view'] ?? null) !== $expectedAction['view']) {
+	if (!is_array($action) || ($action['class'] ?? null) !== $expectedAction['class']) {
 		fwrite(STDERR, sprintf("Action %s is not configured as expected.\n", $actionName));
+		exit(1);
+	}
+
+	if (array_key_exists('view', $expectedAction)) {
+		if (($action['view'] ?? null) !== $expectedAction['view']) {
+			fwrite(STDERR, sprintf("Action %s view is not configured as expected.\n", $actionName));
+			exit(1);
+		}
+	}
+	elseif (array_key_exists('view', $action)) {
+		fwrite(STDERR, sprintf("Action %s must not register a view.\n", $actionName));
 		exit(1);
 	}
 }
@@ -75,7 +85,8 @@ $requiredFiles = [
 	$root.'/actions/TemplateList.php',
 	$root.'/views/template.list.php',
 	$root.'/actions/TemplateCompare.php',
-	$root.'/views/template.compare.php'
+	$root.'/views/template.compare.php',
+	$root.'/actions/TemplateBackup.php'
 ];
 
 foreach ($requiredFiles as $file) {
