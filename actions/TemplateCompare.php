@@ -12,10 +12,12 @@ use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateHistoryReposi
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateSourceRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\ContentComparisonClassifier;
 use Modules\ZabbixTemplateUpdateManager\Service\HistoricalTemplateBaselineService;
+use Modules\ZabbixTemplateUpdateManager\Service\ImportCompareEntityExtractor;
 use Modules\ZabbixTemplateUpdateManager\Service\ImportCompareSummary;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateImportCompareService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateVersionComparator;
+use Modules\ZabbixTemplateUpdateManager\Service\ThreeWayChangeAnalyzer;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamMatcher;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamTemplateDocumentService;
 use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
@@ -28,10 +30,12 @@ require_once dirname(__DIR__).'/src/Repository/UpstreamTemplateHistoryRepository
 require_once dirname(__DIR__).'/src/Repository/UpstreamTemplateSourceRepository.php';
 require_once dirname(__DIR__).'/src/Service/ContentComparisonClassifier.php';
 require_once dirname(__DIR__).'/src/Service/HistoricalTemplateBaselineService.php';
+require_once dirname(__DIR__).'/src/Service/ImportCompareEntityExtractor.php';
 require_once dirname(__DIR__).'/src/Service/ImportCompareSummary.php';
 require_once dirname(__DIR__).'/src/Service/TemplateImportCompareService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateVersionComparator.php';
+require_once dirname(__DIR__).'/src/Service/ThreeWayChangeAnalyzer.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamMatcher.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamTemplateDocumentService.php';
 require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
@@ -70,7 +74,9 @@ class TemplateCompare extends CController {
 			'comparison_error' => null,
 			'historical_baseline' => null,
 			'historical_summary' => ImportCompareSummary::summarize([]),
-			'historical_error' => null
+			'historical_error' => null,
+			'three_way_analysis' => null,
+			'three_way_error' => null
 		];
 
 		if (!ZabbixVersion::isSupported($data['zabbix_version'])) {
@@ -113,8 +119,8 @@ class TemplateCompare extends CController {
 				$template['upstream']
 			);
 			$compareService = new TemplateImportCompareService();
-			$diff = $compareService->compare($isolated['source']);
-			$data['comparison_summary'] = ImportCompareSummary::summarize($diff);
+			$currentDiff = $compareService->compare($isolated['source']);
+			$data['comparison_summary'] = ImportCompareSummary::summarize($currentDiff);
 			$data['content_status'] = ContentComparisonClassifier::classify(
 				$template['version_status'],
 				$data['comparison_summary']
@@ -150,6 +156,23 @@ class TemplateCompare extends CController {
 					if (($baseline['status'] ?? null) === 'found' && is_string($baselineSource)) {
 						$historicalDiff = $compareService->compare($baselineSource);
 						$data['historical_summary'] = ImportCompareSummary::summarize($historicalDiff);
+
+						try {
+							$data['three_way_analysis'] = ThreeWayChangeAnalyzer::analyze(
+								$historicalDiff,
+								$currentDiff
+							);
+						}
+						catch (Throwable $exception) {
+							error_log(sprintf(
+								'[Zabbix Template Update Manager] Three-way analysis failed for template %s: %s',
+								(string) $this->getInput('templateid'),
+								$exception->getMessage()
+							));
+							$data['three_way_error'] = _(
+								'Unable to complete the three-way change analysis. Historical and current comparison summaries remain available.'
+							);
+						}
 					}
 
 					$data['content_status'] = ContentComparisonClassifier::classify(
