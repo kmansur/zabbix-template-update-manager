@@ -1,0 +1,296 @@
+<?php
+
+namespace Modules\ZabbixTemplateUpdateManager\Service;
+
+use CImportReaderFactory;
+use Modules\ZabbixTemplateUpdateManager\Repository\HistoricalBaselineCacheRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\TemplateBackupRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateHistoryRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateSourceRepository;
+use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
+use RuntimeException;
+use Throwable;
+
+/**
+ * Rebuilds the complete read-only update analysis for one visible template.
+ *
+ * The service is deliberately reusable by both the comparison page and future
+ * server-side preflight actions. It never imports or mutates Zabbix
+ * configuration.
+ */
+final class TemplateUpdateAnalysisService {
+
+	public function analyze(string $templateId): array {
+		$templateId = trim($templateId);
+		if ($templateId === '' || !ctype_digit($templateId) || (int) $templateId <= 0) {
+			throw new RuntimeException('A valid numeric template ID is required for update analysis.');
+		}
+
+		$data = $this->emptyResult();
+		$data['zabbix_version'] = ZabbixVersion::current();
+
+		if (!ZabbixVersion::isSupported($data['zabbix_version'])) {
+			$data['comparison_error'] = _(
+				'Content comparison is disabled on unsupported or undetected Zabbix versions.'
+			);
+			return $data;
+		}
+
+		try {
+			$record = (new TemplateRepository())->findById($templateId);
+			if ($record === null) {
+				throw new RuntimeException('The requested template is not visible to the current user.');
+			}
+
+			$inventory = TemplateInventoryService::fromRecords([$record]);
+			$template = $inventory['templates'][0] ?? null;
+			if (!is_array($template)) {
+				throw new RuntimeException('Unable to normalize the requested template.');
+			}
+
+			$index = (new UpstreamIndexRepository())->load($data['zabbix_version']);
+			$matched = UpstreamMatcher::attach([$template], $index);
+			$versioned = TemplateVersionComparator::attach($matched['templates']);
+			$template = $versioned['templates'][0];
+			$data['template'] = $template;
+			$data['upstream_source'] = $index['source'] ?? null;
+
+			if (($template['upstream_status'] ?? null) !== 'official_match'
+					|| !is_array($template['upstream'] ?? null)) {
+				$data['comparison_error'] = _(
+					'Content comparison is available only for templates with an authoritative official UUID match.'
+				);
+				return $data;
+			}
+
+			$sourceRepository = new UpstreamTemplateSourceRepository();
+			$sourceFile = $sourceRepository->fetch($index['source'], $template['upstream']);
+			$reader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
+			$document = $reader->read($sourceFile['content']);
+			$isolated = UpstreamTemplateDocumentService::buildImportSource(
+				$document,
+				$template['uuid'],
+				$template['upstream']
+			);
+
+			$compareService = new TemplateImportCompareService();
+			$currentDiff = $compareService->compare($isolated['source']);
+			$data['comparison_summary'] = ImportCompareSummary::summarize($currentDiff);
+			$data['content_status'] = ContentComparisonClassifier::classify(
+				$template['version_status'],
+				$data['comparison_summary']
+			);
+			$data['source_path'] = $sourceFile['path'];
+
+			if (($template['version_status'] ?? null) === 'update_available') {
+				try {
+					$data['update_preview'] = UpdatePreviewAnalyzer::analyze($currentDiff);
+				}
+				catch (Throwable $exception) {
+					$this->logFailure('Update preview analysis', $templateId, $exception);
+					$data['update_risk_error'] = _(
+						'Unable to normalize the current update preview for risk analysis. The native import comparison summary remains available.'
+					);
+				}
+			}
+
+			if (($template['version_status'] ?? null) === 'update_available'
+					&& ($template['vendor_version'] ?? '') !== '') {
+				$this->resolveHistoricalAnalysis(
+					$data,
+					$template,
+					$index,
+					$sourceFile,
+					$sourceRepository,
+					$compareService,
+					$currentDiff,
+					$templateId
+				);
+			}
+
+			if (is_array($data['update_preview'])) {
+				try {
+					$data['update_risk'] = UpdateRiskAnalyzer::assess(
+						$data['update_preview'],
+						$data['three_way_analysis'],
+						(int) ($template['host_count'] ?? 0)
+					);
+				}
+				catch (Throwable $exception) {
+					$this->logFailure('Update risk analysis', $templateId, $exception);
+					$data['update_risk_error'] = _(
+						'Unable to complete conservative update risk analysis. No update-safety conclusion is available.'
+					);
+				}
+			}
+
+			$data['update_readiness'] = UpdateReadinessEvaluator::evaluate(
+				$template,
+				$data['historical_baseline'],
+				$data['three_way_analysis'],
+				$data['update_preview'],
+				$data['update_risk']
+			);
+
+			if (($data['update_readiness']['status'] ?? null) === 'candidate_for_backup') {
+				try {
+					$data['backup_verification'] = (new TemplateBackupVerificationService(
+						new TemplateExportService(),
+						new TemplateBackupRepository()
+					))->verifyCurrent($template);
+
+					$data['update_readiness'] = UpdateReadinessEvaluator::evaluate(
+						$template,
+						$data['historical_baseline'],
+						$data['three_way_analysis'],
+						$data['update_preview'],
+						$data['update_risk'],
+						$data['backup_verification']
+					);
+				}
+				catch (Throwable $exception) {
+					$this->logFailure('Backup verification', $templateId, $exception);
+					$data['backup_verification_error'] = _(
+						'Unable to inspect or verify the persistent rollback backup. The workflow remains at backup candidacy and no configuration-write step is enabled.'
+					);
+				}
+			}
+		}
+		catch (Throwable $exception) {
+			$this->logFailure('Content comparison', $templateId, $exception);
+			$data['comparison_error'] = _(
+				'Unable to complete the read-only content comparison. Check frontend logs, network access to the official Zabbix repository and the current user role permissions.'
+			);
+		}
+
+		return $data;
+	}
+
+	private function resolveHistoricalAnalysis(
+		array &$data,
+		array $template,
+		array $index,
+		array $sourceFile,
+		UpstreamTemplateSourceRepository $sourceRepository,
+		TemplateImportCompareService $compareService,
+		array $currentDiff,
+		string $templateId
+	): void {
+		try {
+			$currentCommit = (string) ($index['source']['commit'] ?? '');
+			$vendorName = (string) ($template['upstream']['vendor_name'] ?? 'Zabbix');
+			$baselineCache = new HistoricalBaselineCacheRepository();
+			$baseline = $baselineCache->load(
+				$sourceFile['path'],
+				$currentCommit,
+				$template['uuid'],
+				$template['vendor_version'],
+				$vendorName
+			);
+			$cacheStatus = 'hit';
+
+			if ($baseline === null) {
+				$cacheStatus = 'miss';
+				$baselineService = new HistoricalTemplateBaselineService(
+					static fn(string $path, string $until, int $limit): array
+						=> (new UpstreamTemplateHistoryRepository())->listCommits($path, $until, $limit),
+					static fn(string $commit, string $path): array
+						=> $sourceRepository->fetchAtCommit($commit, $path),
+					static function (string $source): array {
+						$historicalReader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
+						return $historicalReader->read($source);
+					}
+				);
+
+				$baseline = $baselineService->find(
+					$sourceFile['path'],
+					$currentCommit,
+					$template['uuid'],
+					$template['vendor_version'],
+					$vendorName
+				);
+
+				if (($baseline['status'] ?? null) === 'found') {
+					$baselineCache->store(
+						$sourceFile['path'],
+						$currentCommit,
+						$template['uuid'],
+						$template['vendor_version'],
+						$vendorName,
+						$baseline
+					);
+				}
+			}
+
+			$baselineSource = $baseline['source'] ?? null;
+			unset($baseline['source']);
+			$baseline['cache_status'] = $cacheStatus;
+			$data['historical_baseline'] = $baseline;
+
+			if (($baseline['status'] ?? null) === 'found' && is_string($baselineSource)) {
+				$historicalDiff = $compareService->compare($baselineSource);
+				$data['historical_summary'] = ImportCompareSummary::summarize($historicalDiff);
+
+				try {
+					$data['three_way_analysis'] = ThreeWayChangeAnalyzer::analyze(
+						$historicalDiff,
+						$currentDiff
+					);
+				}
+				catch (Throwable $exception) {
+					$this->logFailure('Three-way analysis', $templateId, $exception);
+					$data['three_way_error'] = _(
+						'Unable to complete the three-way change analysis. Historical and current comparison summaries remain available.'
+					);
+				}
+			}
+
+			$data['content_status'] = ContentComparisonClassifier::classify(
+				$template['version_status'],
+				$data['comparison_summary'],
+				(string) ($baseline['status'] ?? ''),
+				$data['historical_summary']
+			);
+		}
+		catch (Throwable $exception) {
+			$this->logFailure('Historical baseline lookup', $templateId, $exception);
+			$data['historical_error'] = _(
+				'Unable to resolve the historical official baseline. The current-upstream comparison remains valid as an update preview.'
+			);
+		}
+	}
+
+	private function emptyResult(): array {
+		return [
+			'zabbix_version' => '',
+			'template' => null,
+			'upstream_source' => null,
+			'source_path' => '',
+			'comparison_summary' => ImportCompareSummary::summarize([]),
+			'content_status' => 'not_available',
+			'comparison_error' => null,
+			'historical_baseline' => null,
+			'historical_summary' => ImportCompareSummary::summarize([]),
+			'historical_error' => null,
+			'three_way_analysis' => null,
+			'three_way_error' => null,
+			'update_preview' => null,
+			'update_risk' => null,
+			'update_risk_error' => null,
+			'update_readiness' => null,
+			'backup_verification' => null,
+			'backup_verification_error' => null
+		];
+	}
+
+	private function logFailure(string $stage, string $templateId, Throwable $exception): void {
+		error_log(sprintf(
+			'[Zabbix Template Update Manager] %s failed for template %s: %s',
+			$stage,
+			$templateId,
+			$exception->getMessage()
+		));
+	}
+}
