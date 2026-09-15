@@ -1,0 +1,4531 @@
+{
+  "schema_version": 1,
+  "source": {
+    "line": "7.2",
+    "ref": "release/7.2",
+    "commit": "e8af8368d9b024900498f101c5a8927ac78746ab",
+    "commit_date": "2025-12-17T12:36:07+02:00",
+    "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
+    "mirror_repository": "https://github.com/zabbix/zabbix"
+  },
+  "statistics": {
+    "templates": 347,
+    "duplicate_uuid_definitions": 2,
+    "content_variant_uuids": 0
+  },
+  "templates": {
+    "001a1677f6a949b6bddfdb2926023300": {
+      "uuid": "001a1677f6a949b6bddfdb2926023300",
+      "name": "MSSQL by ODBC",
+      "technical_name": "MSSQL by ODBC",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-5",
+      "paths": [
+        "templates/db/mssql_odbc/template_db_mssql_odbc.yaml"
+      ],
+      "content_sha256s": [
+        "febbd299b49bcfa6e39eae1454d7fe85470e7a5e50d9bbf418482fbf1b05d719"
+      ]
+    },
+    "00ade9277d7c41e8b57d638b22d54372": {
+      "uuid": "00ade9277d7c41e8b57d638b22d54372",
+      "name": "Oracle by ODBC",
+      "technical_name": "Oracle by ODBC",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/oracle_odbc/template_db_oracle_odbc.yaml"
+      ],
+      "content_sha256s": [
+        "64e1a5510afd9b5d877a77738200e5101be05352de2145202f817f688babee4d"
+      ]
+    },
+    "012e7043ff9849e197c42bf41cdf4d9a": {
+      "uuid": "012e7043ff9849e197c42bf41cdf4d9a",
+      "name": "MikroTik CCR1009-7G-1C-PC by SNMP",
+      "technical_name": "MikroTik CCR1009-7G-1C-PC by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR1009-7G-1C-PC_snmp/template_net_mikrotik_CCR1009-7G-1C-PC_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "0bdfb940a8c29d2008c1d0ffd4b84d0726772135101157f9f179a33b847000e1"
+      ]
+    },
+    "01deb47efa1f4a9092de67fd61820a7d": {
+      "uuid": "01deb47efa1f4a9092de67fd61820a7d",
+      "name": "ZYXEL MGS-3712F by SNMP",
+      "technical_name": "ZYXEL MGS-3712F by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_mgs-3712f_snmp/template_net_zyxel_mgs-3712f_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "1dfbe44291281f2210a3b295b3cfc8d56d9299b7291eea766be71459e002ccb7"
+      ]
+    },
+    "02aac022a62c48bba810d07bbaa712cc": {
+      "uuid": "02aac022a62c48bba810d07bbaa712cc",
+      "name": "Zabbix proxy health by Zabbix agent active",
+      "technical_name": "Zabbix proxy health by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml"
+      ],
+      "content_sha256s": [
+        "1aaaa0dfeb27641bca67952ebd3a57b904d3205553e1b4dfcb14d0fc121eea7c"
+      ]
+    },
+    "02f35169a5a54a5aad8b3f06e798ab1f": {
+      "uuid": "02f35169a5a54a5aad8b3f06e798ab1f",
+      "name": "Chassis by IPMI",
+      "technical_name": "Chassis by IPMI",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/chassis_ipmi/template_server_chassis_ipmi.yaml"
+      ],
+      "content_sha256s": [
+        "143c46eec21d841e9224151ee7e508a71d2408e8905e9a04711b908db1b2cd14"
+      ]
+    },
+    "0368ca599bbb49729587b9c43ac83084": {
+      "uuid": "0368ca599bbb49729587b9c43ac83084",
+      "name": "Envoy Proxy by HTTP",
+      "technical_name": "Envoy Proxy by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/envoy_proxy_http/template_app_envoy_proxy_http.yaml"
+      ],
+      "content_sha256s": [
+        "4d13040742865d57ef8368c951bb318705b8ed740050c7df338db07ccbb0254d"
+      ]
+    },
+    "03e93dc9a8194a17958544a056d02316": {
+      "uuid": "03e93dc9a8194a17958544a056d02316",
+      "name": "Microsoft 365 reports by HTTP",
+      "technical_name": "Microsoft 365 reports by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/ms365_http/template_app_microsoft_365_http.yaml"
+      ],
+      "content_sha256s": [
+        "30fa6e94b5819f5564155bc4d98679cb3e438abfe51348688665fe3130a15bdc"
+      ]
+    },
+    "057558a26d934b4683d73a7058499d62": {
+      "uuid": "057558a26d934b4683d73a7058499d62",
+      "name": "Oracle Cloud by HTTP",
+      "technical_name": "Oracle Cloud by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml"
+      ],
+      "content_sha256s": [
+        "a438da5a0bbe9ad511aa38518d6e924ddcf2bd33c9117b5c832e7ef8440f508f"
+      ]
+    },
+    "05894ba2c9184d33992bf1bd21c347f6": {
+      "uuid": "05894ba2c9184d33992bf1bd21c347f6",
+      "name": "Memcached by Zabbix agent 2",
+      "technical_name": "Memcached by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/memcached/template_app_memcached.yaml"
+      ],
+      "content_sha256s": [
+        "11b7246598646f33570138b0534b258541e48e9345ed67c684388f0ff5eb7252"
+      ]
+    },
+    "07695028a2ba4b66a5414797bec791df": {
+      "uuid": "07695028a2ba4b66a5414797bec791df",
+      "name": "Kubernetes cluster state by HTTP",
+      "technical_name": "Kubernetes cluster state by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/kubernetes_http/kubernetes_state_http/template_kubernetes_state.yaml"
+      ],
+      "content_sha256s": [
+        "e4ca9309913f6c5ef06554417a92845366da738592f4dbeff6f2a17fb63adc3d"
+      ]
+    },
+    "07b32152c3654e8ead4c1eeae24efa8f": {
+      "uuid": "07b32152c3654e8ead4c1eeae24efa8f",
+      "name": "Morningstar TriStar MPPT by SNMP",
+      "technical_name": "Morningstar TriStar MPPT by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/morningstar/morningstar_tristar_mppt_snmp/template_net_morningstar_tristar_mppt_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "c6275dd97f1ea4f9dcac91d5b65cc4fe44f29b58493ef849e7bf918d2b8af329"
+      ]
+    },
+    "08ef3d687d754b0aba17e1dcbd77d4bd": {
+      "uuid": "08ef3d687d754b0aba17e1dcbd77d4bd",
+      "name": "Cloudflare by HTTP",
+      "technical_name": "Cloudflare by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/cloudflare_http/template_app_cloudflare_http.yaml"
+      ],
+      "content_sha256s": [
+        "1b867098a27a14068ebd46fdb897ebefc5a60c10f61c476592bbb91f029a08bf"
+      ]
+    },
+    "09fb25d089f7467f860895f6e71d3fa2": {
+      "uuid": "09fb25d089f7467f860895f6e71d3fa2",
+      "name": "Ceph by Zabbix agent 2",
+      "technical_name": "Ceph by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/ceph_agent2/template_app_ceph_agent2.yaml"
+      ],
+      "content_sha256s": [
+        "6bd2381d24209076379c531f713879b95612ddc06002f3d063a8e3d267aa638c"
+      ]
+    },
+    "0b9a899ff8f1467c9fdf999d02b9fd77": {
+      "uuid": "0b9a899ff8f1467c9fdf999d02b9fd77",
+      "name": "APC UPS Symmetra LX by SNMP",
+      "technical_name": "APC UPS Symmetra LX by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_symmetra_lx_snmp/template_power_apc_ups_symmetra_lx_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "e524567a4c123b11aa9b11d9115b8c6388b93d06ae52b0963e6b42c4b0bdf6af"
+      ]
+    },
+    "0bb43a48a33f48ad910441384486edb4": {
+      "uuid": "0bb43a48a33f48ad910441384486edb4",
+      "name": "Nutanix Prism Element by HTTP",
+      "technical_name": "Nutanix Prism Element by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/nutanix_http/template_app_nutanix_prism_element_http.yaml"
+      ],
+      "content_sha256s": [
+        "a703450f13e20ec1b34dc56f9978dbf325051ef590dc257d7d6c2e7e1302970f"
+      ]
+    },
+    "0c7b3c03a5854f868b56f3ab63e2d3f7": {
+      "uuid": "0c7b3c03a5854f868b56f3ab63e2d3f7",
+      "name": "MikroTik PowerBox by SNMP",
+      "technical_name": "MikroTik PowerBox by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_PowerBox_snmp/template_net_mikrotik_PowerBox_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "5a1144821ccd7be7d5b1188d554081ce4973bc806f12290e07880926f08ae6ed"
+      ]
+    },
+    "0c94915edb4c41bf8c627dddb4f68f5a": {
+      "uuid": "0c94915edb4c41bf8c627dddb4f68f5a",
+      "name": "OPNsense by SNMP",
+      "technical_name": "OPNsense by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/opnsense_snmp/template_app_opnsense_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "e3822dad5960240caa8303f1e14155c04044e3cc2472402a461eef7a6e493b7c"
+      ]
+    },
+    "0f6889282f6048e2b1370e569e578985": {
+      "uuid": "0f6889282f6048e2b1370e569e578985",
+      "name": "OS processes by Zabbix agent",
+      "technical_name": "OS processes by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/process/template_module_process.yaml"
+      ],
+      "content_sha256s": [
+        "235cac538bc4ac48da3f971893a819a101f23be972d7a26e0819ef6d9679e061"
+      ]
+    },
+    "0ffde4421f524bcbac2f47fec87c0f95": {
+      "uuid": "0ffde4421f524bcbac2f47fec87c0f95",
+      "name": "HPE Synergy by HTTP",
+      "technical_name": "HPE Synergy by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/hpe_synergy_http/template_server_hpe_synergy_http.yaml"
+      ],
+      "content_sha256s": [
+        "d27d30d330c80df5fbb375cb4bcd5ed239205edccb81e469763857c262b500ea"
+      ]
+    },
+    "10537641cfa3416ab0f1451cdb61d804": {
+      "uuid": "10537641cfa3416ab0f1451cdb61d804",
+      "name": "HPE MSA 2060 Storage by HTTP",
+      "technical_name": "HPE MSA 2060 Storage by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/san/hpe_msa2060_http/template_san_hpe_msa2060_http.yaml"
+      ],
+      "content_sha256s": [
+        "a3c03cae9f5b7559ee4f99a205b8ce51f02caa2808866b19bbee3c26132c12cb"
+      ]
+    },
+    "11144543d1144a3693aa0b97a1c20dac": {
+      "uuid": "11144543d1144a3693aa0b97a1c20dac",
+      "name": "GitHub repository by HTTP",
+      "technical_name": "GitHub repository by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/app/github_http/template_app_github_http.yaml"
+      ],
+      "content_sha256s": [
+        "19b83be3264602aa76ff47de7dc9f08977a5e55fcbe809bbb7371a7ebcbdee59"
+      ]
+    },
+    "12af2a9efcc84c3298bf1654aa96c0db": {
+      "uuid": "12af2a9efcc84c3298bf1654aa96c0db",
+      "name": "Juniper MX by NETCONF",
+      "technical_name": "Juniper MX by NETCONF",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/net/juniper_mx_netconf/template_net_juniper_mx_netconf.yaml"
+      ],
+      "content_sha256s": [
+        "11e1c3187637cd15a6423259271720911f7a3d5b5cce51229499748aa199d552"
+      ]
+    },
+    "13b06904a6bf41cbb795e3193d896340": {
+      "uuid": "13b06904a6bf41cbb795e3193d896340",
+      "name": "Windows by Zabbix agent",
+      "technical_name": "Windows by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/os/windows_agent/template_os_windows_agent.yaml"
+      ],
+      "content_sha256s": [
+        "47cf6fe38539b6d91b8a01c7d2803f26d3bb619d50020f3acb77fd04a2962f2b"
+      ]
+    },
+    "13d5bb0a4ae84228bff408aab5be338e": {
+      "uuid": "13d5bb0a4ae84228bff408aab5be338e",
+      "name": "Nginx by HTTP",
+      "technical_name": "Nginx by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/nginx_http/template_app_nginx_http.yaml"
+      ],
+      "content_sha256s": [
+        "2f5e642786c4eead6d3bc9b14d4a7ada0cd8cbb055a34a15efbaf8e028a67bdd"
+      ]
+    },
+    "141438a05f904b518c7d3ddfbbabf91f": {
+      "uuid": "141438a05f904b518c7d3ddfbbabf91f",
+      "name": "MikroTik RB2011iL-IN by SNMP",
+      "technical_name": "MikroTik RB2011iL-IN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB2011iL-IN_snmp/template_net_mikrotik_RB2011iL-IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "7be413cc4bf53cd177f6c95d8c48b65bd5eb0b8beb1e6ced66c1d94cd0e312cf"
+      ]
+    },
+    "16f281aeb8904d3db8b66dda94611fcc": {
+      "uuid": "16f281aeb8904d3db8b66dda94611fcc",
+      "name": "PFSense by SNMP",
+      "technical_name": "PFSense by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/pfsense_snmp/template_app_pfsense_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "436034ea2d45a178daf2996bf61f59b6e1cc9d16f962e7be24b6c3937f900f26"
+      ]
+    },
+    "172ec7e51f1c4a6ba49baffbab3dda97": {
+      "uuid": "172ec7e51f1c4a6ba49baffbab3dda97",
+      "name": "HPE ProLiant BL460 by SNMP",
+      "technical_name": "HPE ProLiant BL460 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/hp/hp_bl460_snmp/template_server_hp_bl460_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "d5de11aecc6bdde6c95761fc9bda3600fa9bdd12e62c9eaab401e2d114b96700"
+      ]
+    },
+    "1782caa5bf724f66a23e7dbb96ef7ba2": {
+      "uuid": "1782caa5bf724f66a23e7dbb96ef7ba2",
+      "name": "MikroTik netPower Lite 7R by SNMP",
+      "technical_name": "MikroTik netPower Lite 7R by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_netPower_Lite_7R_snmp/template_net_mikrotik_netPower_Lite_7R_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "b1dadc8cc769ef739889f467fabe1e1cad975fe5c51e156eb7d47daa34c886fd"
+      ]
+    },
+    "178645e229484bcf9cb030dc1edccebb": {
+      "uuid": "178645e229484bcf9cb030dc1edccebb",
+      "name": "Oracle Cloud Autonomous Database by HTTP",
+      "technical_name": "Oracle Cloud Autonomous Database by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml"
+      ],
+      "content_sha256s": [
+        "f30fb4c6e02de2b62fea38ad6955e7bd40b953508f5b977f2ef92609e4199683"
+      ]
+    },
+    "185867ae9b4a46b59d53931d3330c770": {
+      "uuid": "185867ae9b4a46b59d53931d3330c770",
+      "name": "DELL PowerEdge R660 by HTTP",
+      "technical_name": "DELL PowerEdge R660 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/dell/dell_r660_http/template_server_dell_r660_http.yaml"
+      ],
+      "content_sha256s": [
+        "3c0f76db4013b3daafd322c9ce91993575c5da3f79c8c5e5c1a7a8306d940322"
+      ]
+    },
+    "1a74dd95e7244493a1b13b94fe9dd9e8": {
+      "uuid": "1a74dd95e7244493a1b13b94fe9dd9e8",
+      "name": "MikroTik RB260GS by SNMP",
+      "technical_name": "MikroTik RB260GS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB260GS_snmp/template_net_mikrotik_RB260GS_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "58cf8b915c3bdbf7f0b829d03e2206bbbc3cb33372de0bc344fbf452a47fa464"
+      ]
+    },
+    "1ae69b01417849b180717f62ad7819d6": {
+      "uuid": "1ae69b01417849b180717f62ad7819d6",
+      "name": "MySQL by Zabbix agent active",
+      "technical_name": "MySQL by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/db/mysql_agent_active/template_db_mysql_agent_active.yaml"
+      ],
+      "content_sha256s": [
+        "828e3383cf3dd674dde09f500ec5306e8c16d4fca8c4649f65de45941cdf5bdf"
+      ]
+    },
+    "1bb42fbdb9054645a62ff81f14ba3b99": {
+      "uuid": "1bb42fbdb9054645a62ff81f14ba3b99",
+      "name": "Cisco IOS prior to 12.0_3_T by SNMP",
+      "technical_name": "Cisco IOS prior to 12.0_3_T by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "aa1b525b1de8c7a8337b750a4f4891785adb3a3cbcde2869786748ca32dca956"
+      ]
+    },
+    "1cbda0970410435684135884d0cb7090": {
+      "uuid": "1cbda0970410435684135884d0cb7090",
+      "name": "PHP-FPM by Zabbix agent",
+      "technical_name": "PHP-FPM by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/php-fpm_agent/template_app_php-fpm_agent.yaml"
+      ],
+      "content_sha256s": [
+        "08f2013b440606f9a88ade81643edc11651afb60ac2bbe8c26867049a17a2cb5"
+      ]
+    },
+    "1dac0a88c3774315b90622a48031e369": {
+      "uuid": "1dac0a88c3774315b90622a48031e369",
+      "name": "APC UPS Symmetra RM by SNMP",
+      "technical_name": "APC UPS Symmetra RM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_symmetra_rm_snmp/template_power_apc_ups_symmetra_rm_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "c638a32a0c34374e0378201a196314d213afac8ba9d14f4c5eb60fb788db800d"
+      ]
+    },
+    "1e9fe6b88c7542638c0f5d94484858b2": {
+      "uuid": "1e9fe6b88c7542638c0f5d94484858b2",
+      "name": "DELL PowerEdge R820 by HTTP",
+      "technical_name": "DELL PowerEdge R820 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/server/dell/dell_r820_http/template_server_dell_r820_http.yaml"
+      ],
+      "content_sha256s": [
+        "ca4c4817c908d19437b2f119405d9803a14033668e0b7579e307f36c77e06ab1"
+      ]
+    },
+    "1f38deb487fc4a8d965e407ba7c5247f": {
+      "uuid": "1f38deb487fc4a8d965e407ba7c5247f",
+      "name": "FortiGate by SNMP",
+      "technical_name": "FortiGate by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/fortinet/fortigate_snmp/template_net_fortigate_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "b744d86ed5c18e96ad39e061366e3be2b86114c7b6dd4dcd479413d1d4b80e1a"
+      ]
+    },
+    "20147f00f92d4240aab0b70cf578c022": {
+      "uuid": "20147f00f92d4240aab0b70cf578c022",
+      "name": "DELL PowerEdge R840 by HTTP",
+      "technical_name": "DELL PowerEdge R840 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/server/dell/dell_r840_http/template_server_dell_r840_http.yaml"
+      ],
+      "content_sha256s": [
+        "3c2eb8d24fed4640f5de94be82262bf52a140553b33da5911fa320a230e4abc6"
+      ]
+    },
+    "20ea139663264c21bca0dcecf2e95589": {
+      "uuid": "20ea139663264c21bca0dcecf2e95589",
+      "name": "MikroTik CRS106-1C-5S by SNMP",
+      "technical_name": "MikroTik CRS106-1C-5S by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS106-1C-5S_snmp/template_net_mikrotik_CRS106-1C-5S_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "e8054451263b90844c06e18a883831fef5df8685afb93b4010396129a9755d02"
+      ]
+    },
+    "21a95afef0e74fb19691693090403d1d": {
+      "uuid": "21a95afef0e74fb19691693090403d1d",
+      "name": "ZYXEL MES3500-10 by SNMP",
+      "technical_name": "ZYXEL MES3500-10 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_mes3500-10_snmp/template_net_zyxel_mes3500-10_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "60d26cc17c5b8fb90b1549d5cd330b2ba1c24b89c55fc35339ed97d06f92a555"
+      ]
+    },
+    "21cca24cec1d40cdb0c2999aa6ac3037": {
+      "uuid": "21cca24cec1d40cdb0c2999aa6ac3037",
+      "name": "PostgreSQL by Zabbix agent 2 active",
+      "technical_name": "PostgreSQL by Zabbix agent 2 active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/db/postgresql_agent2_active/template_db_postgresql_agent2_active.yaml"
+      ],
+      "content_sha256s": [
+        "6f89eae84eec26cc785c3a4470d6e28835e086a3bb38e0a519e5ee7bab6b04ca"
+      ]
+    },
+    "21f3e79e1d2e4f5e868d1ef81c94bbfd": {
+      "uuid": "21f3e79e1d2e4f5e868d1ef81c94bbfd",
+      "name": "QTech QSW by SNMP",
+      "technical_name": "QTech QSW by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/qtech_snmp/template_net_qtech_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "27a7104208204b81c0f29370d739186ce215e63c93bf88707e19b9ae71c4a514"
+      ]
+    },
+    "223101f878704022a04c30c3ff066e3f": {
+      "uuid": "223101f878704022a04c30c3ff066e3f",
+      "name": "MikroTik CRS305-1G-4S+IN by SNMP",
+      "technical_name": "MikroTik CRS305-1G-4SIN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS305-1G-4S+IN_snmp/template_net_mikrotik_CRS305-1G-4S+IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "c1f09c683a3a9f2254ca64652710d0b655be4fa9bfd28c1124de50cbc9506294"
+      ]
+    },
+    "230fa9f7c1774821bbe6cdcbbba5cbc6": {
+      "uuid": "230fa9f7c1774821bbe6cdcbbba5cbc6",
+      "name": "Morningstar TriStar PWM by SNMP",
+      "technical_name": "Morningstar TriStar PWM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/morningstar/morningstar_tristar_pwm_snmp/template_net_morningstar_tristar_pwm_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "a84e961ab84cb465687e7cad39466de7e9cb8580537b4aff606807cb01160877"
+      ]
+    },
+    "2327c665b46e4aa781d41240168c3867": {
+      "uuid": "2327c665b46e4aa781d41240168c3867",
+      "name": "Intel SR1630 IPMI",
+      "technical_name": "Intel SR1630 IPMI",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/intel_sr1630_ipmi/template_server_intel_sr1630_ipmi.yaml"
+      ],
+      "content_sha256s": [
+        "1c3275b68f280c25cdcdf9a6071b652830268e38021d0f41b09394f8511903dd"
+      ]
+    },
+    "2420a8a4fda74fbc81743aed69fafa3b": {
+      "uuid": "2420a8a4fda74fbc81743aed69fafa3b",
+      "name": "Kubernetes Controller manager by HTTP",
+      "technical_name": "Kubernetes Controller manager by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/kubernetes_http/kubernetes_controller_manager_http/template_kubernetes_controller_manager.yaml"
+      ],
+      "content_sha256s": [
+        "8b21daa68e0c760025b8e6782a1228946291cde0db4c871f9f83778f900aad8d"
+      ]
+    },
+    "249de8d8d21e4dda9c3f766ab6201378": {
+      "uuid": "249de8d8d21e4dda9c3f766ab6201378",
+      "name": "ZYXEL MES-3528 by SNMP",
+      "technical_name": "ZYXEL MES-3528 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_mes-3528_snmp/template_net_zyxel_mes-3528_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "5ec0731fee0aeb25ce358eeb54f4220f395e5c814f7eb4091b2a7310bdae6cd4"
+      ]
+    },
+    "24b64f6d22b446dabecc86ee3f199004": {
+      "uuid": "24b64f6d22b446dabecc86ee3f199004",
+      "name": "Control-M enterprise manager by HTTP",
+      "technical_name": "Control-M enterprise manager by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/controlm_http/template_app_controlm_http.yaml"
+      ],
+      "content_sha256s": [
+        "e51acda1395ae5ff103fea90cd42a67005aadade5998e3ef36c3b4c5ca2548b8"
+      ]
+    },
+    "24bed6339f0a492fab86fe757394b937": {
+      "uuid": "24bed6339f0a492fab86fe757394b937",
+      "name": "Morningstar ProStar PWM by SNMP",
+      "technical_name": "Morningstar ProStar PWM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/morningstar/morningstar_prostar_pwm_snmp/template_net_morningstar_prostar_pwm_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "14ea18341457d21c4115e9544d4cecf48a848441c86647760609cfe9c112e5b7"
+      ]
+    },
+    "2506b0ca01884903b547b1e19b76ce6d": {
+      "uuid": "2506b0ca01884903b547b1e19b76ce6d",
+      "name": "Linux by Prom",
+      "technical_name": "Linux by Prom",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/os/linux_prom/template_os_linux_prom.yaml"
+      ],
+      "content_sha256s": [
+        "395430eedb95dd2769ea689f52c51e08e7bfc21f4e8a84ed89727ddea7a76625"
+      ]
+    },
+    "2526dce71d714e31bd545e96370c67b2": {
+      "uuid": "2526dce71d714e31bd545e96370c67b2",
+      "name": "Website by Browser",
+      "technical_name": "Website by Browser",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/website_browser/template_app_website_browser.yaml"
+      ],
+      "content_sha256s": [
+        "02d395fb79f12ebf5035a4c56e6f5851f166a44978f0b3b08f37f2a796231d25"
+      ]
+    },
+    "26674f62500e4e79b9f470bbf962130d": {
+      "uuid": "26674f62500e4e79b9f470bbf962130d",
+      "name": "Arista by SNMP",
+      "technical_name": "Arista by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/arista_snmp/template_net_arista_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "55c0fb3f0911061dedaa53edb89ee6c26a5a9e9352b822ac50885ce26032f163"
+      ]
+    },
+    "2785d83763c641a7a7937b516665d93a": {
+      "uuid": "2785d83763c641a7a7937b516665d93a",
+      "name": "MikroTik hEX lite by SNMP",
+      "technical_name": "MikroTik hEX lite by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_hEX_lite_snmp/template_net_mikrotik_hEX_lite_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "08cd9b01d3cf7b498803cf3e27f3644058c5bdcaca11a9c7a213a2269a031296"
+      ]
+    },
+    "27f6424905884dbb96ab9210d987a56c": {
+      "uuid": "27f6424905884dbb96ab9210d987a56c",
+      "name": "Nginx by Zabbix agent",
+      "technical_name": "Nginx by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/nginx_agent/template_app_nginx_agent.yaml"
+      ],
+      "content_sha256s": [
+        "e9985e1201897e6a014efbcebb662723a6c469fdd8533313c8cc5873d415987b"
+      ]
+    },
+    "28e31ef9402d4c1ba2fbc730a288d2d8": {
+      "uuid": "28e31ef9402d4c1ba2fbc730a288d2d8",
+      "name": "TrueNAS CORE by SNMP",
+      "technical_name": "TrueNAS CORE by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/truenas_snmp/template_app_truenas_core_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "475d7509c56188b59d2c995a8498e2869cff4ed9834118d2ee6b8c2a507019c1"
+      ]
+    },
+    "292970ad91204722b5e5cb3233fc0026": {
+      "uuid": "292970ad91204722b5e5cb3233fc0026",
+      "name": "ZYXEL MES3500-24 by SNMP",
+      "technical_name": "ZYXEL MES3500-24 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_mes3500-24_snmp/template_net_zyxel_mes3500-24_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "07789bef2248eb80bf758ab75511cf615ae6578b22bf3d6bdebc4f45bc5a20b3"
+      ]
+    },
+    "29325098807848aa928b4192ad5e020f": {
+      "uuid": "29325098807848aa928b4192ad5e020f",
+      "name": "Azure Cosmos DB for MongoDB by HTTP",
+      "technical_name": "Azure Cosmos DB for MongoDB by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "2aaa7f1ae36d6ffc2f759c1a93f6624bf6e053b79406c884de9aee2f3bddc1fb"
+      ]
+    },
+    "2b9039885edf45b8bdd39f16dd069133": {
+      "uuid": "2b9039885edf45b8bdd39f16dd069133",
+      "name": "TP-LINK by SNMP",
+      "technical_name": "TP-LINK by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/tplink_snmp/template_net_tplink_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "aaebf9819b5d35528488bb61d58f1aa6a5cbedd17b3d7371eff224184617ab60"
+      ]
+    },
+    "2bd6f566391d49dab6bee184522ab5fa": {
+      "uuid": "2bd6f566391d49dab6bee184522ab5fa",
+      "name": "MikroTik FiberBox by SNMP",
+      "technical_name": "MikroTik FiberBox by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_FiberBox_snmp/template_net_mikrotik_FiberBox_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "fad0a2cdb81be35460bb53d6d9a688236641711718a4aed5b1949f3612443e6c"
+      ]
+    },
+    "2bf5827343f0420792ad953f290baa05": {
+      "uuid": "2bf5827343f0420792ad953f290baa05",
+      "name": "WildFly Server by JMX",
+      "technical_name": "WildFly Server by JMX",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/wildfly_server_jmx/template_app_wildfly_server_jmx.yaml"
+      ],
+      "content_sha256s": [
+        "a7fc4b1c0e93a139e7c24e84e5b50ec62d6b1523f2faba03a156ec057c3134b7"
+      ]
+    },
+    "2c96393f8f2945c1a9f03f86adf5eb57": {
+      "uuid": "2c96393f8f2945c1a9f03f86adf5eb57",
+      "name": "Mantis BT by HTTP",
+      "technical_name": "Mantis BT by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/mantisbt_http/template_app_mantisbt_http.yaml"
+      ],
+      "content_sha256s": [
+        "3bb15b10087b5f4bacea29e4e958047ac085d0a89e48a7f904c177c8ead4ad41"
+      ]
+    },
+    "2cae7d2eeca04e6fa7419759ac9ad814": {
+      "uuid": "2cae7d2eeca04e6fa7419759ac9ad814",
+      "name": "Cisco Meraki device by HTTP",
+      "technical_name": "Cisco Meraki device by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/meraki_http/template_net_meraki_http.yaml"
+      ],
+      "content_sha256s": [
+        "ab9878aab3e0e63875f8558872fb88f7f412a2e59c797fd3acefceb174d9c27d"
+      ]
+    },
+    "2ce384bafd524db5b910d7f55bca1fbb": {
+      "uuid": "2ce384bafd524db5b910d7f55bca1fbb",
+      "name": "Veeam Backup Enterprise Manager by HTTP",
+      "technical_name": "Veeam Backup Enterprise Manager by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/veeam/enterprise_manager_http/template_veeam_enterprise_manager_http.yaml"
+      ],
+      "content_sha256s": [
+        "9b001b5bfa13f809859d733119809c6104fd8802143fa749f0770ce42a44da46"
+      ]
+    },
+    "2d20a2fbd540492089fdcafc8feb60e3": {
+      "uuid": "2d20a2fbd540492089fdcafc8feb60e3",
+      "name": "Morningstar TriStar MPPT 600V by SNMP",
+      "technical_name": "Morningstar TriStar MPPT 600V by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/morningstar/morningstar_tristar_mppt_600V_snmp/template_net_morningstar_tristar_mppt_600V_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "cd2097edc7ad0e62798ddfb18d719932b53bf26a07e5a8c030f21cb1f236b842"
+      ]
+    },
+    "2d8b9329b5d04cdf85bf17d2d0db2b29": {
+      "uuid": "2d8b9329b5d04cdf85bf17d2d0db2b29",
+      "name": "Azure Microsoft SQL Database by HTTP",
+      "technical_name": "Azure Microsoft SQL Database by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "8c9e4d0b190effd2d323948cc17a0d8c3710551d8a28353d1946ef9b5298e090"
+      ]
+    },
+    "2eb43a3c9666467683b9ce09d2bd26d7": {
+      "uuid": "2eb43a3c9666467683b9ce09d2bd26d7",
+      "name": "Apache Kafka by JMX",
+      "technical_name": "Apache Kafka by JMX",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/kafka_jmx/template_app_kafka_jmx.yaml"
+      ],
+      "content_sha256s": [
+        "15c2c76b0f4d974690d2a935276b76d274aac461f62456029bfc00957d1da761"
+      ]
+    },
+    "2ef2f2eb75ee4a0bae839e22aa76e5fc": {
+      "uuid": "2ef2f2eb75ee4a0bae839e22aa76e5fc",
+      "name": "Jenkins by HTTP",
+      "technical_name": "Jenkins by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/jenkins/template_app_jenkins.yaml"
+      ],
+      "content_sha256s": [
+        "10047cc5e0d6298f12e0105ff02f18ebda7c5147209a479ad556e0c9cdb6063b"
+      ]
+    },
+    "2f82248e411340429d390e8389850401": {
+      "uuid": "2f82248e411340429d390e8389850401",
+      "name": "HashiCorp Vault by HTTP",
+      "technical_name": "HashiCorp Vault by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/vault_http/template_app_vault_http.yaml"
+      ],
+      "content_sha256s": [
+        "a9c97d7ead9553ec7e1d22ca36e769b9c914f4f68f7d6b9fe470b7c205c66f2f"
+      ]
+    },
+    "2fca6b60914b4fa98132b1a7885ab014": {
+      "uuid": "2fca6b60914b4fa98132b1a7885ab014",
+      "name": "Cisco Meraki dashboard by HTTP",
+      "technical_name": "Cisco Meraki dashboard by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/net/meraki_http/template_net_meraki_http.yaml"
+      ],
+      "content_sha256s": [
+        "38dd58c31828b956eb78948540aedf561cb7be602220b1a6c136e42e8775eeba"
+      ]
+    },
+    "30cc187a4e994c39b07f53d86b5cc6bc": {
+      "uuid": "30cc187a4e994c39b07f53d86b5cc6bc",
+      "name": "Asterisk by HTTP",
+      "technical_name": "Asterisk by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/tel/asterisk_http/template_tel_asterisk_http.yaml"
+      ],
+      "content_sha256s": [
+        "0aa211d0753cee260bdac497360bd3cab9d13705431827379fb8da8dd705999d"
+      ]
+    },
+    "30d084c6b7844b7cab6cf820b00bb7b2": {
+      "uuid": "30d084c6b7844b7cab6cf820b00bb7b2",
+      "name": "Cisco Catalyst 3750V2-24TS by SNMP",
+      "technical_name": "Cisco Catalyst 3750V2-24TS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_catalyst_3750_24ts_snmp/template_net_cisco_catalyst_3750_24ts_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "94f401272d569b2db8a3f11f851738fe2d519845115641958b510da1e6e82127"
+      ]
+    },
+    "318fd61c22fa4f1a92a71376814d6c32": {
+      "uuid": "318fd61c22fa4f1a92a71376814d6c32",
+      "name": "MikroTik RB2011iLS-IN by SNMP",
+      "technical_name": "MikroTik RB2011iLS-IN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB2011iLS-IN_snmp/template_net_mikrotik_RB2011iLS-IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "08167b95360b9497b3ce1623b263d93f863e2e81d806cb7a3915a7c8cc444767"
+      ]
+    },
+    "32a39c8aca9445df862e9f3e1369c19a": {
+      "uuid": "32a39c8aca9445df862e9f3e1369c19a",
+      "name": "Nvidia by Zabbix agent 2",
+      "technical_name": "Nvidia by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/nvidia_agent2/template_app_nvidia_agent2.yaml"
+      ],
+      "content_sha256s": [
+        "46ee7d4f4bb0bb245f3ec558d9bd1909b74d725578f9f755e83b6a2f9f56a4ac"
+      ]
+    },
+    "32d3c78ff44c4c3c9ff5b893ad7f5fc9": {
+      "uuid": "32d3c78ff44c4c3c9ff5b893ad7f5fc9",
+      "name": "APC Smart-UPS RT 1000 XL by SNMP",
+      "technical_name": "APC Smart-UPS RT 1000 XL by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_smart_rt_1000_xl_snmp/template_power_apc_ups_smart_rt_1000_xl_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "70811011ec23b5e0ab9754a2028c3c9b7821b40a81566cb7d5dc2191fb62687e"
+      ]
+    },
+    "340ec6917c274ead8fab36925e57f30a": {
+      "uuid": "340ec6917c274ead8fab36925e57f30a",
+      "name": "APC Smart-UPS RT 1000 RM XL by SNMP",
+      "technical_name": "APC Smart-UPS RT 1000 RM XL by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_smart_rt_1000_rm_xl_snmp/template_power_apc_ups_smart_rt_1000_rm_xl_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "99deb40c67e6bd2340cd931b4c50ea03e53405f9651385c3bf00a287ecba21c7"
+      ]
+    },
+    "34f386276a094e8e9a6e46653fdf05b1": {
+      "uuid": "34f386276a094e8e9a6e46653fdf05b1",
+      "name": "Nextcloud by HTTP",
+      "technical_name": "Nextcloud by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/nextcloud/template_nextcloud_http.yaml"
+      ],
+      "content_sha256s": [
+        "be3daa75d9ada15c5e534f701271508f4391feb71fb34c0a6184e506884664cc"
+      ]
+    },
+    "35ef29f24158444097272d2ea7fa6044": {
+      "uuid": "35ef29f24158444097272d2ea7fa6044",
+      "name": "Azure PostgreSQL Flexible Server by HTTP",
+      "technical_name": "Azure PostgreSQL Flexible Server by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "76d8c7dfa1dfa8fee71f37b02cb68c983670400346fd2475bde844d2269dde97"
+      ]
+    },
+    "36116d8675da47b8a678193969d5a787": {
+      "uuid": "36116d8675da47b8a678193969d5a787",
+      "name": "CockroachDB by HTTP",
+      "technical_name": "CockroachDB by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/db/cockroachdb_http/template_db_cockroachdb_http.yaml"
+      ],
+      "content_sha256s": [
+        "1d7ea4a3fb126c5c6f7c2043f2a9f12da5984363bcbe3492d503ba840c8ea960"
+      ]
+    },
+    "3645654baaf04f11927b171bcb048349": {
+      "uuid": "3645654baaf04f11927b171bcb048349",
+      "name": "ZYXEL IES-6000 by SNMP",
+      "technical_name": "ZYXEL IES-6000 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_ies-6000_snmp/template_net_zyxel_ies-6000_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "fdee7911e1a0d042fe85e49cca93f0dc20ebbb9dd188fbbf2b3b96c46559afbc"
+      ]
+    },
+    "379aaf7e87574debb4f5c3947a22ec68": {
+      "uuid": "379aaf7e87574debb4f5c3947a22ec68",
+      "name": "HPE ProLiant DL380 by SNMP",
+      "technical_name": "HPE ProLiant DL380 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/hp/hp_dl380_snmp/template_server_hp_dl380_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "bdd9f03ef91960dcf0d23ca0f3065f5cf1fa9086949eb09e0549fb16140151ea"
+      ]
+    },
+    "37e5eb5606bc4abba66c8b20381a1e8a": {
+      "uuid": "37e5eb5606bc4abba66c8b20381a1e8a",
+      "name": "ICMP Ping",
+      "technical_name": "ICMP Ping",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/icmp_ping/template_module_icmp_ping.yaml"
+      ],
+      "content_sha256s": [
+        "8d8b200766a9d38ae2cceea36b3fa8da8843014fb8e5349fd81b6f40542dc926"
+      ]
+    },
+    "38456af4aedd4b168ec3fa4ad2acb256": {
+      "uuid": "38456af4aedd4b168ec3fa4ad2acb256",
+      "name": "GCP Cloud SQL MySQL by HTTP",
+      "technical_name": "GCP Cloud SQL MySQL by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/gcp/template_cloud_gcp_http.yaml"
+      ],
+      "content_sha256s": [
+        "21f4916f521300abf586c3f3c90d173418ef492aabad5cf8abd832554a8649bf"
+      ]
+    },
+    "395184b5d5b048a68e06c91154c56847": {
+      "uuid": "395184b5d5b048a68e06c91154c56847",
+      "name": "D-Link DES 7200 by SNMP",
+      "technical_name": "D-Link DES 7200 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/dlink_des7200_snmp/template_net_dlink_des7200_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "97204d7b5e1fd676fac2e31600fb2b64bf2e4420df1dbe6c2640639f0fa35776"
+      ]
+    },
+    "399bd1ee587245ecac6f39beaa99886f": {
+      "uuid": "399bd1ee587245ecac6f39beaa99886f",
+      "name": "PostgreSQL by Zabbix agent",
+      "technical_name": "PostgreSQL by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/postgresql_agent/template_db_postgresql_agent.yaml"
+      ],
+      "content_sha256s": [
+        "ec44f798d4de750dc8bfd44c44f05b727ac1b0e0a209f2c14182a531822155a9"
+      ]
+    },
+    "39e2f742d0b24ea489b7f61d27a5df1c": {
+      "uuid": "39e2f742d0b24ea489b7f61d27a5df1c",
+      "name": "Cisco Meraki organization by HTTP",
+      "technical_name": "Cisco Meraki organization by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/meraki_http/template_net_meraki_http.yaml"
+      ],
+      "content_sha256s": [
+        "7a07e10669d0ec49bb7e034fa6e1519ccb47faa565d5cbf174739f030a0e0018"
+      ]
+    },
+    "3a0bbbb2ec0a4c58bba3ba3a3d6ce660": {
+      "uuid": "3a0bbbb2ec0a4c58bba3ba3a3d6ce660",
+      "name": "TiDB TiKV by HTTP",
+      "technical_name": "TiDB TiKV by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/tidb_http/tidb_tikv_http/template_db_tidb_tikv_http.yaml"
+      ],
+      "content_sha256s": [
+        "9ffb65b5971982ebfd071eb87230dd8e7e4cddcfcd87c768579959f4ee01588c"
+      ]
+    },
+    "3a71dcdcfe0b4a0e8284d8939d335cce": {
+      "uuid": "3a71dcdcfe0b4a0e8284d8939d335cce",
+      "name": "ZYXEL AAM1212-51 IES-612 by SNMP",
+      "technical_name": "ZYXEL AAM1212-51 IES-612 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_aam1212-51_snmp/template_net_zyxel_aam1212-51_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "c7b58f7a6411a50a65b6c7d03465c0335cf3d185941d6cec1961b5b35a246efd"
+      ]
+    },
+    "3a7ff6eb19bb4a42b5b5b34a7179b30c": {
+      "uuid": "3a7ff6eb19bb4a42b5b5b34a7179b30c",
+      "name": "Check Point Next Generation Firewall by SNMP",
+      "technical_name": "Check Point Next Generation Firewall by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/checkpoint/quantum_ngfw_snmp/template_net_checkpoint_ngfw_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "9dbd0d19685d297dc92c82a35a53d80c43dadb3a185c57c40db694c3836b292b"
+      ]
+    },
+    "3ba7dec7c0034d86ad1c73b4f8ee8994": {
+      "uuid": "3ba7dec7c0034d86ad1c73b4f8ee8994",
+      "name": "DELL PowerEdge R660 by SNMP",
+      "technical_name": "DELL PowerEdge R660 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/dell/dell_r660_snmp/template_server_dell_r660_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "2c83c72f128f7ee93124f0007e771929a862424c126b3bff8c5de3227c1da47e"
+      ]
+    },
+    "3bbfe42c78c74f04a2565431fbdd19e2": {
+      "uuid": "3bbfe42c78c74f04a2565431fbdd19e2",
+      "name": "Morningstar SureSine by SNMP",
+      "technical_name": "Morningstar SureSine by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/morningstar/morningstar_suresine_snmp/template_net_morningstar_suresine_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "0448c7b1aaa604207f79cd0c9918fadd4cd3cb6c25b161e6dd57b0db39f716d1"
+      ]
+    },
+    "3cc8c9ae7055458c9a803597007f70bd": {
+      "uuid": "3cc8c9ae7055458c9a803597007f70bd",
+      "name": "Apache Tomcat by JMX",
+      "technical_name": "Apache Tomcat by JMX",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/tomcat_jmx/template_app_tomcat_jmx.yaml"
+      ],
+      "content_sha256s": [
+        "bd8557fcf6d9d27efec510764d76773532e5cd3d32bd305c510b1437a0cc0a4f"
+      ]
+    },
+    "3d527f609e344ed8a4ec19762c31c619": {
+      "uuid": "3d527f609e344ed8a4ec19762c31c619",
+      "name": "Azure Backup Jobs by HTTP",
+      "technical_name": "Azure Backup Jobs by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "90a8fdb6582bed313ff56c0989e5aa1bbfeff481c3d10a53bbe6bc4df4aebfd8"
+      ]
+    },
+    "3db29bb6b2b14fa289ba7915264efcdf": {
+      "uuid": "3db29bb6b2b14fa289ba7915264efcdf",
+      "name": "HashiCorp Consul Cluster by HTTP",
+      "technical_name": "HashiCorp Consul Cluster by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/consul_http/consul_cluster/template_consul_cluster_http.yaml"
+      ],
+      "content_sha256s": [
+        "7ec2e1655a1d1170efbecc881c50e92a04f62bc551e3718c3e12a7dcecb1add2"
+      ]
+    },
+    "3db86b0d235e4c7b80f7d6144ca08925": {
+      "uuid": "3db86b0d235e4c7b80f7d6144ca08925",
+      "name": "ZYXEL IES-500x by SNMP",
+      "technical_name": "ZYXEL IES-500x by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_ies-500x_snmp/template_net_zyxel_ies-500x_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "ac25ef24e2ac3c8a4d741d5d52b854a16bec57d4b20425ac88503e1a3b985adf"
+      ]
+    },
+    "3dfd1a55987848e5aa6ffe92c228f63b": {
+      "uuid": "3dfd1a55987848e5aa6ffe92c228f63b",
+      "name": "MikroTik RB1100AHx4 by SNMP",
+      "technical_name": "MikroTik RB1100AHx4 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB1100AHx4_snmp/template_net_mikrotik_RB1100AHx4_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "20ded7c051512d559807aa786b6988ab64a582b1e280b4a391ad74ec686d01da"
+      ]
+    },
+    "3ec55c9966624ef5bc1b50502812d581": {
+      "uuid": "3ec55c9966624ef5bc1b50502812d581",
+      "name": "APC UPS by SNMP",
+      "technical_name": "APC UPS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_snmp/template_power_apc_ups_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "898feb42e81c0a26663bfbd0dd7d03895432f15941ab00f32a2cd038d27ad798"
+      ]
+    },
+    "3f707f39c32a4b6e8b214c38a260f6f9": {
+      "uuid": "3f707f39c32a4b6e8b214c38a260f6f9",
+      "name": "DELL PowerEdge R740 by HTTP",
+      "technical_name": "DELL PowerEdge R740 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/server/dell/dell_r740_http/template_server_dell_r740_http.yaml"
+      ],
+      "content_sha256s": [
+        "3249332731d1a17ddf03e02bd0636c457a846208086bb0f0d8dfb433ba257deb"
+      ]
+    },
+    "3fb4020df2984b0ab64dfd8355ff5c65": {
+      "uuid": "3fb4020df2984b0ab64dfd8355ff5c65",
+      "name": "Hikvision camera by HTTP",
+      "technical_name": "Hikvision camera by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cctv/hikvision/template_cctv_hikvision.yaml"
+      ],
+      "content_sha256s": [
+        "cc540bea5bc645daabbeac4ddd28602db51767332196dd13ff839fc7a5992edb"
+      ]
+    },
+    "40c233aaa3424fd29dc378022ff3461d": {
+      "uuid": "40c233aaa3424fd29dc378022ff3461d",
+      "name": "Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP",
+      "technical_name": "Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "3110909c74dc3aeb1c2a9a5b7c60bc01bd80b561dd6b1b07f95a2415f601d695"
+      ]
+    },
+    "419145c8af7e4b8eb30af8460bbed566": {
+      "uuid": "419145c8af7e4b8eb30af8460bbed566",
+      "name": "DELL PowerEdge R750 by SNMP",
+      "technical_name": "DELL PowerEdge R750 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/dell/dell_r750_snmp/template_server_dell_r750_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "a340285418312f963809b045ccdc20ac9256b5bc7ee335896c288b24779c8409"
+      ]
+    },
+    "42b18986c8b34c2d9c36f9cd00565bd5": {
+      "uuid": "42b18986c8b34c2d9c36f9cd00565bd5",
+      "name": "DELL PowerEdge R750 by HTTP",
+      "technical_name": "DELL PowerEdge R750 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/dell/dell_r750_http/template_server_dell_r750_http.yaml"
+      ],
+      "content_sha256s": [
+        "c70d13e6ba53b4dbe174e4a865e527e1c03e3094248989bd8e06f8012c8391b2"
+      ]
+    },
+    "43596328d4d74a5592906a9e08e3fd96": {
+      "uuid": "43596328d4d74a5592906a9e08e3fd96",
+      "name": "TiDB PD by HTTP",
+      "technical_name": "TiDB PD by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/tidb_http/tidb_pd_http/template_db_tidb_pd_http.yaml"
+      ],
+      "content_sha256s": [
+        "293ee2531e1ed0d3396be12ae2f5939e249382e539a98b75f75c50cd8e86d56a"
+      ]
+    },
+    "43dc5c8a9a0e4786b64e44422c7f32b4": {
+      "uuid": "43dc5c8a9a0e4786b64e44422c7f32b4",
+      "name": "Dell iDRAC by SNMP",
+      "technical_name": "Dell iDRAC by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/server/dell_idrac_snmp/template_server_dell_idrac_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "df1bbd3a9ab196d23017b1264d2407bf9a7f3c4c20f1fea0bec15fda97724f35"
+      ]
+    },
+    "44990575121d4798b9e10520604c786c": {
+      "uuid": "44990575121d4798b9e10520604c786c",
+      "name": "Pure Storage FlashArray v2 by HTTP",
+      "technical_name": "Pure Storage FlashArray v2 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/san/pure_storage_flasharray/template_pure_storage_flasharray_http.yaml"
+      ],
+      "content_sha256s": [
+        "39927caaf90973d39073b1734e6c271ec21e35c6cc97faadbe88bdf50aa6af4e"
+      ]
+    },
+    "44c2c2d94a4447c6a924386640e4854a": {
+      "uuid": "44c2c2d94a4447c6a924386640e4854a",
+      "name": "F5 Big-IP by SNMP",
+      "technical_name": "F5 Big-IP by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/f5_bigip_snmp/template_net_f5_bigip_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "e5d547fbea40c7f46349c0b84ddffc4cfb47d69cc956877b9c953cc279559cf7"
+      ]
+    },
+    "44eac6a1abe34999b85ad6d0e40073fd": {
+      "uuid": "44eac6a1abe34999b85ad6d0e40073fd",
+      "name": "HashiCorp Nomad Client by HTTP",
+      "technical_name": "HashiCorp Nomad Client by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/nomad/template_app_nomad_http.yaml"
+      ],
+      "content_sha256s": [
+        "4569b51c7acd4af47c67203b574cc96af0fa699b7f0637bc1bed8f5de0487093"
+      ]
+    },
+    "4583f0c3bc894251a6c5e7129cb5b9aa": {
+      "uuid": "4583f0c3bc894251a6c5e7129cb5b9aa",
+      "name": "Cisco Catalyst 3750V2-24PS by SNMP",
+      "technical_name": "Cisco Catalyst 3750V2-24PS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_catalyst_3750_24ps_snmp/template_net_cisco_catalyst_3750_24ps_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "e93f6cdbc94895d76983160067fce93142236c204cd23503edc2cc2a3acc9ec8"
+      ]
+    },
+    "4677be3e07bf4f3285496f2f4230b928": {
+      "uuid": "4677be3e07bf4f3285496f2f4230b928",
+      "name": "IIS by Zabbix agent active",
+      "technical_name": "IIS by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/iis_agent_active/template_app_iis_agent_active.yaml"
+      ],
+      "content_sha256s": [
+        "d4d0943d9b50cc139c3329a79f1f2fc35d8c2e2196dcf40e8495a30e9ba52e67"
+      ]
+    },
+    "47d87c39c121429b98a18f641aa443ea": {
+      "uuid": "47d87c39c121429b98a18f641aa443ea",
+      "name": "GridGain by JMX",
+      "technical_name": "GridGain by JMX",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/gridgain_jmx/template_db_gridgain_jmx.yaml"
+      ],
+      "content_sha256s": [
+        "2821f0924bf7b64eb71429be64fb0213a37cc8be152ba9831a10bb1fe638cd0a"
+      ]
+    },
+    "4904f84303c74c5e955b7849730c3155": {
+      "uuid": "4904f84303c74c5e955b7849730c3155",
+      "name": "MySQL by Zabbix agent 2",
+      "technical_name": "MySQL by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/db/mysql_agent2/template_db_mysql_agent2.yaml"
+      ],
+      "content_sha256s": [
+        "d5cb4f41a34d7880025e261c33fb1fd28c28892257382733e9ae771b9b6c9908"
+      ]
+    },
+    "4958b76448d74ff1b6d7d6280449beee": {
+      "uuid": "4958b76448d74ff1b6d7d6280449beee",
+      "name": "Proxmox VE by HTTP",
+      "technical_name": "Proxmox VE by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/proxmox/template_app_proxmox.yaml"
+      ],
+      "content_sha256s": [
+        "5ea957bc6cf4f864415f34c63b3e5c269f5ecdb96973adc045b9e152a0344b20"
+      ]
+    },
+    "49c77ce207f8478da53e761526d6eca5": {
+      "uuid": "49c77ce207f8478da53e761526d6eca5",
+      "name": "PHP-FPM by HTTP",
+      "technical_name": "PHP-FPM by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/php-fpm_http/template_app_php-fpm_http.yaml"
+      ],
+      "content_sha256s": [
+        "3295f7fae024ff39f50f03ed228aec0f6378eb2b484952a8a63d2134a1dc3a5e"
+      ]
+    },
+    "4b27e636b6ad4ce68511d344d5604999": {
+      "uuid": "4b27e636b6ad4ce68511d344d5604999",
+      "name": "WildFly Domain by JMX",
+      "technical_name": "WildFly Domain by JMX",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/wildfly_domain_jmx/template_app_wildfly_domain_jmx.yaml"
+      ],
+      "content_sha256s": [
+        "3707b37ee5fe75873b6af18ff7cbbc80b971aa423d378b8e76ac5bf5f5dc5f03"
+      ]
+    },
+    "4c7d0c6e342b40458611bdb6e9dd958f": {
+      "uuid": "4c7d0c6e342b40458611bdb6e9dd958f",
+      "name": "AWS ELB Network Load Balancer by HTTP",
+      "technical_name": "AWS ELB Network Load Balancer by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml"
+      ],
+      "content_sha256s": [
+        "8d9d6fb90a8ec168e5abe0d6893d5a4945a1f142e251380dda248698f70b2553"
+      ]
+    },
+    "4cb1aabe2b704b5c882963c2ef87d8f6": {
+      "uuid": "4cb1aabe2b704b5c882963c2ef87d8f6",
+      "name": "Generic by SNMP",
+      "technical_name": "Generic by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/generic_snmp_snmp/template_module_generic_snmp_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "9959cbe859803711a0790351c26ee93f137b06040430a5ba9ba55b1c72f075fc"
+      ]
+    },
+    "4d3a7adbb6964bd08f2b9d28e0da6496": {
+      "uuid": "4d3a7adbb6964bd08f2b9d28e0da6496",
+      "name": "Linux by SNMP",
+      "technical_name": "Linux by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/os/linux_snmp_snmp/template_os_linux_snmp_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "bda25b44ecaa8f443683f79d7c0109086f3f202b49a674bf8f18b4583c11b468"
+      ]
+    },
+    "4e1e9372a5fe4297936210bc4fc4b1c0": {
+      "uuid": "4e1e9372a5fe4297936210bc4fc4b1c0",
+      "name": "GCP by HTTP",
+      "technical_name": "GCP by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/gcp/template_cloud_gcp_http.yaml"
+      ],
+      "content_sha256s": [
+        "d43662010be5d329f8a77e15ad5431b8d549c427ea7dcd2a2404366e34d784f1"
+      ]
+    },
+    "4e3fb27f028e4c35b8c9fc43b11c07d7": {
+      "uuid": "4e3fb27f028e4c35b8c9fc43b11c07d7",
+      "name": "OpenStack by HTTP",
+      "technical_name": "OpenStack by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/cloud/openstack/template_cloud_openstack_http.yaml"
+      ],
+      "content_sha256s": [
+        "ed9b0be6a6960e45f1b93019a560aeadb001d6e49c966fd0a27d9f513ee3d975"
+      ]
+    },
+    "4ffb0f9103084384a98379ed533865e9": {
+      "uuid": "4ffb0f9103084384a98379ed533865e9",
+      "name": "APC UPS Symmetra RX by SNMP",
+      "technical_name": "APC UPS Symmetra RX by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_symmetra_rx_snmp/template_power_apc_ups_symmetra_rx_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "037cb77264f24027d845cc91453113962d970725aa3218c5fe66ad8ccd9ec13e"
+      ]
+    },
+    "507d70db18554a4e9ee5e09bb29bc85f": {
+      "uuid": "507d70db18554a4e9ee5e09bb29bc85f",
+      "name": "GCP Cloud SQL MSSQL by HTTP",
+      "technical_name": "GCP Cloud SQL MSSQL by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/gcp/template_cloud_gcp_http.yaml"
+      ],
+      "content_sha256s": [
+        "adafde851c7db9d3bb32b06e01fbf8ea2e96a50137adc33ef3a993bdeed81f44"
+      ]
+    },
+    "5175afdf713744d9a81ce53864ccfc1d": {
+      "uuid": "5175afdf713744d9a81ce53864ccfc1d",
+      "name": "Azure Microsoft SQL Serverless Database by HTTP",
+      "technical_name": "Azure Microsoft SQL Serverless Database by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "f98e0159f8032ed4a6cee3f35fa482e37b41820a0178608914aa505ee8292e18"
+      ]
+    },
+    "51ffd432b9324ce2b04e1d4dc4122d16": {
+      "uuid": "51ffd432b9324ce2b04e1d4dc4122d16",
+      "name": "MySQL by Zabbix agent 2 active",
+      "technical_name": "MySQL by Zabbix agent 2 active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/db/mysql_agent2_active/template_db_mysql_agent2_active.yaml"
+      ],
+      "content_sha256s": [
+        "8038a4cc882397048dd713121c874e39cc6a1d7c43bed04b414d907df3d62930"
+      ]
+    },
+    "521d864fe8574f19b350f7ddbe259042": {
+      "uuid": "521d864fe8574f19b350f7ddbe259042",
+      "name": "Huawei OceanStor V6 by SNMP",
+      "technical_name": "Huawei OceanStor V6 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/san/huawei_oceanstor_v6_snmp/template_san_huawei_oceanstor_v6_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "64b5a7c2db218d76950bd3114ccd59af371b703cb07c92dffb8b413c3d636c6a"
+      ]
+    },
+    "52b2664578884d9eba62e47375c99f8e": {
+      "uuid": "52b2664578884d9eba62e47375c99f8e",
+      "name": "Elasticsearch Cluster by HTTP",
+      "technical_name": "Elasticsearch Cluster by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/elasticsearch_http/template_app_elasticsearch_http.yaml"
+      ],
+      "content_sha256s": [
+        "d66d8e002ae147e704684773af4d1d6bf68d63d8ea56e6a1934ba0c3052e164c"
+      ]
+    },
+    "53044571fb864d87af32473e08c76d0b": {
+      "uuid": "53044571fb864d87af32473e08c76d0b",
+      "name": "Alcatel Timetra TiMOS by SNMP",
+      "technical_name": "Alcatel Timetra TiMOS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/alcatel_timetra_snmp/template_net_alcatel_timetra_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "415f9c16581a11ec6588f2774281cd4ed17c43f02401a40b5a69005101ae9b47"
+      ]
+    },
+    "5331ecc3be9f47d6a8eb0732ae141239": {
+      "uuid": "5331ecc3be9f47d6a8eb0732ae141239",
+      "name": "MikroTik RB260GSP by SNMP",
+      "technical_name": "MikroTik RB260GSP by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB260GSP_snmp/template_net_mikrotik_RB260GSP_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "8445e2f0f87586e06f4e1a7da17902b8bfc4ebee69041ae316096274164f5feb"
+      ]
+    },
+    "538ec67ce01341a9b281dbd86d86d2a2": {
+      "uuid": "538ec67ce01341a9b281dbd86d86d2a2",
+      "name": "MikroTik CRS112-8P-4S-IN by SNMP",
+      "technical_name": "MikroTik CRS112-8P-4S-IN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS112-8P-4S-IN_snmp/template_net_mikrotik_CRS112-8P-4S-IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "e0a084731e970cd886bf15946b3f1b4e1752609a643717646ad20bfb59b52b1d"
+      ]
+    },
+    "54f0ffb538d94a9bb8062df3e63c4cb6": {
+      "uuid": "54f0ffb538d94a9bb8062df3e63c4cb6",
+      "name": "GCP Cloud SQL MSSQL Replica by HTTP",
+      "technical_name": "GCP Cloud SQL MSSQL Replica by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/gcp/template_cloud_gcp_http.yaml"
+      ],
+      "content_sha256s": [
+        "1a78167282f9ff65d48b49c89214e549bcb512fa3e690e19776b6db6b5872544"
+      ]
+    },
+    "56079badd056419383cc26e6a4fcc7e0": {
+      "uuid": "56079badd056419383cc26e6a4fcc7e0",
+      "name": "VMware",
+      "technical_name": "VMware",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/vmware/template_app_vmware.yaml"
+      ],
+      "content_sha256s": [
+        "548db93263c09bfbf987ba1f3fa3fb974efabf1eaf2378282d0aec13d45cead8"
+      ]
+    },
+    "5630ec1b1baf449abe1bc5521f85fe6c": {
+      "uuid": "5630ec1b1baf449abe1bc5521f85fe6c",
+      "name": "Website certificate by Zabbix agent 2",
+      "technical_name": "Website certificate by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/certificate_agent2/template_app_certificate_agent2.yaml"
+      ],
+      "content_sha256s": [
+        "e4f0f4fc856b739dffa72e71fa32c4c366fdb68f72523f2a5975a1ec7662ca85"
+      ]
+    },
+    "57aeccd43b744942b9555269b79a96ad": {
+      "uuid": "57aeccd43b744942b9555269b79a96ad",
+      "name": "HP Comware HH3C by SNMP",
+      "technical_name": "HP Comware HH3C by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/hp_hh3c_snmp/template_net_hp_hh3c_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "c2d8bc75e1104aea01ca99eae2a69eb1846149771915e09d6c40b8e5487e3065"
+      ]
+    },
+    "586119e5e27e4062a3cce8601ecb8d71": {
+      "uuid": "586119e5e27e4062a3cce8601ecb8d71",
+      "name": "HPE ProLiant BL920 by SNMP",
+      "technical_name": "HPE ProLiant BL920 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/hp/hp_bl920_snmp/template_server_hp_bl920_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "4970eab974c210b96352b70337df6d23f392081e5a27552687d79fadc61349ec"
+      ]
+    },
+    "5899b2f0aced4085b5ac25d0461b3425": {
+      "uuid": "5899b2f0aced4085b5ac25d0461b3425",
+      "name": "VMware Hypervisor",
+      "technical_name": "VMware Hypervisor",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/vmware/template_app_vmware.yaml",
+        "templates/app/vmware_fqdn/template_app_vmware_fqdn.yaml"
+      ],
+      "content_sha256s": [
+        "16323e897834ab3192c478df5c3f6005f72490ad10e94dd556b6eb2e8cad10ee"
+      ]
+    },
+    "5920713da492452889adabc25e259caa": {
+      "uuid": "5920713da492452889adabc25e259caa",
+      "name": "Netgear Fastpath by SNMP",
+      "technical_name": "Netgear Fastpath by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/netgear_snmp/template_net_netgear_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "cbd34974eb5e974fd9d37c72c067978a1f4aa2d26fa54c631b69e44bf3237ccb"
+      ]
+    },
+    "5c42de26643c4b43b23a11159df021ce": {
+      "uuid": "5c42de26643c4b43b23a11159df021ce",
+      "name": "Apache Cassandra by JMX",
+      "technical_name": "Apache Cassandra by JMX",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/db/cassandra_jmx/template_db_cassandra_jmx.yaml"
+      ],
+      "content_sha256s": [
+        "1ded3281ca095b9f9602db85b3f9b44163158bee4d7d8e20d3fd0ccb85a99a4d"
+      ]
+    },
+    "5d3971cd973b46e7915d7ae0750bac57": {
+      "uuid": "5d3971cd973b46e7915d7ae0750bac57",
+      "name": "APC UPS Galaxy 3500 by SNMP",
+      "technical_name": "APC UPS Galaxy 3500 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_galaxy_3500_snmp/template_power_apc_ups_galaxy_3500_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "94d4b848a06faaaf496846294a94028100bf378c22376dc80d8fafa13f0b90d2"
+      ]
+    },
+    "5e225ad1c2cc4d0bbf75586e7bf8871b": {
+      "uuid": "5e225ad1c2cc4d0bbf75586e7bf8871b",
+      "name": "AWS ECS Serverless Cluster by HTTP",
+      "technical_name": "AWS ECS Serverless Cluster by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml"
+      ],
+      "content_sha256s": [
+        "0d82d7d3a9afd61f44a6b52f253647131dbcfe8b8f9d0d09d8248a7a6a70deaf"
+      ]
+    },
+    "5ed19d1f74224588bf5f53ac47003acc": {
+      "uuid": "5ed19d1f74224588bf5f53ac47003acc",
+      "name": "MikroTik CCR1016-12G by SNMP",
+      "technical_name": "MikroTik CCR1016-12G by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR1016-12G_snmp/template_net_mikrotik_CCR1016-12G_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "a344d6acb4b49d8f85dfdf47b9ff5e7ca61839f022773f368a25ba1c6c003ef3"
+      ]
+    },
+    "5fa761bc51e4432a90c6c9eece930c4a": {
+      "uuid": "5fa761bc51e4432a90c6c9eece930c4a",
+      "name": "RabbitMQ cluster by Zabbix agent",
+      "technical_name": "RabbitMQ cluster by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/rabbitmq_agent/template_app_rabbitmq_agent.yaml"
+      ],
+      "content_sha256s": [
+        "c13822a172f4c9a539ba0dfe825cba2fc737121b2bfdf7ce6d0097fb044fc8bf"
+      ]
+    },
+    "5fdd2ca8b8f84962aaea5a218b46ea7d": {
+      "uuid": "5fdd2ca8b8f84962aaea5a218b46ea7d",
+      "name": "Windows by Zabbix agent active",
+      "technical_name": "Windows by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/os/windows_agent_active/template_os_windows_agent_active.yaml"
+      ],
+      "content_sha256s": [
+        "55bc7710274c588d4c9e82c23eefa60cd2084ac753210da059f322e43134a01c"
+      ]
+    },
+    "60cb9ccb922e4fd194a1d9573db10237": {
+      "uuid": "60cb9ccb922e4fd194a1d9573db10237",
+      "name": "HPE ProLiant DL360 by SNMP",
+      "technical_name": "HPE ProLiant DL360 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/hp/hp_dl360_snmp/template_server_hp_dl360_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "124901d2bddde5f80193398f4add1d469ecc32eb1ae3735cc8ef7a7e6061a5f2"
+      ]
+    },
+    "62d99b55585e41dd89736f5f46074dcb": {
+      "uuid": "62d99b55585e41dd89736f5f46074dcb",
+      "name": "Oracle Cloud Networking by HTTP",
+      "technical_name": "Oracle Cloud Networking by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml"
+      ],
+      "content_sha256s": [
+        "86036ea1001e7e9fdd5decf3158b410d02d51811f19de52cbb1802181a2c2f5b"
+      ]
+    },
+    "650bec3f2f364a478b82317396949459": {
+      "uuid": "650bec3f2f364a478b82317396949459",
+      "name": "Zabbix agent active",
+      "technical_name": "Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/app/zabbix_agent/template_module_zabbix_agent.yaml"
+      ],
+      "content_sha256s": [
+        "b36fe35d8e39b66c061da92acb4c33c0d6f709dbb3976af74bc4b6e8be9d2bf6"
+      ]
+    },
+    "654910b270d9464f863ed085ba7302ce": {
+      "uuid": "654910b270d9464f863ed085ba7302ce",
+      "name": "MikroTik CCR1016-12S-1S+ by SNMP",
+      "technical_name": "MikroTik CCR1016-12S-1S by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR1016-12S-1S+_snmp/template_net_mikrotik_CCR1016-12S-1S+_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "982af524f45460cc9e2bd41d9141c6c9f0e5e36c37d85d33ca8fb02f4c5f5b27"
+      ]
+    },
+    "67332e679035423f85090aa985947c36": {
+      "uuid": "67332e679035423f85090aa985947c36",
+      "name": "Network Generic Device by SNMP",
+      "technical_name": "Network Generic Device by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/generic_snmp/template_net_generic_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "338fac4775138e640e460d76562ac78b631b4450645a92f91a020c6b6e6db646"
+      ]
+    },
+    "6742f5ed33ca4c19b8e61203770e5fe5": {
+      "uuid": "6742f5ed33ca4c19b8e61203770e5fe5",
+      "name": "MikroTik CRS328-4C-20S-4S+RM by SNMP",
+      "technical_name": "MikroTik CRS328-4C-20S-4SRM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS328-4C-20S-4S+RM_snmp/template_net_mikrotik_CRS328-4C-20S-4S+RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "4f8d8579c46d2c542886d5955b88f55edb2263433140a67c6f88dca17f5d8ca7"
+      ]
+    },
+    "68c2034014f24115ae9e910962530472": {
+      "uuid": "68c2034014f24115ae9e910962530472",
+      "name": "MikroTik hEX by SNMP",
+      "technical_name": "MikroTik hEX by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_hEX_snmp/template_net_mikrotik_hEX_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "3459d9fa2409e4d357fce48b509217d7de1e91714239500657ef3ccf8842296b"
+      ]
+    },
+    "6c235d126c1f4895acfe2156b140a886": {
+      "uuid": "6c235d126c1f4895acfe2156b140a886",
+      "name": "Ubiquiti AirOS by SNMP",
+      "technical_name": "Ubiquiti AirOS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/ubiquiti_airos_snmp/template_net_ubiquiti_airos_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "f953945413103ed5f5542d4e4c7668de5a0436bb19e5d8425c5e44cdf6030d1c"
+      ]
+    },
+    "6d2443db49e54d59a82b9b525f2424ef": {
+      "uuid": "6d2443db49e54d59a82b9b525f2424ef",
+      "name": "GCP Compute Engine Instance by HTTP",
+      "technical_name": "GCP Compute Engine Instance by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/gcp/template_cloud_gcp_http.yaml"
+      ],
+      "content_sha256s": [
+        "c4ed01ac1549a6f835bca071921c432896cc1dd60f91c2ce658249f38202eb01"
+      ]
+    },
+    "6d6c147c87de4af1b09cf0f55bac50a0": {
+      "uuid": "6d6c147c87de4af1b09cf0f55bac50a0",
+      "name": "Zabbix server health by Zabbix agent active",
+      "technical_name": "Zabbix server health by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-4",
+      "paths": [
+        "templates/app/zabbix_server/template_app_zabbix_server.yaml"
+      ],
+      "content_sha256s": [
+        "234eaea60b04bb0a74f3f44726899157878e9f588ede3f069193e08806aaa95c"
+      ]
+    },
+    "6d9737c72e5540d39e3553b773a587b1": {
+      "uuid": "6d9737c72e5540d39e3553b773a587b1",
+      "name": "MikroTik RB2011iL-RM by SNMP",
+      "technical_name": "MikroTik RB2011iL-RM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB2011iL-RM_snmp/template_net_mikrotik_RB2011iL-RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "492d97c9789b480c47fcbe832a22f18035257643e77d4bb44de66c17a30e47e1"
+      ]
+    },
+    "6ecfb7083ddf45f183ab4be50cfba37a": {
+      "uuid": "6ecfb7083ddf45f183ab4be50cfba37a",
+      "name": "Brocade_Foundry Nonstackable by SNMP",
+      "technical_name": "Brocade_Foundry Nonstackable by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/brocade_foundry_sw_snmp/template_net_brocade_foundry_sw_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "104080736b3f83e4880460785c6657a4644369958525d07c58a31d3e80666c82"
+      ]
+    },
+    "6f7f2c44e13a46a4b219fbb5db92f3f7": {
+      "uuid": "6f7f2c44e13a46a4b219fbb5db92f3f7",
+      "name": "Intel_Qlogic Infiniband by SNMP",
+      "technical_name": "Intel_Qlogic Infiniband by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/intel_qlogic_infiniband_snmp/template_net_intel_qlogic_infiniband_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "218790ec99e6d6ee943e077a309cee867c802c7f72b8842e832a1985899215ab"
+      ]
+    },
+    "6ff896f545e043cc98de6d98698d41df": {
+      "uuid": "6ff896f545e043cc98de6d98698d41df",
+      "name": "Cisco Catalyst 3750V2-24FS by SNMP",
+      "technical_name": "Cisco Catalyst 3750V2-24FS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_catalyst_3750_24fs_snmp/template_net_cisco_catalyst_3750_24fs_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "76827219f848b8005c518fcba6f7501681e1b38c91fa6387074a1e91ce707d0d"
+      ]
+    },
+    "7005acc9123e4bc290805a3a16dab9cf": {
+      "uuid": "7005acc9123e4bc290805a3a16dab9cf",
+      "name": "PostgreSQL by Zabbix agent active",
+      "technical_name": "PostgreSQL by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/postgresql_agent_active/template_db_postgresql_agent_active.yaml"
+      ],
+      "content_sha256s": [
+        "b7ce27260d9cd0aa3fd0b1f7b2eb24a7d904687a3b84df3458b1ce3124fd53fe"
+      ]
+    },
+    "7297d66e419543c6b83dd8cfe5eb4fb7": {
+      "uuid": "7297d66e419543c6b83dd8cfe5eb4fb7",
+      "name": "Nvidia by Zabbix agent 2 active",
+      "technical_name": "Nvidia by Zabbix agent 2 active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/nvidia_agent2_active/template_app_nvidia_agent2_active.yaml"
+      ],
+      "content_sha256s": [
+        "81b0661ae4c859b4a4278c78a7f582bf43cc68cfaa3329e5849e303511ecefa9"
+      ]
+    },
+    "72aab08f7f27406a8f2c291648e5ba95": {
+      "uuid": "72aab08f7f27406a8f2c291648e5ba95",
+      "name": "Generic Java JMX",
+      "technical_name": "Generic Java JMX",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/generic_java_jmx/template_app_generic_java_jmx.yaml"
+      ],
+      "content_sha256s": [
+        "245f8b137933e31a6697e64e062ed13ee882147faf919782d81f5aacfeeed8ae"
+      ]
+    },
+    "738085dde4e749d49199e5e6fd4d56ab": {
+      "uuid": "738085dde4e749d49199e5e6fd4d56ab",
+      "name": "Veeam Backup and Replication by HTTP",
+      "technical_name": "Veeam Backup and Replication by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/veeam/backup_replication_http/template_veeam_backup_replication_http.yaml"
+      ],
+      "content_sha256s": [
+        "98f7882ea91f8453120f5d108a7b2d5b74ff12b24c5906a37c2dfa03a6e13d68"
+      ]
+    },
+    "73f123bb9ffe4587a0269c7e8752b2ed": {
+      "uuid": "73f123bb9ffe4587a0269c7e8752b2ed",
+      "name": "ZYXEL GS-4012F by SNMP",
+      "technical_name": "ZYXEL GS-4012F by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_gs4012f_snmp/template_net_zyxel_gs4012f_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "fff0e1ff611ccbb9867db8cc494bae2feae9c85970ee0ced7aeeef9592e539c6"
+      ]
+    },
+    "75ada0d6fb22416a9e6e5f44c2c3f64a": {
+      "uuid": "75ada0d6fb22416a9e6e5f44c2c3f64a",
+      "name": "MikroTik CSS326-24G-2S+RM by SNMP",
+      "technical_name": "MikroTik CSS326-24G-2SRM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CSS326-24G-2S+RM_snmp/template_net_mikrotik_CSS326-24G-2S+RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "b50036bd25308281c11bb6e0b9c255178d8929c9f0d5fe20e29cf9a0ab500a69"
+      ]
+    },
+    "75d009cd4dc84ee7a8fc479fa2fbaeee": {
+      "uuid": "75d009cd4dc84ee7a8fc479fa2fbaeee",
+      "name": "Cisco ASAv by SNMP",
+      "technical_name": "Cisco ASAv by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_asav_snmp/template_net_cisco_asav_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "e12f0d8e7ea2a59ba87f2f6a509347f7d8a9a5621c58b6307d6c449cb5704173"
+      ]
+    },
+    "75fc96367e8d4588ba8314145fc12d35": {
+      "uuid": "75fc96367e8d4588ba8314145fc12d35",
+      "name": "MSSQL by Zabbix agent 2",
+      "technical_name": "MSSQL by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-4",
+      "paths": [
+        "templates/db/mssql_agent2/template_db_mssql_agent2.yaml"
+      ],
+      "content_sha256s": [
+        "586784c6d816240e79e7cffa17e4cbd3819ef58430bc6542a107f4fe9c72b100"
+      ]
+    },
+    "760be6e1c2194a5bb7c0df47cc5f71ca": {
+      "uuid": "760be6e1c2194a5bb7c0df47cc5f71ca",
+      "name": "OpenBSD by Zabbix agent",
+      "technical_name": "OpenBSD by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/os/openbsd/template_os_openbsd.yaml"
+      ],
+      "content_sha256s": [
+        "cbbe68fcf01a8929ae6fa0ce902a92f3cf46d2a3ccf3448b6cbcfee54f1bbbcc"
+      ]
+    },
+    "7802db8c2f9c4a7eba7b381b8f3fa5c5": {
+      "uuid": "7802db8c2f9c4a7eba7b381b8f3fa5c5",
+      "name": "MikroTik hEX S by SNMP",
+      "technical_name": "MikroTik hEX S by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_hEX_S_snmp/template_net_mikrotik_hEX_S_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "e895d1b9a7255b44d6d1c98f6c8bf1353b7305f114e5aa8d3d62841503c09525"
+      ]
+    },
+    "780c4a9a657e42fc83f1ab9a535f5184": {
+      "uuid": "780c4a9a657e42fc83f1ab9a535f5184",
+      "name": "MikroTik RB4011iGS+RM by SNMP",
+      "technical_name": "MikroTik RB4011iGSRM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB4011iGS+RM_snmp/template_net_mikrotik_RB4011iGS+RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "098bc336685cb001c52cb19b1feca0497ef733d34c3583e0e8180b9dce6ab3d4"
+      ]
+    },
+    "79267c69f54a4e59b4152aba4e8c4bd5": {
+      "uuid": "79267c69f54a4e59b4152aba4e8c4bd5",
+      "name": "NetApp AFF A700 by HTTP",
+      "technical_name": "NetApp AFF A700 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/san/netapp_aff_a700_http/template_san_netapp_aff_a700_http.yaml"
+      ],
+      "content_sha256s": [
+        "d75ef2b47163520ae4f297144a209f810cb624e65b935e2cb4d8feee4523a750"
+      ]
+    },
+    "7942fb93ae3b47cf9ca0ea4beb0675ce": {
+      "uuid": "7942fb93ae3b47cf9ca0ea4beb0675ce",
+      "name": "VMware Guest",
+      "technical_name": "VMware Guest",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/vmware/template_app_vmware.yaml",
+        "templates/app/vmware_fqdn/template_app_vmware_fqdn.yaml"
+      ],
+      "content_sha256s": [
+        "c39b03ed6af05c00f6590b6dc4ef66d461906207f0bc348a8e642060366b8e42"
+      ]
+    },
+    "79b16cbbe593444eae3de66de0cb566b": {
+      "uuid": "79b16cbbe593444eae3de66de0cb566b",
+      "name": "Remote Zabbix server health",
+      "technical_name": "Remote Zabbix server health",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-5",
+      "paths": [
+        "templates/app/zabbix_server/template_app_zabbix_server.yaml"
+      ],
+      "content_sha256s": [
+        "b67eb18a9ab5f7efb7e255cac5e3908d129f23c9b0e4e71d6f3c37c8b0e683e4"
+      ]
+    },
+    "7af6d68b223a43d4bf8526cc5dc3fe2e": {
+      "uuid": "7af6d68b223a43d4bf8526cc5dc3fe2e",
+      "name": "AWS EC2 by HTTP",
+      "technical_name": "AWS EC2 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml"
+      ],
+      "content_sha256s": [
+        "b3444449790bb68e4769377f018c8429c8c801821aae5c0b3dbfcd28945ad763"
+      ]
+    },
+    "7b3ecb24366f4685970df8e1143323f0": {
+      "uuid": "7b3ecb24366f4685970df8e1143323f0",
+      "name": "MikroTik CCR1036-8G-2S+EM by SNMP",
+      "technical_name": "MikroTik CCR1036-8G-2SEM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR1036-8G-2S+EM_snmp/template_net_mikrotik_CCR1036-8G-2S+EM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "36967f7a51283950610e9ddca5e573b65c3830a241100828cf9fe22812f57352"
+      ]
+    },
+    "7b6c6228b25f4586b42cd1bf37ff8034": {
+      "uuid": "7b6c6228b25f4586b42cd1bf37ff8034",
+      "name": "SMART by Zabbix agent 2",
+      "technical_name": "SMART by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/server/smart_agent2/template_module_smart_agent2.yaml"
+      ],
+      "content_sha256s": [
+        "f4ae51e5c16164303d30b93b2d186b832eb65aee37865cd619bba1b191376ee5"
+      ]
+    },
+    "7b6f7a12a6b449ca926e74c894eca354": {
+      "uuid": "7b6f7a12a6b449ca926e74c894eca354",
+      "name": "MikroTik RB5009UG+S+IN by SNMP",
+      "technical_name": "MikroTik RB5009UGSIN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB5009UG+S+IN_snmp/template_net_mikrotik_RB5009UG+S+IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "41191aeeb322a133956c50515c1eaefee6f7d72c98d576f0200ee60adfd8119d"
+      ]
+    },
+    "7e6bb0931a72459db9514aa924b420bc": {
+      "uuid": "7e6bb0931a72459db9514aa924b420bc",
+      "name": "AIX by Zabbix agent",
+      "technical_name": "AIX by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/os/aix/template_os_aix.yaml"
+      ],
+      "content_sha256s": [
+        "6376b4cd6670f90d10f48ee41a28fff078f119af8a6f97e888e318b51437216b"
+      ]
+    },
+    "7f44e67e3f564ec9894c9142d7276553": {
+      "uuid": "7f44e67e3f564ec9894c9142d7276553",
+      "name": "MikroTik CCR1036-8G-2S+ by SNMP",
+      "technical_name": "MikroTik CCR1036-8G-2S by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR1036-8G-2S+_snmp/template_net_mikrotik_CCR1036-8G-2S+_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "b19140f31ebc621220361546815149175c5bf64fd089e9a3d593b0fe4c365141"
+      ]
+    },
+    "8098b3c157ab456abd55d3840eef79c1": {
+      "uuid": "8098b3c157ab456abd55d3840eef79c1",
+      "name": "OpenWeatherMap by HTTP",
+      "technical_name": "OpenWeatherMap by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/openweathermap_http/template_app_openweathermap_http.yaml"
+      ],
+      "content_sha256s": [
+        "a1b1a431cc8da8bf462d51363d09aa3b35465f3c4fc6444384e5bfc023e530c9"
+      ]
+    },
+    "80fc469750f84061924662a98c33580c": {
+      "uuid": "80fc469750f84061924662a98c33580c",
+      "name": "Cisco Nexus 9000 Series by SNMP",
+      "technical_name": "Cisco Nexus 9000 Series by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_nexus_9000_series_snmp/template_net_cisco_nexus_9000_series_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "eb3e7b0dd7565bb3dbf3edec7da8d6d2dc3e480369e81e67a4d4d053ccd4dc9e"
+      ]
+    },
+    "812073bf8df143bcae2a84b32c3965e5": {
+      "uuid": "812073bf8df143bcae2a84b32c3965e5",
+      "name": "HAProxy by Zabbix agent",
+      "technical_name": "HAProxy by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/haproxy_agent/template_app_haproxy_agent.yaml"
+      ],
+      "content_sha256s": [
+        "74fa2c0be56955f23036a712f3ffffea335ba57ce8f079e8f36d0c07a57a6b36"
+      ]
+    },
+    "815b5a81b29a477695fddbd533ad9c84": {
+      "uuid": "815b5a81b29a477695fddbd533ad9c84",
+      "name": "Mikrotik by SNMP",
+      "technical_name": "Mikrotik by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_snmp/template_net_mikrotik_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "f943479f2533e59412514afbdd11ada4e65aeab7c28f02457247d090e906ccbd"
+      ]
+    },
+    "81aa8c5ab5594f77a2b26fb7f5094048": {
+      "uuid": "81aa8c5ab5594f77a2b26fb7f5094048",
+      "name": "MongoDB node by Zabbix agent 2",
+      "technical_name": "MongoDB node by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/db/mongodb/template_db_mongodb.yaml"
+      ],
+      "content_sha256s": [
+        "853ee48d1932363e249beb58aabe92320f4896903c28d0eca01454dcb3d6a035"
+      ]
+    },
+    "820fa4a1565c43e4aac07a691a5bface": {
+      "uuid": "820fa4a1565c43e4aac07a691a5bface",
+      "name": "Azure Virtual Machine by HTTP",
+      "technical_name": "Azure Virtual Machine by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "b86a42f8f535382b9fbecc7dd1ab06d9ab822c9611c64e5e4975b2bad66e37b5"
+      ]
+    },
+    "82b428ad78d34988b93f3d577f2b6adc": {
+      "uuid": "82b428ad78d34988b93f3d577f2b6adc",
+      "name": "MikroTik CCR1036-12G-4S by SNMP",
+      "technical_name": "MikroTik CCR1036-12G-4S by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR1036-12G-4S_snmp/template_net_mikrotik_CCR1036-12G-4S_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "388ac34051799eb72dc933d7ffbedae8f9c4317a5d35a34d344413a42ed52e83"
+      ]
+    },
+    "8598d0e2bd6f4903832ec91b7b300062": {
+      "uuid": "8598d0e2bd6f4903832ec91b7b300062",
+      "name": "HashiCorp Nomad Server by HTTP",
+      "technical_name": "HashiCorp Nomad Server by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/nomad/template_app_nomad_http.yaml"
+      ],
+      "content_sha256s": [
+        "57f5b710d5138263dda525c5abfb9db5eacc8f555d263b94af47afb40cc50be5"
+      ]
+    },
+    "85ce114c802e4e28a5f3597e07d07032": {
+      "uuid": "85ce114c802e4e28a5f3597e07d07032",
+      "name": "Kubernetes API server by HTTP",
+      "technical_name": "Kubernetes API server by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/kubernetes_http/kubernetes_api_server_http/template_kubernetes_api_servers.yaml"
+      ],
+      "content_sha256s": [
+        "6d0248394e0d25eab4ff166095b43748e6f00ebc94f3d2456f6c8981760780b3"
+      ]
+    },
+    "861dbdece18f4b8f85214a319995eb3e": {
+      "uuid": "861dbdece18f4b8f85214a319995eb3e",
+      "name": "Extreme EXOS by SNMP",
+      "technical_name": "Extreme EXOS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/extreme_snmp/template_net_extreme_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "1ddd3d03f122ff7b6f8613ef0b659e8cb9a1bde740dc8d918a44236acbab8ba4"
+      ]
+    },
+    "86702e8bc514434e8c914d50c206cb94": {
+      "uuid": "86702e8bc514434e8c914d50c206cb94",
+      "name": "Apache by HTTP",
+      "technical_name": "Apache by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/apache_http/template_app_apache_http.yaml"
+      ],
+      "content_sha256s": [
+        "514764c168cd32b392070bcb805ead574e91e717fcbb9b85c70721304761c9f7"
+      ]
+    },
+    "884bdbeea93c4be0a11a2c92a5f8adce": {
+      "uuid": "884bdbeea93c4be0a11a2c92a5f8adce",
+      "name": "HashiCorp Consul Node by HTTP",
+      "technical_name": "HashiCorp Consul Node by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/consul_http/consul/template_consul_node_http.yaml"
+      ],
+      "content_sha256s": [
+        "fc8e9749791bc906c9e3ad2296611ea1dd70caf87fa7d40068f468a4876eab57"
+      ]
+    },
+    "89eef2fe23964f44bf9aec6d00e39efd": {
+      "uuid": "89eef2fe23964f44bf9aec6d00e39efd",
+      "name": "ZYXEL MES3500-24S by SNMP",
+      "technical_name": "ZYXEL MES3500-24S by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_mgs3500-24s_snmp/template_net_zyxel_mgs3500-24s_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "20e135756718f8f8a342bc7b7f9d72471b26630003bc4f2919c521806c9fcf91"
+      ]
+    },
+    "8aa4557f6c3f4aadbc03447fca3af9f6": {
+      "uuid": "8aa4557f6c3f4aadbc03447fca3af9f6",
+      "name": "Zabbix agent",
+      "technical_name": "Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/app/zabbix_agent/template_module_zabbix_agent.yaml"
+      ],
+      "content_sha256s": [
+        "493ceace4a6754ef40a7f37259ede557e8781fa9310a969124b80a6d4c19ac6c"
+      ]
+    },
+    "8ab5387c8887435587cce8383b2fc6c5": {
+      "uuid": "8ab5387c8887435587cce8383b2fc6c5",
+      "name": "Nutanix Host Prism Element by HTTP",
+      "technical_name": "Nutanix Host Prism Element by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/nutanix_http/template_app_nutanix_prism_element_http.yaml"
+      ],
+      "content_sha256s": [
+        "ab1dc2dbfe45d3120e66b558d5c3033c31f2175ad847797bb1ca6835bd153a06"
+      ]
+    },
+    "8afa1796d280425b99c7ea36900dac24": {
+      "uuid": "8afa1796d280425b99c7ea36900dac24",
+      "name": "Oracle Cloud Block Volume by HTTP",
+      "technical_name": "Oracle Cloud Block Volume by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml"
+      ],
+      "content_sha256s": [
+        "94614b853d7b7fd86f663b6e6c2250311a1e3cebd0dd4bd0fe90ab0dd47ffadb"
+      ]
+    },
+    "8c8474148c2a4eaeabe5a9331ea99d77": {
+      "uuid": "8c8474148c2a4eaeabe5a9331ea99d77",
+      "name": "RabbitMQ cluster by HTTP",
+      "technical_name": "RabbitMQ cluster by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/rabbitmq_http/template_app_rabbitmq_http.yaml"
+      ],
+      "content_sha256s": [
+        "b27546266fb206411925b465fd69cae17ea7a12f22923d83ae2e3b10feed02b4"
+      ]
+    },
+    "8cad0f2564694416b60bd8a414948641": {
+      "uuid": "8cad0f2564694416b60bd8a414948641",
+      "name": "NGINX Plus by HTTP",
+      "technical_name": "NGINX Plus by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/nginx_plus_http/template_app_nginx_plus_http.yaml"
+      ],
+      "content_sha256s": [
+        "fcdad4efaa0edffe3439f7e30b3cdd597479d935dbc7df373b4586a44760802f"
+      ]
+    },
+    "8cd15d3b39654eb7b7423e6b109037b2": {
+      "uuid": "8cd15d3b39654eb7b7423e6b109037b2",
+      "name": "Zabbix proxy health by Zabbix agent",
+      "technical_name": "Zabbix proxy health by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml"
+      ],
+      "content_sha256s": [
+        "6265cc5c55fa2ab979ee9b5fd79796d53a027e0278e61ff44c58517d34b5f20e"
+      ]
+    },
+    "8cdbe00a2a3046ee962d28d32567968a": {
+      "uuid": "8cdbe00a2a3046ee962d28d32567968a",
+      "name": "Travis CI by HTTP",
+      "technical_name": "Travis CI by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/travis_ci_http/template_app_travis_ci_http.yaml"
+      ],
+      "content_sha256s": [
+        "fa2980a9185fde4e9b877300630505bfb23d2d236177aba860f9ae9b7a641385"
+      ]
+    },
+    "8cf537f34600403b9de31d3db4eb2a1d": {
+      "uuid": "8cf537f34600403b9de31d3db4eb2a1d",
+      "name": "MikroTik RB2011UiAS-IN by SNMP",
+      "technical_name": "MikroTik RB2011UiAS-IN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB2011UiAS-IN_snmp/template_net_mikrotik_RB2011UiAS-IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "e850fdb23154c271c9a02812cd2960464504f4cedc5d005d584f3f8248c3ee76"
+      ]
+    },
+    "8d22b4d1a9c6457fbd6fd959263f91db": {
+      "uuid": "8d22b4d1a9c6457fbd6fd959263f91db",
+      "name": "MikroTik CSS610-8G-2S+IN by SNMP",
+      "technical_name": "MikroTik CSS610-8G-2SIN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CSS610-8G-2S+IN_snmp/template_net_mikrotik_CSS610-8G-2S+IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "6345ee4b3952409ee6f2540d0dcbe9a295c1ea89f46e9a50ca24b337ede3087c"
+      ]
+    },
+    "8d5fe5b4ebb64255a2429b34c7dd3681": {
+      "uuid": "8d5fe5b4ebb64255a2429b34c7dd3681",
+      "name": "Microsoft SharePoint by HTTP",
+      "technical_name": "Microsoft SharePoint by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/sharepoint_http/template_app_sharepoint_http.yaml"
+      ],
+      "content_sha256s": [
+        "72bf170fc34b4d4c2d02c7dabdf23eb6d12aaa4239316432a28e302ca2d93ffc"
+      ]
+    },
+    "8d7d49fd0b3f4b1f9046dc0e94457931": {
+      "uuid": "8d7d49fd0b3f4b1f9046dc0e94457931",
+      "name": "MikroTik CRS112-8G-4S-IN by SNMP",
+      "technical_name": "MikroTik CRS112-8G-4S-IN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS112-8G-4S-IN_snmp/template_net_mikrotik_CRS112-8G-4S-IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "7b66772c0ad015b342c0d531b7ce3356b0863e2b99cbddf68c167a840ace0f9a"
+      ]
+    },
+    "8da94e2f01ff46e28becf0b08ff09ace": {
+      "uuid": "8da94e2f01ff46e28becf0b08ff09ace",
+      "name": "MikroTik CRS312-4C+8XG-RM by SNMP",
+      "technical_name": "MikroTik CRS312-4C8XG-RM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS312-4C+8XG-RM_snmp/template_net_mikrotik_CRS312-4C+8XG-RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "ae8e6691b6b8e214aa7a83b7fb4a026a24976b81ff4646ddac168dad358305c3"
+      ]
+    },
+    "8e5236f799b347a8ae90a979198be85e": {
+      "uuid": "8e5236f799b347a8ae90a979198be85e",
+      "name": "Squid by SNMP",
+      "technical_name": "Squid by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/squid_snmp/template_app_squid_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "1c5d395460f246af46aaf16ab4dbf92dbd6a721ec20278bdbd50dc9591b81a24"
+      ]
+    },
+    "8e6d7067cd094e56a52db999b3199edc": {
+      "uuid": "8e6d7067cd094e56a52db999b3199edc",
+      "name": "ZYXEL IES1248-51 by SNMP",
+      "technical_name": "ZYXEL IES1248-51 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_ies1248-51_snmp/template_net_zyxel_ies1248-51_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "41b1c164d4c35402b2bac08f8ad45c8fdcaeb2d67ec365b4fc68bbb4759d11c5"
+      ]
+    },
+    "8ea7299983f24d0a913606e334f0e526": {
+      "uuid": "8ea7299983f24d0a913606e334f0e526",
+      "name": "ZYXEL MGS-3712 by SNMP",
+      "technical_name": "ZYXEL MGS-3712 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_mgs-3712_snmp/template_net_zyxel_mgs-3712_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "8116543d516e9de7c72dc7e4a26d1b47af334c7e7e000728e6f4f5ae158e62b7"
+      ]
+    },
+    "8ec72ebbe3204d7789429640abcac610": {
+      "uuid": "8ec72ebbe3204d7789429640abcac610",
+      "name": "TiDB by HTTP",
+      "technical_name": "TiDB by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/tidb_http/tidb_tidb_http/template_db_tidb_tidb_http.yaml"
+      ],
+      "content_sha256s": [
+        "f426e073980a4f68b6ff3b42aa47828c85757c207330cb184047bd551cc0960d"
+      ]
+    },
+    "8ec76aeb703747a5affdf435bc12f572": {
+      "uuid": "8ec76aeb703747a5affdf435bc12f572",
+      "name": "APC Smart-UPS SRT 5000 by SNMP",
+      "technical_name": "APC Smart-UPS SRT 5000 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_smart_srt_5000_snmp/template_power_apc_ups_smart_srt_5000_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "bd5bffcb19f8d1c32bee990af9601a6be32f8cbfcdb79018e1bb8625fa99a0e4"
+      ]
+    },
+    "90ac276995294a6aa88462c032d2ddaf": {
+      "uuid": "90ac276995294a6aa88462c032d2ddaf",
+      "name": "Systemd by Zabbix agent 2",
+      "technical_name": "Systemd by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/systemd/template_app_systemd.yaml"
+      ],
+      "content_sha256s": [
+        "f58dfb1d0e70923d0b586e0aa1ce7db87417a361dc7c0cbc35b94faa0bcc2645"
+      ]
+    },
+    "930c0e0534a9424fb01f2b6218d8ce59": {
+      "uuid": "930c0e0534a9424fb01f2b6218d8ce59",
+      "name": "MikroTik CCR1036-12G-4S-EM by SNMP",
+      "technical_name": "MikroTik CCR1036-12G-4S-EM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR1036-12G-4S-EM_snmp/template_net_mikrotik_CCR1036-12G-4S-EM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "c67183d1ae58432d8e3662ee4c40f18212d7559bc42e13c72248ecf2824199ce"
+      ]
+    },
+    "948d046cb2894e5c8d07767a518cc1a9": {
+      "uuid": "948d046cb2894e5c8d07767a518cc1a9",
+      "name": "HAProxy by HTTP",
+      "technical_name": "HAProxy by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/haproxy_http/template_app_haproxy_http.yaml"
+      ],
+      "content_sha256s": [
+        "1a5b3c8e89a33f8cff23ba9531e0c0deceb0259e3fa657dee70e8fd3221a67a0"
+      ]
+    },
+    "95f2053c21094ad4968440b562cc7ea2": {
+      "uuid": "95f2053c21094ad4968440b562cc7ea2",
+      "name": "ClickHouse by HTTP",
+      "technical_name": "ClickHouse by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/db/clickhouse_http/template_db_clickhouse_http.yaml"
+      ],
+      "content_sha256s": [
+        "d671416ae9d6ba1dd464fce12d703ed51f173a7138fa90741e90e4ac16f645dc"
+      ]
+    },
+    "9643f22821104f809e2486be83e1816e": {
+      "uuid": "9643f22821104f809e2486be83e1816e",
+      "name": "DELL PowerEdge R720 by HTTP",
+      "technical_name": "DELL PowerEdge R720 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/server/dell/dell_r720_http/template_server_dell_r720_http.yaml"
+      ],
+      "content_sha256s": [
+        "1777e0b79e59edfa4a0503eeaf241ee2c843ba0e7ec08239f5bdf9e5e16a0e43"
+      ]
+    },
+    "969cf5dca58f47f0b271ccf62ef79c13": {
+      "uuid": "969cf5dca58f47f0b271ccf62ef79c13",
+      "name": "MikroTik RB2011UiAS-RM by SNMP",
+      "technical_name": "MikroTik RB2011UiAS-RM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB2011UiAS-RM_snmp/template_net_mikrotik_RB2011UiAS-RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "ad0f0228e40fb0b02f5dcf2c75fc6b271f02bba9d0684be13731064c3f16c334"
+      ]
+    },
+    "970c2342146549768e6b91a26089bcdf": {
+      "uuid": "970c2342146549768e6b91a26089bcdf",
+      "name": "Remote Zabbix proxy health",
+      "technical_name": "Remote Zabbix proxy health",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml"
+      ],
+      "content_sha256s": [
+        "78910e72737cbcf31e6e11bc31c57bffdb94bdc079800d8bbcf42caf1a00ba09"
+      ]
+    },
+    "9cc843a085bb4ee5af0dc4d764a7eee9": {
+      "uuid": "9cc843a085bb4ee5af0dc4d764a7eee9",
+      "name": "ZYXEL MGS3520-28x by SNMP",
+      "technical_name": "ZYXEL MGS3520-28x by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_mgs3520-28x_snmp/template_net_zyxel_mgs3520-28x_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "8451031a18a4a0a1af2eb36d2a05b5e215de466f7c334da3c45ce48bb80b7129"
+      ]
+    },
+    "9d7871c093f9489293421396b9fea668": {
+      "uuid": "9d7871c093f9489293421396b9fea668",
+      "name": "GCP Cloud SQL MySQL Replica by HTTP",
+      "technical_name": "GCP Cloud SQL MySQL Replica by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/gcp/template_cloud_gcp_http.yaml"
+      ],
+      "content_sha256s": [
+        "05bc17b54d85424b1842b02b947c362bb053b01abe8e7dced5ef7dddc86afa9a"
+      ]
+    },
+    "9fde0e1c36f8453da72f97535d4e74ca": {
+      "uuid": "9fde0e1c36f8453da72f97535d4e74ca",
+      "name": "DELL PowerEdge R740 by SNMP",
+      "technical_name": "DELL PowerEdge R740 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/server/dell/dell_r740_snmp/template_server_dell_r740_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "3925599c80ba78e3b73bf036cdc503eae419ceec1f0cbeeef18cdb9fcb89f011"
+      ]
+    },
+    "a0e05ca631034676821b7e0e1ce25488": {
+      "uuid": "a0e05ca631034676821b7e0e1ce25488",
+      "name": "Microsoft Exchange Server 2016 by Zabbix agent active",
+      "technical_name": "Microsoft Exchange Server 2016 by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/exchange_active/template_app_exchange_active.yaml"
+      ],
+      "content_sha256s": [
+        "0818211c3e5497112ffe55d0fbb4c34a6704cc8394e4a3913fbcf608c4ec7a51"
+      ]
+    },
+    "a14ab6b4e80643fe8daa9d7288658f79": {
+      "uuid": "a14ab6b4e80643fe8daa9d7288658f79",
+      "name": "AWS S3 bucket by HTTP",
+      "technical_name": "AWS S3 bucket by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml"
+      ],
+      "content_sha256s": [
+        "46b2078545c41c720500d89d664e7236a500ff9319e1d3619cff4029b50c62b4"
+      ]
+    },
+    "a326034825984bbd8a3a5885f3939bb3": {
+      "uuid": "a326034825984bbd8a3a5885f3939bb3",
+      "name": "Juniper by SNMP",
+      "technical_name": "Juniper by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/juniper_snmp/template_net_juniper_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "049b9ecd149c40248990699b36507f4602628fe979ed45bebd69766dcfbb7c3a"
+      ]
+    },
+    "a3dc630729e443139f4e608954fa6e19": {
+      "uuid": "a3dc630729e443139f4e608954fa6e19",
+      "name": "FreeBSD by Zabbix agent",
+      "technical_name": "FreeBSD by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/os/freebsd/template_os_freebsd.yaml"
+      ],
+      "content_sha256s": [
+        "6a8d0e02ec15e56b7388dfbe98ccf831b1a0b3a386279639c65a4253845eb30c"
+      ]
+    },
+    "a5ddacdd5ac64b82bf5183769cc03e8c": {
+      "uuid": "a5ddacdd5ac64b82bf5183769cc03e8c",
+      "name": "MikroTik hEX PoE lite by SNMP",
+      "technical_name": "MikroTik hEX PoE lite by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_hEX_PoE_lite_snmp/template_net_mikrotik_hEX_PoE_lite_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "d3059da5845064badce8ce24ecffd0c5ed78af08695cd670f566b25dc36e9412"
+      ]
+    },
+    "a60798c651604d93a062bec0f8a89751": {
+      "uuid": "a60798c651604d93a062bec0f8a89751",
+      "name": "Mellanox by SNMP",
+      "technical_name": "Mellanox by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/mellanox_snmp/template_net_mellanox_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "422968903e09d4063b42ca2c44545a0c234fd3fae2787a5c461e6bc791b28860"
+      ]
+    },
+    "a6fe3640b23544e7ae15d438b38ce1cd": {
+      "uuid": "a6fe3640b23544e7ae15d438b38ce1cd",
+      "name": "InfluxDB by HTTP",
+      "technical_name": "InfluxDB by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/influxdb_http/template_db_influxdb_http.yaml"
+      ],
+      "content_sha256s": [
+        "a2286da58ab2c5cf95ba0062739eb754600767427febb3b5cb947de432f26fa2"
+      ]
+    },
+    "a7f0c853c6634b1dacaaf43c2a0d9375": {
+      "uuid": "a7f0c853c6634b1dacaaf43c2a0d9375",
+      "name": "Jira Data Center by JMX",
+      "technical_name": "Jira Data Center by JMX",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/jira_datacenter_jmx/template_app_jira_datacenter_jmx.yaml"
+      ],
+      "content_sha256s": [
+        "1ca23a0edd9071698bf5cc3dec63a1284538c6f5996befcf072063e40db1b703"
+      ]
+    },
+    "a809695fbc784b75adcd4833c86bca8d": {
+      "uuid": "a809695fbc784b75adcd4833c86bca8d",
+      "name": "MikroTik CCR1009-7G-1C-1S+ by SNMP",
+      "technical_name": "MikroTik CCR1009-7G-1C-1S by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR1009-7G-1C-1S+_snmp/template_net_mikrotik_CCR1009-7G-1C-1S+_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "81af9d8753720646af5c55b197d166c7a6e80bb000806d57f8e02ecb8087c45c"
+      ]
+    },
+    "a8d91e4f36794e32b73090d5edf3d7ae": {
+      "uuid": "a8d91e4f36794e32b73090d5edf3d7ae",
+      "name": "Apache by Zabbix agent",
+      "technical_name": "Apache by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/apache_agent/template_app_apache_agent.yaml"
+      ],
+      "content_sha256s": [
+        "149a58e34be956804ff8d31d980f023f62cda256b6f102960e6d1d456a90771a"
+      ]
+    },
+    "a93f57ccc68e442da79bf4a20fe46570": {
+      "uuid": "a93f57ccc68e442da79bf4a20fe46570",
+      "name": "Azure SQL Managed Instance by HTTP",
+      "technical_name": "Azure SQL Managed Instance by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "4b0cfb79efc29614ede0f9a24991d33093f8189cb3c1ab11fca34e52427821c4"
+      ]
+    },
+    "a9e83f950e9f41a78474d523c8376338": {
+      "uuid": "a9e83f950e9f41a78474d523c8376338",
+      "name": "PHP-FPM by Zabbix agent active",
+      "technical_name": "PHP-FPM by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/php-fpm_agent_active/template_app_php-fpm_agent_active.yaml"
+      ],
+      "content_sha256s": [
+        "84a44e23260cbb560df0583365994e29015d005a60702f6fd5f3f64f3e22753a"
+      ]
+    },
+    "aa3286a824464020863ead141e8f0afc": {
+      "uuid": "aa3286a824464020863ead141e8f0afc",
+      "name": "Apache by Zabbix agent active",
+      "technical_name": "Apache by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/apache_agent_active/template_app_apache_agent_active.yaml"
+      ],
+      "content_sha256s": [
+        "06fc9523a96ea6bf8d1130fd52fea546fd25040f203322d46850d82cc6600377"
+      ]
+    },
+    "aa3ce9bd8c1d40a2b0f83f9e642e88ee": {
+      "uuid": "aa3ce9bd8c1d40a2b0f83f9e642e88ee",
+      "name": "Cisco IOS by SNMP",
+      "technical_name": "Cisco IOS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "e690f9c6fd1dd8c12332c6e78f7545eb95b3e857fdb2d31a95e9c29e61370558"
+      ]
+    },
+    "ab05dbb15ff047f192782f617f0627ac": {
+      "uuid": "ab05dbb15ff047f192782f617f0627ac",
+      "name": "Ignite by JMX",
+      "technical_name": "Ignite by JMX",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/ignite_jmx/template_db_ignite_jmx.yaml"
+      ],
+      "content_sha256s": [
+        "4840e043936606df295b66a15e9792f0c8d52810f76afeaa8fd782e1219e0db3"
+      ]
+    },
+    "ab18a5665b7d4bed876881b5c4e8ce51": {
+      "uuid": "ab18a5665b7d4bed876881b5c4e8ce51",
+      "name": "ZYXEL XGS-4728F by SNMP",
+      "technical_name": "ZYXEL XGS-4728F by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_xgs-4728f_snmp/template_net_zyxel_xgs-4728f_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "a3043a7c1fa6116b9d8a2856d3c60e933fa0dc35758703d52406243d4dd07f46"
+      ]
+    },
+    "ab871d051e304f83950171c5243aa4db": {
+      "uuid": "ab871d051e304f83950171c5243aa4db",
+      "name": "MikroTik CCR2004-16G-2S+ by SNMP",
+      "technical_name": "MikroTik CCR2004-16G-2S by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR2004-16G-2S+_snmp/template_net_mikrotik_CCR2004-16G-2S+_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "86b7773e796b98a65867eb6be8ce049677907632c60c91f41a53a90372a48224"
+      ]
+    },
+    "ad4c3dad4b7b492685d1fd3bd3a664f9": {
+      "uuid": "ad4c3dad4b7b492685d1fd3bd3a664f9",
+      "name": "Huawei VRP by SNMP",
+      "technical_name": "Huawei VRP by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/huawei_snmp/template_net_huawei_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "86294dc3fd9e0ed5ac52c5a74014f233df775dc0e4d15c6d2b91392ae375c3fc"
+      ]
+    },
+    "ae3ce7156aae4ae79a72742365c884ea": {
+      "uuid": "ae3ce7156aae4ae79a72742365c884ea",
+      "name": "Pure Storage FlashArray v1 by HTTP",
+      "technical_name": "Pure Storage FlashArray v1 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/san/pure_storage_flasharray/template_pure_storage_flasharray_http.yaml"
+      ],
+      "content_sha256s": [
+        "a52556d809fb8cff72d8937ca650616f889a83ad5b5f70a7be4cc036dab74436"
+      ]
+    },
+    "af21edc47557400583e537904ea632aa": {
+      "uuid": "af21edc47557400583e537904ea632aa",
+      "name": "Aranet Cloud",
+      "technical_name": "Aranet Cloud",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/aranet_http/template_app_aranet_http.yaml"
+      ],
+      "content_sha256s": [
+        "ada370b308a400d80a0602ef8a063b0d2025c8316e5bc3fdebc0857e815a525d"
+      ]
+    },
+    "b126aaf4499d49d7b4fcee0329b7dea7": {
+      "uuid": "b126aaf4499d49d7b4fcee0329b7dea7",
+      "name": "MikroTik netPower 16P by SNMP",
+      "technical_name": "MikroTik netPower 16P by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_netPower_16P_snmp/template_net_mikrotik_netPower_16P_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "d6ea8826367b4283f7ceff8ed14425fbd91290dd491ad7311372bbbaae7a5191"
+      ]
+    },
+    "b1fd823d262042e08291313f72be9452": {
+      "uuid": "b1fd823d262042e08291313f72be9452",
+      "name": "HP-UX by Zabbix agent",
+      "technical_name": "HP-UX by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/os/hp-ux/template_os_hp-ux.yaml"
+      ],
+      "content_sha256s": [
+        "25877e589d8186332dea0af78beb8f17852bb42a0e76af747ad7497377100cd6"
+      ]
+    },
+    "b25b8b517a4743c48037bfa10af3dc3c": {
+      "uuid": "b25b8b517a4743c48037bfa10af3dc3c",
+      "name": "Etcd by HTTP",
+      "technical_name": "Etcd by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/etcd_http/template_app_etcd_http.yaml"
+      ],
+      "content_sha256s": [
+        "900496c0cd9f8cdcea7ac6649881d8721d902546c102a7a171971f18a3c16584"
+      ]
+    },
+    "b3caafda8c5345cc832ac3be3cefa615": {
+      "uuid": "b3caafda8c5345cc832ac3be3cefa615",
+      "name": "APC Smart-UPS SRT 8000 by SNMP",
+      "technical_name": "APC Smart-UPS SRT 8000 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_smart_srt_8000_snmp/template_power_apc_ups_smart_srt_8000_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "55b16ed2c85b332e1dbfa75d48e657e2620440a0ac9395c717bd0e7ed64448c9"
+      ]
+    },
+    "b43a7c5f1d1d43d28e2eb8f0a9f6f16f": {
+      "uuid": "b43a7c5f1d1d43d28e2eb8f0a9f6f16f",
+      "name": "GCP Cloud SQL PostgreSQL Replica by HTTP",
+      "technical_name": "GCP Cloud SQL PostgreSQL Replica by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/gcp/template_cloud_gcp_http.yaml"
+      ],
+      "content_sha256s": [
+        "be4d5150e21a489cfd03d68496f2cc0a0b37a44f5569aa1177ee43ea2725b43a"
+      ]
+    },
+    "b6027e374e424481951ca2256099515c": {
+      "uuid": "b6027e374e424481951ca2256099515c",
+      "name": "Nutanix Cluster Prism Element by HTTP",
+      "technical_name": "Nutanix Cluster Prism Element by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/nutanix_http/template_app_nutanix_prism_element_http.yaml"
+      ],
+      "content_sha256s": [
+        "edfa4520dfc247c73e5eada76896dc4cf32b567c55304199fdc9bcee4cd53ea1"
+      ]
+    },
+    "b606eda347ea4663a33ad4d12a482750": {
+      "uuid": "b606eda347ea4663a33ad4d12a482750",
+      "name": "Zookeeper by HTTP",
+      "technical_name": "Zookeeper by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/zookeeper_http/template_app_zookeeper_http.yaml"
+      ],
+      "content_sha256s": [
+        "69344b97758c0a17ef4a1d0106b51a3bacf10473103fdb176dad831bd368e4e7"
+      ]
+    },
+    "b84324c2a40a496dbbb379bbf5dde8d5": {
+      "uuid": "b84324c2a40a496dbbb379bbf5dde8d5",
+      "name": "Morningstar ProStar MPPT by SNMP",
+      "technical_name": "Morningstar ProStar MPPT by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/morningstar/morningstar_prostar_mppt_snmp/template_net_morningstar_prostar_mppt_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "2cf78f7edb0c3b1e25b3d4c0c929f3be4aadd8cf810507cf68ba80e2de8a2c89"
+      ]
+    },
+    "b8750c02b5624c6889979b129735bd56": {
+      "uuid": "b8750c02b5624c6889979b129735bd56",
+      "name": "HPE Primera by HTTP",
+      "technical_name": "HPE Primera by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/san/hpe_primera_http/template_san_hpe_primera_http.yaml"
+      ],
+      "content_sha256s": [
+        "187fefdd8694fae513ff84ed373b58ef582c676b9f84af65f7761ddbc6d79b89"
+      ]
+    },
+    "b8a6f34fd5c447b1b9310746a96f4e80": {
+      "uuid": "b8a6f34fd5c447b1b9310746a96f4e80",
+      "name": "ZYXEL ES3500-8PD by SNMP",
+      "technical_name": "ZYXEL ES3500-8PD by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/zyxel_snmp/zyxel_es3500-8pd_snmp/template_net_zyxel_es3500-8pd_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "654bdcddd31d51c02dccce1e0baaa43acc68330fb576cce4cbfeee92af8ca768"
+      ]
+    },
+    "b9514029d03b44de9adf24251778dbf3": {
+      "uuid": "b9514029d03b44de9adf24251778dbf3",
+      "name": "RabbitMQ node by HTTP",
+      "technical_name": "RabbitMQ node by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/rabbitmq_http/template_app_rabbitmq_http.yaml"
+      ],
+      "content_sha256s": [
+        "8a66745a2c0e7e9ea2343f2a8436b1916844cec34fa5e251b44a796126980dba"
+      ]
+    },
+    "bc056b1724e748bba50928f8cc605f8e": {
+      "uuid": "bc056b1724e748bba50928f8cc605f8e",
+      "name": "YugabyteDB by HTTP",
+      "technical_name": "YugabyteDB by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/yugabytedb_http/template_db_yugabyte_http.yaml"
+      ],
+      "content_sha256s": [
+        "95a92ce358c960484b508ed73958ba54130f6910abc33e0ea824b3d0d9a4044a"
+      ]
+    },
+    "bc80883918ac4f879427ca145122b5cb": {
+      "uuid": "bc80883918ac4f879427ca145122b5cb",
+      "name": "MikroTik CRS326-24G-2S+RM by SNMP",
+      "technical_name": "MikroTik CRS326-24G-2SRM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS326-24G-2S+RM_snmp/template_net_mikrotik_CRS326-24G-2S+RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "77d13f04e4496f841bdb7fc706eb1b60587111418161e12b9d18e4eb23ea260d"
+      ]
+    },
+    "bcc01f2b466345c4bcbe0cea1a7884d1": {
+      "uuid": "bcc01f2b466345c4bcbe0cea1a7884d1",
+      "name": "MikroTik CRS309-1G-8S+IN by SNMP",
+      "technical_name": "MikroTik CRS309-1G-8SIN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS309-1G-8S+IN_snmp/template_net_mikrotik_CRS309-1G-8S+IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "bca3db4d675891cbf15b1cde5042f973227d2b1a62387e626fd8f5b2cdffccfb"
+      ]
+    },
+    "be10b1140fce4cc08247260b71bcd037": {
+      "uuid": "be10b1140fce4cc08247260b71bcd037",
+      "name": "HPE MSA 2040 Storage by HTTP",
+      "technical_name": "HPE MSA 2040 Storage by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/san/hpe_msa2040_http/template_san_hpe_msa2040_http.yaml"
+      ],
+      "content_sha256s": [
+        "6aff9ddde8596f251beabb295749d6652f2c1b70dabac7984a568a39e18b0af0"
+      ]
+    },
+    "bf3107deff3a4aabab1e1c0ee71a3281": {
+      "uuid": "bf3107deff3a4aabab1e1c0ee71a3281",
+      "name": "Acronis Cyber Protect Cloud MSP by HTTP",
+      "technical_name": "Acronis Cyber Protect Cloud MSP by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/acronis/template_app_acronis_cyber_protect_cloud_http.yaml"
+      ],
+      "content_sha256s": [
+        "c962dda16f5e6548d185c30c1d7ca9944071d02fae240a2f6067588f61ec9a46"
+      ]
+    },
+    "c0263df8d8c14d30b24afcf45a6a354f": {
+      "uuid": "c0263df8d8c14d30b24afcf45a6a354f",
+      "name": "Azure Cost Management by HTTP",
+      "technical_name": "Azure Cost Management by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "c74227feeb73e78b20ef301f16fb8d1217432c71805dff5584d8e703c932c15c"
+      ]
+    },
+    "c03e1ab0128a4ae1847bc04a34f5634e": {
+      "uuid": "c03e1ab0128a4ae1847bc04a34f5634e",
+      "name": "MikroTik PowerBox Pro by SNMP",
+      "technical_name": "MikroTik PowerBox Pro by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_PowerBox_Pro_snmp/template_net_mikrotik_PowerBox_Pro_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "1154836ca5c64f78030b18a2dc20d13e6877297e59e84bc9efb7c50469429a15"
+      ]
+    },
+    "c077d6c381904e94a4df88136588b551": {
+      "uuid": "c077d6c381904e94a4df88136588b551",
+      "name": "Control-M server by HTTP",
+      "technical_name": "Control-M server by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/controlm_http/template_app_controlm_http.yaml"
+      ],
+      "content_sha256s": [
+        "a412fe338d3f65f2191abdf7bb9460c6277cef825eedad893956425a619f3375"
+      ]
+    },
+    "c1396bf1e8cf46f6a407e88ddceef0b8": {
+      "uuid": "c1396bf1e8cf46f6a407e88ddceef0b8",
+      "name": "Azure MySQL Single Server by HTTP",
+      "technical_name": "Azure MySQL Single Server by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "bb861afae461524bf36cc81398184a8b4673233cbaba55c955602b764682d18f"
+      ]
+    },
+    "c2a7ddca051d4b4a9553f339c57e47a9": {
+      "uuid": "c2a7ddca051d4b4a9553f339c57e47a9",
+      "name": "HP iLO by SNMP",
+      "technical_name": "HP iLO by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/hp_ilo_snmp/template_server_hp_ilo_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "a2b66d0531b3726c07196f1266e9ae6052afda5b34f2a1e1165e156e7a0526d3"
+      ]
+    },
+    "c3a9fa0e07be4c1bbe19ae65c3375d17": {
+      "uuid": "c3a9fa0e07be4c1bbe19ae65c3375d17",
+      "name": "Azure Microsoft SQL DTU Database by HTTP",
+      "technical_name": "Azure Microsoft SQL DTU Database by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "ac1e7573b36749921107359827a496cb7182fbf4806c56a17185510435993cf4"
+      ]
+    },
+    "c5564dd58c394b969d5365cc5de3e7f8": {
+      "uuid": "c5564dd58c394b969d5365cc5de3e7f8",
+      "name": "Huawei OceanStor 5300 V5 by SNMP",
+      "technical_name": "Huawei OceanStor 5300 V5 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/san/huawei_5300v5_snmp/template_san_huawei_5300v5_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "4db42377cb24600af653401177e08b657b1e02288198ad9a526f56d8dbe88217"
+      ]
+    },
+    "c5f41fe0f54f470f9e304384838f150a": {
+      "uuid": "c5f41fe0f54f470f9e304384838f150a",
+      "name": "MikroTik CRS326-24G-2S+IN by SNMP",
+      "technical_name": "MikroTik CRS326-24G-2SIN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS326-24G-2S+IN_snmp/template_net_mikrotik_CRS326-24G-2S+IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "58d3812b3dcfa7dc0195a5a51c12e8afd1c5638153179b9f81fec4aeb9485522"
+      ]
+    },
+    "c5fd214cdd0d4b3b8272e73b022ba5c2": {
+      "uuid": "c5fd214cdd0d4b3b8272e73b022ba5c2",
+      "name": "Docker by Zabbix agent 2",
+      "technical_name": "Docker by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/docker/template_app_docker.yaml"
+      ],
+      "content_sha256s": [
+        "8e78aff97ddbf5348a519b47b3854d9929cf8e6a8b0cced564264c4658f05e42"
+      ]
+    },
+    "c60e5929ab474f67bbe67dc6b04e709d": {
+      "uuid": "c60e5929ab474f67bbe67dc6b04e709d",
+      "name": "AWS by HTTP",
+      "technical_name": "AWS by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml"
+      ],
+      "content_sha256s": [
+        "69835a3c622a914a968a454492a9833076353b61143996f201c53252e84af32f"
+      ]
+    },
+    "c6d9475847f44d9193f8253e5995b8f8": {
+      "uuid": "c6d9475847f44d9193f8253e5995b8f8",
+      "name": "AWS RDS instance by HTTP",
+      "technical_name": "AWS RDS instance by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml"
+      ],
+      "content_sha256s": [
+        "a65a101dd06be118b4086e881ffb94b797c85096d4ab6d0e50c80a7777ebef90"
+      ]
+    },
+    "c7c7e5dc319b4801982e719beb1c5191": {
+      "uuid": "c7c7e5dc319b4801982e719beb1c5191",
+      "name": "IIS by Zabbix agent",
+      "technical_name": "IIS by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/iis_agent/template_app_iis_agent.yaml"
+      ],
+      "content_sha256s": [
+        "9471166670f67544626b3ce756d70c2a997c9bd7a4f6320bb5fb6570bb2657ce"
+      ]
+    },
+    "c87e0a2e0683483ab7c6f3c380e9f840": {
+      "uuid": "c87e0a2e0683483ab7c6f3c380e9f840",
+      "name": "Apache ActiveMQ by JMX",
+      "technical_name": "Apache ActiveMQ by JMX",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/activemq_jmx/template_app_activemq_jmx.yaml"
+      ],
+      "content_sha256s": [
+        "64164295d3640e1d056b150ccbc16ffc493490c5999e92d1b8864683beb36139"
+      ]
+    },
+    "c8db153405704d859ba5ee19f08b46f3": {
+      "uuid": "c8db153405704d859ba5ee19f08b46f3",
+      "name": "MikroTik CRS125-24G-1S-2HnD-IN by SNMP",
+      "technical_name": "MikroTik CRS125-24G-1S-2HnD-IN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS125-24G-1S-2HnD-IN_snmp/template_net_mikrotik_CRS125-24G-1S-2HnD-IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "447b9dab0bffa7842c36e5ca73cff1f3f68b7b192d92d8ec4b8434a5d542402c"
+      ]
+    },
+    "c94105c23220452baed03ba87f09ca12": {
+      "uuid": "c94105c23220452baed03ba87f09ca12",
+      "name": "AWS ECS Cluster by HTTP",
+      "technical_name": "AWS ECS Cluster by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml"
+      ],
+      "content_sha256s": [
+        "364476a9f404862b0dce585689a3440b10bc647575f3d4677b326b698a107db3"
+      ]
+    },
+    "c9e1acd3ae4a427ab39724b6bcaf839e": {
+      "uuid": "c9e1acd3ae4a427ab39724b6bcaf839e",
+      "name": "IBM IMM by SNMP",
+      "technical_name": "IBM IMM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/ibm_imm_snmp/template_server_ibm_imm_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "665fdd4c91f824a0513f05d8379b3b138e1f91343177f33da8fc060c3fc1d3cd"
+      ]
+    },
+    "ca02e82e6c414d0aa7aedc8d78468a49": {
+      "uuid": "ca02e82e6c414d0aa7aedc8d78468a49",
+      "name": "VMware FQDN",
+      "technical_name": "VMware FQDN",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/vmware_fqdn/template_app_vmware_fqdn.yaml"
+      ],
+      "content_sha256s": [
+        "f531c800e200b3cd4ff33d0ea217634ad1678cdd1e9a1426f8759613c9a57eef"
+      ]
+    },
+    "cb66d34564e44b3893442fc74cf6e951": {
+      "uuid": "cb66d34564e44b3893442fc74cf6e951",
+      "name": "Cisco UCS by SNMP",
+      "technical_name": "Cisco UCS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/cisco_ucs_snmp/template_server_cisco_ucs_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "9bacc47dd05a7046c884fb121fcc1c5327a402873141c23b204eec683f3feeaf"
+      ]
+    },
+    "cbf70ed444394566bcf213dd63d4d352": {
+      "uuid": "cbf70ed444394566bcf213dd63d4d352",
+      "name": "Microsoft Exchange Server 2016 by Zabbix agent",
+      "technical_name": "Microsoft Exchange Server 2016 by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/exchange/template_app_exchange.yaml"
+      ],
+      "content_sha256s": [
+        "7535fd77b8b380737620bdc5655c7ca34a54c6c2698aab9c7c0152946d065c16"
+      ]
+    },
+    "cc762a057f0f467ab571b6d76a9bb278": {
+      "uuid": "cc762a057f0f467ab571b6d76a9bb278",
+      "name": "MikroTik RB3011UiAS-RM by SNMP",
+      "technical_name": "MikroTik RB3011UiAS-RM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB3011UiAS-RM_snmp/template_net_mikrotik_RB3011UiAS-RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "1ee872e7deef702f943a78f16e21b002eff7562cf375652463086f06d43470c3"
+      ]
+    },
+    "cce20a5d149a48b7ac7f5383c3510883": {
+      "uuid": "cce20a5d149a48b7ac7f5383c3510883",
+      "name": "HP Enterprise Switch by SNMP",
+      "technical_name": "HP Enterprise Switch by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/hp_hpn_snmp/template_net_hp_hpn_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "bcbc8ac32e1f73b6e85b4b8baf2037145be3532d13322d95f9656aa6df502c87"
+      ]
+    },
+    "cdb6ebceb1174bada392dd24889b14d9": {
+      "uuid": "cdb6ebceb1174bada392dd24889b14d9",
+      "name": "MikroTik CRS212-1G-10S-1S+IN by SNMP",
+      "technical_name": "MikroTik CRS212-1G-10S-1SIN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS212-1G-10S-1S+IN_snmp/template_net_mikrotik_CRS212-1G-10S-1S+IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "f999ddec606e2c994babdb121bb6b70208c1bc6909dc9fe7e4b348ce2a78f546"
+      ]
+    },
+    "cf0947cc05d3450b9a6d66b2eb180482": {
+      "uuid": "cf0947cc05d3450b9a6d66b2eb180482",
+      "name": "Supermicro Aten by SNMP",
+      "technical_name": "Supermicro Aten by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/supermicro_aten_snmp/template_server_supermicro_aten_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "54120074ebe831d3de92658872b0717acfab38e50600af4eba53823e613a1608"
+      ]
+    },
+    "d023e2cd326c486f908e3e361d1fe157": {
+      "uuid": "d023e2cd326c486f908e3e361d1fe157",
+      "name": "Azure PostgreSQL Single Server by HTTP",
+      "technical_name": "Azure PostgreSQL Single Server by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "c61cb0cfe964c83a9657da644e7e4f2ac10ccaf25f68fc40b4d3773a6e4ebe9c"
+      ]
+    },
+    "d0571c5f2c204b7ab244843040288a35": {
+      "uuid": "d0571c5f2c204b7ab244843040288a35",
+      "name": "Acronis Cyber Protect Cloud by HTTP",
+      "technical_name": "Acronis Cyber Protect Cloud by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/app/acronis/template_app_acronis_cyber_protect_cloud_http.yaml"
+      ],
+      "content_sha256s": [
+        "79a007ab10ec19e7c00f8893ab821b587054d73a52d9373cd6f17c6bdf69ba0f"
+      ]
+    },
+    "d0ef7d659a8f4beaaabfc4b6134e737a": {
+      "uuid": "d0ef7d659a8f4beaaabfc4b6134e737a",
+      "name": "PostgreSQL by Zabbix agent 2",
+      "technical_name": "PostgreSQL by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/db/postgresql_agent2/template_db_postgresql_agent2.yaml"
+      ],
+      "content_sha256s": [
+        "b0504eb617957344d2cf982b053e2a8a23a8f79c16630b63b80b6798c7e3ddea"
+      ]
+    },
+    "d0fd5d346b1740dda9d3a976371789dd": {
+      "uuid": "d0fd5d346b1740dda9d3a976371789dd",
+      "name": "Azure VM Scale Set by HTTP",
+      "technical_name": "Azure VM Scale Set by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "1f81e24159f762ba5c06b59af9cbe18e2bfbfd428f6927b4701934a1cf33bf9a"
+      ]
+    },
+    "d1c1ab5db2c34c17ae3541407f8b7faa": {
+      "uuid": "d1c1ab5db2c34c17ae3541407f8b7faa",
+      "name": "MikroTik CRS354-48G-4S+2Q+RM by SNMP",
+      "technical_name": "MikroTik CRS354-48G-4S2QRM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS354-48G-4S+2Q+RM_snmp/template_net_mikrotik_CRS354-48G-4S+2Q+RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "962a6db43bf1a95e07e7f4bce9708996bc92a760da33f9e8931e2eeb3a88c2d0"
+      ]
+    },
+    "d2cebb67b4d94a12a072db85e7be6a33": {
+      "uuid": "d2cebb67b4d94a12a072db85e7be6a33",
+      "name": "Nginx by Zabbix agent active",
+      "technical_name": "Nginx by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/nginx_agent_active/template_app_nginx_agent_active.yaml"
+      ],
+      "content_sha256s": [
+        "9306a26abb12e103faaca2791fa89d3ee1018246af518fd7d1fbf23136d3f763"
+      ]
+    },
+    "d3176749a5274264938f487cd89d17eb": {
+      "uuid": "d3176749a5274264938f487cd89d17eb",
+      "name": "D-Link DES_DGS Switch by SNMP",
+      "technical_name": "D-Link DES_DGS Switch by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/dlink_des_snmp/template_net_dlink_des_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "49c940c9a0956745e8e46a805fd4baf9a73fe2ffe6c60288c4d753f93c817496"
+      ]
+    },
+    "d31c888d12aa4bf68f280bc242501743": {
+      "uuid": "d31c888d12aa4bf68f280bc242501743",
+      "name": "Zabbix server health by Zabbix agent",
+      "technical_name": "Zabbix server health by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-4",
+      "paths": [
+        "templates/app/zabbix_server/template_app_zabbix_server.yaml"
+      ],
+      "content_sha256s": [
+        "a69b04abe490e1cf7570261fa0d5eea22058d380859da406a8dda5df2720ea0e"
+      ]
+    },
+    "d38b271797bd41f2ad8c79d83b9d8d9c": {
+      "uuid": "d38b271797bd41f2ad8c79d83b9d8d9c",
+      "name": "MongoDB cluster by Zabbix agent 2",
+      "technical_name": "MongoDB cluster by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/db/mongodb_cluster/template_db_mongodb_cluster.yaml"
+      ],
+      "content_sha256s": [
+        "e04ebc85e88059b84c82376c23a8f5e8d9d0036f93a7a6a6070c80c8580f1344"
+      ]
+    },
+    "d41c5d0fa91545d68cced1b5dabe4bf1": {
+      "uuid": "d41c5d0fa91545d68cced1b5dabe4bf1",
+      "name": "DELL PowerEdge R820 by SNMP",
+      "technical_name": "DELL PowerEdge R820 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/server/dell/dell_r820_snmp/template_server_dell_r820_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "10df904f450848914b9cbf3a59820ee12d05aa353c90a3514f89dd27480e07fb"
+      ]
+    },
+    "d50f6dcfc3e44244a0fc9fd933607024": {
+      "uuid": "d50f6dcfc3e44244a0fc9fd933607024",
+      "name": "HPE iLO by HTTP",
+      "technical_name": "HPE iLO by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/hpe_ilo_http/template_server_hpe_ilo_http.yaml"
+      ],
+      "content_sha256s": [
+        "9083e73ed29f0d00f7b8809deed85426784d0244f8e0a27a9ee6524116b414ef"
+      ]
+    },
+    "d596d6d231bf49c08890aa3ff135ecc6": {
+      "uuid": "d596d6d231bf49c08890aa3ff135ecc6",
+      "name": "MikroTik CCR1009-7G-1C-1S+PC by SNMP",
+      "technical_name": "MikroTik CCR1009-7G-1C-1SPC by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR1009-7G-1C-1S+PC_snmp/template_net_mikrotik_CCR1009-7G-1C-1S+PC_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "9f6f34340f759a5cb7346d706af5b414b927df240f5f6b12a96e300797aee0f2"
+      ]
+    },
+    "d5dc11ae9ab143a89c4be534bbb35188": {
+      "uuid": "d5dc11ae9ab143a89c4be534bbb35188",
+      "name": "RabbitMQ node by Zabbix agent",
+      "technical_name": "RabbitMQ node by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/rabbitmq_agent/template_app_rabbitmq_agent.yaml"
+      ],
+      "content_sha256s": [
+        "f0b69eb1ec7ed02497983a51183208652ee2a156e34247239a82782db1c95220"
+      ]
+    },
+    "d5eb4ce08a334098a85e6e02c534be90": {
+      "uuid": "d5eb4ce08a334098a85e6e02c534be90",
+      "name": "Cisco UCS Manager by SNMP",
+      "technical_name": "Cisco UCS Manager by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/cisco_ucs_manager_snmp/template_server_cisco_ucs_manager_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "0893d56c14bc71b64c84dc43685790f6a3c59b77fe3898c39eee0d572d38a2d4"
+      ]
+    },
+    "d670c32f007d438c9dcd32db57d2b691": {
+      "uuid": "d670c32f007d438c9dcd32db57d2b691",
+      "name": "Oracle by Zabbix agent 2",
+      "technical_name": "Oracle by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/oracle_agent2/template_db_oracle_agent2.yaml"
+      ],
+      "content_sha256s": [
+        "6515c75cc4b0c37db1b9108bc3151fe05deb062c0b567365f63e963f80f6bc6b"
+      ]
+    },
+    "dce23cdaef364e139efa580d8a304ffe": {
+      "uuid": "dce23cdaef364e139efa580d8a304ffe",
+      "name": "AWS Cost Explorer by HTTP",
+      "technical_name": "AWS Cost Explorer by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml"
+      ],
+      "content_sha256s": [
+        "4694b18392f57e84d8f3e6759e7a4ea59005cddc5fa8c6d33cadf37f37f3ee6d"
+      ]
+    },
+    "dcf88bca5aaf4123a10eb3daab28a9af": {
+      "uuid": "dcf88bca5aaf4123a10eb3daab28a9af",
+      "name": "MikroTik CRS328-24P-4S+RM by SNMP",
+      "technical_name": "MikroTik CRS328-24P-4SRM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS328-24P-4S+RM_snmp/template_net_mikrotik_CRS328-24P-4S+RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "a7dab4e4ffecafbbe8632b6ed8a771c0a9e778ea89a09ebc996fd8eee18b760a"
+      ]
+    },
+    "dd114bf0fb2f46bc84840f1bb24e2b23": {
+      "uuid": "dd114bf0fb2f46bc84840f1bb24e2b23",
+      "name": "Zabbix proxy health",
+      "technical_name": "Zabbix proxy health",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml"
+      ],
+      "content_sha256s": [
+        "fcc4c50ee1b515c544ea6da917754fb3a1cb3921a940294024c0441af84ea006"
+      ]
+    },
+    "de38542cf4f24fafab33520677f392c4": {
+      "uuid": "de38542cf4f24fafab33520677f392c4",
+      "name": "Website certificate by Zabbix agent 2 active",
+      "technical_name": "Website certificate by Zabbix agent 2 active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/certificate_agent2_active/template_app_certificate_agent2_active.yaml"
+      ],
+      "content_sha256s": [
+        "4d6c6a0c5ab5760d0a7f6f370ba05dbc087368e2d4a5d07fef9111c2b80bc22c"
+      ]
+    },
+    "de96d02bd5f242bfa31308ae2131d03f": {
+      "uuid": "de96d02bd5f242bfa31308ae2131d03f",
+      "name": "Brocade FC by SNMP",
+      "technical_name": "Brocade FC by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/brocade_fc_sw_snmp/template_net_brocade_fc_sw_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "0dd2173ea2ba68f6d8a297274e600f08de9eb7e05bb5bdbba0f7ebf6a617fb12"
+      ]
+    },
+    "e0a7c3e725c445228b03116dc6114fe9": {
+      "uuid": "e0a7c3e725c445228b03116dc6114fe9",
+      "name": "PostgreSQL by ODBC",
+      "technical_name": "PostgreSQL by ODBC",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/postgresql_odbc/template_db_postgresql_odbc.yaml"
+      ],
+      "content_sha256s": [
+        "dfc14d0fbb24a0e350a366feb61c97c204ff0bbfbeebb827c6fe1f90ffc4b600"
+      ]
+    },
+    "e111446745a1425b862f8727ae63bce4": {
+      "uuid": "e111446745a1425b862f8727ae63bce4",
+      "name": "Redis by Zabbix agent 2",
+      "technical_name": "Redis by Zabbix agent 2",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/db/redis/template_db_redis.yaml"
+      ],
+      "content_sha256s": [
+        "46d17a693294d5b4c2bfa480f3de42eba6951ff65e7a3d3bd8876f2f667a7586"
+      ]
+    },
+    "e118ab11c1ec4f9cbe21dfce1441c0f6": {
+      "uuid": "e118ab11c1ec4f9cbe21dfce1441c0f6",
+      "name": "NetApp FAS3220 by SNMP",
+      "technical_name": "NetApp FAS3220 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/san/netapp_fas3220_snmp/template_san_netapp_fas3220_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "2f6cee6ec34892c1ff6818e2c5dc217b7bc47c2291f70a64dd4a23261c398199"
+      ]
+    },
+    "e129aeba7c814bf189772cf5919b4bbb": {
+      "uuid": "e129aeba7c814bf189772cf5919b4bbb",
+      "name": "Hadoop by HTTP",
+      "technical_name": "Hadoop by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/app/hadoop_http/template_app_hadoop_http.yaml"
+      ],
+      "content_sha256s": [
+        "112161fec306c276992698f17b5af1297c3cd879d9df378dadd520592eff6501"
+      ]
+    },
+    "e19c120027e04da69b130e0f6cea29fc": {
+      "uuid": "e19c120027e04da69b130e0f6cea29fc",
+      "name": "MySQL by ODBC",
+      "technical_name": "MySQL by ODBC",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/db/mysql_odbc/template_db_mysql_odbc.yaml"
+      ],
+      "content_sha256s": [
+        "b6d2ce7605a7bbabb12530b18ef70276480262516b82643fa027fb8105d53d6f"
+      ]
+    },
+    "e1ca624566424496bff9d90c261ab37b": {
+      "uuid": "e1ca624566424496bff9d90c261ab37b",
+      "name": "VMWare SD-WAN VeloCloud by HTTP",
+      "technical_name": "VMWare SD-WAN VeloCloud by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/velocloud_http/template_net_velocloud_http.yaml"
+      ],
+      "content_sha256s": [
+        "80e4be7d0cdefa639b7a499ac20744f48c5b270c183618987bd09d5fadcdd0a5"
+      ]
+    },
+    "e1e25df663204b099f2597caf89a0678": {
+      "uuid": "e1e25df663204b099f2597caf89a0678",
+      "name": "Cisco SD-WAN device by HTTP",
+      "technical_name": "Cisco SD-WAN device by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_sdwan_http/template_net_cisco_sdwan_http.yaml"
+      ],
+      "content_sha256s": [
+        "cde66a1d0a34aaf0d60dadddd53b94942a4f39df9b70c93bb8a067f9e7f4ac36"
+      ]
+    },
+    "e2307c94f1744af7a8f1f458a67af424": {
+      "uuid": "e2307c94f1744af7a8f1f458a67af424",
+      "name": "Linux by Zabbix agent active",
+      "technical_name": "Linux by Zabbix agent active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/os/linux_active/template_os_linux_active.yaml"
+      ],
+      "content_sha256s": [
+        "2139fad4e0b4c3ca9c02ec5e4ead8905c65a3e7db363f1ff911515b97349af43"
+      ]
+    },
+    "e2d2b4e4ac28483996cc11fe42823d57": {
+      "uuid": "e2d2b4e4ac28483996cc11fe42823d57",
+      "name": "Zabbix server health",
+      "technical_name": "Zabbix server health",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-5",
+      "paths": [
+        "templates/app/zabbix_server/template_app_zabbix_server.yaml"
+      ],
+      "content_sha256s": [
+        "454f6e04828f19fa117939c1e2dbb655c3820500aae30a8daf0aca8398142947"
+      ]
+    },
+    "e518b1340ce44d7389d2cc7c304a97b4": {
+      "uuid": "e518b1340ce44d7389d2cc7c304a97b4",
+      "name": "SMART by Zabbix agent 2 active",
+      "technical_name": "SMART by Zabbix agent 2 active",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/server/smart_agent2_active/template_module_smart_agent2_active.yaml"
+      ],
+      "content_sha256s": [
+        "c206c8667f2b96a31b9c559a617f9809bcb32a45b5d2d5984cae6dac25fbd7a2"
+      ]
+    },
+    "e5486d98ff414c1391de1bd369a7f9db": {
+      "uuid": "e5486d98ff414c1391de1bd369a7f9db",
+      "name": "Oracle Cloud Boot Volume by HTTP",
+      "technical_name": "Oracle Cloud Boot Volume by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml"
+      ],
+      "content_sha256s": [
+        "fd3e2b3e5361c2285b9dd7dafe734aa917eb306e61095fefada7bbbb28bbdaf6"
+      ]
+    },
+    "e56c9577c225476eb6d8f1c2f5dc90a5": {
+      "uuid": "e56c9577c225476eb6d8f1c2f5dc90a5",
+      "name": "FortiGate by HTTP",
+      "technical_name": "FortiGate by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/fortinet/fortigate_http/template_net_fortigate_http.yaml"
+      ],
+      "content_sha256s": [
+        "b2597bf4e332b0402f415e956395c9429fd030bbb73aed193ea60701e542c580"
+      ]
+    },
+    "e5cf4e7ac41a470b99e4262d1c5ee104": {
+      "uuid": "e5cf4e7ac41a470b99e4262d1c5ee104",
+      "name": "Cisco SD-WAN by HTTP",
+      "technical_name": "Cisco SD-WAN by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_sdwan_http/template_net_cisco_sdwan_http.yaml"
+      ],
+      "content_sha256s": [
+        "bd9c417cbe98b5fc05222411498a6b1ed0aafc68a601e4f95565ead70af10fc1"
+      ]
+    },
+    "e5ec7acc7efc4ac491b6fa552ab077ae": {
+      "uuid": "e5ec7acc7efc4ac491b6fa552ab077ae",
+      "name": "Dell Force S-Series by SNMP",
+      "technical_name": "Dell Force S-Series by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/dell_force_s_series_snmp/template_net_dell_force_s_series_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "8f973bf8bafd549bda450200effe7d2d896ecff2eb80495bdff32dabc95db819"
+      ]
+    },
+    "e6b0aada359944d09ee4bd46c1a55587": {
+      "uuid": "e6b0aada359944d09ee4bd46c1a55587",
+      "name": "Oracle Cloud Compute by HTTP",
+      "technical_name": "Oracle Cloud Compute by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml"
+      ],
+      "content_sha256s": [
+        "d011623b04070780a7b37d1253875c162f041ac03371df7291f1865ed8034331"
+      ]
+    },
+    "e74c1e12f82e4d9880a368b53f5e65a4": {
+      "uuid": "e74c1e12f82e4d9880a368b53f5e65a4",
+      "name": "GCP Cloud SQL PostgreSQL by HTTP",
+      "technical_name": "GCP Cloud SQL PostgreSQL by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/gcp/template_cloud_gcp_http.yaml"
+      ],
+      "content_sha256s": [
+        "b66e44d54bc9705ecce0ad28bc9105a3074fb75cb9ab3dc7a998cbeb066613e0"
+      ]
+    },
+    "e785916967c14544b59c3644c3edda3a": {
+      "uuid": "e785916967c14544b59c3644c3edda3a",
+      "name": "Kubernetes Kubelet by HTTP",
+      "technical_name": "Kubernetes Kubelet by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/app/kubernetes_http/kubernetes_kubelet_http/template_kubernetes_kubelet.yaml"
+      ],
+      "content_sha256s": [
+        "36368a0c58348fb98a675cfabfe4b72cc6cc9dcf1848dd78c9b0bbac94e1c1e5"
+      ]
+    },
+    "e7894db1c4c94e0f8715977e751368b3": {
+      "uuid": "e7894db1c4c94e0f8715977e751368b3",
+      "name": "MikroTik CCR1072-1G-8S+ by SNMP",
+      "technical_name": "MikroTik CCR1072-1G-8S by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR1072-1G-8S+_snmp/template_net_mikrotik_CCR1072-1G-8S+_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "dddb07dade4d19785122bba8d9c03f153bdfcdd9fdbd68c89c59ce9287352d2a"
+      ]
+    },
+    "e7ed0e0cbd0b439394f6498ea90dc31d": {
+      "uuid": "e7ed0e0cbd0b439394f6498ea90dc31d",
+      "name": "MikroTik CRS326-24S+2Q+RM by SNMP",
+      "technical_name": "MikroTik CRS326-24S2QRM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS326-24S+2Q+RM_snmp/template_net_mikrotik_CRS326-24S+2Q+RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "0f0a57f32668be9f14bfe6a15cb2f3c915ee1dcc1161bb0f430da0342e650ff3"
+      ]
+    },
+    "e8c0b2c40e884f1598d86f3edf020ea7": {
+      "uuid": "e8c0b2c40e884f1598d86f3edf020ea7",
+      "name": "APC Smart-UPS 2200 RM by SNMP",
+      "technical_name": "APC Smart-UPS 2200 RM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_smart_2200_rm_snmp/template_power_apc_ups_smart_2200_rm_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "ec7159f3683ec3cc50e27ea951150fb9538c80f50ff4cab069826c0b093741ec"
+      ]
+    },
+    "e8f89476695848e99ba900a5664d290b": {
+      "uuid": "e8f89476695848e99ba900a5664d290b",
+      "name": "Oracle Cloud Object Storage by HTTP",
+      "technical_name": "Oracle Cloud Object Storage by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml"
+      ],
+      "content_sha256s": [
+        "6235bcf887799518d7b3fe8ff3ce7a1887c111b2c19bbc3ba0be01ecd49f6eb9"
+      ]
+    },
+    "ea096c13a09b4d7a9be0aab1cec95206": {
+      "uuid": "ea096c13a09b4d7a9be0aab1cec95206",
+      "name": "Cisco Catalyst 3750V2-48PS by SNMP",
+      "technical_name": "Cisco Catalyst 3750V2-48PS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_catalyst_3750_48ps_snmp/template_net_cisco_catalyst_3750_48ps_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "ce71a7e303dbf8cd718c5af5a92d012c0a281306c0b3d6660aa91634df8648dd"
+      ]
+    },
+    "eaf36c98b91843b7b79bd5184a23d377": {
+      "uuid": "eaf36c98b91843b7b79bd5184a23d377",
+      "name": "Solaris by Zabbix agent",
+      "technical_name": "Solaris by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/os/solaris/template_os_solaris.yaml"
+      ],
+      "content_sha256s": [
+        "8aa3d6a42f0f1fdd3478993ba4fb73db9ad684383c6e593eddd3dd737fac266b"
+      ]
+    },
+    "eafd78764fde4110b9e46ae184f327ba": {
+      "uuid": "eafd78764fde4110b9e46ae184f327ba",
+      "name": "APC Smart-UPS 3000 XLM by SNMP",
+      "technical_name": "APC Smart-UPS 3000 XLM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/power/apc/apc_ups_smart_3000_xlm_snmp/template_power_apc_ups_smart_3000_xlm_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "436abb0f2946a27528331356e0b34a7144bfe4f4b3003039bc1c8344a4ceb643"
+      ]
+    },
+    "ec92c7b0b1d14946b6ac61de89357199": {
+      "uuid": "ec92c7b0b1d14946b6ac61de89357199",
+      "name": "Azure MySQL Flexible Server by HTTP",
+      "technical_name": "Azure MySQL Flexible Server by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "ef44d1ce07cec338c91375401d777afb40f556557fe59a5e6a948b7990aa8b0c"
+      ]
+    },
+    "ece96efdf0a045b99ede7978fa9366d6": {
+      "uuid": "ece96efdf0a045b99ede7978fa9366d6",
+      "name": "Kubernetes Scheduler by HTTP",
+      "technical_name": "Kubernetes Scheduler by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/kubernetes_http/kubernetes_scheduler_http/template_kubernetes_scheduler.yaml"
+      ],
+      "content_sha256s": [
+        "5b35575e951313771fdc7ddfe47d708354640bd0f3e8593919dfbdb0e2e9766e"
+      ]
+    },
+    "edc752f178f94b9dbaee459ec7bacc66": {
+      "uuid": "edc752f178f94b9dbaee459ec7bacc66",
+      "name": "Palo Alto PA-440 by HTTP",
+      "technical_name": "Palo Alto PA-440 by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/net/paloalto/paloalto_pa440/template_net_paloalto_pa440_http.yaml"
+      ],
+      "content_sha256s": [
+        "97473265545b11854c0fcd2f3afb62a72098cdf6b07d18e6b6f278fe0d36a7f5"
+      ]
+    },
+    "f01bd64eef4049fabe087cccae590226": {
+      "uuid": "f01bd64eef4049fabe087cccae590226",
+      "name": "Intel SR1530 IPMI",
+      "technical_name": "Intel SR1530 IPMI",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/server/intel_sr1530_ipmi/template_server_intel_sr1530_ipmi.yaml"
+      ],
+      "content_sha256s": [
+        "b1950d81f202b7fbca328aa2cac8f90c6b5154b43ae3b96986c5fdb59ad592a2"
+      ]
+    },
+    "f1336fd88ab0415a9c02892a71e50032": {
+      "uuid": "f1336fd88ab0415a9c02892a71e50032",
+      "name": "Morningstar SunSaver MPPT by SNMP",
+      "technical_name": "Morningstar SunSaver MPPT by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/morningstar/morningstar_sunsaver_mppt_snmp/template_net_morningstar_sunsaver_mppt_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "99ac2691a4c42504d72c78c5ccbca97f2cf6121d30137967b54ace4782055a5e"
+      ]
+    },
+    "f1928e12f9554599a9adb516f38b6bf6": {
+      "uuid": "f1928e12f9554599a9adb516f38b6bf6",
+      "name": "MikroTik netPower 15FR by SNMP",
+      "technical_name": "MikroTik netPower 15FR by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_netPower_15FR_snmp/template_net_mikrotik_netPower_15FR_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "430ebdd637e4b33224e83339d15867584a27772ce60b0c521695af161f9db340"
+      ]
+    },
+    "f255e3fc32124b55b2a17ef3c961e5f5": {
+      "uuid": "f255e3fc32124b55b2a17ef3c961e5f5",
+      "name": "MySQL by Zabbix agent",
+      "technical_name": "MySQL by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/db/mysql_agent/template_db_mysql_agent.yaml"
+      ],
+      "content_sha256s": [
+        "9ad2138d60022bfa102a035cd35decd0292d46e06efc2b5a9eb8ae8a97f00ae3"
+      ]
+    },
+    "f2efeb94f4bd4ed9ab34a973c0363eb8": {
+      "uuid": "f2efeb94f4bd4ed9ab34a973c0363eb8",
+      "name": "MikroTik CCR2004-1G-12S+2XS by SNMP",
+      "technical_name": "MikroTik CCR2004-1G-12S2XS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CCR2004-1G-12S+2XS_snmp/template_net_mikrotik_CCR2004-1G-12S+2XS_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "da3fe7b6c89a10afc409f27d56124661ac40a337e75a4517a1caa5649d6ecfa9"
+      ]
+    },
+    "f397be2340734d24bc666102fbe184a5": {
+      "uuid": "f397be2340734d24bc666102fbe184a5",
+      "name": "Kubernetes nodes by HTTP",
+      "technical_name": "Kubernetes nodes by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/app/kubernetes_http/kubernetes_nodes_http/template_kubernetes_nodes.yaml"
+      ],
+      "content_sha256s": [
+        "116cacd558e64d3c3ec51637e86a976155830a4da566ce0c1e27440230c6124c"
+      ]
+    },
+    "f445dac89ff74deabaae9dcb84815998": {
+      "uuid": "f445dac89ff74deabaae9dcb84815998",
+      "name": "GitLab by HTTP",
+      "technical_name": "GitLab by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/gitlab_http/template_app_gitlab_http.yaml"
+      ],
+      "content_sha256s": [
+        "9fa41c177ceef2c2839f26215bb1b5d640aa48b8943dfabf062000dcd9330760"
+      ]
+    },
+    "f474ff823fe84d689b9e4c6a4f0ce59e": {
+      "uuid": "f474ff823fe84d689b9e4c6a4f0ce59e",
+      "name": "MikroTik CRS317-1G-16S+RM by SNMP",
+      "technical_name": "MikroTik CRS317-1G-16SRM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS317-1G-16S+RM_snmp/template_net_mikrotik_CRS317-1G-16S+RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "abdfe3e9c8b5ec91013fc36b325ecd046c605fc1093ccdf435e153fa58b6448a"
+      ]
+    },
+    "f59c8b4156ec4386a7c724534ddd384d": {
+      "uuid": "f59c8b4156ec4386a7c724534ddd384d",
+      "name": "AWS ELB Application Load Balancer by HTTP",
+      "technical_name": "AWS ELB Application Load Balancer by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml"
+      ],
+      "content_sha256s": [
+        "6de322b0284c8e67ac4a5eae1f96b97edf4e56bf6ace669882d282407089d594"
+      ]
+    },
+    "f5fff9a83f774f4688692ad58aa35d45": {
+      "uuid": "f5fff9a83f774f4688692ad58aa35d45",
+      "name": "YugabyteDB Cluster by HTTP",
+      "technical_name": "YugabyteDB Cluster by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/db/yugabytedb_http/template_db_yugabyte_http.yaml"
+      ],
+      "content_sha256s": [
+        "99040aa97fb61d80be475fe7fc88737b969e4a8c166bbc0a94d7bed01d051c10"
+      ]
+    },
+    "f64ad01567914165a493815e492fb315": {
+      "uuid": "f64ad01567914165a493815e492fb315",
+      "name": "Brocade_Foundry Stackable by SNMP",
+      "technical_name": "Brocade_Foundry Stackable by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/brocade_foundry_sw_snmp/template_net_brocade_foundry_sw_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "2d1a9f50fc45a226aa38b21a4109d185dbdc16a30f73cb7c05423ccb04dbbc30"
+      ]
+    },
+    "f744679600844c07b2b4eedda9bc3d0c": {
+      "uuid": "f744679600844c07b2b4eedda9bc3d0c",
+      "name": "Cisco Catalyst 3750V2-48TS by SNMP",
+      "technical_name": "Cisco Catalyst 3750V2-48TS by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/net/cisco/cisco_catalyst_3750_48ts_snmp/template_net_cisco_catalyst_3750_48ts_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "4ffe5a05fa4f03cc38b58ebfb963e16feee7def2e5ac8b5ed8c2e3ceb9e3162b"
+      ]
+    },
+    "f74adf26d9ab44ada318002d31fd2881": {
+      "uuid": "f74adf26d9ab44ada318002d31fd2881",
+      "name": "HashiCorp Nomad by HTTP",
+      "technical_name": "HashiCorp Nomad by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/app/nomad/template_app_nomad_http.yaml"
+      ],
+      "content_sha256s": [
+        "b3c3a8b24bc8882218f900023a7df8e53bcff462364640f5883d22401c5c4d80"
+      ]
+    },
+    "f895df5b37494f668cde1a2388d7af8b": {
+      "uuid": "f895df5b37494f668cde1a2388d7af8b",
+      "name": "macOS by Zabbix agent",
+      "technical_name": "macOS by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/os/macos/template_os_macos.yaml"
+      ],
+      "content_sha256s": [
+        "41da64cafb3e564277614142b9baede61d5a72f045b0fdb102eee5554d70004f"
+      ]
+    },
+    "f8f7908280354f2abeed07dc788c3747": {
+      "uuid": "f8f7908280354f2abeed07dc788c3747",
+      "name": "Linux by Zabbix agent",
+      "technical_name": "Linux by Zabbix agent",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/os/linux/template_os_linux.yaml"
+      ],
+      "content_sha256s": [
+        "ded2f3a80399df0e23a39cfeedc38bf6150e1a7f13cf28366009e53f2b3b99e0"
+      ]
+    },
+    "f9a59315c8944853bb91c0a9ec3056d7": {
+      "uuid": "f9a59315c8944853bb91c0a9ec3056d7",
+      "name": "Windows by SNMP",
+      "technical_name": "Windows by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/os/windows_snmp/template_os_windows_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "76b85bc68217dceecf8d7f4194066980d2910c9668d70510de80369cc6260225"
+      ]
+    },
+    "fa58228fee8a4e34a7c6503950d1c615": {
+      "uuid": "fa58228fee8a4e34a7c6503950d1c615",
+      "name": "Azure by HTTP",
+      "technical_name": "Azure by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-4",
+      "paths": [
+        "templates/cloud/azure_http/template_cloud_azure_http.yaml"
+      ],
+      "content_sha256s": [
+        "17c31ced9029827edbd0b0cfd3fc7191a9aa73302d6bcdca5614963746d458a9"
+      ]
+    },
+    "fa5e5e131eb34bbea1b1f7b2352a853d": {
+      "uuid": "fa5e5e131eb34bbea1b1f7b2352a853d",
+      "name": "MikroTik CRS354-48P-4S+2Q+RM by SNMP",
+      "technical_name": "MikroTik CRS354-48P-4S2QRM by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS354-48P-4S+2Q+RM_snmp/template_net_mikrotik_CRS354-48P-4S+2Q+RM_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "cb823e566771c6df0daf2a502cb7700941ca610b73950d24fd161fd6088b9994"
+      ]
+    },
+    "fac16383680c4454be48b6db870d975e": {
+      "uuid": "fac16383680c4454be48b6db870d975e",
+      "name": "MikroTik CRS109-8G-1S-2HnD-IN by SNMP",
+      "technical_name": "MikroTik CRS109-8G-1S-2HnD-IN by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_CRS109-8G-1S-2HnD-IN_snmp/template_net_mikrotik_CRS109-8G-1S-2HnD-IN_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "51d26fba08c9f1937f5190c8a87c4c3464919b39fa5a4581a75e429a75aa5c73"
+      ]
+    },
+    "fac50638cb77468598c29a6a47520c24": {
+      "uuid": "fac50638cb77468598c29a6a47520c24",
+      "name": "MikroTik RB1100AHx4 Dude Edition by SNMP",
+      "technical_name": "MikroTik RB1100AHx4 Dude Edition by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_RB1100AHx4_Dude_Edition_snmp/template_net_mikrotik_RB1100AHx4_Dude_Edition_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "21ab8c902e2c71da904ad475b36c410b57d8502dc29aa010d87e6c2efde1b6ad"
+      ]
+    },
+    "fc834b8da8864678b55557e9a237eac9": {
+      "uuid": "fc834b8da8864678b55557e9a237eac9",
+      "name": "DELL PowerEdge R840 by SNMP",
+      "technical_name": "DELL PowerEdge R840 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/server/dell/dell_r840_snmp/template_server_dell_r840_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "438e3164d8a07b51faa4de98849dfd3b7e2562e322eb7ef1b438f8dd136e969a"
+      ]
+    },
+    "fd36e0a231d343d38a95d1ed789584ca": {
+      "uuid": "fd36e0a231d343d38a95d1ed789584ca",
+      "name": "AWS Lambda by HTTP",
+      "technical_name": "AWS Lambda by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml"
+      ],
+      "content_sha256s": [
+        "83c6fda120529048b555d2df99855f30f4d450cd0e482c38aeec33bf6ab77d5b"
+      ]
+    },
+    "fe5b8448661f41b9a6d948fccd7f9045": {
+      "uuid": "fe5b8448661f41b9a6d948fccd7f9045",
+      "name": "DELL PowerEdge R720 by SNMP",
+      "technical_name": "DELL PowerEdge R720 by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-3",
+      "paths": [
+        "templates/server/dell/dell_r720_snmp/template_server_dell_r720_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "51cff748a2d3bdc126a68ff5357a7bfbf0e4fdf45effe71e0236738d20d7c391"
+      ]
+    },
+    "fe7eb8b22ce84017b07bcab36e9032dc": {
+      "uuid": "fe7eb8b22ce84017b07bcab36e9032dc",
+      "name": "Juniper MX by SNMP",
+      "technical_name": "Juniper MX by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-0",
+      "paths": [
+        "templates/net/juniper_mx_snmp/template_net_juniper_mx_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "97b12a6c08c07fbb3386464d09e443a9916fc83e84246358dcdba457ad417267"
+      ]
+    },
+    "ff57532daf924030b364e3b75acb74c4": {
+      "uuid": "ff57532daf924030b364e3b75acb74c4",
+      "name": "MikroTik hEX PoE by SNMP",
+      "technical_name": "MikroTik hEX PoE by SNMP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-2",
+      "paths": [
+        "templates/net/mikrotik/mikrotik_hEX_PoE_snmp/template_net_mikrotik_hEX_PoE_snmp.yaml"
+      ],
+      "content_sha256s": [
+        "d7b1ea67ad79de04e4a988cf03e254d768b56015b83a0d61685930e6c35a2ac9"
+      ]
+    },
+    "ff637e001b91472d8730eb7f10e65800": {
+      "uuid": "ff637e001b91472d8730eb7f10e65800",
+      "name": "OpenStack Nova by HTTP",
+      "technical_name": "OpenStack Nova by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "7.2-1",
+      "paths": [
+        "templates/cloud/openstack/template_cloud_openstack_http.yaml"
+      ],
+      "content_sha256s": [
+        "bbf6403a65b55785e200f099fe906d35226951067b2b215e188a4cca7524ffb1"
+      ]
+    }
+  }
+}
