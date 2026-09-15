@@ -47,6 +47,9 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Backup-history action contract coverage enforcing role restrictions, bounded repository inspection, no fresh export, no filesystem path disclosure and no write controls.
 - Reusable `TemplateUpdateAnalysisService` that rebuilds the complete current-upstream, historical-baseline, three-way, risk, readiness and rollback-verification pipeline from a numeric template ID.
 - Static orchestration coverage ensuring the comparison controller delegates to the reusable analysis service and that the service remains configuration-read-only.
+- Fail-closed `TemplateUpdatePreflightService` that freshly recomputes authoritative update analysis and requires `backup_verified` before producing a passing read-only preflight result.
+- Deterministic preflight evidence SHA-256 binding template identity, immutable upstream commit/path, installed/available versions, verified rollback fingerprint, fresh current-export fingerprint and direct-host impact context.
+- Dedicated update-preflight documentation defining why preflight evidence is diagnostic only and can never replace fresh server-side revalidation before a future write.
 - Dedicated backup/rollback and update-readiness architecture documentation.
 - Unit coverage for upstream identity/version/source/history, baseline cache, import comparison, three-way analysis, update risk/readiness, native export contract, backup artifact integrity, tamper detection and current-state backup verification.
 
