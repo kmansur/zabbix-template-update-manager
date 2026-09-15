@@ -10,7 +10,7 @@ Current version:
 
 `0.1.0-dev`
 
-The current milestone is strictly read-only. The module can inventory templates, verify upstream identity, compare official vendor versions, preview current upstream content with Zabbix `configuration.importcompare` and resolve historical official baselines for outdated templates. It must not modify templates or other Zabbix configuration yet.
+The current milestone is strictly read-only. The module can inventory templates, verify upstream identity, compare official vendor versions, preview current upstream content with Zabbix `configuration.importcompare`, resolve historical official baselines for outdated templates and perform three-way BASE / LOCAL / UPSTREAM overlap analysis. It must not modify templates or other Zabbix configuration yet.
 
 ## Target versions
 
@@ -109,7 +109,40 @@ Current content states:
 
 This closes an important false-positive case: an outdated but unmodified official template is no longer labeled locally modified merely because the current Zabbix template has evolved.
 
-The historical comparison does **not** yet perform field-level three-way conflict classification. When local modifications exist, the next stage must determine whether those local changes overlap the upstream changes and then classify operational risk.
+## Three-way change analysis
+
+When a historical baseline is available, the module correlates two native Zabbix import previews that share the same installed LOCAL state:
+
+```text
+historical preview: LOCAL (before) -> BASE (after)
+current preview:    LOCAL (before) -> UPSTREAM (after)
+```
+
+The model is:
+
+```text
+BASE     = official historical template matching the installed vendor.version
+LOCAL    = currently installed template
+UPSTREAM = current official template
+```
+
+The module uses the normalized `before`/`after` snapshots returned by Zabbix instead of implementing a second import parser. Structured entities are correlated by UUID first, with object-specific unique-field fallback when a UUID is unavailable.
+
+Three-way field classifications are:
+
+- `Upstream only` — BASE equals LOCAL and UPSTREAM changed;
+- `Local only — current upstream would overwrite it` — LOCAL differs while BASE equals UPSTREAM;
+- `Converged to the same result` — LOCAL and UPSTREAM independently reached the same value from BASE;
+- `Conflict` — BASE, LOCAL and UPSTREAM all differ for the same normalized field/entity state;
+- `Unresolved` — stable identity or a consistent LOCAL pivot could not be proven.
+
+Entity additions and removals are analyzed as existence/snapshot states rather than as invented missing-field comparisons.
+
+The native detail page shows summary counts plus BASE / LOCAL / UPSTREAM values for normalized changes. Detail rendering is bounded, while summary counters cover the complete analysis.
+
+A three-way conflict is a review signal, not a declaration that an update is impossible. Likewise, absence of conflicts is **not yet** an operational safety decision. Risk scoring, affected-host impact and controlled update behavior remain separate stages.
+
+More detail: [`docs/three-way-analysis.md`](docs/three-way-analysis.md).
 
 ## Upstream index architecture
 
@@ -174,8 +207,8 @@ No user-provided repository URL or Git ref is passed to the network clients.
 - Resolve historical official baselines for outdated installed versions
 - Detect local modifications on outdated templates against the correct historical baseline
 - Perform three-way field-level comparison for local modifications versus upstream evolution
-- Display granular differences
-- Estimate update risk
+- Display granular BASE / LOCAL / UPSTREAM differences
+- Estimate operational update risk
 - Show affected hosts
 - Preserve the native Zabbix frontend experience
 
@@ -229,7 +262,7 @@ Local template inventory    Upstream index JSON
                  +---------------+-----------------+
                                  |
                                  v
-                  configuration.importcompare
+             configuration.importcompare (B -> C)
                                  |
                          current update preview
                                  |
@@ -242,10 +275,20 @@ Local template inventory    Upstream index JSON
            historical YAML matching vendor.version
                                  |
                                  v
-                  configuration.importcompare
+             configuration.importcompare (B -> A)
+                                 |
+                     +-----------+-----------+
+                     |                       |
+                     v                       v
+            historical diff            current diff
+                     |                       |
+                     +-----------+-----------+
                                  |
                                  v
-              local-modification classification
+                    ThreeWayChangeAnalyzer
+                                 |
+                                 v
+                 BASE / LOCAL / UPSTREAM detail
 ```
 
 ## Development validation
@@ -267,6 +310,9 @@ CI validates:
 - historical baseline selection and incomplete-history semantics;
 - deterministic isolation of one target UUID from multi-template upstream bundles;
 - nested import-comparison summary logic;
+- stable entity extraction from recursive import-comparison output;
+- BASE / LOCAL / UPSTREAM field and entity-existence classification;
+- fail-closed behavior when the two native comparisons do not share an identical LOCAL pivot;
 - content-state classification semantics;
 - import-comparison rule coverage;
 - deterministic upstream-index generation;
