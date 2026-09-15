@@ -15,6 +15,7 @@ $commit = '0123456789abcdef0123456789abcdef01234567';
 $path = 'templates/os/linux/template_os_linux.yaml';
 $uuid = 'f8f7908280354f2abeed07dc788c3747';
 $raw = "zabbix_export: fixture\n";
+$contentSha = hash('sha256', $raw);
 $document = [
 	'zabbix_export' => [
 		'version' => '7.0',
@@ -35,6 +36,7 @@ $preflight = [
 	'candidate' => [
 		'commit' => $commit,
 		'path' => $path,
+		'content_sha256' => $contentSha,
 		'uuid' => $uuid,
 		'name' => 'Linux by Zabbix agent',
 		'technical_name' => 'Linux by Zabbix agent',
@@ -55,9 +57,10 @@ $service = new TemplateUpdateCandidateService(
 $result = $service->build($preflight);
 assertUpdateCandidate($commit, $result['commit'], 'Candidate must preserve immutable commit.');
 assertUpdateCandidate($path, $result['path'], 'Candidate must preserve validated path.');
+assertUpdateCandidate($contentSha, $result['content_sha256'], 'Candidate must preserve the validated index content hash.');
 assertUpdateCandidate($uuid, $result['uuid'], 'Candidate must preserve normalized UUID.');
 assertUpdateCandidate('7.0-8', $result['vendor_version'], 'Candidate must preserve upstream vendor version.');
-assertUpdateCandidate(hash('sha256', $raw), $result['canonical_sha256'], 'Candidate must fingerprint canonical source bytes.');
+assertUpdateCandidate($contentSha, $result['canonical_sha256'], 'Candidate must verify canonical source bytes against the index hash.');
 assertUpdateCandidate(true, is_string($result['source']) && $result['source'] !== '', 'Candidate must produce an isolated import source.');
 assertUpdateCandidate(hash('sha256', $result['source']), $result['import_sha256'], 'Candidate must fingerprint isolated import source.');
 
@@ -88,5 +91,16 @@ catch (RuntimeException $exception) {
 	$threw = true;
 }
 assertUpdateCandidate(true, $threw, 'Fetched source must match the preflight immutable commit exactly.');
+
+$wrongHash = $preflight;
+$wrongHash['candidate']['content_sha256'] = hash('sha256', 'tampered-index-fingerprint');
+$threw = false;
+try {
+	$service->build($wrongHash);
+}
+catch (RuntimeException $exception) {
+	$threw = true;
+}
+assertUpdateCandidate(true, $threw, 'Fetched source bytes must match the content hash bound by preflight.');
 
 echo "TemplateUpdateCandidateService tests passed.\n";
