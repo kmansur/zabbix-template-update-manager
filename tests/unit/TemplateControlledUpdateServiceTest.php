@@ -12,9 +12,11 @@ function assertControlledUpdate($expected, $actual, string $message): void {
 }
 
 $evidence = hash('sha256', 'fresh-preflight');
+$contentSha = hash('sha256', 'canonical');
 $candidate = [
 	'commit' => '0123456789abcdef0123456789abcdef01234567',
 	'path' => 'templates/os/linux/template_os_linux.yaml',
+	'content_sha256' => $contentSha,
 	'uuid' => 'f8f7908280354f2abeed07dc788c3747',
 	'name' => 'Linux by Zabbix agent',
 	'technical_name' => 'Linux by Zabbix agent',
@@ -31,7 +33,7 @@ $preflight = [
 	]
 ];
 $builtCandidate = $candidate + [
-	'canonical_sha256' => hash('sha256', 'canonical'),
+	'canonical_sha256' => $contentSha,
 	'import_sha256' => hash('sha256', 'isolated'),
 	'format' => 'json',
 	'source' => '{"zabbix_export":{"version":"7.0","templates":[]}}'
@@ -60,6 +62,7 @@ assertControlledUpdate('updated', $result['status'], 'Matching fresh evidence sh
 assertControlledUpdate(true, $result['write_performed'], 'Successful controlled update must report that a write occurred.');
 assertControlledUpdate(true, $imported, 'Importer must run only after fresh preflight and evidence match.');
 assertControlledUpdate($evidence, $result['preflight_evidence_sha256'], 'Result must retain confirmed fresh evidence.');
+assertControlledUpdate($contentSha, $result['candidate']['canonical_sha256'], 'Result must retain verified upstream content evidence.');
 
 $imported = false;
 $result = $service->execute('12345', hash('sha256', 'stale-page'));
@@ -104,6 +107,27 @@ catch (RuntimeException $exception) {
 assertControlledUpdate(true, $threw, 'Candidate identity drift after preflight must throw before import.');
 assertControlledUpdate(false, $imported, 'Candidate identity drift must not invoke importer.');
 
+$hashDriftCandidate = $builtCandidate;
+$hashDriftCandidate['canonical_sha256'] = hash('sha256', 'different-source');
+$imported = false;
+$hashDriftService = new TemplateControlledUpdateService(
+	static fn(string $templateId): array => $preflight,
+	static fn(array $freshPreflight): array => $hashDriftCandidate,
+	static function (array $candidateToImport) use (&$imported): void {
+		$imported = true;
+	},
+	static fn(string $templateId, array $candidateToValidate): array => ['valid' => true]
+);
+$threw = false;
+try {
+	$hashDriftService->execute('12345', $evidence);
+}
+catch (RuntimeException $exception) {
+	$threw = true;
+}
+assertControlledUpdate(true, $threw, 'Candidate content drift after preflight must throw before import.');
+assertControlledUpdate(false, $imported, 'Candidate content drift must not invoke importer.');
+
 $validationFailureService = new TemplateControlledUpdateService(
 	static fn(string $templateId): array => $preflight,
 	static fn(array $freshPreflight): array => $builtCandidate,
@@ -117,6 +141,19 @@ $validationFailureService = new TemplateControlledUpdateService(
 $result = $validationFailureService->execute('12345', $evidence);
 assertControlledUpdate('validation_failed', $result['status'], 'Post-import validation failure must be reported explicitly.');
 assertControlledUpdate(true, $result['write_performed'], 'Validation failure occurs after an acknowledged import write.');
+
+$validationExceptionService = new TemplateControlledUpdateService(
+	static fn(string $templateId): array => $preflight,
+	static fn(array $freshPreflight): array => $builtCandidate,
+	static function (array $candidateToImport): void {},
+	static function (string $templateId, array $candidateToValidate): array {
+		throw new RuntimeException('simulated validation failure');
+	}
+);
+$result = $validationExceptionService->execute('12345', $evidence);
+assertControlledUpdate('validation_failed', $result['status'], 'Validation exceptions after import must be converted to explicit validation failure.');
+assertControlledUpdate(true, $result['write_performed'], 'Validation exceptions occur after an acknowledged import write.');
+assertControlledUpdate('validation_error', $result['validation']['status'], 'Validation exception state must remain explicit.');
 
 $threw = false;
 try {
