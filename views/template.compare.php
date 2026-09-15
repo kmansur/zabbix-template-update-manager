@@ -26,14 +26,37 @@ $baselineLabels = [
 	'history_limit_reached' => _('Historical scan limit reached')
 ];
 
+$threeWayStatusLabels = [
+	'conflict_detected' => _('Conflict detected'),
+	'needs_review' => _('Needs review'),
+	'local_overwrite_risk' => _('Local customization overwrite risk'),
+	'compatible_overlap' => _('Compatible / converged changes'),
+	'upstream_only' => _('Upstream-only changes'),
+	'no_changes' => _('No three-way differences')
+];
+
+$threeWayClassLabels = [
+	'upstream_only' => _('Upstream only'),
+	'local_only_overwrite' => _('Local only — current upstream would overwrite it'),
+	'converged' => _('Converged to the same result'),
+	'conflict' => _('Conflict'),
+	'unresolved' => _('Unresolved')
+];
+
 $entityLabels = [
 	'templates' => _('Templates'),
 	'items' => _('Items'),
+	'item_prototypes' => _('Item prototypes'),
 	'discovery_rules' => _('Discovery rules'),
 	'discoveryRules' => _('Discovery rules'),
 	'triggers' => _('Triggers'),
+	'trigger_prototypes' => _('Trigger prototypes'),
+	'graph_prototypes' => _('Graph prototypes'),
+	'host_prototypes' => _('Host prototypes'),
 	'graphs' => _('Graphs'),
+	'dashboards' => _('Template dashboards'),
 	'httptests' => _('Web scenarios'),
+	'valuemaps' => _('Value maps'),
 	'template_dashboards' => _('Template dashboards'),
 	'templateDashboards' => _('Template dashboards'),
 	'template_linkage' => _('Template linkage'),
@@ -43,6 +66,28 @@ $entityLabels = [
 	'template_groups' => _('Template groups'),
 	'host_groups' => _('Host groups')
 ];
+
+$formatThreeWayValue = static function ($value): string {
+	if (is_array($value) && ($value['__state'] ?? null) === 'missing') {
+		return '∅';
+	}
+	if ($value === null) {
+		return 'null';
+	}
+	if (is_bool($value)) {
+		return $value ? 'true' : 'false';
+	}
+	if (is_scalar($value)) {
+		$text = (string) $value;
+	}
+	else {
+		$encoded = json_encode($value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		$text = is_string($encoded) ? $encoded : _('Unable to display value');
+	}
+
+	$limit = 240;
+	return mb_strlen($text) > $limit ? mb_substr($text, 0, $limit - 1).'…' : $text;
+};
 
 $backUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates');
 $page = (new CHtmlPage())
@@ -145,6 +190,81 @@ if ($data['historical_error'] !== null) {
 	$page->addItem(new CTag('p', true, $data['historical_error']));
 }
 
+if (is_array($data['three_way_analysis'])) {
+	$analysis = $data['three_way_analysis'];
+	$threeWaySummary = $analysis['summary'];
+	$threeWayStatus = (string) ($analysis['status'] ?? 'needs_review');
+
+	$threeWayStatusTable = (new CTableInfo())
+		->setHeader([
+			_('Three-way status'),
+			_('Upstream only'),
+			_('Local overwrite risk'),
+			_('Converged'),
+			_('Conflicts'),
+			_('Unresolved'),
+			_('Affected entities')
+		])
+		->addRow([
+			$threeWayStatusLabels[$threeWayStatus] ?? _('Unknown'),
+			$threeWaySummary['upstream_only'],
+			$threeWaySummary['local_only_overwrite'],
+			$threeWaySummary['converged'],
+			$threeWaySummary['conflict'],
+			$threeWaySummary['unresolved'],
+			$threeWaySummary['entities_affected']
+		]);
+
+	$page
+		->addItem(new CTag('h4', true, _('Three-way change analysis')))
+		->addItem($threeWayStatusTable)
+		->addItem(new CTag('p', true, _(
+			'BASE is the official historical template matching the installed vendor version, LOCAL is the currently installed template and UPSTREAM is the current official template.'
+		)));
+
+	if (($analysis['details'] ?? []) !== []) {
+		$detailsTable = (new CTableInfo())
+			->setHeader([
+				_('Entity type'),
+				_('Entity'),
+				_('Field'),
+				_('Classification'),
+				_('BASE'),
+				_('LOCAL'),
+				_('UPSTREAM')
+			]);
+
+		foreach ($analysis['details'] as $detail) {
+			$detailsTable->addRow([
+				$entityLabels[$detail['entity_type']] ?? $detail['entity_type'],
+				$detail['entity'],
+				$detail['field'],
+				$threeWayClassLabels[$detail['classification']] ?? _('Unknown'),
+				$formatThreeWayValue($detail['base']),
+				$formatThreeWayValue($detail['local']),
+				$formatThreeWayValue($detail['upstream'])
+			]);
+		}
+
+		$page->addItem(new CTag('h4', true, _('Three-way field details')))->addItem($detailsTable);
+
+		if (!empty($analysis['details_truncated'])) {
+			$page->addItem(new CTag('p', true, sprintf(
+				_('Only the first %1$d detailed changes are displayed; summary counts include all analyzed changes.'),
+				(int) ($analysis['detail_limit'] ?? 0)
+			)));
+		}
+	}
+
+	$page->addItem(new CTag('p', true, _(
+		'A conflict means the same normalized field has different BASE, LOCAL and UPSTREAM values. A local overwrite risk means UPSTREAM still has the BASE value while LOCAL was customized, so importing the official template would tend to replace that customization. These classifications are review signals, not an automatic update-safety decision.'
+	)));
+}
+
+if ($data['three_way_error'] !== null) {
+	$page->addItem(new CTag('p', true, $data['three_way_error']));
+}
+
 switch ($data['content_status']) {
 	case 'matches_current_upstream':
 		$interpretation = _(
@@ -166,7 +286,7 @@ switch ($data['content_status']) {
 
 	case 'update_available_local_modifications':
 		$interpretation = _(
-			'The installed template is older than upstream, and it differs from the historical official baseline matching its installed vendor version. Local modifications are therefore present. The module does not yet classify whether those local changes conflict with the newer upstream changes.'
+			'The installed template is older than upstream and differs from the historical official baseline. The three-way section, when available, shows whether those local differences are upstream-only, would be overwritten, have converged with upstream, or conflict with newer upstream values.'
 		);
 		break;
 
@@ -190,6 +310,6 @@ $page
 	->addItem(new CTag('h4', true, _('Interpretation')))
 	->addItem(new CTag('p', true, $interpretation))
 	->addItem(new CTag('p', true, _(
-		'This page uses configuration.importcompare only. Historical lookup and source retrieval are read-only and do not import, update or delete Zabbix configuration.'
+		'This page uses configuration.importcompare only. Historical lookup, three-way analysis and source retrieval are read-only and do not import, update or delete Zabbix configuration.'
 	)))
 	->show();

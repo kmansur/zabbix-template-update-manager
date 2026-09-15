@@ -19,6 +19,7 @@ The project is designed as a native Zabbix frontend module.
 11. Design repository providers independently from the comparison engine.
 12. Fail closed when runtime, upstream identity, source provenance, historical provenance or version semantics cannot be verified safely.
 13. Never infer a Git tag from template `vendor.version` metadata.
+14. Reuse Zabbix's normalized import-comparison output instead of implementing a second import engine.
 
 ## Current architecture
 
@@ -55,21 +56,20 @@ TemplateInventoryService                |
             +------------+-------------+
             |                          |
             v                          v
-UpstreamTemplateSourceRepository    local Zabbix state
+ current official source          LOCAL Zabbix state
             |                          |
             v                          |
-native Zabbix YAML reader              |
+ native YAML reader                    |
             |                          |
             v                          |
-UpstreamTemplateDocumentService        |
+ isolate selected UUID                 |
             |                          |
             +------------+-------------+
                          |
                          v
-          API::Configuration()->importcompare()
+       configuration.importcompare (LOCAL -> UPSTREAM)
                          |
-                         v
-             current-upstream preview
+                  current preview
                          |
                  update_available?
                          |
@@ -77,30 +77,29 @@ UpstreamTemplateDocumentService        |
        UpstreamTemplateHistoryRepository
                          |
                          v
-          path-specific canonical history
+       HistoricalTemplateBaselineService
                          |
                          v
-       HistoricalTemplateBaselineService
+              historical BASE source
+                         |
+                         v
+       configuration.importcompare (LOCAL -> BASE)
                          |
              +-----------+-----------+
              |                       |
              v                       v
- historical immutable YAML       stable UUID +
- by commit + same path           vendor.version check
+      historical diff           current diff
              |                       |
              +-----------+-----------+
                          |
                          v
-          isolated historical baseline
+          ImportCompareEntityExtractor
                          |
                          v
-          API::Configuration()->importcompare()
+            ThreeWayChangeAnalyzer
                          |
                          v
-          installed-vs-baseline summary
-                         |
-                         v
-          ContentComparisonClassifier
+        BASE / LOCAL / UPSTREAM field states
                          |
                          v
               Native comparison view
@@ -224,7 +223,7 @@ A version result is metadata-only. `update_available` does not imply that import
 
 Retrieves official template source by immutable commit and validated path.
 
-The normal current-upstream path uses:
+The current-upstream path uses:
 
 - the exact 40-character Git commit recorded by the upstream index;
 - one of the official YAML paths recorded for that UUID.
@@ -357,21 +356,14 @@ The service enables create/update comparison for the selected template and its s
 
 This does not call `configuration.import` and does not mutate Zabbix configuration.
 
-The current preview scope includes:
+The same service is used twice for an outdated official template with a resolved baseline:
 
-- template/template groups and referenced host groups;
-- template dashboards;
-- template linkage;
-- items;
-- discovery rules;
-- triggers;
-- graphs;
-- web scenarios;
-- value maps.
+```text
+LOCAL -> UPSTREAM
+LOCAL -> BASE
+```
 
-Hosts are intentionally outside this comparison input.
-
-The same import-comparison service is used for both current-upstream preview and historical-baseline comparison, keeping Zabbix's native import semantics as the comparison authority.
+The installed LOCAL state is therefore the shared pivot of both normalized Zabbix comparisons.
 
 ### ImportCompareSummary
 
@@ -399,44 +391,80 @@ Current states:
 - `historical_baseline_required`;
 - `not_available`.
 
-Safety rules:
+This remains a high-level content state. Three-way overlap is a separate layer so the simple status is not overloaded with merge semantics.
 
-- `current` + zero current-upstream differences → content matches current upstream;
-- `current` + current-upstream differences → local modifications detected;
-- `update_available` + resolved historical baseline + zero installed-vs-baseline differences → update available, no local modifications detected;
-- `update_available` + resolved historical baseline + installed-vs-baseline differences → update available, local modifications detected;
-- `update_available` without a safely resolved historical baseline → current differences remain only an update preview;
-- ambiguous/missing/newer installed version states → historical baseline required or not available.
+### ImportCompareEntityExtractor
 
-This prevents the central false positive the architecture was designed to avoid: an outdated but unmodified official template is not classified as locally modified merely because it differs from the latest upstream revision.
+`CConfigurationImportcompare` already returns recursive normalized `before` and `after` snapshots and matches structured entities by UUID first. The module consumes that output rather than reparsing raw template content for overlap analysis.
 
-### Three-way model
+The extractor:
 
-Historical baseline lookup establishes two authoritative relationships:
+- walks the recursive `added` / `updated` / `removed` tree;
+- creates hierarchical entity paths;
+- uses normalized UUID as the preferred identity token;
+- falls back to object-specific uniqueness fields when UUID is unavailable;
+- preserves normalized before/after snapshots;
+- rejects duplicate/ambiguous extracted paths;
+- marks identities without a reliable UUID/uniqueness key as unresolved.
 
-```text
-A = official historical baseline matching installed version
-B = installed local template
-C = current official upstream template
-
-A vs B -> local customization
-B vs C -> proposed current-upstream update preview
-```
-
-The remaining relationship required for field-level conflict classification is:
+Example path:
 
 ```text
-A vs C -> upstream evolution at object/field level
+/templates:uuid-<template UUID>/items:uuid-<item UUID>
 ```
 
-Once A-vs-B and A-vs-C changes can be normalized into stable object/field identities, the module can detect overlap:
+### ThreeWayChangeAnalyzer
 
-- local-only changes;
-- upstream-only changes;
-- non-overlapping changes;
-- overlapping/conflicting changes.
+The analyzer reconstructs three states from the two native previews:
 
-The current milestone does **not** call an update safe merely because no local changes are present. Operational risk analysis is a separate stage.
+```text
+historical comparison: LOCAL (before) -> BASE (after)
+current comparison:    LOCAL (before) -> UPSTREAM (after)
+```
+
+For a stable entity path, the two LOCAL snapshots must be equal. A mismatch fails closed as `unresolved`.
+
+When an entity exists in BASE, LOCAL and UPSTREAM, the analyzer compares normalized fields individually. When existence differs, it classifies the entity state/snapshot as a whole instead of inventing values for absent fields.
+
+Classification rules:
+
+```text
+BASE == LOCAL, UPSTREAM differs
+    -> upstream_only
+
+LOCAL differs, BASE == UPSTREAM
+    -> local_only_overwrite
+
+BASE differs, LOCAL == UPSTREAM
+    -> converged
+
+BASE, LOCAL and UPSTREAM all differ
+    -> conflict
+
+identity/pivot cannot be proven
+    -> unresolved
+```
+
+`local_only_overwrite` is intentionally separate from `conflict`. Upstream did not independently change that field, but importing the current official template would tend to restore the BASE value and therefore overwrite the local customization.
+
+The analyzer returns:
+
+- counts for every classification;
+- total normalized differences;
+- affected-entity count;
+- bounded detailed rows with BASE / LOCAL / UPSTREAM values;
+- overall review status.
+
+Overall status precedence is conservative:
+
+1. conflict detected;
+2. unresolved / needs review;
+3. local overwrite risk;
+4. compatible/converged overlap;
+5. upstream-only;
+6. no changes.
+
+See `docs/three-way-analysis.md` for detailed semantics.
 
 ### Frontend
 
@@ -455,10 +483,11 @@ The comparison view is responsible for:
 - immutable current source path/commit context;
 - current-upstream update preview;
 - historical baseline status and commit when resolved;
-- number of history commits examined;
 - installed-vs-historical-baseline difference count;
-- final conservative content classification;
-- explicit explanation of unresolved conflict/risk limits.
+- high-level content classification;
+- three-way status and summary;
+- granular BASE / LOCAL / UPSTREAM field details;
+- explicit explanation that conflict/overwrite classifications are review signals, not automatic update-safety decisions.
 
 Only Zabbix administrators and super administrators can open the comparison action because `configuration.importcompare` applies the same import-related role access checks used by Zabbix itself.
 
@@ -468,22 +497,32 @@ All views use native Zabbix components and do not add a UI framework.
 
 - cache successful historical baseline resolution to avoid repeated remote scans;
 - rename-aware historical raw-path resolution;
-- canonical object/field normalization for A-vs-B and A-vs-C;
-- granular field-level diff presentation;
-- local/upstream change separation;
-- conflict detection;
-- impact analysis.
+- decompose selected nested collections such as macros/tags/preprocessing when a more granular semantic key is safe;
+- impact analysis against linked hosts;
+- risk scoring using change type, entity type and three-way classification;
+- filters/drill-down for large three-way detail sets.
 
 ### Risk analyzer
 
-Future classifications:
+Future classifications may include:
 
 - low;
 - medium;
 - high;
 - conflict.
 
-No risk classification is made solely from vendor version, current-upstream preview or absence of local customization.
+A future risk score should combine at least:
+
+- three-way conflict/overwrite state;
+- entity type;
+- field type;
+- removals versus additions;
+- item key/value type/master-item changes;
+- trigger-expression changes;
+- discovery-rule/prototype changes;
+- number of linked hosts affected.
+
+No operational safety decision is made solely from vendor version or the absence of a three-way conflict.
 
 ### Update engine
 

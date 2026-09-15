@@ -38,7 +38,12 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Historical baseline comparison through `configuration.importcompare` for outdated official templates.
 - Separate outdated-template states for updates with no detected local modifications and updates with detected local modifications.
 - Capped historical scans with explicit `history_limit_reached` semantics instead of claiming a baseline does not exist after an incomplete scan.
-- Unit coverage for source URL validation, path traversal rejection, history response validation, historical baseline selection, document isolation, nested import-comparison summaries, classification semantics and import-comparison rules.
+- Three-way BASE / LOCAL / UPSTREAM field analysis built from two native `configuration.importcompare` results sharing the same LOCAL pivot.
+- Stable UUID-based extraction of normalized import-comparison entities, with unique-field fallback and fail-closed handling of ambiguous identities.
+- Three-way classifications for upstream-only changes, local customizations that current upstream would overwrite, converged changes, real conflicts and unresolved states.
+- Native comparison-page summary and field detail table showing BASE, LOCAL and UPSTREAM values without enabling any write action.
+- Bounded three-way detail output while retaining complete summary counts.
+- Unit coverage for source URL validation, path traversal rejection, history response validation, historical baseline selection, document isolation, nested import-comparison summaries, entity extraction, three-way classification semantics and import-comparison rules.
 
 ### Changed
 
@@ -59,6 +64,8 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Content differences are classified as local modifications only when the installed vendor version equals the current official upstream version or when the installed content is compared against a resolved historical official baseline of the same vendor version.
 - Differences against a newer upstream version remain an update preview when no historical official baseline can be established safely.
 - The comparison page now keeps current-upstream update changes separate from installed-content differences against the historical baseline.
+- When a historical baseline is available, the comparison page now distinguishes local/upstream overlap instead of treating every local customization as the same risk.
+- A three-way conflict is limited to the case where the same normalized field has distinct BASE, LOCAL and UPSTREAM states; the result remains a review signal rather than an automatic update-safety decision.
 
 ## [0.1.0-dev] - 2026-09-14
 
