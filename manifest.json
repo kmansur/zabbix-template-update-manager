@@ -29,6 +29,14 @@
         "ztum.template.update": {
             "class": "TemplateUpdate",
             "view": "template.update"
+        },
+        "ztum.template.rollback.review": {
+            "class": "TemplateRollbackReview",
+            "view": "template.rollback.review"
+        },
+        "ztum.template.rollback": {
+            "class": "TemplateRollback",
+            "view": "template.rollback"
         }
     }
 }
