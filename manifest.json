@@ -25,6 +25,10 @@
         "ztum.template.preflight": {
             "class": "TemplatePreflight",
             "view": "template.preflight"
+        },
+        "ztum.template.update": {
+            "class": "TemplateUpdate",
+            "view": "template.update"
         }
     }
 }
