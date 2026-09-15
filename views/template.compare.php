@@ -57,6 +57,30 @@ $riskCoverageLabels = [
 	'incomplete' => _('Incomplete')
 ];
 
+$readinessStatusLabels = [
+	'not_applicable' => _('Not applicable'),
+	'blocked_baseline' => _('Blocked — historical baseline required'),
+	'blocked_unresolved' => _('Blocked — analysis unresolved'),
+	'blocked_conflict' => _('Blocked — conflict detected'),
+	'blocked_local_overwrite' => _('Blocked — local customization overwrite risk'),
+	'review_high' => _('Manual high-risk review required'),
+	'review_medium' => _('Manual review required'),
+	'candidate_for_backup' => _('Candidate for backup and continued review')
+];
+
+$readinessNextStepLabels = [
+	'none' => _('None'),
+	'resolve_update_preview' => _('Resolve update-preview identities'),
+	'resolve_historical_baseline' => _('Resolve historical official baseline'),
+	'resolve_three_way_analysis' => _('Resolve three-way comparison'),
+	'resolve_conflicts' => _('Resolve BASE / LOCAL / UPSTREAM conflicts'),
+	'protect_local_customizations' => _('Protect or reconcile local customizations'),
+	'resolve_risk_analysis' => _('Resolve risk analysis'),
+	'manual_high_risk_review' => _('Perform manual high-risk change review'),
+	'manual_change_review' => _('Perform manual change review'),
+	'create_and_verify_backup' => _('Create and verify rollback backup')
+];
+
 $entityLabels = [
 	'templates' => _('Templates'),
 	'items' => _('Items'),
@@ -344,6 +368,80 @@ if ($data['update_risk_error'] !== null) {
 	$page->addItem(new CTag('p', true, $data['update_risk_error']));
 }
 
+if (is_array($data['update_readiness'])
+		&& ($data['update_readiness']['status'] ?? 'not_applicable') !== 'not_applicable') {
+	$readiness = $data['update_readiness'];
+	$readinessStatus = (string) ($readiness['status'] ?? 'blocked_unresolved');
+	$nextStep = (string) ($readiness['next_step'] ?? 'none');
+
+	$readinessTable = (new CTableInfo())
+		->setHeader([
+			_('Readiness state'),
+			_('Required next step'),
+			_('Directly linked hosts'),
+			_('Update writes enabled')
+		])
+		->addRow([
+			$readinessStatusLabels[$readinessStatus] ?? _('Unknown'),
+			$readinessNextStepLabels[$nextStep] ?? _('Unknown'),
+			(int) ($readiness['direct_host_count'] ?? 0),
+			!empty($readiness['write_enabled']) ? _('Yes') : _('No')
+		]);
+
+	$page
+		->addItem(new CTag('h4', true, _('Update readiness gate')))
+		->addItem($readinessTable);
+
+	switch ($readinessStatus) {
+		case 'candidate_for_backup':
+			$readinessText = _(
+				'The read-only comparison gate has enough authoritative evidence to advance to creating and verifying a rollback backup. This is not an update authorization, and no update action is enabled.'
+			);
+			break;
+
+		case 'review_high':
+			$readinessText = _(
+				'The comparison evidence is complete, but the proposed upstream change has high technical review priority. Manual review is required before the workflow may advance to backup creation.'
+			);
+			break;
+
+		case 'review_medium':
+			$readinessText = _(
+				'The comparison evidence is complete, but the proposed upstream change requires manual review before the workflow may advance to backup creation.'
+			);
+			break;
+
+		case 'blocked_conflict':
+			$readinessText = _(
+				'The default update path is blocked because at least one BASE / LOCAL / UPSTREAM conflict is confirmed. The conflict must be reviewed and resolved deliberately.'
+			);
+			break;
+
+		case 'blocked_local_overwrite':
+			$readinessText = _(
+				'The default update path is blocked because current official content would overwrite one or more known local customizations. Those customizations must be preserved, reconciled or explicitly retired first.'
+			);
+			break;
+
+		case 'blocked_baseline':
+			$readinessText = _(
+				'The update path is blocked because an authoritative historical official baseline matching the installed vendor version has not been established.'
+			);
+			break;
+
+		default:
+			$readinessText = _(
+				'The update path is blocked because one or more comparison identities or analysis stages remain unresolved. The module fails closed rather than inferring update readiness.'
+			);
+	}
+
+	$page
+		->addItem(new CTag('p', true, $readinessText))
+		->addItem(new CTag('p', true, _(
+			'During the current milestone the strongest positive state is only “candidate for backup”. Zabbix configuration write/import operations remain disabled by design.'
+		)));
+}
+
 switch ($data['content_status']) {
 	case 'matches_current_upstream':
 		$interpretation = _(
@@ -389,6 +487,6 @@ $page
 	->addItem(new CTag('h4', true, _('Interpretation')))
 	->addItem(new CTag('p', true, $interpretation))
 	->addItem(new CTag('p', true, _(
-		'This page uses configuration.importcompare only. Historical lookup, three-way analysis, risk analysis and source retrieval are read-only and do not import, update or delete Zabbix configuration.'
+		'This page uses configuration.importcompare only. Historical lookup, three-way analysis, risk/readiness analysis and source retrieval are read-only and do not import, update or delete Zabbix configuration.'
 	)))
 	->show();

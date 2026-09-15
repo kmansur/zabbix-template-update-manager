@@ -20,6 +20,7 @@ use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateVersionComparator;
 use Modules\ZabbixTemplateUpdateManager\Service\ThreeWayChangeAnalyzer;
 use Modules\ZabbixTemplateUpdateManager\Service\UpdatePreviewAnalyzer;
+use Modules\ZabbixTemplateUpdateManager\Service\UpdateReadinessEvaluator;
 use Modules\ZabbixTemplateUpdateManager\Service\UpdateRiskAnalyzer;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamMatcher;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamTemplateDocumentService;
@@ -41,6 +42,7 @@ require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateVersionComparator.php';
 require_once dirname(__DIR__).'/src/Service/ThreeWayChangeAnalyzer.php';
 require_once dirname(__DIR__).'/src/Service/UpdatePreviewAnalyzer.php';
+require_once dirname(__DIR__).'/src/Service/UpdateReadinessEvaluator.php';
 require_once dirname(__DIR__).'/src/Service/UpdateRiskAnalyzer.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamMatcher.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamTemplateDocumentService.php';
@@ -85,7 +87,8 @@ class TemplateCompare extends CController {
 			'three_way_error' => null,
 			'update_preview' => null,
 			'update_risk' => null,
-			'update_risk_error' => null
+			'update_risk_error' => null,
+			'update_readiness' => null
 		];
 
 		if (!ZabbixVersion::isSupported($data['zabbix_version'])) {
@@ -265,6 +268,14 @@ class TemplateCompare extends CController {
 					);
 				}
 			}
+
+			$data['update_readiness'] = UpdateReadinessEvaluator::evaluate(
+				$template,
+				$data['historical_baseline'],
+				$data['three_way_analysis'],
+				$data['update_preview'],
+				$data['update_risk']
+			);
 		}
 		catch (Throwable $exception) {
 			error_log(sprintf(

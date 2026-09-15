@@ -28,8 +28,12 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Private local template backup repository with exact byte count and SHA-256 verification.
 - Deterministic JSON backup manifests recording template identity and export provenance.
 - Template backup service combining native export with local rollback-artifact persistence.
-- Dedicated backup/rollback architecture documentation.
-- Unit coverage for upstream identity/version/source/history, baseline cache, import comparison, three-way analysis, update risk, native export contract and backup artifact integrity.
+- Read-only update readiness gate with explicit blocked/review/candidate workflow states.
+- Fail-closed readiness blockers for missing baseline, unresolved analysis, three-way conflict and local-customization overwrite risk.
+- Explicit `candidate_for_backup` state as the strongest positive read-only result; it never enables configuration writes.
+- Native comparison-page readiness summary showing the required next workflow step without exposing an update action.
+- Dedicated backup/rollback and update-readiness architecture documentation.
+- Unit coverage for upstream identity/version/source/history, baseline cache, import comparison, three-way analysis, update risk/readiness, native export contract and backup artifact integrity.
 
 ### Changed
 
@@ -43,6 +47,7 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Overall update review priority is forced to `Unknown` when three-way local-overlap coverage is unavailable or unresolved.
 - Direct host count is presented as impact context rather than being used to inflate technical severity.
 - Backup artifacts use template IDs rather than names for filesystem paths and are written as private local files.
+- Readiness never labels an update safe or ready-to-import; medium/high risk remains manual-review state and all Zabbix write operations stay disabled.
 
 ## [0.1.0-dev] - 2026-09-14
 
