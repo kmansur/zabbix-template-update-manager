@@ -7,6 +7,7 @@ use CControllerResponseData;
 use CControllerResponseFatal;
 use CImportReaderFactory;
 use Modules\ZabbixTemplateUpdateManager\Repository\HistoricalBaselineCacheRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\TemplateBackupRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateHistoryRepository;
@@ -15,6 +16,8 @@ use Modules\ZabbixTemplateUpdateManager\Service\ContentComparisonClassifier;
 use Modules\ZabbixTemplateUpdateManager\Service\HistoricalTemplateBaselineService;
 use Modules\ZabbixTemplateUpdateManager\Service\ImportCompareEntityExtractor;
 use Modules\ZabbixTemplateUpdateManager\Service\ImportCompareSummary;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateBackupVerificationService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateExportService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateImportCompareService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateVersionComparator;
@@ -29,6 +32,7 @@ use RuntimeException;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Repository/HistoricalBaselineCacheRepository.php';
+require_once dirname(__DIR__).'/src/Repository/TemplateBackupRepository.php';
 require_once dirname(__DIR__).'/src/Repository/TemplateRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamTemplateHistoryRepository.php';
@@ -37,6 +41,8 @@ require_once dirname(__DIR__).'/src/Service/ContentComparisonClassifier.php';
 require_once dirname(__DIR__).'/src/Service/HistoricalTemplateBaselineService.php';
 require_once dirname(__DIR__).'/src/Service/ImportCompareEntityExtractor.php';
 require_once dirname(__DIR__).'/src/Service/ImportCompareSummary.php';
+require_once dirname(__DIR__).'/src/Service/TemplateBackupVerificationService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateExportService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateImportCompareService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateVersionComparator.php';
@@ -88,7 +94,9 @@ class TemplateCompare extends CController {
 			'update_preview' => null,
 			'update_risk' => null,
 			'update_risk_error' => null,
-			'update_readiness' => null
+			'update_readiness' => null,
+			'backup_verification' => null,
+			'backup_verification_error' => null
 		];
 
 		if (!ZabbixVersion::isSupported($data['zabbix_version'])) {
@@ -276,6 +284,34 @@ class TemplateCompare extends CController {
 				$data['update_preview'],
 				$data['update_risk']
 			);
+
+			if (($data['update_readiness']['status'] ?? null) === 'candidate_for_backup') {
+				try {
+					$data['backup_verification'] = (new TemplateBackupVerificationService(
+						new TemplateExportService(),
+						new TemplateBackupRepository()
+					))->verifyCurrent($template);
+
+					$data['update_readiness'] = UpdateReadinessEvaluator::evaluate(
+						$template,
+						$data['historical_baseline'],
+						$data['three_way_analysis'],
+						$data['update_preview'],
+						$data['update_risk'],
+						$data['backup_verification']
+					);
+				}
+				catch (Throwable $exception) {
+					error_log(sprintf(
+						'[Zabbix Template Update Manager] Backup verification failed for template %s: %s',
+						(string) $this->getInput('templateid'),
+						$exception->getMessage()
+					));
+					$data['backup_verification_error'] = _(
+						'Unable to inspect or verify the persistent rollback backup. The workflow remains at backup candidacy and no configuration-write step is enabled.'
+					);
+				}
+			}
 		}
 		catch (Throwable $exception) {
 			error_log(sprintf(
