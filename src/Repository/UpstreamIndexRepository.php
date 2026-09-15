@@ -129,8 +129,18 @@ final class UpstreamIndexRepository {
 	}
 
 	public static function isValidTemplatePath($path): bool {
-		return is_string($path)
-			&& preg_match('#^templates/(?:[A-Za-z0-9._-]+/)*[A-Za-z0-9._-]+\.yaml$#D', $path) === 1;
+		if (!is_string($path)
+				|| preg_match('#^templates/(?:[A-Za-z0-9._-]+/)*[A-Za-z0-9._-]+\.yaml$#D', $path) !== 1) {
+			return false;
+		}
+
+		foreach (explode('/', $path) as $segment) {
+			if ($segment === '.' || $segment === '..') {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private function cacheFile(string $line): string {
