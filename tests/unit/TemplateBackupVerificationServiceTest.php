@@ -66,6 +66,12 @@ try {
 	assertBackupVerification($artifact['sha256'], $result['latest']['sha256'] ?? null, 'Verification must report the latest artifact fingerprint.');
 	assertBackupVerification($artifact['sha256'], $result['current_export']['sha256'] ?? null, 'Verification must report the fresh current export fingerprint.');
 
+	$wrongIdentity = $template;
+	$wrongIdentity['uuid'] = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+	$result = $verification->verifyCurrent($wrongIdentity);
+	assertBackupVerification('current_mismatch', $result['status'], 'Artifact identity must match the current template exactly.');
+	assertBackupVerification('backup_identity_mismatch', $result['reason'], 'Identity mismatch must fail before accepting the rollback artifact.');
+
 	$differentSource = $currentSource."# local change\n";
 	$mismatchExporter = new TemplateExportService(static fn(array $params): string => $differentSource);
 	$mismatchVerification = new TemplateBackupVerificationService($mismatchExporter, $repository);
