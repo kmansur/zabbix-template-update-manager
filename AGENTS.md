@@ -17,14 +17,15 @@ Current development version: `0.1.0-dev`.
 2. Preserve compatibility with both Zabbix 7.x and 8.x unless a documented compatibility layer is required.
 3. Use native Zabbix frontend components, layout patterns, fonts, colors and controls whenever possible.
 4. Do not introduce Bootstrap, Tailwind, Material UI or another CSS/UI framework.
-5. Keep the current milestone strictly read-only. Do not create, update, import or delete Zabbix configuration.
-6. Do not add write operations to the database.
+5. Keep the current milestone read-only with respect to Zabbix configuration. Local persistent rollback-backup files are allowed, but do not create, update, import or delete Zabbix configuration.
+6. Do not add write operations to the Zabbix database.
 7. Do not commit credentials, tokens, API keys, repository secrets or private keys.
 8. Never pass unvalidated user input to shell commands, Git commands, repository URLs or refs.
 9. Prefer official Zabbix APIs and supported frontend extension points over internal workarounds.
 10. Fail closed when the Zabbix version or an upstream template identity cannot be determined safely.
 11. Do not classify a template as official from `vendor_name` alone. Official identity requires an upstream UUID match.
 12. Do not classify a template as current/outdated from UUID identity alone. Version/content comparison is a separate stage.
+13. Do not treat the existence of a backup file as proof that rollback is ready. Stored artifacts must be revalidated before any future configuration write.
 
 ## Architecture
 
@@ -37,7 +38,7 @@ Current development version: `0.1.0-dev`.
 - `tests/` contains deterministic validation and unit tests.
 - `.github/workflows/` contains CI and upstream-index automation.
 
-Keep controllers thin. Put comparison, repository, inventory and update logic in `src/` services/classes rather than in views or controllers.
+Keep controllers thin. Put comparison, repository, inventory, backup and update logic in `src/` services/classes rather than in views or controllers.
 
 ## Zabbix compatibility
 
@@ -80,7 +81,7 @@ The module should look and behave like Zabbix itself.
 - Do not hard-code theme colors when a native class/component can provide them.
 - Preserve light/dark theme behavior automatically.
 
-## Read-only milestone
+## Read-only Zabbix-configuration milestone
 
 Until the update milestone is explicitly enabled, allowed operations include:
 
@@ -90,11 +91,21 @@ Until the update milestone is explicitly enabled, allowed operations include:
 - comparison;
 - `configuration.importcompare`;
 - risk analysis;
-- impact analysis.
+- impact analysis;
+- readiness evaluation;
+- persistent local rollback-backup artifact creation after the readiness gate reaches `candidate_for_backup`.
+
+The local backup action must remain:
+
+- HTTP POST;
+- protected by native Zabbix CSRF validation;
+- restricted to Zabbix administrators/super administrators;
+- limited to private persistent storage;
+- separate from any Zabbix configuration write.
 
 Disallowed operations include:
 
-- `configuration.import`;
+- Zabbix configuration import/write;
 - template create/update/delete;
 - direct database inserts/updates/deletes;
 - automatic template replacement.
@@ -103,15 +114,16 @@ The CI read-only guard must remain green during this phase.
 
 ## Future update milestone
 
-Write operations may only be introduced after the read-only discovery/comparison phase is validated. The future update flow must include, at minimum:
+Zabbix configuration write operations may only be introduced after the discovery/comparison and backup-verification phases are validated. The future update flow must include, at minimum:
 
 1. review of proposed changes;
 2. `configuration.importcompare`;
 3. backup/export of the current template;
-4. explicit administrator confirmation;
-5. controlled import;
-6. post-import validation;
-7. rollback capability.
+4. revalidation that the backup matches the current installed state;
+5. explicit administrator confirmation;
+6. controlled import/write;
+7. post-import validation;
+8. rollback capability.
 
 ## Testing before commit
 
