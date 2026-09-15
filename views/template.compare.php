@@ -80,7 +80,7 @@ $readinessNextStepLabels = [
 	'manual_high_risk_review' => _('Perform manual high-risk change review'),
 	'manual_change_review' => _('Perform manual change review'),
 	'create_and_verify_backup' => _('Create and verify rollback backup'),
-	'await_write_enabled_milestone' => _('No configuration-write step is enabled in this milestone')
+	'run_controlled_preflight' => _('Run fresh controlled update preflight')
 ];
 
 $backupVerificationLabels = [
@@ -365,7 +365,7 @@ if (is_array($data['update_risk']) && is_array($data['update_preview'])) {
 	}
 	elseif ($riskLevel === 'conflict') {
 		$page->addItem(new CTag('p', true, _(
-			'The update preview contains at least one confirmed three-way conflict. Manual review is required before any future update action can be considered.'
+			'The update preview contains at least one confirmed three-way conflict. Manual review is required before any controlled update can be considered.'
 		)));
 	}
 
@@ -458,13 +458,13 @@ if (is_array($data['update_readiness'])
 	switch ($readinessStatus) {
 		case 'backup_verified':
 			$readinessText = _(
-				'The comparison evidence is complete and the newest rollback artifact exactly matches the current installed template export. This proves the rollback prerequisite only; it does not authorize an update.'
+				'The comparison evidence is complete and the newest rollback artifact exactly matches the current installed template export. The next step is a fresh controlled preflight; any configuration write still requires explicit super-administrator confirmation and another fresh preflight immediately before import.'
 			);
 			break;
 
 		case 'candidate_for_backup':
 			$readinessText = _(
-				'The read-only comparison gate has enough authoritative evidence to advance to creating and verifying a rollback backup. This is not an update authorization, and no update action is enabled.'
+				'The comparison gate has enough authoritative evidence to advance to creating and verifying a rollback backup. This is not an update authorization, and no configuration import is enabled at this state.'
 			);
 			break;
 
@@ -507,7 +507,7 @@ if (is_array($data['update_readiness'])
 	$page
 		->addItem(new CTag('p', true, $readinessText))
 		->addItem(new CTag('p', true, _(
-			'Even when the rollback backup is verified, Zabbix configuration write/import operations remain disabled by design in this milestone.'
+			'This comparison page does not call configuration.import. Controlled writes are available only through the separate preflight and confirmation flow after all safety gates pass.'
 		)));
 
 	if ($readinessStatus === 'candidate_for_backup' && is_array($data['template'])) {
@@ -530,6 +530,26 @@ if (is_array($data['update_readiness'])
 			)))
 			->addItem($backupForm);
 	}
+	elseif ($readinessStatus === 'backup_verified' && is_array($data['template'])) {
+		$preflightAction = (new CUrl('zabbix.php'))
+			->setArgument('action', 'ztum.template.preflight')
+			->getUrl();
+		$preflightForm = (new CForm('post'))
+			->setId('ztum-template-preflight-form')
+			->setAction($preflightAction)
+			->addItem([
+				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.preflight')))->removeId(),
+				(new CVar('templateid', (string) $data['template']['templateid']))->removeId(),
+				new CSubmitButton(_('Run controlled preflight'))
+			]);
+
+		$page
+			->addItem(new CTag('h4', true, _('Controlled update preflight')))
+			->addItem(new CTag('p', true, _(
+				'The preflight recomputes the complete authoritative state and rollback match before showing any super-administrator update confirmation.'
+			)))
+			->addItem($preflightForm);
+	}
 }
 
 switch ($data['content_status']) {
@@ -547,7 +567,7 @@ switch ($data['content_status']) {
 
 	case 'update_available_no_local_modifications':
 		$interpretation = _(
-			'The installed template is older than upstream, and a historical official baseline matching the installed vendor version was found. The installed content matches that baseline, so no local modifications were detected. The review-priority section classifies the proposed upstream changes technically, but it does not authorize an update.'
+			'The installed template is older than upstream, and a historical official baseline matching the installed vendor version was found. The installed content matches that baseline, so no local modifications were detected. The review-priority section classifies the proposed upstream changes technically; only low/none-risk candidates can advance through the automatic backup/preflight gate.'
 		);
 		break;
 
@@ -577,6 +597,6 @@ $page
 	->addItem(new CTag('h4', true, _('Interpretation')))
 	->addItem(new CTag('p', true, $interpretation))
 	->addItem(new CTag('p', true, _(
-		'This page uses configuration.importcompare and configuration.export only. Historical lookup, three-way analysis, risk/readiness analysis, rollback verification and source retrieval do not import, update or delete Zabbix configuration.'
+		'This comparison page uses configuration.importcompare and configuration.export only. A controlled configuration.import is performed only by the separate super-administrator update action after fresh preflight, explicit confirmation and immutable source verification.'
 	)))
 	->show();
