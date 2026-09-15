@@ -4,17 +4,21 @@
 
 Any future write-enabled template update must have a verified copy of the currently installed template before a configuration write is ever allowed.
 
-The current milestone remains read-only with respect to Zabbix configuration. It now exposes a deliberately narrow rollback-backup action for templates that reach the `candidate_for_backup` readiness state. That action performs only:
+The current milestone remains read-only with respect to Zabbix configuration. It exposes a deliberately narrow rollback-backup action for templates that reach the `candidate_for_backup` readiness state, then re-reads the stored artifact and compares it with a fresh export of the installed template.
+
+The implemented backup path performs only:
 
 1. native Zabbix template export;
 2. local persistent backup-file creation;
-3. SHA-256 and byte-count integrity recording.
+3. stored-artifact integrity validation;
+4. fresh native export of the current installed template;
+5. exact byte-count and SHA-256 comparison.
 
 It does **not** modify, import, replace or delete Zabbix configuration.
 
 ## Native export source
 
-Backups are produced from the installed Zabbix instance through the native read-only API method:
+Backups and current-state verification are produced from the installed Zabbix instance through the native read-only API method:
 
 ```text
 API::Configuration()->export()
@@ -94,15 +98,15 @@ Template configuration backups must be treated as sensitive operational data.
 
 The repository therefore:
 
-- creates template-specific private directories with requested mode `0700`;
-- writes source and manifest files with requested mode `0600`;
+- creates template-specific private directories with mode `0700` on Unix;
+- writes source and manifest files with mode `0600` on Unix;
 - uses atomic temporary-file + rename writes;
 - validates source byte count and SHA-256 before persistence;
 - rejects invalid template IDs and UUIDs;
-- applies a hard export size limit;
+- applies a hard 20 MiB export size limit;
 - removes the YAML artifact if manifest persistence fails;
 - uses numeric template IDs, never template names, in filesystem paths;
-- fails if the persistent destination cannot be created or written.
+- fails if the persistent destination cannot be created, secured or written.
 
 ## Frontend backup action
 
@@ -123,9 +127,83 @@ The controller intentionally leaves native CSRF validation enabled. It reloads t
 
 The action creates a local rollback artifact only. It does not enable any template update operation.
 
+## Backup inventory and integrity inspection
+
+The repository can inspect a bounded set of recent artifacts for one numeric template ID. Runtime verification currently examines at most the newest 10 artifacts; the repository has a hard maximum inspection limit of 50.
+
+Every inspected manifest is checked conservatively before its backup is considered usable:
+
+- manifest filename must match the generated backup naming convention;
+- manifest must be a regular readable file, not a symlink;
+- manifest is limited to 1 MiB;
+- JSON must decode successfully;
+- manifest schema version must be supported;
+- recorded template ID must match the requested template ID;
+- recorded UUID and identity metadata must be valid;
+- export format must be YAML;
+- source filename must be a basename only and must share the manifest stem;
+- recorded byte count must be within the export size limit;
+- recorded SHA-256 must be valid;
+- YAML source must be a regular readable file, not a symlink;
+- actual YAML byte count must equal the manifest;
+- actual YAML SHA-256 must equal the manifest;
+- on Unix, source and manifest files must have exact mode `0600`.
+
+An invalid newest artifact is not silently bypassed in favor of an older valid backup. The verification path fails closed and reports the newest artifact as invalid.
+
+## Matching the current installed template
+
+Artifact integrity alone is not enough. A perfectly intact backup may still be stale if the installed template changed after the backup was created.
+
+`TemplateBackupVerificationService` therefore:
+
+1. inspects the newest stored rollback artifact;
+2. rejects an invalid newest artifact;
+3. checks the artifact identity against the current template metadata;
+4. performs a fresh one-template `configuration.export`;
+5. compares the fresh export byte count and SHA-256 with the stored artifact.
+
+Current verification states are:
+
+- `no_backup` — no rollback artifact exists for the template;
+- `repository_unavailable` — the persistent repository cannot be read safely;
+- `latest_invalid` — the newest artifact failed integrity validation;
+- `current_mismatch` — the newest intact artifact does not represent the current installed export;
+- `current_match` — the newest artifact is intact and exactly matches a fresh current export.
+
+Only `current_match` satisfies the current rollback prerequisite.
+
+## Readiness progression
+
+When all comparison/risk evidence is complete and technical review priority is `none` or `low`, readiness first becomes:
+
+```text
+candidate_for_backup
+```
+
+If a persistent artifact then verifies as `current_match`, readiness advances to:
+
+```text
+backup_verified
+```
+
+`backup_verified` means only that the rollback artifact matches the exact currently installed template export. It does **not** mean the upstream update is safe, approved or authorized.
+
+The readiness result continues to contain:
+
+```text
+write_enabled = false
+```
+
+and the next step is explicitly:
+
+```text
+await_write_enabled_milestone
+```
+
 ## Why backup is separate from update
 
-A successful backup does not mean an update is safe. The intended future sequence is:
+A successful and verified backup does not mean an update is safe. The intended future sequence remains:
 
 ```text
 current upstream comparison
@@ -140,7 +218,11 @@ readiness gate
         |
 backup current installed template
         |
-verify backup fingerprint against current installed export
+re-read and validate stored artifact
+        |
+fresh current export fingerprint match
+        |
+backup_verified
         |
 explicit administrator confirmation
         |
@@ -164,13 +246,18 @@ Implemented now:
 - `candidate_for_backup`-gated native frontend button;
 - POST + native Zabbix CSRF protection;
 - administrator/super-administrator permission check;
-- redirect back to the comparison page with success/error messaging;
-- unit tests for export contract, artifact integrity and frontend backup-action security contract.
+- bounded stored-backup inventory;
+- manifest/path/size/permission/SHA-256 validation;
+- fail-closed handling when the newest artifact is invalid;
+- fresh current-template export after stored-artifact validation;
+- exact current-export fingerprint comparison;
+- `backup_verified` readiness state when the newest artifact exactly matches current installed state;
+- native comparison-page verification summary;
+- unit tests for export contract, artifact integrity, tamper detection, current-state verification and frontend backup-action security contract.
 
 Not implemented yet:
 
-- listing or browsing stored backups in the frontend;
-- re-reading and verifying a stored backup before a future update;
+- a dedicated historical backup browser/download UI;
 - retention/cleanup policy;
 - configurable backup root directory;
 - rollback import;
@@ -178,4 +265,4 @@ Not implemented yet:
 - explicit update confirmation;
 - post-update validation.
 
-The next safe milestone is backup inventory and verification. A stored artifact must be revalidated before it can ever become part of a future write-enabled workflow.
+A future write-enabled milestone must re-evaluate every prerequisite server-side and must not trust the presence of a button, a previous page state or a historical `backup_verified` result.
