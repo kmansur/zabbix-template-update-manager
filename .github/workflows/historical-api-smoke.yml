@@ -1,0 +1,63 @@
+name: Historical source API smoke test
+
+on:
+  push:
+    branches:
+      - test/historical-api-smoke
+    paths:
+      - '.github/workflows/historical-api-smoke.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Verify canonical commit history endpoint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query template commit history
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          endpoint='https://git.zabbix.com/rest/api/1.0/projects/ZBX/repos/zabbix/commits'
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --location \
+            --connect-timeout 10 \
+            --max-time 30 \
+            --retry 2 \
+            --retry-delay 2 \
+            --user-agent 'Zabbix-Template-Update-Manager/0.1.0-dev' \
+            --get \
+            --data-urlencode 'path=templates/os/linux/template_os_linux.yaml' \
+            --data-urlencode 'until=release/7.0' \
+            --data-urlencode 'followRenames=true' \
+            --data-urlencode 'limit=5' \
+            "$endpoint" \
+            --output /tmp/zabbix-template-commits.json
+
+          python - <<'PY'
+          import json
+          import re
+
+          with open('/tmp/zabbix-template-commits.json', encoding='utf-8') as handle:
+              data = json.load(handle)
+
+          values = data.get('values')
+          if not isinstance(values, list) or not values:
+              raise SystemExit('commit history response contains no values')
+
+          for commit in values:
+              commit_id = commit.get('id', '')
+              if not re.fullmatch(r'[0-9a-f]{40}', commit_id):
+                  raise SystemExit(f'invalid commit id: {commit_id!r}')
+
+          print(f"History endpoint returned {len(values)} commits")
+          for commit in values:
+              print(commit['id'][:12], commit.get('message', '').splitlines()[0])
+          print('isLastPage=', data.get('isLastPage'))
+          print('nextPageStart=', data.get('nextPageStart'))
+          PY
