@@ -24,9 +24,27 @@ $riskLow = ['coverage' => 'complete', 'level' => 'low'];
 $result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $preview, $riskLow);
 assertReadiness('candidate_for_backup', $result['status'], 'Low known risk with complete overlap evidence should become a backup candidate.');
 assertReadiness(true, $result['candidate_for_backup'], 'Positive comparison gate should allow advancing to backup creation.');
-assertReadiness(false, $result['write_enabled'], 'Readiness must never enable configuration writes during the read-only milestone.');
+assertReadiness(false, $result['backup_verified'], 'Backup candidate is not yet a verified rollback prerequisite.');
+assertReadiness(false, $result['write_enabled'], 'Readiness must never enable configuration writes during the current milestone.');
 assertReadiness(37, $result['direct_host_count'], 'Direct host impact must be preserved as context.');
 assertReadiness('create_and_verify_backup', $result['next_step'], 'Backup must remain the next step before any future write.');
+
+$verifiedBackup = ['status' => 'current_match', 'current_match' => true];
+$result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $preview, $riskLow, $verifiedBackup);
+assertReadiness('backup_verified', $result['status'], 'Exact current rollback artifact should advance readiness to backup_verified.');
+assertReadiness(true, $result['backup_verified'], 'Verified rollback prerequisite must be explicit.');
+assertReadiness(false, $result['candidate_for_backup'], 'Once verified, backup creation is no longer the outstanding prerequisite.');
+assertReadiness('await_write_enabled_milestone', $result['next_step'], 'No configuration-write action is enabled after backup verification.');
+assertReadiness(false, $result['write_enabled'], 'Even backup_verified must keep Zabbix configuration writes disabled.');
+
+$staleBackup = ['status' => 'current_mismatch', 'current_match' => false];
+$result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $preview, $riskLow, $staleBackup);
+assertReadiness('candidate_for_backup', $result['status'], 'Stale backup must not satisfy the rollback prerequisite.');
+assertReadiness(false, $result['backup_verified'], 'Stale backup must never be marked verified.');
+
+$invalidBackup = ['status' => 'latest_invalid', 'current_match' => false];
+$result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $preview, $riskLow, $invalidBackup);
+assertReadiness('candidate_for_backup', $result['status'], 'Invalid newest backup must leave the workflow at backup candidacy.');
 
 $notOfficial = $template;
 $notOfficial['upstream_status'] = 'not_found';
@@ -81,9 +99,5 @@ assertReadiness('candidate_for_backup', $result['status'], 'No effective technic
 
 $result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $preview, null);
 assertReadiness('blocked_unresolved', $result['status'], 'Missing risk analysis must fail closed.');
-
-foreach (['blocked_baseline', 'blocked_unresolved', 'blocked_conflict', 'blocked_local_overwrite', 'review_high', 'review_medium', 'candidate_for_backup'] as $expectedStatus) {
-	// Every applicable status remains non-write-enabled in this milestone.
-}
 
 echo "UpdateReadinessEvaluator tests passed.\n";
