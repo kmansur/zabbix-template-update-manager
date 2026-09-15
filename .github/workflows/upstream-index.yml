@@ -1,0 +1,141 @@
+name: Refresh upstream template indexes
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/upstream-index.yml'
+      - 'tools/build_upstream_index.py'
+      - 'requirements-dev.txt'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: upstream-template-index
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    name: Build official Zabbix template indexes
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install generator dependencies
+        run: python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+      - name: Build indexes
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          SOURCE_REPO='https://github.com/zabbix/zabbix.git'
+          mkdir -p build/upstream
+
+          resolve_ref() {
+            local line="$1"
+            local branch="release/${line}"
+            local tag
+
+            if git ls-remote --exit-code --heads "$SOURCE_REPO" "$branch" >/dev/null 2>&1; then
+              printf '%s\n' "$branch"
+              return 0
+            fi
+
+            tag="$(git ls-remote --tags --refs "$SOURCE_REPO" "refs/tags/${line}.*" \
+              | awk -F/ '{print $3}' | sort -V | tail -n 1)"
+            if [[ -n "$tag" ]]; then
+              printf '%s\n' "$tag"
+              return 0
+            fi
+
+            if [[ "$line" == '8.0' ]]; then
+              printf '%s\n' 'master'
+              return 0
+            fi
+
+            return 1
+          }
+
+          build_line() {
+            local line="$1"
+            local ref
+            local safe_line
+            local source_dir
+            local commit
+            local commit_date
+
+            ref="$(resolve_ref "$line")"
+            safe_line="${line//./-}"
+            source_dir="/tmp/zabbix-${safe_line}"
+            rm -rf "$source_dir"
+
+            git clone --depth 1 --branch "$ref" --filter=blob:none --sparse "$SOURCE_REPO" "$source_dir"
+            git -C "$source_dir" sparse-checkout set templates include
+
+            if [[ "$ref" == 'master' ]]; then
+              major="$(awk '/^#define ZABBIX_VERSION_MAJOR/{print $3}' "$source_dir/include/version.h")"
+              minor="$(awk '/^#define ZABBIX_VERSION_MINOR/{print $3}' "$source_dir/include/version.h")"
+              if [[ "${major}.${minor}" != "$line" ]]; then
+                echo "master is ${major}.${minor}, expected ${line}" >&2
+                exit 1
+              fi
+            fi
+
+            commit="$(git -C "$source_dir" rev-parse HEAD)"
+            commit_date="$(git -C "$source_dir" show -s --format=%cI HEAD)"
+
+            python tools/build_upstream_index.py \
+              --source-dir "$source_dir" \
+              --line "$line" \
+              --source-ref "$ref" \
+              --source-commit "$commit" \
+              --source-commit-date "$commit_date" \
+              --output "build/upstream/${line}.json"
+          }
+
+          build_line '7.0'
+          build_line '7.2'
+          build_line '7.4'
+          build_line '8.0'
+
+      - name: Publish index branch
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git fetch origin upstream-index:refs/remotes/origin/upstream-index
+          rm -rf /tmp/ztum-upstream-index
+          git worktree add /tmp/ztum-upstream-index origin/upstream-index
+          cd /tmp/ztum-upstream-index
+          git switch -C upstream-index
+
+          mkdir -p indexes
+          rm -f indexes/*.json
+          cp "$GITHUB_WORKSPACE"/build/upstream/*.json indexes/
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add indexes
+
+          if git diff --cached --quiet; then
+            echo 'Upstream indexes are already current.'
+            exit 0
+          fi
+
+          git commit -m 'chore: refresh upstream template indexes'
+          git push origin HEAD:upstream-index
