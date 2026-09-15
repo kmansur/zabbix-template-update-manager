@@ -13,6 +13,28 @@ use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use RuntimeException;
 use Throwable;
 
+require_once dirname(__DIR__).'/Repository/HistoricalBaselineCacheRepository.php';
+require_once dirname(__DIR__).'/Repository/TemplateBackupRepository.php';
+require_once dirname(__DIR__).'/Repository/TemplateRepository.php';
+require_once dirname(__DIR__).'/Repository/UpstreamIndexRepository.php';
+require_once dirname(__DIR__).'/Repository/UpstreamTemplateHistoryRepository.php';
+require_once dirname(__DIR__).'/Repository/UpstreamTemplateSourceRepository.php';
+require_once __DIR__.'/ContentComparisonClassifier.php';
+require_once __DIR__.'/HistoricalTemplateBaselineService.php';
+require_once __DIR__.'/ImportCompareSummary.php';
+require_once __DIR__.'/TemplateBackupVerificationService.php';
+require_once __DIR__.'/TemplateExportService.php';
+require_once __DIR__.'/TemplateImportCompareService.php';
+require_once __DIR__.'/TemplateInventoryService.php';
+require_once __DIR__.'/TemplateVersionComparator.php';
+require_once __DIR__.'/ThreeWayChangeAnalyzer.php';
+require_once __DIR__.'/UpdatePreviewAnalyzer.php';
+require_once __DIR__.'/UpdateReadinessEvaluator.php';
+require_once __DIR__.'/UpdateRiskAnalyzer.php';
+require_once __DIR__.'/UpstreamMatcher.php';
+require_once __DIR__.'/UpstreamTemplateDocumentService.php';
+require_once dirname(__DIR__).'/Support/ZabbixVersion.php';
+
 /**
  * Rebuilds the complete read-only update analysis for one visible template.
  *
