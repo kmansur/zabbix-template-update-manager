@@ -19,6 +19,22 @@ The current milestone is strictly read-only. The module can evolve through disco
 
 Runtime compatibility detection uses the native Zabbix `ZABBIX_VERSION` frontend constant. Unsupported or unknown major versions fail closed instead of being assumed compatible.
 
+## Current functionality
+
+The module can inventory templates visible to the current Zabbix user through the native `template.get` API service. No direct database access is used.
+
+The inventory currently displays:
+
+- visible/technical template name;
+- UUID;
+- vendor name;
+- vendor version;
+- template groups;
+- number of directly linked hosts;
+- vendor metadata classification.
+
+Vendor metadata is not treated as proof that a template is official. A template with `vendor_name = Zabbix` is classified only as `Vendor: Zabbix`; official/upstream identity will later be verified against the Zabbix repository by UUID.
+
 ## Initial goals
 
 - Discover installed templates
@@ -39,7 +55,7 @@ The first development phase is read-only.
 
 No template will be modified or imported automatically.
 
-CI includes a read-only guard that rejects known template write operations and direct database write calls during this milestone.
+CI includes a read-only guard that rejects known Zabbix API write methods, template write operations and direct database write calls during this milestone.
 
 ## Architecture
 
@@ -47,14 +63,34 @@ The project is implemented as a native Zabbix frontend module and does not modif
 
 The frontend should reuse native Zabbix components and styling so that menus, tables, filters, controls, fonts, colors and themes remain consistent with the installed Zabbix version.
 
+Current inventory flow:
+
+```text
+TemplateList controller
+        |
+        v
+TemplateRepository
+        |
+        v
+API::Template()->get()
+        |
+        v
+TemplateInventoryService
+        |
+        v
+Native Zabbix CTableInfo view
+```
+
 ## Development validation
 
-The initial CI validates:
+CI validates:
 
 - PHP syntax;
 - `manifest.json` structure and action registration;
 - read-only constraints;
-- Zabbix 7/8 runtime version detection.
+- Zabbix 7/8 runtime version detection;
+- template repository query contract;
+- template inventory normalization and summary logic.
 
 Local checks:
 
@@ -62,7 +98,7 @@ Local checks:
 find . -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 php tests/validate_manifest.php
 php tests/read_only_guard.php
-php tests/unit/ZabbixVersionTest.php
+for test in tests/unit/*Test.php; do php "$test"; done
 ```
 
 ## License

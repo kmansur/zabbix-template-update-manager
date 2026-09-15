@@ -6,9 +6,12 @@ $blockedPatterns = [
 	'/template\.create/i' => 'template.create',
 	'/template\.update/i' => 'template.update',
 	'/template\.delete/i' => 'template.delete',
+	'/API::[A-Za-z0-9_]+\(\)->(?:create|update|delete|massadd|massremove|import|replace|push)\s*\(/i'
+		=> 'Zabbix API write method',
 	'/DB::insert\s*\(/i' => 'DB::insert()',
 	'/DB::update\s*\(/i' => 'DB::update()',
-	'/DB::delete\s*\(/i' => 'DB::delete()'
+	'/DB::delete\s*\(/i' => 'DB::delete()',
+	'/\bDBexecute\s*\(/i' => 'DBexecute()'
 ];
 
 $iterator = new RecursiveIteratorIterator(
