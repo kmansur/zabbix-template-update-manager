@@ -99,6 +99,26 @@ final class UpstreamIndexRepository {
 			if (!is_array($template) || ($template['uuid'] ?? null) !== $uuid) {
 				throw new RuntimeException('The upstream index contains an invalid template record.');
 			}
+
+			$paths = $template['paths'] ?? null;
+			if (!is_array($paths) || $paths === []) {
+				throw new RuntimeException('The upstream index contains a template without source paths.');
+			}
+			foreach ($paths as $path) {
+				if (!is_string($path) || !str_starts_with($path, 'templates/') || !str_ends_with($path, '.yaml')) {
+					throw new RuntimeException('The upstream index contains an invalid source path.');
+				}
+			}
+
+			$hashes = $template['content_sha256s'] ?? null;
+			if (!is_array($hashes) || $hashes === []) {
+				throw new RuntimeException('The upstream index contains a template without content hashes.');
+			}
+			foreach ($hashes as $hash) {
+				if (!is_string($hash) || !preg_match('/^[a-f0-9]{64}$/', $hash)) {
+					throw new RuntimeException('The upstream index contains an invalid content hash.');
+				}
+			}
 		}
 
 		return $data;
