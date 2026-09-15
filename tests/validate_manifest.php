@@ -59,7 +59,11 @@ $expectedActions = [
 	'ztum.templates' => ['class' => 'TemplateList', 'view' => 'template.list'],
 	'ztum.template.compare' => ['class' => 'TemplateCompare', 'view' => 'template.compare'],
 	'ztum.template.backup' => ['class' => 'TemplateBackup'],
-	'ztum.template.backups' => ['class' => 'TemplateBackupList', 'view' => 'template.backup.list']
+	'ztum.template.backups' => ['class' => 'TemplateBackupList', 'view' => 'template.backup.list'],
+	'ztum.template.preflight' => ['class' => 'TemplatePreflight', 'view' => 'template.preflight'],
+	'ztum.template.update' => ['class' => 'TemplateUpdate', 'view' => 'template.update'],
+	'ztum.template.rollback.review' => ['class' => 'TemplateRollbackReview', 'view' => 'template.rollback.review'],
+	'ztum.template.rollback' => ['class' => 'TemplateRollback', 'view' => 'template.rollback']
 ];
 
 foreach ($expectedActions as $actionName => $expectedAction) {
@@ -81,6 +85,11 @@ foreach ($expectedActions as $actionName => $expectedAction) {
 	}
 }
 
+if (count($manifest['actions']) !== count($expectedActions)) {
+	fwrite(STDERR, "manifest.json contains an unexpected action count.\n");
+	exit(1);
+}
+
 $requiredFiles = [
 	$root.'/Module.php',
 	$root.'/actions/TemplateList.php',
@@ -89,12 +98,20 @@ $requiredFiles = [
 	$root.'/views/template.compare.php',
 	$root.'/actions/TemplateBackup.php',
 	$root.'/actions/TemplateBackupList.php',
-	$root.'/views/template.backup.list.php'
+	$root.'/views/template.backup.list.php',
+	$root.'/actions/TemplatePreflight.php',
+	$root.'/views/template.preflight.php',
+	$root.'/actions/TemplateUpdate.php',
+	$root.'/views/template.update.php',
+	$root.'/actions/TemplateRollbackReview.php',
+	$root.'/views/template.rollback.review.php',
+	$root.'/actions/TemplateRollback.php',
+	$root.'/views/template.rollback.php'
 ];
 
 foreach ($requiredFiles as $file) {
-	if (!is_file($file)) {
-		fwrite(STDERR, 'Required module file not found: '.$file.PHP_EOL);
+	if (!is_file($file) || filesize($file) === 0) {
+		fwrite(STDERR, 'Required module file not found or empty: '.$file.PHP_EOL);
 		exit(1);
 	}
 }
