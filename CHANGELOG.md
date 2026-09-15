@@ -27,13 +27,18 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Explicit version states for current templates, available updates, installed-newer versions, missing versions and uncomparable formats.
 - Unit tests that verify numeric vendor-version comparison across revisions and release lines.
 - Canonical raw-source smoke test in the upstream-index workflow using an exact immutable source commit.
+- Canonical path-specific commit-history smoke test against `git.zabbix.com` before runtime historical lookup is enabled.
 - Safe official-template source retrieval from `git.zabbix.com` by validated commit and path.
 - Per-template read-only content comparison through Zabbix `configuration.importcompare`.
 - Isolation of the selected template UUID from official YAML bundles that contain multiple templates.
 - Inclusion of only referenced template-group and discovered host-group definitions in comparison input.
 - Read-only change summaries for added, updated and removed entities, including per-entity counts.
 - Conservative content states for current matches, local modifications, newer-upstream previews and historical-baseline requirements.
-- Unit coverage for source URL validation, path traversal rejection, document isolation, nested import-comparison summaries, classification semantics and import-comparison rules.
+- On-demand historical baseline lookup by stable UUID plus installed `vendor.version`, using canonical path history pinned to the current immutable upstream commit.
+- Historical baseline comparison through `configuration.importcompare` for outdated official templates.
+- Separate outdated-template states for updates with no detected local modifications and updates with detected local modifications.
+- Capped historical scans with explicit `history_limit_reached` semantics instead of claiming a baseline does not exist after an incomplete scan.
+- Unit coverage for source URL validation, path traversal rejection, history response validation, historical baseline selection, document isolation, nested import-comparison summaries, classification semantics and import-comparison rules.
 
 ### Changed
 
@@ -51,8 +56,9 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - The template table now distinguishes installed vendor version, available upstream vendor version and version-comparison state.
 - Upstream source-path validation now explicitly rejects `.` and `..` traversal segments.
 - Official template names are links to the read-only content-comparison action for eligible Zabbix administrators and super administrators.
-- Content differences are classified as local modifications only when the installed vendor version equals the current official upstream version.
-- Differences against a newer upstream version are reported only as an update preview until a historical official baseline matching the installed version is available.
+- Content differences are classified as local modifications only when the installed vendor version equals the current official upstream version or when the installed content is compared against a resolved historical official baseline of the same vendor version.
+- Differences against a newer upstream version remain an update preview when no historical official baseline can be established safely.
+- The comparison page now keeps current-upstream update changes separate from installed-content differences against the historical baseline.
 
 ## [0.1.0-dev] - 2026-09-14
 
