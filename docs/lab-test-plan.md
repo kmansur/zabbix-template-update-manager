@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.1
+# Laboratory test plan — 0.1.0-beta.2
 
 ## Release state
 
@@ -7,11 +7,11 @@ This is a laboratory test release, not a production recommendation.
 Status at publication:
 
 - implementation: ready for laboratory testing;
-- automation validation: green on the release snapshot commit;
-- field validation: pending;
+- automation validation: must be green on the release snapshot commit;
+- field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The repository uses the fixed test snapshot branch `release/0.1.0-beta.1` for this first laboratory build. A formal Git tag/GitHub release remains a later publication step; do not infer a tag from the version string.
+The repository uses the fixed test snapshot branch `release/0.1.0-beta.2` for this laboratory build. A formal Git tag/GitHub release remains a later publication step; do not infer a tag from the version string.
 
 The first field-validation pass should be performed on Zabbix 7.x. Repeat the same functional path on Zabbix 8.x only after the Zabbix 7.x pass is understood.
 
@@ -76,8 +76,8 @@ For a Git checkout:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.1
-git checkout -B release/0.1.0-beta.1 origin/release/0.1.0-beta.1
+git fetch origin release/0.1.0-beta.2
+git checkout -B release/0.1.0-beta.2 origin/release/0.1.0-beta.2
 cat VERSION
 git rev-parse HEAD
 ```
@@ -85,7 +85,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.1
+0.1.0-beta.2
 ```
 
 Record the exact `git rev-parse HEAD` output with the laboratory evidence. Do not test a later moving development branch while reporting results for this beta snapshot.
@@ -100,7 +100,7 @@ In the Zabbix frontend:
 Administration → General → Modules → Scan directory
 ```
 
-Locate **Zabbix Template Update Manager**, confirm version `0.1.0-beta.1`, then enable it.
+Locate **Zabbix Template Update Manager**, confirm version `0.1.0-beta.2`, then enable it.
 
 Expected navigation:
 
@@ -110,12 +110,13 @@ Data collection → Template updates
 
 If the module does not appear, verify `manifest.json`, filesystem read/search permissions and the actual frontend modules directory before changing code.
 
-## 5. Inventory smoke test
+## 5. Inventory and upstream smoke test
 
 Open **Data collection → Template updates**.
 
 Record:
 
+- module version displayed by the page;
 - detected Zabbix version;
 - compatibility state;
 - visible template count;
@@ -125,10 +126,31 @@ Record:
 
 Expected:
 
+- module version shown as `0.1.0-beta.2`, not a hard-coded development value;
 - no PHP fatal error;
 - no direct database requirement;
 - official identity based on UUID;
 - unsupported/unknown upstream states fail closed instead of being guessed.
+
+If the upstream index cannot be loaded, an administrator/super administrator should see **Upstream diagnostics**. Record all fields from that table:
+
+```text
+Requested index:
+cURL:
+allow_url_fopen:
+OpenSSL:
+Failure detail:
+```
+
+The requested Zabbix 7.0 index is expected to be:
+
+```text
+https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/upstream-index/indexes/7.0.json
+```
+
+The loader first tries cURL when available. If cURL fails and `allow_url_fopen` is enabled, beta.2 also tries the PHP stream transport. A repository failure must still leave all templates in the fail-closed `Repository unavailable` state rather than guessing official identity.
+
+Do not proceed to comparison/update validation until upstream identity works for at least one official template.
 
 ## 6. Comparison test
 
@@ -271,6 +293,9 @@ PHP version:
 Frontend/web runtime user:
 Module version:
 Module commit/snapshot branch:
+Requested upstream index:
+Upstream transport state:
+Upstream failure detail (if any):
 Test template name:
 Template UUID:
 Installed version before:
