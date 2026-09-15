@@ -86,6 +86,7 @@ $templateTable = (new CTableInfo())
 		_('Upstream identity'),
 		_('Template groups'),
 		_('Linked hosts'),
+		_('Rollback backups'),
 		_('UUID')
 	]);
 
@@ -103,6 +104,14 @@ foreach ($data['templates'] as $template) {
 		$templateCell = new CLink($templateName, $compareUrl);
 	}
 
+	$backupCell = '—';
+	if ($data['can_compare']) {
+		$backupsUrl = (new CUrl('zabbix.php'))
+			->setArgument('action', 'ztum.template.backups')
+			->setArgument('templateid', $template['templateid']);
+		$backupCell = new CLink(_('View'), $backupsUrl);
+	}
+
 	$templateTable->addRow([
 		$templateCell,
 		$template['vendor_name'] !== '' ? $template['vendor_name'] : '—',
@@ -112,6 +121,7 @@ foreach ($data['templates'] as $template) {
 		$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
 		$template['groups'] !== [] ? implode(', ', $template['groups']) : '—',
 		$template['host_count'],
+		$backupCell,
 		$template['uuid'] !== '' ? $template['uuid'] : '—'
 	]);
 }
@@ -172,7 +182,7 @@ $page
 
 if ($data['can_compare']) {
 	$page->addItem(new CTag('p', true, _(
-		'For templates with an official UUID match, select the template name to run a read-only content comparison.'
+		'For templates with an official UUID match, select the template name to run a read-only content comparison. Rollback backup history is available separately without scanning backup storage on this inventory page.'
 	)));
 }
 
