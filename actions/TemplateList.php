@@ -7,6 +7,7 @@ use CControllerResponseData;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateVersionComparator;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamMatcher;
 use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use Throwable;
@@ -14,6 +15,7 @@ use Throwable;
 require_once dirname(__DIR__).'/src/Repository/TemplateRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateVersionComparator.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamMatcher.php';
 require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
 
@@ -35,12 +37,13 @@ class TemplateList extends CController {
 		$data = [
 			'title' => _('Zabbix Template Update Manager'),
 			'version' => '0.1.0-dev',
-			'status' => _('Read-only inventory and upstream identity'),
+			'status' => _('Read-only inventory, upstream identity and version comparison'),
 			'zabbix_version' => ZabbixVersion::current(),
 			'zabbix_supported' => ZabbixVersion::isSupported(),
 			'templates' => [],
 			'summary' => TemplateInventoryService::emptySummary(),
 			'upstream_summary' => UpstreamMatcher::emptySummary(),
+			'version_summary' => TemplateVersionComparator::emptySummary(),
 			'upstream_source' => null,
 			'upstream_runtime' => null,
 			'inventory_error' => null,
@@ -97,6 +100,10 @@ class TemplateList extends CController {
 				'Unable to check the official upstream template index. The local inventory remains available.'
 			);
 		}
+
+		$versionComparison = TemplateVersionComparator::attach($data['templates']);
+		$data['templates'] = $versionComparison['templates'];
+		$data['version_summary'] = $versionComparison['summary'];
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

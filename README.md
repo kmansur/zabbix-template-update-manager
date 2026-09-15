@@ -10,7 +10,7 @@ Current version:
 
 `0.1.0-dev`
 
-The current milestone is strictly read-only. The module can inventory templates and verify upstream identity, but it must not modify templates or other Zabbix configuration yet.
+The current milestone is strictly read-only. The module can inventory templates, verify upstream identity and compare official vendor versions, but it must not modify templates or other Zabbix configuration yet.
 
 ## Target versions
 
@@ -28,10 +28,12 @@ The inventory currently displays:
 - visible/technical template name;
 - UUID;
 - vendor name;
-- vendor version;
+- installed vendor version;
+- official upstream vendor version when the UUID matches;
 - template groups;
 - number of directly linked hosts;
-- upstream identity status.
+- upstream identity status;
+- vendor-version comparison status.
 
 Upstream identity is verified by UUID against compact indexes generated from the canonical Zabbix Git repository. `vendor_name = Zabbix` alone is never treated as proof that a template is official.
 
@@ -43,7 +45,21 @@ Current upstream identity states:
 - `Invalid UUID`;
 - `Repository unavailable`.
 
-The module intentionally does **not** classify a template as current, outdated, modified or conflicting yet. Version/content comparison belongs to a later milestone.
+## Version comparison
+
+Version comparison runs only after an authoritative upstream UUID match. Official Zabbix vendor versions in the numeric `major.minor-revision` form, such as `7.0-4`, are compared component by component instead of lexically.
+
+Current version states:
+
+- `Current` — installed and upstream vendor versions are equal;
+- `Update available` — the official upstream vendor version is newer;
+- `Installed version is newer` — the installed vendor version is numerically newer than the current index;
+- `Installed version missing` — the local template has no vendor version;
+- `Upstream version missing` — the matched upstream record has no vendor version;
+- `Version format cannot be compared` — one of the versions does not use the supported numeric format;
+- `Not applicable` — the template has no authoritative official UUID match.
+
+`Update available` is intentionally **not** a safety decision. The module does not yet compare the installed template content against the official source, so local modifications and merge conflicts are not classified at this stage.
 
 ## Upstream index architecture
 
@@ -58,7 +74,7 @@ Supported index lines are built for:
 - 7.4;
 - 8.0.
 
-The index records its exact source ref, source commit and commit date. For active release branches, the `release/<major.minor>` branch is preferred. If an old non-LTS line no longer has an active release branch, the latest matching maintenance tag is used. For 8.0 prereleases, `master` is accepted only when the source version file confirms the 8.0 line.
+The index records its exact source ref, source commit and commit date. For active release branches, the `release/<major.minor>` branch is preferred. If an old non-LTS line no longer has an active release branch, the latest matching maintenance tag is used. For 8.0 prereleases, the latest matching prerelease tag or guarded `master` fallback is used according to source availability.
 
 The canonical repository is required for index generation because it contains the complete ref/tag history. The GitHub repository maintained by the Zabbix organization mirrors master and supported release branches and remains useful as a public browsing/reference mirror.
 
@@ -78,7 +94,8 @@ Official GitHub mirror:
 - Discover installed/visible templates
 - Identify official Zabbix templates by UUID
 - Detect installed vendor/version
-- Compare installed templates with upstream templates
+- Compare installed vendor versions with upstream metadata
+- Compare installed templates with upstream template content
 - Detect local modifications
 - Detect available updates
 - Display granular differences
@@ -117,6 +134,9 @@ Local template inventory    Upstream index JSON
                            UUID identity matcher
                                   |
                                   v
+                        Vendor version comparator
+                                  |
+                                  v
                          Native Zabbix table
 ```
 
@@ -132,6 +152,7 @@ CI validates:
 - template inventory normalization;
 - upstream index decoding;
 - UUID matching;
+- vendor-version comparison;
 - deterministic upstream-index generation;
 - handling of equivalent/repeated UUID definitions and rejection of conflicting identity metadata.
 
