@@ -30,15 +30,20 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Template backup service combining native export with local rollback-artifact persistence.
 - Read-only update readiness gate with explicit blocked/review/candidate workflow states.
 - Fail-closed readiness blockers for missing baseline, unresolved analysis, three-way conflict and local-customization overwrite risk.
-- Explicit `candidate_for_backup` state as the strongest positive read-only result; it never enables Zabbix configuration writes.
+- Explicit `candidate_for_backup` state as the strongest positive analysis result before rollback verification; it never enables Zabbix configuration writes.
 - Native comparison-page readiness summary showing the required next workflow step.
 - CSRF-protected POST action for creating a persistent rollback backup from the currently installed template.
 - Native comparison-page **Create rollback backup** control shown when readiness reaches `candidate_for_backup`.
 - Persistent default backup root at `/var/lib/zabbix-template-update-manager/backups` with no silent `/tmp` fallback.
 - Administrator/super-administrator permission enforcement for rollback-backup creation.
 - Static action-contract regression coverage for manifest registration, POST use, native CSRF protection and role restrictions.
+- Bounded per-template rollback-artifact inventory with manifest, filename, path, size, mode and SHA-256 validation.
+- Fail-closed newest-artifact semantics: an invalid newest backup is never silently replaced by an older valid artifact for readiness purposes.
+- Fresh installed-template export verification against the newest intact rollback artifact.
+- Explicit `backup_verified` readiness state when the newest artifact exactly matches the current installed export.
+- Native comparison-page rollback verification summary including stored-artifact counts and current-match state.
 - Dedicated backup/rollback and update-readiness architecture documentation.
-- Unit coverage for upstream identity/version/source/history, baseline cache, import comparison, three-way analysis, update risk/readiness, native export contract and backup artifact integrity.
+- Unit coverage for upstream identity/version/source/history, baseline cache, import comparison, three-way analysis, update risk/readiness, native export contract, backup artifact integrity, tamper detection and current-state backup verification.
 
 ### Changed
 
@@ -55,6 +60,8 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Runtime rollback backups moved from temporary development storage to persistent `/var/lib/zabbix-template-update-manager/backups` storage.
 - The milestone is described as read-only with respect to **Zabbix configuration**; persistent rollback-artifact files are the only intentional frontend-triggered local write.
 - Readiness never labels an update safe or ready-to-import; medium/high risk remains manual-review state and all Zabbix configuration write operations stay disabled.
+- After `candidate_for_backup`, the comparison page revalidates the newest stored artifact and advances only an exact current export match to `backup_verified`.
+- `backup_verified` still keeps `write_enabled = false` and has no configuration-write action attached to it.
 
 ## [0.1.0-dev] - 2026-09-14
 
