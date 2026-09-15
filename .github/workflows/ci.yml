@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'feature/**'
+      - 'fix/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate module
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ensure PHP CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v php >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y php-cli
+          fi
+          php --version
+
+      - name: PHP syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            php -l "$file"
+          done < <(find . -type f -name '*.php' -print0)
+
+      - name: Validate manifest
+        run: php tests/validate_manifest.php
+
+      - name: Enforce read-only milestone
+        run: php tests/read_only_guard.php
+
+      - name: Unit tests
+        run: php tests/unit/ZabbixVersionTest.php
