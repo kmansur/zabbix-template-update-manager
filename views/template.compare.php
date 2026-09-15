@@ -438,7 +438,7 @@ if (is_array($data['update_readiness'])
 	$page
 		->addItem(new CTag('p', true, $readinessText))
 		->addItem(new CTag('p', true, _(
-			'During the current milestone the strongest positive state is only “candidate for backup”. configuration.import remains disabled by design.'
+			'During the current milestone the strongest positive state is only “candidate for backup”. Zabbix configuration write/import operations remain disabled by design.'
 		)));
 }
 
