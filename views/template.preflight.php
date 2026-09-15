@@ -5,7 +5,7 @@ $statusLabels = [
 	'blocked_readiness' => _('Blocked — readiness prerequisite not met'),
 	'blocked_candidate' => _('Blocked — upstream candidate identity unresolved'),
 	'blocked_backup' => _('Blocked — rollback evidence unresolved'),
-	'passed' => _('Passed — write milestone not enabled')
+	'passed' => _('Passed — eligible for controlled update confirmation')
 ];
 
 $backUrl = (new CUrl('zabbix.php'))
@@ -35,7 +35,7 @@ $stateTable = (new CTableInfo())
 		_('Preflight state'),
 		_('Reason'),
 		_('Next step'),
-		_('Write enabled')
+		_('Preflight write enabled')
 	])
 	->addRow([
 		$statusLabels[$status] ?? _('Unknown'),
@@ -77,11 +77,13 @@ if ($candidate !== []) {
 	$candidateTable = (new CTableInfo())
 		->setHeader([
 			_('Available version'),
+			_('Vendor'),
 			_('Upstream commit'),
 			_('Official source path')
 		])
 		->addRow([
 			(string) ($candidate['vendor_version'] ?? '—'),
+			(string) ($candidate['vendor_name'] ?? '—'),
 			isset($candidate['commit']) ? substr((string) $candidate['commit'], 0, 16) : '—',
 			(string) ($candidate['path'] ?? '—')
 		]);
@@ -117,8 +119,38 @@ if ($evidenceSha !== '') {
 
 if ($status === 'passed') {
 	$page->addItem(new CTag('p', true, _(
-		'All currently implemented safety prerequisites passed. This page still performs no configuration import and does not authorize a write by itself.'
+		'All implemented safety prerequisites passed. The update action will rerun this complete preflight immediately before configuration.import and will refuse the write if this evidence changes.'
 	)));
+
+	if (!empty($data['can_update']) && $evidenceSha !== '' && $template !== []) {
+		$updateAction = (new CUrl('zabbix.php'))
+			->setArgument('action', 'ztum.template.update')
+			->getUrl();
+		$updateForm = (new CForm('post'))
+			->setId('ztum-template-update-form')
+			->setAction($updateAction)
+			->addItem([
+				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.update')))->removeId(),
+				(new CVar('templateid', (string) $template['templateid']))->removeId(),
+				(new CVar('evidence_sha256', $evidenceSha))->removeId(),
+				(new CCheckBox('confirm', '1'))->setLabel(_(
+					'I reviewed the candidate and verified rollback evidence and want to update this template.'
+				)),
+				new CSubmitButton(_('Update official template'))
+			]);
+
+		$page
+			->addItem(new CTag('h4', true, _('Controlled update confirmation')))
+			->addItem(new CTag('p', true, _(
+				'This operation writes Zabbix configuration. It is restricted to super administrators. The stored rollback backup is not deleted after the update.'
+			)))
+			->addItem($updateForm);
+	}
+	else {
+		$page->addItem(new CTag('p', true, _(
+			'A Zabbix super administrator is required for the controlled configuration import.'
+		)));
+	}
 }
 else {
 	$page->addItem(new CTag('p', true, _(
