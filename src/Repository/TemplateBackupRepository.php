@@ -68,9 +68,9 @@ final class TemplateBackupRepository {
 		}
 
 		$templateDir = $this->backupDir.DIRECTORY_SEPARATOR.'template-'.$templateId;
-		if (!$this->ensureDirectory($templateDir)) {
+		if (!$this->ensurePrivateDirectory($templateDir)) {
 			throw new RuntimeException(sprintf(
-				'Unable to create the persistent template backup directory below %s.',
+				'Unable to create or secure the persistent template backup directory below %s.',
 				$this->backupDir
 			));
 		}
@@ -123,28 +123,64 @@ final class TemplateBackupRepository {
 		];
 	}
 
-	private function ensureDirectory(string $directory): bool {
-		if (is_dir($directory)) {
-			return is_writable($directory);
+	private function ensurePrivateDirectory(string $directory): bool {
+		if (!is_dir($directory)) {
+			if (!@mkdir($directory, 0700, true) && !is_dir($directory)) {
+				return false;
+			}
 		}
-		if (!@mkdir($directory, 0700, true) && !is_dir($directory)) {
-			return false;
+
+		if (DIRECTORY_SEPARATOR === '/') {
+			if (!@chmod($directory, 0700)) {
+				return false;
+			}
+			$permissions = @fileperms($directory);
+			if ($permissions === false || (($permissions & 0777) !== 0700)) {
+				return false;
+			}
 		}
-		@chmod($directory, 0700);
+
 		return is_writable($directory);
 	}
 
 	private function writePrivateFile(string $path, string $content): bool {
-		$tmp = $path.'.tmp-'.getmypid();
-		if (@file_put_contents($tmp, $content, LOCK_EX) === false) {
+		try {
+			$tmp = $path.'.tmp-'.bin2hex(random_bytes(8));
+		}
+		catch (\Throwable $exception) {
 			return false;
 		}
-		@chmod($tmp, 0600);
+
+		$previousUmask = umask(0077);
+		try {
+			$written = @file_put_contents($tmp, $content, LOCK_EX);
+		}
+		finally {
+			umask($previousUmask);
+		}
+
+		if ($written === false) {
+			@unlink($tmp);
+			return false;
+		}
+
+		if (DIRECTORY_SEPARATOR === '/') {
+			if (!@chmod($tmp, 0600)) {
+				@unlink($tmp);
+				return false;
+			}
+			$permissions = @fileperms($tmp);
+			if ($permissions === false || (($permissions & 0777) !== 0600)) {
+				@unlink($tmp);
+				return false;
+			}
+		}
+
 		if (!@rename($tmp, $path)) {
 			@unlink($tmp);
 			return false;
 		}
-		@chmod($path, 0600);
+
 		return true;
 	}
 }
