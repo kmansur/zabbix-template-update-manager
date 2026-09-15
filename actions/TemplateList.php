@@ -7,6 +7,10 @@ use CControllerResponseData;
 
 class TemplateList extends CController {
 
+public function init(): void {
+$this->disableCsrfValidation();
+}
+
 protected function checkInput(): bool {
 return true;
 }

@@ -11,7 +11,10 @@ class Module extends CModule {
 public function init(): void {
 APP::Component()
 ->get('menu.main')
-->add(
+->findOrAdd(_('Data collection'))
+->getSubmenu()
+->insertAfter(
+_('Templates'),
 (new CMenuItem(_('Template updates')))
 ->setAction('ztum.templates')
 );
