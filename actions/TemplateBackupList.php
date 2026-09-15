@@ -45,7 +45,7 @@ class TemplateBackupList extends CController {
 		$data = [
 			'title' => _('Rollback backup history'),
 			'template' => null,
-			'repository_status' => 'unavailable',
+			'repository_status' => 'repository_unavailable',
 			'artifacts' => [],
 			'scanned' => 0,
 			'valid' => 0,
