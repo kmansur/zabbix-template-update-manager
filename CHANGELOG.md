@@ -30,8 +30,13 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Template backup service combining native export with local rollback-artifact persistence.
 - Read-only update readiness gate with explicit blocked/review/candidate workflow states.
 - Fail-closed readiness blockers for missing baseline, unresolved analysis, three-way conflict and local-customization overwrite risk.
-- Explicit `candidate_for_backup` state as the strongest positive read-only result; it never enables configuration writes.
-- Native comparison-page readiness summary showing the required next workflow step without exposing an update action.
+- Explicit `candidate_for_backup` state as the strongest positive read-only result; it never enables Zabbix configuration writes.
+- Native comparison-page readiness summary showing the required next workflow step.
+- CSRF-protected POST action for creating a persistent rollback backup from the currently installed template.
+- Native comparison-page **Create rollback backup** control shown when readiness reaches `candidate_for_backup`.
+- Persistent default backup root at `/var/lib/zabbix-template-update-manager/backups` with no silent `/tmp` fallback.
+- Administrator/super-administrator permission enforcement for rollback-backup creation.
+- Static action-contract regression coverage for manifest registration, POST use, native CSRF protection and role restrictions.
 - Dedicated backup/rollback and update-readiness architecture documentation.
 - Unit coverage for upstream identity/version/source/history, baseline cache, import comparison, three-way analysis, update risk/readiness, native export contract and backup artifact integrity.
 
@@ -47,7 +52,9 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Overall update review priority is forced to `Unknown` when three-way local-overlap coverage is unavailable or unresolved.
 - Direct host count is presented as impact context rather than being used to inflate technical severity.
 - Backup artifacts use template IDs rather than names for filesystem paths and are written as private local files.
-- Readiness never labels an update safe or ready-to-import; medium/high risk remains manual-review state and all Zabbix write operations stay disabled.
+- Runtime rollback backups moved from temporary development storage to persistent `/var/lib/zabbix-template-update-manager/backups` storage.
+- The milestone is described as read-only with respect to **Zabbix configuration**; persistent rollback-artifact files are the only intentional frontend-triggered local write.
+- Readiness never labels an update safe or ready-to-import; medium/high risk remains manual-review state and all Zabbix configuration write operations stay disabled.
 
 ## [0.1.0-dev] - 2026-09-14
 
