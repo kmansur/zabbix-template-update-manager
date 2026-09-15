@@ -35,6 +35,7 @@ final class TemplateUpdateCandidateService {
 		$candidate = is_array($preflight['candidate'] ?? null) ? $preflight['candidate'] : [];
 		$commit = strtolower(trim((string) ($candidate['commit'] ?? '')));
 		$path = trim((string) ($candidate['path'] ?? ''));
+		$expectedContentSha256 = strtolower(trim((string) ($candidate['content_sha256'] ?? '')));
 		$uuid = self::normalizeUuid((string) ($candidate['uuid'] ?? ''));
 		$name = trim((string) ($candidate['name'] ?? ''));
 		$technicalName = trim((string) ($candidate['technical_name'] ?? ''));
@@ -43,6 +44,7 @@ final class TemplateUpdateCandidateService {
 
 		if (!preg_match('/^[a-f0-9]{40}$/', $commit)
 				|| !self::isSafeTemplatePath($path)
+				|| !preg_match('/^[a-f0-9]{64}$/', $expectedContentSha256)
 				|| !preg_match('/^[a-f0-9]{32}$/', $uuid)
 				|| $name === ''
 				|| $technicalName === ''
@@ -61,6 +63,11 @@ final class TemplateUpdateCandidateService {
 		}
 
 		$canonicalSource = $fetched['content'];
+		$canonicalSha256 = hash('sha256', $canonicalSource);
+		if (!hash_equals($expectedContentSha256, $canonicalSha256)) {
+			throw new RuntimeException('The immutable upstream source content hash does not match the validated upstream index.');
+		}
+
 		$document = ($this->parser)($canonicalSource);
 		if (!is_array($document)) {
 			throw new RuntimeException('The immutable upstream source parser returned an invalid document.');
@@ -86,12 +93,13 @@ final class TemplateUpdateCandidateService {
 		return [
 			'commit' => $commit,
 			'path' => $path,
+			'content_sha256' => $expectedContentSha256,
 			'uuid' => $uuid,
 			'name' => $name,
 			'technical_name' => $technicalName,
 			'vendor_name' => $vendorName,
 			'vendor_version' => $vendorVersion,
-			'canonical_sha256' => hash('sha256', $canonicalSource),
+			'canonical_sha256' => $canonicalSha256,
 			'import_sha256' => hash('sha256', $source),
 			'format' => 'json',
 			'source' => $source
