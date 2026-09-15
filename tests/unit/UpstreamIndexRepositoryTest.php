@@ -32,6 +32,11 @@ $valid = json_encode([
 		'ref' => 'release/7.0',
 		'commit' => str_repeat('a', 40)
 	],
+	'statistics' => [
+		'templates' => 1,
+		'duplicate_uuid_definitions' => 0,
+		'content_variant_uuids' => 0
+	],
 	'templates' => [
 		$uuid => [
 			'uuid' => $uuid,
@@ -39,7 +44,8 @@ $valid = json_encode([
 			'technical_name' => 'Linux by Zabbix agent',
 			'vendor_name' => 'Zabbix',
 			'vendor_version' => '7.0-4',
-			'path' => 'templates/os/linux/template_os_linux.yaml'
+			'paths' => ['templates/os/linux/template_os_linux.yaml'],
+			'content_sha256s' => [str_repeat('b', 64)]
 		]
 	]
 ], JSON_UNESCAPED_SLASHES);
@@ -47,6 +53,7 @@ $valid = json_encode([
 $decoded = UpstreamIndexRepository::decodeIndex($valid, '7.0');
 assertUpstreamValue('release/7.0', $decoded['source']['ref'], 'Valid index source ref was not preserved.');
 assertUpstreamValue('7.0-4', $decoded['templates'][$uuid]['vendor_version'], 'Valid template record was not preserved.');
+assertUpstreamValue(1, count($decoded['templates'][$uuid]['paths']), 'Valid template source paths were not preserved.');
 
 assertUpstreamThrows(
 	fn() => UpstreamIndexRepository::decodeIndex($valid, '8.0'),
@@ -60,6 +67,20 @@ $invalidUuid['templates'] = [
 assertUpstreamThrows(
 	fn() => UpstreamIndexRepository::decodeIndex(json_encode($invalidUuid), '7.0'),
 	'An invalid UUID key must be rejected.'
+);
+
+$invalidPath = json_decode($valid, true);
+$invalidPath['templates'][$uuid]['paths'] = ['../outside.yaml'];
+assertUpstreamThrows(
+	fn() => UpstreamIndexRepository::decodeIndex(json_encode($invalidPath), '7.0'),
+	'An invalid source path must be rejected.'
+);
+
+$invalidHash = json_decode($valid, true);
+$invalidHash['templates'][$uuid]['content_sha256s'] = ['invalid'];
+assertUpstreamThrows(
+	fn() => UpstreamIndexRepository::decodeIndex(json_encode($invalidHash), '7.0'),
+	'An invalid content hash must be rejected.'
 );
 
 echo "UpstreamIndexRepository tests passed.\n";

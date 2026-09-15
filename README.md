@@ -49,6 +49,8 @@ The module intentionally does **not** classify a template as current, outdated, 
 
 Querying every official YAML file from the Zabbix repository on every page load would require hundreds of remote requests. Instead, the project builds compact UUID indexes with GitHub Actions from the official Zabbix repository mirror maintained by the Zabbix organization.
 
+The official repository can legitimately package the same template UUID in more than one YAML bundle (for example, shared VMware child templates). The index therefore merges repeated UUID definitions when their technical identity and vendor metadata agree, retains every official source path, and records SHA-256 hashes for each distinct content variant. A repeated UUID with conflicting identity metadata still fails index generation.
+
 Supported index lines are built for:
 
 - 7.0;
@@ -127,7 +129,8 @@ CI validates:
 - template inventory normalization;
 - upstream index decoding;
 - UUID matching;
-- deterministic upstream-index generation.
+- deterministic upstream-index generation;
+- handling of equivalent/repeated UUID definitions and rejection of conflicting identity metadata.
 
 Local checks:
 
