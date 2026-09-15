@@ -23,6 +23,9 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Python tests for deterministic upstream-index generation.
 - PHP tests for upstream index validation and UUID matching.
 - Upstream index provenance for repeated official UUID definitions, including all source paths and distinct content SHA-256 hashes.
+- Read-only comparison of installed and official upstream `vendor.version` values.
+- Explicit version states for current templates, available updates, installed-newer versions, missing versions and uncomparable formats.
+- Unit tests that verify numeric vendor-version comparison across revisions and release lines.
 
 ### Changed
 
@@ -37,6 +40,7 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Upstream index generation now merges repeated UUID definitions when identity metadata agrees instead of assuming every UUID occurs in only one YAML file.
 - Repeated UUIDs with conflicting identity metadata continue to fail index generation.
 - Upstream index generation now uses the canonical full Zabbix Git repository so historical maintenance tags remain resolvable.
+- The template table now distinguishes installed vendor version, available upstream vendor version and version-comparison state.
 
 ## [0.1.0-dev] - 2026-09-14
 
