@@ -1,0 +1,15 @@
+{
+    "manifest_version": 2.0,
+    "id": "kmansur_zabbix_template_update_manager",
+    "name": "Zabbix Template Update Manager",
+    "namespace": "ZabbixTemplateUpdateManager",
+    "version": "0.1.0-dev",
+    "author": "Karim Mansur",
+    "description": "Discover, compare and safely manage updates for installed Zabbix templates.",
+    "actions": {
+        "ztum.templates": {
+            "class": "TemplateList",
+            "view": "template.list"
+        }
+    }
+}

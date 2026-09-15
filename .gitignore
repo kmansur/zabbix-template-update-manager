@@ -1,0 +1,39 @@
+# IDE
+.idea/
+.vscode/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# PHP
+vendor/
+.phpunit.cache/
+.phpunit.result.cache
+composer.lock
+
+# Runtime
+cache/
+data/
+logs/
+backups/
+repository/
+
+# Temporary
+*.tmp
+*.temp
+*.bak
+*.swp
+*~
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Test artifacts
+coverage/
+build/
+dist/
