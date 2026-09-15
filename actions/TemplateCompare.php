@@ -6,6 +6,7 @@ use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
 use CImportReaderFactory;
+use Modules\ZabbixTemplateUpdateManager\Repository\HistoricalBaselineCacheRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateHistoryRepository;
@@ -26,6 +27,7 @@ use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use RuntimeException;
 use Throwable;
 
+require_once dirname(__DIR__).'/src/Repository/HistoricalBaselineCacheRepository.php';
 require_once dirname(__DIR__).'/src/Repository/TemplateRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamTemplateHistoryRepository.php';
@@ -153,27 +155,54 @@ class TemplateCompare extends CController {
 			if (($template['version_status'] ?? null) === 'update_available'
 					&& ($template['vendor_version'] ?? '') !== '') {
 				try {
-					$baselineService = new HistoricalTemplateBaselineService(
-						static fn(string $path, string $until, int $limit): array
-							=> (new UpstreamTemplateHistoryRepository())->listCommits($path, $until, $limit),
-						static fn(string $commit, string $path): array
-							=> $sourceRepository->fetchAtCommit($commit, $path),
-						static function (string $source): array {
-							$historicalReader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
-							return $historicalReader->read($source);
-						}
-					);
-
-					$baseline = $baselineService->find(
+					$currentCommit = (string) ($index['source']['commit'] ?? '');
+					$vendorName = (string) ($template['upstream']['vendor_name'] ?? 'Zabbix');
+					$baselineCache = new HistoricalBaselineCacheRepository();
+					$baseline = $baselineCache->load(
 						$sourceFile['path'],
-						(string) ($index['source']['commit'] ?? ''),
+						$currentCommit,
 						$template['uuid'],
 						$template['vendor_version'],
-						(string) ($template['upstream']['vendor_name'] ?? 'Zabbix')
+						$vendorName
 					);
+					$cacheStatus = 'hit';
 
-					$baselineSource = $baseline['source'];
+					if ($baseline === null) {
+						$cacheStatus = 'miss';
+						$baselineService = new HistoricalTemplateBaselineService(
+							static fn(string $path, string $until, int $limit): array
+								=> (new UpstreamTemplateHistoryRepository())->listCommits($path, $until, $limit),
+							static fn(string $commit, string $path): array
+								=> $sourceRepository->fetchAtCommit($commit, $path),
+							static function (string $source): array {
+								$historicalReader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
+								return $historicalReader->read($source);
+							}
+						);
+
+						$baseline = $baselineService->find(
+							$sourceFile['path'],
+							$currentCommit,
+							$template['uuid'],
+							$template['vendor_version'],
+							$vendorName
+						);
+
+						if (($baseline['status'] ?? null) === 'found') {
+							$baselineCache->store(
+								$sourceFile['path'],
+								$currentCommit,
+								$template['uuid'],
+								$template['vendor_version'],
+								$vendorName,
+								$baseline
+							);
+						}
+					}
+
+					$baselineSource = $baseline['source'] ?? null;
 					unset($baseline['source']);
+					$baseline['cache_status'] = $cacheStatus;
 					$data['historical_baseline'] = $baseline;
 
 					if (($baseline['status'] ?? null) === 'found' && is_string($baselineSource)) {
