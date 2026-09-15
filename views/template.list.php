@@ -86,6 +86,7 @@ $templateTable = (new CTableInfo())
 		_('Upstream identity'),
 		_('Template groups'),
 		_('Linked hosts'),
+		_('Update preflight'),
 		_('Rollback backups'),
 		_('UUID')
 	]);
@@ -102,6 +103,22 @@ foreach ($data['templates'] as $template) {
 			->setArgument('action', 'ztum.template.compare')
 			->setArgument('templateid', $template['templateid']);
 		$templateCell = new CLink($templateName, $compareUrl);
+	}
+
+	$preflightCell = '—';
+	if ($data['can_compare']
+			&& ($template['upstream_status'] ?? null) === 'official_match'
+			&& ($template['version_status'] ?? null) === 'update_available') {
+		$preflightAction = (new CUrl('zabbix.php'))
+			->setArgument('action', 'ztum.template.preflight')
+			->getUrl();
+		$preflightCell = (new CForm('post'))
+			->setAction($preflightAction)
+			->addItem([
+				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.preflight')))->removeId(),
+				(new CVar('templateid', (string) $template['templateid']))->removeId(),
+				new CSubmitButton(_('Run'))
+			]);
 	}
 
 	$backupCell = '—';
@@ -121,6 +138,7 @@ foreach ($data['templates'] as $template) {
 		$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
 		$template['groups'] !== [] ? implode(', ', $template['groups']) : '—',
 		$template['host_count'],
+		$preflightCell,
 		$backupCell,
 		$template['uuid'] !== '' ? $template['uuid'] : '—'
 	]);
@@ -182,7 +200,7 @@ $page
 
 if ($data['can_compare']) {
 	$page->addItem(new CTag('p', true, _(
-		'For templates with an official UUID match, select the template name to run a read-only content comparison. Rollback backup history is available separately without scanning backup storage on this inventory page.'
+		'For templates with an official UUID match, select the template name to run a content comparison. For an outdated official template, the preflight action independently recomputes the safety evidence and remains blocked until rollback verification is complete.'
 	)));
 }
 
