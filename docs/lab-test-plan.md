@@ -7,9 +7,11 @@ This is a laboratory test release, not a production recommendation.
 Status at publication:
 
 - implementation: ready for laboratory testing;
-- automation validation: must be green for the tagged commit;
+- automation validation: green on the release snapshot commit;
 - field validation: pending;
 - target Zabbix generations: 7.x and 8.x.
+
+The repository uses the fixed test snapshot branch `release/0.1.0-beta.1` for this first laboratory build. A formal Git tag/GitHub release remains a later publication step; do not infer a tag from the version string.
 
 The first field-validation pass should be performed on Zabbix 7.x. Repeat the same functional path on Zabbix 8.x only after the Zabbix 7.x pass is understood.
 
@@ -67,23 +69,26 @@ sudo stat -c '%U %G %a %n' \
 
 Do not make this directory world-writable.
 
-## 3. Install the exact beta source
+## 3. Install the exact beta snapshot
 
 For a Git checkout:
 
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch --tags
-git checkout v0.1.0-beta.1
+git fetch origin release/0.1.0-beta.1
+git checkout -B release/0.1.0-beta.1 origin/release/0.1.0-beta.1
 cat VERSION
+git rev-parse HEAD
 ```
 
-Expected:
+Expected project version:
 
 ```text
 0.1.0-beta.1
 ```
+
+Record the exact `git rev-parse HEAD` output with the laboratory evidence. Do not test a later moving development branch while reporting results for this beta snapshot.
 
 Copy or extract the complete repository content into a dedicated directory below the Zabbix frontend `modules` directory. Do not copy the `.git` directory into the frontend module directory when packaging manually.
 
@@ -226,7 +231,7 @@ Expected review behavior:
 
 Submit the explicit rollback confirmation.
 
-Before importing the older artifact, the module must create a **new recovery backup** of the current post-update state and prove its exact SHA-256/byte-count equality with the preflight current export.
+Before importing the older artifact, the module must create a **new recovery backup** of the current post-update state and prove its exact SHA-256/byte-count equality with the final preflight current export.
 
 Expected successful result:
 
@@ -265,7 +270,7 @@ Zabbix version:
 PHP version:
 Frontend/web runtime user:
 Module version:
-Module commit/tag:
+Module commit/snapshot branch:
 Test template name:
 Template UUID:
 Installed version before:
