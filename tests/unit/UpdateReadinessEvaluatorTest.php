@@ -25,17 +25,17 @@ $result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $p
 assertReadiness('candidate_for_backup', $result['status'], 'Low known risk with complete overlap evidence should become a backup candidate.');
 assertReadiness(true, $result['candidate_for_backup'], 'Positive comparison gate should allow advancing to backup creation.');
 assertReadiness(false, $result['backup_verified'], 'Backup candidate is not yet a verified rollback prerequisite.');
-assertReadiness(false, $result['write_enabled'], 'Readiness must never enable configuration writes during the current milestone.');
+assertReadiness(false, $result['write_enabled'], 'Readiness evaluator must never enable configuration writes by itself.');
 assertReadiness(37, $result['direct_host_count'], 'Direct host impact must be preserved as context.');
-assertReadiness('create_and_verify_backup', $result['next_step'], 'Backup must remain the next step before any future write.');
+assertReadiness('create_and_verify_backup', $result['next_step'], 'Backup must remain the next step before controlled preflight.');
 
 $verifiedBackup = ['status' => 'current_match', 'current_match' => true];
 $result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $preview, $riskLow, $verifiedBackup);
 assertReadiness('backup_verified', $result['status'], 'Exact current rollback artifact should advance readiness to backup_verified.');
 assertReadiness(true, $result['backup_verified'], 'Verified rollback prerequisite must be explicit.');
 assertReadiness(false, $result['candidate_for_backup'], 'Once verified, backup creation is no longer the outstanding prerequisite.');
-assertReadiness('await_write_enabled_milestone', $result['next_step'], 'No configuration-write action is enabled after backup verification.');
-assertReadiness(false, $result['write_enabled'], 'Even backup_verified must keep Zabbix configuration writes disabled.');
+assertReadiness('run_controlled_preflight', $result['next_step'], 'Verified backup must advance only to the fresh controlled preflight gate.');
+assertReadiness(false, $result['write_enabled'], 'Even backup_verified must not directly enable a Zabbix configuration write.');
 
 $staleBackup = ['status' => 'current_mismatch', 'current_match' => false];
 $result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $preview, $riskLow, $staleBackup);
