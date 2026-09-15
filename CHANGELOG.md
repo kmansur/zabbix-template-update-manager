@@ -17,7 +17,7 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - Read-only installed-template inventory using the native Zabbix `template.get` API service.
 - Inventory metadata for UUID, vendor, vendor version, template groups and directly linked host count.
 - Unit tests for the template repository query contract and inventory normalization.
-- Compact official-upstream template indexes generated from the `zabbix/zabbix` repository.
+- Compact official-upstream template indexes generated from the canonical Zabbix Git repository.
 - Runtime upstream-index retrieval with strict validation, 15-minute cache and stale-cache fallback.
 - UUID-based upstream identity matching with explicit fail-closed states.
 - Python tests for deterministic upstream-index generation.
@@ -36,6 +36,7 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 - `Linked to hosts` summary wording now explicitly means templates linked to one or more hosts.
 - Upstream index generation now merges repeated UUID definitions when identity metadata agrees instead of assuming every UUID occurs in only one YAML file.
 - Repeated UUIDs with conflicting identity metadata continue to fail index generation.
+- Upstream index generation now uses the canonical full Zabbix Git repository so historical maintenance tags remain resolvable.
 
 ## [0.1.0-dev] - 2026-09-14
 
