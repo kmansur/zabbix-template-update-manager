@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current development version: `0.1.0-dev`.
+Current test version: `0.1.0-beta.1`.
 
 ## Non-negotiable rules
 
@@ -17,7 +17,7 @@ Current development version: `0.1.0-dev`.
 2. Preserve compatibility with both Zabbix 7.x and 8.x unless a documented compatibility layer is required.
 3. Use native Zabbix frontend components, layout patterns, fonts, colors and controls whenever possible.
 4. Do not introduce Bootstrap, Tailwind, Material UI or another CSS/UI framework.
-5. Zabbix configuration writes are allowed only through the explicitly reviewed controlled-update boundary described below. Do not add another configuration-write path.
+5. Zabbix configuration writes are allowed only through the explicitly reviewed controlled-import boundary described below. Do not add another configuration-write path.
 6. Do not add direct write operations to the Zabbix database.
 7. Do not commit credentials, tokens, API keys, repository secrets or private keys.
 8. Never pass unvalidated user input to shell commands, Git commands, repository URLs or refs.
@@ -26,8 +26,10 @@ Current development version: `0.1.0-dev`.
 11. Do not classify a template as official from `vendor_name` alone. Official identity requires an upstream UUID match.
 12. Do not classify a template as current/outdated from UUID identity alone. Version/content comparison is a separate stage.
 13. Do not treat the existence of a backup file as proof that rollback is ready. Stored artifacts must be revalidated against a fresh installed-template export before an update.
-14. Do not trust a previously rendered UI state as authorization to write. The controlled update must rerun the full preflight server-side immediately before import.
+14. Do not trust a previously rendered UI state as authorization to write. Controlled update and rollback must rerun their authoritative preflight server-side before import.
 15. Do not retry a failed or uncertain configuration import automatically.
+16. Rollback must remain an explicit super-administrator operation. Never trigger rollback automatically after update validation failure.
+17. Before restoring an older artifact, persist and verify a fresh recovery backup of the current installed state.
 
 ## Architecture
 
@@ -39,6 +41,7 @@ Current development version: `0.1.0-dev`.
 - `tools/` contains deterministic development/index-generation tools.
 - `tests/` contains deterministic validation and unit tests.
 - `.github/workflows/` contains CI and upstream-index automation.
+- `VERSION` is the project/module test-release version and must match `manifest.json`.
 
 Keep controllers thin. Put comparison, repository, inventory, backup, preflight, update and rollback logic in `src/` services/classes rather than in views or controllers.
 
@@ -56,7 +59,7 @@ Avoid duplicating the entire codebase into Zabbix 7 and Zabbix 8 variants. Add v
 
 The authoritative initial identity key is the Zabbix template UUID.
 
-Upstream indexes are generated from the official `zabbix/zabbix` repository and must record:
+Upstream indexes are generated from the official Zabbix source repository and must record:
 
 - source line;
 - source ref;
@@ -74,7 +77,7 @@ Runtime repository URLs are fixed project constants. Do not make arbitrary repos
 
 If the remote index cannot be validated, use only a previously validated stale cache. If no validated cache exists, mark upstream identity as unavailable rather than guessing.
 
-A write candidate must be bound to all of the following before import:
+A write candidate must be bound to all of the following before update import:
 
 - exact 40-character immutable upstream commit;
 - validated `templates/.../*.yaml` path;
@@ -83,7 +86,7 @@ A write candidate must be bound to all of the following before import:
 - visible and technical template names;
 - vendor name and vendor version.
 
-The immutable source is re-fetched immediately before import and its SHA-256 must exactly match the upstream index fingerprint.
+The immutable source is re-fetched immediately before update import and its SHA-256 must exactly match the upstream index fingerprint.
 
 ## UI/UX
 
@@ -111,7 +114,7 @@ Allowed non-configuration-write operations include:
 - readiness evaluation;
 - persistent local rollback-backup creation;
 - rollback-artifact integrity verification;
-- fresh server-side update preflight.
+- fresh server-side update and rollback preflight.
 
 The local backup action must remain:
 
@@ -121,9 +124,9 @@ The local backup action must remain:
 - limited to private persistent storage;
 - separate from Zabbix configuration import.
 
-Preflight must remain a non-write evidence gate. A passing preflight never sets `write_enabled = true`; instead it permits only an explicit controlled-update confirmation step.
+Preflight must remain a non-write evidence gate. A passing preflight never sets `write_enabled = true`; instead it permits only an explicit confirmation step handled by a separate write controller.
 
-## Controlled update milestone
+## Single controlled import boundary
 
 The only approved Zabbix configuration write boundary is:
 
@@ -133,6 +136,10 @@ src/Service/TemplateConfigurationImportService.php
 
 It may contain exactly one `API::Configuration()->import()` call and must reuse `TemplateImportCompareService::rules()` so preview and import use the same reviewed rule profile.
 
+Both controlled update and controlled rollback must reuse this service rather than introducing another configuration-import call site.
+
+## Controlled update
+
 The controlled update flow must include all of the following:
 
 1. official template identity proven by UUID;
@@ -141,24 +148,45 @@ The controlled update flow must include all of the following:
 4. complete three-way analysis with no unresolved identities;
 5. no confirmed conflict;
 6. no known local-customization overwrite risk;
-7. risk/readiness reaches the backup path; initial automatic update eligibility is limited to `none`/`low` technical risk;
+7. initial automatic update eligibility limited to `none`/`low` technical risk;
 8. persistent rollback backup created;
 9. newest rollback backup revalidated against a fresh installed-template export (`backup_verified`);
-10. fresh server-side preflight recomputed after the confirmation page is requested;
+10. fresh server-side preflight;
 11. immutable upstream commit/path/identity/content hash bound into preflight evidence;
 12. explicit super-administrator confirmation through HTTP POST with native CSRF validation;
 13. complete preflight rerun immediately before import;
-14. posted evidence fingerprint must exactly match the freshly recomputed fingerprint;
+14. posted evidence fingerprint must exactly match freshly recomputed evidence;
 15. exact immutable upstream source re-fetched and content SHA-256 revalidated against the index;
 16. candidate identity revalidated and isolated to one template;
 17. `configuration.import` executed only through `TemplateConfigurationImportService`;
-18. fresh post-import analysis must prove the template is current and content matches current upstream with zero remaining comparison differences.
+18. fresh post-import analysis proving the template is current and content matches current upstream with zero remaining comparison differences.
 
 If evidence changes between confirmation and write, the update must be refused with no configuration write.
 
 If import returns successfully but post-import validation fails or errors, report that a write occurred and require manual inspection. Do not retry automatically.
 
 The rollback artifact used as the update prerequisite must not be deleted automatically after update.
+
+## Controlled rollback
+
+Rollback is a separate explicit super-administrator operation.
+
+The rollback flow must include:
+
+1. explicit selection of a valid stored artifact from the bounded backup view;
+2. read-only rollback preflight using current `configuration.export` plus `configuration.importcompare` against the selected artifact;
+3. exact template ID/UUID identity match;
+4. deterministic rollback evidence fingerprint;
+5. explicit super-administrator confirmation through HTTP POST with native CSRF validation;
+6. fresh rollback preflight immediately before preparing the write;
+7. revalidation/loading of the exact selected artifact and its SHA-256/byte count;
+8. fresh persistent recovery backup of the current state before restoring the older artifact;
+9. exact equality between recovery-backup SHA/bytes and the current export participating in the final preflight;
+10. `configuration.import` executed only through `TemplateConfigurationImportService`;
+11. post-rollback validation of template ID, UUID, target vendor version and zero remaining import-comparison differences;
+12. retention of both the rollback target and recovery backup.
+
+Rollback must never silently fall back from an invalid selected artifact to another artifact. It must never be triggered automatically after update failure and must never retry an ambiguous import automatically.
 
 ## Disallowed write patterns
 
@@ -168,24 +196,11 @@ The following remain prohibited:
 - direct database inserts/updates/deletes;
 - additional `configuration.import` call sites outside the approved import service;
 - automatic template replacement without explicit confirmation;
+- automatic rollback after update failure;
 - user-controlled repository URLs or arbitrary Git refs;
-- update retries after ambiguous failures.
+- update or rollback retries after ambiguous failures.
 
 The CI controlled-write guard must remain green and enforce the single write boundary.
-
-## Rollback milestone
-
-Rollback must be a separate explicit super-administrator operation, not an automatic reaction to validation failure.
-
-A rollback implementation must at minimum:
-
-1. revalidate the selected stored artifact immediately before use;
-2. create a fresh backup of the current post-update state before restoring the older artifact;
-3. use the same single controlled configuration-import boundary;
-4. require POST, CSRF protection and explicit confirmation;
-5. validate the restored template after import;
-6. retain all involved backup artifacts;
-7. never silently fall back from an invalid newest artifact to an older one.
 
 ## Testing before commit
 
@@ -194,15 +209,18 @@ At minimum run:
 ```bash
 find . -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 php tests/validate_manifest.php
+php tests/validate_version.php
 php tests/read_only_guard.php
 for test in tests/unit/*Test.php; do php "$test"; done
 python -m py_compile tools/build_upstream_index.py
 python tests/test_build_upstream_index.py
 ```
 
-`tests/read_only_guard.php` is retained as the historical filename, but during the controlled-update milestone it enforces the single approved configuration-write boundary rather than a globally read-only repository.
+`tests/read_only_guard.php` is retained as the historical filename, but it now enforces the single approved configuration-write boundary rather than a globally read-only repository.
 
 A meaningful bug fix or safety-boundary change should add or strengthen an automated regression check whenever practical.
+
+A green CI run is automation validation only. Do not call Zabbix 7.x or 8.x field-validated until the exact test version has been exercised on a real lab instance according to `docs/lab-test-plan.md`.
 
 ## Git workflow
 
