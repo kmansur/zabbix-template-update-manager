@@ -40,6 +40,7 @@ class TemplateList extends CController {
 			'status' => _('Read-only inventory, upstream identity and version comparison'),
 			'zabbix_version' => ZabbixVersion::current(),
 			'zabbix_supported' => ZabbixVersion::isSupported(),
+			'can_compare' => in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true),
 			'templates' => [],
 			'summary' => TemplateInventoryService::emptySummary(),
 			'upstream_summary' => UpstreamMatcher::emptySummary(),

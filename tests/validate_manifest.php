@@ -55,18 +55,27 @@ foreach ($expected as $key => $value) {
 	}
 }
 
-$action = $manifest['actions']['ztum.templates'] ?? null;
-if (!is_array($action)
-		|| ($action['class'] ?? null) !== 'TemplateList'
-		|| ($action['view'] ?? null) !== 'template.list') {
-	fwrite(STDERR, "Action ztum.templates is not configured as expected.\n");
-	exit(1);
+$expectedActions = [
+	'ztum.templates' => ['class' => 'TemplateList', 'view' => 'template.list'],
+	'ztum.template.compare' => ['class' => 'TemplateCompare', 'view' => 'template.compare']
+];
+
+foreach ($expectedActions as $actionName => $expectedAction) {
+	$action = $manifest['actions'][$actionName] ?? null;
+	if (!is_array($action)
+			|| ($action['class'] ?? null) !== $expectedAction['class']
+			|| ($action['view'] ?? null) !== $expectedAction['view']) {
+		fwrite(STDERR, sprintf("Action %s is not configured as expected.\n", $actionName));
+		exit(1);
+	}
 }
 
 $requiredFiles = [
 	$root.'/Module.php',
 	$root.'/actions/TemplateList.php',
-	$root.'/views/template.list.php'
+	$root.'/views/template.list.php',
+	$root.'/actions/TemplateCompare.php',
+	$root.'/views/template.compare.php'
 ];
 
 foreach ($requiredFiles as $file) {
