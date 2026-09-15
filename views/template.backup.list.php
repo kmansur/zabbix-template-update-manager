@@ -77,6 +77,18 @@ $page
 	->addItem(new CTag('h4', true, _('Rollback repository summary')))
 	->addItem($summaryTable);
 
+if ($data['repository_status'] === 'repository_unavailable') {
+	$page
+		->addItem(new CTag('p', true, _(
+			'The persistent rollback repository is unavailable or cannot be inspected safely. No conclusion about stored backup availability can be made.'
+		)))
+		->addItem(new CTag('p', true, _(
+			'Check the frontend logs, repository ownership and permissions before relying on rollback artifacts.'
+		)))
+		->show();
+	return;
+}
+
 if ($data['artifacts'] === []) {
 	$page
 		->addItem(new CTag('p', true, _(
