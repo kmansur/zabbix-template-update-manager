@@ -45,6 +45,7 @@ class TemplateBackupList extends CController {
 		$data = [
 			'title' => _('Rollback backup history'),
 			'template' => null,
+			'can_rollback' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
 			'repository_status' => 'repository_unavailable',
 			'artifacts' => [],
 			'scanned' => 0,

@@ -95,30 +95,34 @@ if ($data['artifacts'] === []) {
 			'No stored rollback artifacts are available for this template.'
 		)))
 		->addItem(new CTag('p', true, _(
-			'This page is read-only. Backup creation remains available only from the comparison workflow when its readiness gate allows it.'
+			'Backup creation remains available from the comparison workflow when its readiness gate allows it.'
 		)))
 		->show();
 	return;
 }
 
-$artifactTable = (new CTableInfo())
-	->setHeader([
-		_('Created at'),
-		_('Integrity'),
-		_('Vendor version'),
-		_('Bytes'),
-		_('SHA-256'),
-		_('YAML file'),
-		_('Manifest file'),
-		_('Issue')
-	]);
+$headers = [
+	_('Created at'),
+	_('Integrity'),
+	_('Vendor version'),
+	_('Bytes'),
+	_('SHA-256'),
+	_('YAML file'),
+	_('Manifest file'),
+	_('Issue')
+];
+if (!empty($data['can_rollback'])) {
+	$headers[] = _('Action');
+}
+
+$artifactTable = (new CTableInfo())->setHeader($headers);
 
 foreach ($data['artifacts'] as $artifact) {
 	$status = (string) ($artifact['status'] ?? 'invalid');
 	$reason = (string) ($artifact['reason'] ?? '');
 	$sha256 = (string) ($artifact['sha256'] ?? '');
 
-	$artifactTable->addRow([
+	$row = [
 		$artifact['created_at'] !== '' ? $artifact['created_at'] : '—',
 		$integrityLabels[$status] ?? _('Unknown'),
 		$artifact['vendor_version'] !== '' ? $artifact['vendor_version'] : '—',
@@ -127,19 +131,34 @@ foreach ($data['artifacts'] as $artifact) {
 		$artifact['source_file'] !== '' ? $artifact['source_file'] : '—',
 		$artifact['manifest_file'] !== '' ? $artifact['manifest_file'] : '—',
 		$reason !== '' ? ($reasonLabels[$reason] ?? $reason) : '—'
-	]);
+	];
+
+	if (!empty($data['can_rollback'])) {
+		if ($status === 'valid' && $artifact['manifest_file'] !== '') {
+			$reviewUrl = (new CUrl('zabbix.php'))
+				->setArgument('action', 'ztum.template.rollback.review')
+				->setArgument('templateid', (string) $data['template']['templateid'])
+				->setArgument('manifest_file', $artifact['manifest_file']);
+			$row[] = new CLink(_('Review rollback'), $reviewUrl);
+		}
+		else {
+			$row[] = '—';
+		}
+	}
+
+	$artifactTable->addRow($row);
 }
 
 $page
 	->addItem(new CTag('h4', true, _('Stored rollback artifacts')))
 	->addItem($artifactTable)
 	->addItem(new CTag('p', true, _(
-		'Artifacts are listed newest first. This view intentionally exposes metadata only; it does not provide download, delete, restore or rollback actions.'
+		'Artifacts are listed newest first. Invalid artifacts are never eligible for rollback. Super administrators may open a valid artifact in a separate read-only review before any configuration write is possible.'
 	)));
 
 if ($data['truncated']) {
 	$page->addItem(new CTag('p', true, _(
-		'Only the newest 50 manifest records are inspected and displayed. Older artifacts remain on disk but are not shown in this bounded view.'
+		'Only the newest 50 manifest records are inspected and displayed. Older artifacts remain on disk but are not shown or eligible for selection in this bounded view.'
 	)));
 }
 

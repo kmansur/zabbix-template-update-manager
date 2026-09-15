@@ -35,6 +35,11 @@ assertBackupHistoryContract(
 );
 assertBackupHistoryContract(
 	true,
+	str_contains($controller, "'can_rollback' => \$this->getUserType() === USER_TYPE_SUPER_ADMIN"),
+	'Only super administrators may be offered rollback-review navigation.'
+);
+assertBackupHistoryContract(
+	true,
 	str_contains($controller, 'TemplateBackupRepository'),
 	'Rollback backup history must read through TemplateBackupRepository.'
 );
@@ -64,6 +69,7 @@ assertBackupHistoryContract(false, str_contains($view, 'manifest_path'), 'Histor
 assertBackupHistoryContract(false, str_contains($view, 'new CSubmitButton'), 'History view must not expose submit actions.');
 assertBackupHistoryContract(false, str_contains($view, 'new CButton'), 'History view must not expose action buttons.');
 assertBackupHistoryContract(false, str_contains($view, 'CSRF_TOKEN_NAME'), 'Read-only history view must not contain a write form or CSRF token.');
+assertBackupHistoryContract(false, str_contains($view, "setArgument('action', 'ztum.template.rollback')"), 'History view must never invoke rollback write action directly.');
 assertBackupHistoryContract(
 	true,
 	str_contains($view, "if (\$data['repository_status'] === 'repository_unavailable')"),
@@ -80,9 +86,13 @@ assertBackupHistoryContract(
 	'Template inventory must link administrators to rollback backup history.'
 );
 
-// The only explicit action target in the history view itself must be the read-only back link.
+// History may navigate only back to inventory or into the separate read-only rollback review.
 preg_match_all("/setArgument\\('action',\\s*'([^']+)'\\)/", $view, $matches);
 $viewActions = array_values(array_unique($matches[1] ?? []));
-assertBackupHistoryContract(['ztum.templates'], $viewActions, 'History view must not expose download/delete/restore/write actions.');
+assertBackupHistoryContract(
+	['ztum.templates', 'ztum.template.rollback.review'],
+	$viewActions,
+	'History view may expose only inventory navigation and read-only rollback review.'
+);
 
 echo "TemplateBackup history action contract tests passed.\n";
