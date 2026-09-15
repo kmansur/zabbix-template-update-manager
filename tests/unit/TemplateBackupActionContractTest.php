@@ -29,7 +29,7 @@ assertTemplateBackupAction(
 );
 assertTemplateBackupAction(
 	true,
-	str_contains($action, 'TemplateBackupService')->value ?? false,
+	str_contains($action, 'TemplateBackupService'),
 	'Backup action must delegate export/persistence to TemplateBackupService.'
 );
 
@@ -59,4 +59,4 @@ assertTemplateBackupAction(
 	'Rollback backup form must submit only the selected template ID as business input.'
 );
 
- echo "TemplateBackup action contract tests passed.\n";
+echo "TemplateBackup action contract tests passed.\n";
