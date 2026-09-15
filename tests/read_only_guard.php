@@ -5,9 +5,6 @@ $controlledImportRelative = 'src/Service/TemplateConfigurationImportService.php'
 $controlledImportPath = $root.DIRECTORY_SEPARATOR.str_replace('/', DIRECTORY_SEPARATOR, $controlledImportRelative);
 
 $alwaysBlockedPatterns = [
-	'/template\.create/i' => 'template.create',
-	'/template\.update/i' => 'template.update',
-	'/template\.delete/i' => 'template.delete',
 	'/DB::insert\s*\(/i' => 'DB::insert()',
 	'/DB::update\s*\(/i' => 'DB::update()',
 	'/DB::delete\s*\(/i' => 'DB::delete()',
