@@ -42,8 +42,8 @@ final class HistoricalTemplateBaselineService {
 	 *
 	 * vendor.version is not a unique source revision: several consecutive file
 	 * commits may legitimately carry the same value. When more than one distinct
-	 * official template body exists for that vendor version, an evaluator can
-	 * compare each candidate against LOCAL using Zabbix importcompare semantics.
+	 * official template body exists for that vendor version, each candidate is
+	 * compared against LOCAL using Zabbix importcompare semantics when available.
 	 * Only an exact semantic LOCAL match is then authoritative. Otherwise the
 	 * baseline is reported as ambiguous and update readiness remains fail-closed.
 	 */
@@ -64,6 +64,19 @@ final class HistoricalTemplateBaselineService {
 		$history = ($this->historyLoader)($path, $currentCommit, $maxCommits);
 		if (!is_array($history) || !is_array($history['commits'] ?? null)) {
 			throw new RuntimeException('The historical commit loader returned an invalid result.');
+		}
+
+		// Runtime analysis already loads these services. Using them here keeps
+		// provenance selection tied to the same native Zabbix importcompare semantics
+		// used everywhere else, while dependency-injected unit tests remain standalone.
+		if ($candidateEvaluator === null
+				&& class_exists(TemplateImportCompareService::class)
+				&& class_exists(ImportCompareSummary::class)) {
+			$compareService = new TemplateImportCompareService();
+			$candidateEvaluator = static function (string $source, string $commit) use ($compareService): int {
+				$summary = ImportCompareSummary::summarize($compareService->compare($source));
+				return max(0, (int) ($summary['total'] ?? 0));
+			};
 		}
 
 		$examined = 0;
