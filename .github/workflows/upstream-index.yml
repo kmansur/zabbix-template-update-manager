@@ -48,9 +48,11 @@ jobs:
         run: |
           set -euo pipefail
 
-          # The canonical repository contains the full tag history. The GitHub
-          # mirror intentionally exposes only master and supported releases.
-          SOURCE_REPO='https://git.zabbix.com/scm/zbx/zabbix.git'
+          # Resolve refs against the canonical full-history repository. Prefer
+          # the official GitHub mirror for refs it exposes because it is more
+          # reliable for Actions; historical refs fall back to git.zabbix.com.
+          CANONICAL_REPO='https://git.zabbix.com/scm/zbx/zabbix.git'
+          MIRROR_REPO='https://github.com/zabbix/zabbix.git'
           mkdir -p build/upstream
 
           resolve_ref() {
@@ -58,12 +60,12 @@ jobs:
             local branch="release/${line}"
             local tag
 
-            if git ls-remote --exit-code --heads "$SOURCE_REPO" "$branch" >/dev/null 2>&1; then
+            if git ls-remote --exit-code --heads "$CANONICAL_REPO" "$branch" >/dev/null 2>&1; then
               printf '%s\n' "$branch"
               return 0
             fi
 
-            tag="$(git ls-remote --tags --refs "$SOURCE_REPO" "refs/tags/${line}.*" \
+            tag="$(git ls-remote --tags --refs "$CANONICAL_REPO" "refs/tags/${line}.*" \
               | awk -F/ '{print $3}' | sort -V | tail -n 1)"
             if [[ -n "$tag" ]]; then
               printf '%s\n' "$tag"
@@ -76,6 +78,64 @@ jobs:
             fi
 
             echo "Unable to resolve an official source ref for Zabbix ${line}." >&2
+            return 1
+          }
+
+          repo_has_ref() {
+            local repo="$1"
+            local ref="$2"
+
+            git ls-remote --exit-code --heads "$repo" "$ref" >/dev/null 2>&1 \
+              || git ls-remote --exit-code --tags "$repo" "refs/tags/${ref}" >/dev/null 2>&1
+          }
+
+          clone_ref_once() {
+            local repo="$1"
+            local ref="$2"
+            local source_dir="$3"
+
+            rm -rf "$source_dir"
+            git -c http.version=HTTP/1.1 clone \
+              --depth 1 \
+              --single-branch \
+              --branch "$ref" \
+              --filter=blob:none \
+              --sparse \
+              "$repo" \
+              "$source_dir" \
+              && git -C "$source_dir" -c http.version=HTTP/1.1 sparse-checkout set templates include
+          }
+
+          clone_ref_with_retry() {
+            local ref="$1"
+            local source_dir="$2"
+            local preferred_repo="$CANONICAL_REPO"
+            local attempt
+
+            if repo_has_ref "$MIRROR_REPO" "$ref"; then
+              preferred_repo="$MIRROR_REPO"
+            fi
+
+            for attempt in 1 2 3; do
+              echo "Checkout attempt ${attempt}/3 for ${ref} from ${preferred_repo}."
+              if clone_ref_once "$preferred_repo" "$ref" "$source_dir"; then
+                return 0
+              fi
+              sleep $((attempt * 5))
+            done
+
+            if [[ "$preferred_repo" != "$CANONICAL_REPO" ]]; then
+              echo "Mirror checkout failed repeatedly; falling back to canonical repository."
+              for attempt in 1 2 3; do
+                echo "Canonical checkout attempt ${attempt}/3 for ${ref}."
+                if clone_ref_once "$CANONICAL_REPO" "$ref" "$source_dir"; then
+                  return 0
+                fi
+                sleep $((attempt * 5))
+              done
+            fi
+
+            echo "Unable to checkout official source ref ${ref} after retries." >&2
             return 1
           }
 
@@ -92,11 +152,9 @@ jobs:
             ref="$(resolve_ref "$line")"
             safe_line="${line//./-}"
             source_dir="/tmp/zabbix-${safe_line}"
-            rm -rf "$source_dir"
 
             echo "Building Zabbix ${line} index from ${ref}."
-            git clone --depth 1 --branch "$ref" --filter=blob:none --sparse "$SOURCE_REPO" "$source_dir"
-            git -C "$source_dir" sparse-checkout set templates include
+            clone_ref_with_retry "$ref" "$source_dir"
 
             if [[ "$ref" == 'master' ]]; then
               major="$(awk '/^#define ZABBIX_VERSION_MAJOR/{print $3}' "$source_dir/include/version.h")"
@@ -156,7 +214,8 @@ jobs:
             --location \
             --connect-timeout 10 \
             --max-time 30 \
-            --retry 2 \
+            --retry 3 \
+            --retry-all-errors \
             --retry-delay 2 \
             --user-agent "$user_agent" \
             "$url" \
@@ -186,7 +245,8 @@ jobs:
             --location \
             --connect-timeout 10 \
             --max-time 30 \
-            --retry 2 \
+            --retry 3 \
+            --retry-all-errors \
             --retry-delay 2 \
             --user-agent "$user_agent" \
             --get \
