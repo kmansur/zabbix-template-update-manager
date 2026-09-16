@@ -55,7 +55,79 @@ $baseline = $service->find(
 assertBaseline('found', $baseline['status'], 'The requested historical vendor version must be found.');
 assertBaseline($commits[2], $baseline['commit'], 'The matching historical commit must be returned.');
 assertBaseline(3, $baseline['commits_examined'], 'The scan must report how many path commits were examined.');
+assertBaseline(1, $baseline['distinct_candidate_count'], 'One distinct official body must be deterministic.');
 assertBaseline(true, is_string($baseline['source']) && $baseline['source'] !== '', 'A found baseline must provide an isolated import source.');
+
+// vendor.version alone is not source provenance. If several different official
+// bodies carry the same version, select only a candidate that is an exact
+// semantic match for LOCAL according to the injected evaluator.
+$sameVersionCommits = [str_repeat('1', 40), str_repeat('2', 40), str_repeat('3', 40)];
+$descriptions = [
+	$sameVersionCommits[0] => 'newer revision, same vendor version',
+	$sameVersionCommits[1] => 'installed official revision',
+	$sameVersionCommits[2] => 'older vendor version'
+];
+$vendorVersions = [
+	$sameVersionCommits[0] => '7.0-0',
+	$sameVersionCommits[1] => '7.0-0',
+	$sameVersionCommits[2] => '6.4-9'
+];
+$sameVersionHistory = static fn(string $path, string $until, int $limit): array => [
+	'commits' => array_map(static fn(string $id): array => ['id' => $id, 'message' => ''], $sameVersionCommits),
+	'truncated' => false,
+	'limit' => $limit
+];
+$sameVersionSource = static function (string $commit, string $path) use ($uuid, $descriptions, $vendorVersions): array {
+	return [
+		'content' => json_encode([
+			'zabbix_export' => [
+				'version' => '7.0',
+				'templates' => [[
+					'uuid' => $uuid,
+					'template' => 'T',
+					'name' => 'T',
+					'description' => $descriptions[$commit],
+					'vendor' => ['name' => 'Zabbix', 'version' => $vendorVersions[$commit]]
+				]]
+			]
+		]),
+		'path' => $path,
+		'commit' => $commit
+	];
+};
+$sameVersionService = new HistoricalTemplateBaselineService($sameVersionHistory, $sameVersionSource, $reader);
+$exact = $sameVersionService->find(
+	'templates/test/template_test.yaml',
+	str_repeat('f', 40),
+	$uuid,
+	'7.0-0',
+	'Zabbix',
+	75,
+	static function (string $source, string $commit) use ($sameVersionCommits): int {
+		return $commit === $sameVersionCommits[1] ? 0 : 9;
+	}
+);
+assertBaseline('found', $exact['status'], 'An exact semantic LOCAL match must prove the historical baseline.');
+assertBaseline($sameVersionCommits[1], $exact['commit'], 'The exact matching revision must be selected, not merely the newest same-version commit.');
+assertBaseline(2, $exact['candidate_count'], 'Both commits carrying the installed vendor version must be counted.');
+assertBaseline(2, $exact['distinct_candidate_count'], 'Distinct same-version official bodies must remain distinguishable.');
+assertBaseline(1, $exact['exact_match_count'], 'Exactly one semantic LOCAL match must be reported.');
+assertBaseline('exact_local_match', $exact['selection'], 'Selection provenance must explain why the baseline is authoritative.');
+
+$ambiguous = $sameVersionService->find(
+	'templates/test/template_test.yaml',
+	str_repeat('f', 40),
+	$uuid,
+	'7.0-0',
+	'Zabbix',
+	75,
+	static fn(string $source, string $commit): int => str_starts_with($commit, '1') ? 4 : 7
+);
+assertBaseline('ambiguous', $ambiguous['status'], 'Multiple same-version official bodies without an exact LOCAL match must fail closed.');
+assertBaseline('', $ambiguous['commit'], 'An ambiguous baseline must not claim an authoritative commit.');
+assertBaseline(2, $ambiguous['distinct_candidate_count'], 'Ambiguous result must expose the number of distinct candidates.');
+assertBaseline(4, $ambiguous['closest_changes'], 'Closest semantic distance may be shown diagnostically without becoming authoritative.');
+assertBaseline(null, $ambiguous['source'], 'An ambiguous baseline must not feed a guessed source into three-way analysis.');
 
 $notFoundService = new HistoricalTemplateBaselineService(
 	static fn(string $path, string $until, int $limit): array => [
