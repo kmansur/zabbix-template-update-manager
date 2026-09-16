@@ -71,22 +71,14 @@ final class ImportCompareEntityExtractor {
 
 					$identity = self::identity((string) $entityType, $before, $after, (int) $ordinal);
 					$entityPath = $parentPath.'/'.(string) $entityType.':'.$identity['token'];
-
-					if (array_key_exists($entityPath, $entities)) {
-						throw new RuntimeException(sprintf(
-							'The import comparison contains an ambiguous %s identity (%s).',
-							(string) $entityType,
-							$identity['label']
-						));
-					}
-
-					$entities[$entityPath] = [
+					$record = [
 						'path' => $entityPath,
 						'parent_path' => $parentPath,
 						'entity_type' => (string) $entityType,
 						'identity' => $identity['token'],
 						'label' => $identity['label'],
 						'identity_reliable' => $identity['reliable'],
+						'identity_issue' => $identity['reliable'] ? null : 'unresolved_identity',
 						'operation' => $operation,
 						'before_exists' => $beforeExists,
 						'after_exists' => $afterExists,
@@ -94,10 +86,67 @@ final class ImportCompareEntityExtractor {
 						'after' => $after
 					];
 
-					self::walkContainer($entityDiff, $entityPath, $entities);
+					$storedPath = self::storeEntity(
+						$entities,
+						$entityPath,
+						$record,
+						(string) $entityType,
+						(string) $operation,
+						(int) $ordinal
+					);
+
+					self::walkContainer($entityDiff, $storedPath, $entities);
 				}
 			}
 		}
+	}
+
+	/**
+	 * Store one normalized entity without allowing an identity collision to
+	 * abort the complete template analysis.
+	 *
+	 * A collision means our fallback identity is insufficient to prove which
+	 * native Zabbix entity is which. Both records are therefore marked
+	 * unreliable and the second record receives a deterministic collision path.
+	 * Downstream analyzers will fail closed for these records while continuing
+	 * to explain all other entities in the comparison.
+	 */
+	private static function storeEntity(
+		array &$entities,
+		string $entityPath,
+		array $record,
+		string $entityType,
+		string $operation,
+		int $ordinal
+	): string {
+		if (!array_key_exists($entityPath, $entities)) {
+			$entities[$entityPath] = $record;
+			return $entityPath;
+		}
+
+		$entities[$entityPath]['identity_reliable'] = false;
+		$entities[$entityPath]['identity_issue'] = 'ambiguous_identity';
+
+		$fingerprint = substr(hash('sha256', self::canonicalJson([
+			$entityType,
+			$operation,
+			$ordinal,
+			$record['before'],
+			$record['after']
+		])), 0, 16);
+		$collisionPath = $entityPath.'~collision-'.$fingerprint;
+		$counter = 2;
+		while (array_key_exists($collisionPath, $entities)) {
+			$collisionPath = $entityPath.'~collision-'.$fingerprint.'-'.$counter;
+			$counter++;
+		}
+
+		$record['path'] = $collisionPath;
+		$record['identity_reliable'] = false;
+		$record['identity_issue'] = 'ambiguous_identity';
+		$entities[$collisionPath] = $record;
+
+		return $collisionPath;
 	}
 
 	private static function isChangeBlock(array $value): bool {
