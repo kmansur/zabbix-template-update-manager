@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.3
+# Laboratory test plan — 0.1.0-beta.4
 
 ## Release state
 
@@ -6,60 +6,39 @@ This is a laboratory test release, not a production recommendation.
 
 Status at publication:
 
-- implementation: ready for continued laboratory testing;
+- implementation: ready for end-to-end laboratory validation;
 - automation validation: must be green on the release snapshot commit;
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The repository uses the fixed test snapshot branch `release/0.1.0-beta.3` for this laboratory build. A formal Git tag/GitHub release remains a later publication step; do not infer a tag from the version string.
+The fixed test snapshot branch is `release/0.1.0-beta.4`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.3 exists because the beta.2 Zabbix 7.0.30 field pass reached the upstream decoder and exposed an official MikroTik path containing `+`. Beta.3 fixes that narrow validation mismatch and adds native Zabbix checkbox/select-all selection for choosing only the update candidates the administrator wants to review.
-
-The first field-validation pass should be performed on Zabbix 7.x. Repeat the same functional path on Zabbix 8.x only after the Zabbix 7.x pass is understood.
+Beta.4 builds on the successful Zabbix 7.0.30 beta.3 inventory/upstream pass and adds bounded multi-template preparation plus controlled sequential execution. The batch path must never bypass the existing per-template analysis, rollback, fresh preflight, immutable source/hash validation, explicit confirmation and single `configuration.import` boundary.
 
 ## Safety assumptions
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-Do not begin testing with a business-critical template or host. Prefer one official Zabbix template that:
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications, complete historical/three-way analysis and `none`/`low` technical risk.
 
-- has an update available according to the module;
-- has no detected local modifications;
-- has a resolved historical baseline;
-- has complete three-way analysis;
-- has no conflict or local-overwrite risk;
-- is classified `none` or `low` technical risk by the current gate.
+Do not begin with a business-critical template or host. Medium/high-risk, conflict, local-overwrite and unresolved templates must not enter the automatic batch execution set.
 
-The controlled update UI intentionally does not offer the automatic path for medium/high review states or unresolved/conflicting templates.
+## 1. Confirm frontend module and backup directory
 
-## 1. Confirm the frontend module directory
-
-Do not assume the package-specific frontend path. Locate it first, for example:
+Locate the actual modules directory:
 
 ```bash
 find /usr/share/zabbix /usr/local/share/zabbix /var/www \
   -type d -name modules 2>/dev/null
 ```
 
-The module must be installed as one directory directly below the Zabbix frontend `modules` directory and that directory must contain `manifest.json`.
-
-## 2. Identify the PHP/web runtime user
-
-The module stores rollback artifacts under:
-
-```text
-/var/lib/zabbix-template-update-manager/backups
-```
-
-Determine the actual frontend runtime account before creating the directory. On Debian/Ubuntu it is commonly `www-data`, but this must be verified locally.
-
-Examples:
+Identify the PHP/web runtime user:
 
 ```bash
 ps -eo user,group,comm,args | egrep 'php-fpm|apache2|httpd' | grep -v grep
 ```
 
-Then create the persistent directory with private permissions, replacing `www-data:www-data` when necessary:
+Create persistent private backup storage only after confirming that account:
 
 ```bash
 sudo install -d -o www-data -g www-data -m 0700 \
@@ -69,17 +48,15 @@ sudo stat -c '%U %G %a %n' \
   /var/lib/zabbix-template-update-manager/backups
 ```
 
-Do not make this directory world-writable.
+Expected artifact permissions: template directories `0700`, YAML/JSON files `0600`.
 
-## 3. Install the exact beta snapshot
-
-For a Git checkout:
+## 2. Install the exact beta snapshot
 
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.3
-git checkout -B release/0.1.0-beta.3 origin/release/0.1.0-beta.3
+git fetch origin release/0.1.0-beta.4
+git checkout -B release/0.1.0-beta.4 origin/release/0.1.0-beta.4
 cat VERSION
 git rev-parse HEAD
 ```
@@ -87,192 +64,189 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.3
+0.1.0-beta.4
 ```
 
-Record the exact `git rev-parse HEAD` output with the laboratory evidence. Do not test a later moving development branch while reporting results for this beta snapshot.
-
-Copy or extract the complete repository content into a dedicated directory below the Zabbix frontend `modules` directory. Do not copy the `.git` directory into the frontend module directory when packaging manually.
-
-## 4. Scan and enable the module
-
-In the Zabbix frontend:
+Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
 
 ```text
 Administration → General → Modules → Scan directory
 ```
 
-Locate **Zabbix Template Update Manager**, confirm version `0.1.0-beta.3`, then enable it.
-
-Expected navigation:
+Confirm `0.1.0-beta.4`, enable the module and open:
 
 ```text
 Data collection → Template updates
 ```
 
-If the module does not appear, verify `manifest.json`, filesystem read/search permissions and the actual frontend modules directory before changing code.
-
-## 5. Inventory and upstream smoke test
-
-Open **Data collection → Template updates**.
+## 3. Inventory/upstream regression smoke test
 
 Record:
 
-- module version displayed by the page;
+- module version;
 - detected Zabbix version;
-- compatibility state;
-- visible template count;
+- visible templates;
 - official UUID matches;
-- update-available count;
-- repository/cache state.
+- current/update counts;
+- repository/cache state;
+- upstream ref and commit.
 
-Expected for the existing Zabbix 7.0.30 lab:
-
-- module version shown as `0.1.0-beta.3`;
-- visible-template count remains plausible compared with the previous 303-template passes;
-- the 7.0 upstream index validates instead of failing on official paths containing `+`;
-- official UUID matches become non-zero;
-- version summary becomes populated;
-- no PHP fatal error;
-- no direct database requirement.
-
-If the upstream index still cannot be loaded, capture the complete **Upstream diagnostics** table:
+For the current Zabbix 7.0.30 laboratory baseline, the previous pass observed:
 
 ```text
-Requested index:
-cURL:
-allow_url_fopen:
-OpenSSL:
-Failure detail:
+Visible templates:       303
+Official UUID match:     298
+Repository unavailable:    0
+Current:                    8
+Updates available:        290
 ```
 
-The requested Zabbix 7.0 index is expected to be:
+The exact update count may change when the official upstream index moves, but repository-unavailable should remain zero in a healthy run and UUID matching should remain plausible.
+
+If upstream loading fails, capture the complete **Upstream diagnostics** table and stop before write-path tests.
+
+## 4. Native checkbox/subset selection
+
+Confirm:
+
+- row checkboxes appear only for `Official UUID match` + `Update available` rows;
+- current/unresolved/custom rows are not selectable through the normal update selection workflow;
+- the header checkbox uses native Zabbix selection behavior;
+- select only 2–3 candidates for the first test;
+- **Review selected updates** shows only those explicitly selected templates.
+
+Beta.4 intentionally bounds one selected batch to **25 templates**. Larger batch submissions must fail closed rather than silently truncate.
+
+## 5. Selected review → batch preparation
+
+On the selected review page confirm the chosen IDs/names/versions are correct.
+
+As Super Admin click:
 
 ```text
-https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/upstream-index/indexes/7.0.json
+Prepare selected updates
 ```
 
-A repository failure must still leave templates in the fail-closed `Repository unavailable` state rather than guessing official identity. If the failure detail reports another source path, stop and report that exact path before write-path testing.
+Expected behavior:
 
-## 6. Native selected-template checkbox test
+1. each selected template runs the full authoritative update analysis;
+2. historical baseline and BASE/LOCAL/UPSTREAM analysis are reused;
+3. conflict/local-overwrite/unresolved states remain blocked;
+4. medium/high risk becomes Manual review;
+5. low/none-risk candidates that reached `candidate_for_backup` receive/refresh a persistent rollback artifact;
+6. analysis is rerun after backup creation;
+7. `backup_verified` candidates run fresh preflight;
+8. only a valid fresh preflight evidence SHA-256 can classify the template as `Ready`;
+9. no `configuration.import` occurs during preparation.
 
-Proceed only after upstream identity and version comparison work.
+The page must summarize:
 
-Expected inventory behavior:
+```text
+Selected
+Ready
+Manual review
+Conflict
+Blocked
+```
 
-- the leftmost table header contains the standard Zabbix select-all checkbox;
-- row checkboxes appear only for templates with `Official UUID match` + `Update available`;
-- current, unresolved, custom or repository-unavailable rows are not selectable for the selected-update workflow;
-- clicking the header checkbox selects/deselects the eligible rows using native Zabbix `checkAll()` behavior;
-- selecting only two or three update candidates and pressing **Review selected updates** shows only those selected template IDs;
-- the selected review page performs no `configuration.import` and states that each template still needs its own safety workflow.
+## 6. Batch classification sanity checks
 
-For this beta, do not select more than 100 templates in one review operation. The controller intentionally fails closed above that bound.
+Before any write, inspect at least one item from each category that naturally occurs:
 
-## 7. Comparison test
+- **Ready**: eligible for controlled sequential execution;
+- **Manual review**: medium/high technical review state;
+- **Conflict / local overwrite**: must never be automatically executed;
+- **Blocked**: incomplete/unresolved/not-applicable evidence.
 
-From the selected review page, choose a single official outdated template and open **Review update**.
+If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
 
-Confirm that the page can show, when applicable:
+## 7. Controlled sequential batch update
 
-- installed and available vendor versions;
-- current-upstream import preview;
-- historical official baseline;
-- BASE / LOCAL / UPSTREAM analysis;
-- risk/review priority;
-- directly linked host count;
-- update-readiness state.
+Proceed only when the batch preparation page has one or more `Ready` items.
 
-For the first write-path test, continue only with a template whose evidence reaches `candidate_for_backup`.
+Check the explicit confirmation:
 
-## 8. Backup and verification test
+```text
+I reviewed the batch plan and want to update the N Ready template(s) sequentially.
+```
 
-Use **Create rollback backup**.
+Then submit **Update ready templates**.
 
-Expected filesystem result below the selected template directory:
+For each Ready template, immediately before its own write, the module must:
+
+1. rerun fresh authoritative preflight;
+2. compare the fresh evidence fingerprint with the reviewed evidence;
+3. reject stale/changed evidence before import;
+4. rebuild the immutable upstream candidate;
+5. validate exact commit/path/content SHA-256 and template identity;
+6. use the single approved `TemplateConfigurationImportService` boundary;
+7. run fresh post-update validation.
+
+A successful template must return `updated` before the next template begins.
+
+## 8. Stop-on-first-failure semantics
+
+The batch executor must stop immediately if a template returns any non-`updated` state or throws an exception.
+
+Expected report groups:
+
+```text
+Updated successfully
+Execution stopped / Failed
+Not attempted
+```
+
+Templates after the stopping template must not receive `configuration.import` calls.
+
+If the failed template reports `write_performed = yes`, do not retry the batch. Inspect that template and its stored rollback artifacts first.
+
+Automatic rollback must **not** occur.
+
+## 9. Individual comparison and preflight regression
+
+For one selected template, also exercise the individual path:
+
+```text
+Review update
+  → current-upstream import preview
+  → historical baseline
+  → BASE / LOCAL / UPSTREAM
+  → risk/readiness
+  → rollback verification
+  → controlled preflight
+```
+
+Confirm batch support did not remove or weaken the existing individual workflow.
+
+## 10. Backup/history verification
+
+For every template that reached Ready, verify its rollback history contains an intact pre-update artifact.
+
+Expected files:
 
 ```text
 backup-<UTC timestamp>-<hash prefix>.yaml
 backup-<UTC timestamp>-<hash prefix>.json
 ```
 
-Expected permissions on Unix:
+Reloading individual comparison should be able to prove that the newest artifact matched the fresh installed-template export at the time preparation occurred.
 
-```text
-0700  template directory
-0600  YAML and JSON files
-```
+## 11. Rollback validation
 
-Re-open/reload the comparison. Expected readiness:
+After at least one successful controlled update, use **Rollback backups** for that template.
 
-```text
-backup_verified
-```
+Expected rollback review:
 
-The verification must prove that the newest intact stored artifact exactly matches a fresh `configuration.export` of the currently installed template.
+- artifact integrity revalidated;
+- current template freshly exported;
+- template ID/UUID identity checked;
+- `configuration.importcompare` previews restore;
+- deterministic rollback preflight generated;
+- no write on review page.
 
-## 9. Controlled update preflight
+On explicit rollback confirmation, a new recovery backup must be created/verified before the older artifact is imported.
 
-Run the controlled preflight.
-
-Expected:
-
-- preflight recomputes server-side evidence;
-- exact upstream commit/path/content hash are bound;
-- rollback/current-export fingerprints match;
-- no configuration write occurs on the preflight page;
-- only a super administrator receives the explicit controlled-update confirmation when all gates pass.
-
-Record the preflight evidence fingerprint for the test evidence log.
-
-## 10. Controlled update
-
-Read the confirmation carefully and submit the explicit update confirmation.
-
-The module must, immediately before import:
-
-1. rerun authoritative preflight;
-2. reject changed evidence;
-3. re-fetch the immutable official candidate;
-4. validate canonical source SHA-256;
-5. revalidate candidate identity;
-6. call the single controlled `configuration.import` boundary;
-7. run fresh post-import validation.
-
-Expected successful result:
-
-```text
-updated
-write_performed = yes
-post-update validation = passed
-remaining differences = 0
-```
-
-Afterward, re-open the inventory/comparison and confirm the template is current and its content matches current upstream.
-
-## 11. Rollback review
-
-Open the template's **Rollback backups** history.
-
-The old pre-update artifact should remain present. As a super administrator, select **Review rollback** for that valid artifact.
-
-Expected review behavior:
-
-- artifact integrity is revalidated;
-- current template is freshly exported;
-- template ID/UUID identity is checked;
-- `configuration.importcompare` previews the restore;
-- no configuration write occurs on the review page;
-- a deterministic rollback evidence fingerprint is generated;
-- an invalid artifact cannot be selected.
-
-## 12. Controlled rollback
-
-Submit the explicit rollback confirmation.
-
-Before importing the older artifact, the module must create a **new recovery backup** of the current post-update state and prove its exact SHA-256/byte-count equality with the final preflight current export.
-
-Expected successful result:
+Expected success:
 
 ```text
 rolled_back
@@ -281,30 +255,29 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Verify that both artifacts remain available:
+Rollback remains an explicit per-template operation; beta.4 does not provide automatic batch rollback.
 
-- the older rollback target;
-- the new recovery backup containing the state that existed immediately before rollback.
+## 12. Permission/CSRF negative checks
 
-The rollback must never be triggered automatically from an update failure.
+Confirm:
 
-## 13. Negative/fail-closed tests
+- normal Admin can inspect supported read-only pages but cannot run batch preparation/execution;
+- only Super Admin can prepare and execute selected updates;
+- leaving batch confirmation unchecked is rejected;
+- direct POST without the valid action-specific CSRF token is rejected by native Zabbix handling;
+- tampering a reviewed evidence fingerprint prevents that template from being written;
+- submitting more than 25 template IDs fails closed;
+- conflict/manual-review/blocked items are absent from the hidden Ready execution set.
 
-At minimum, exercise safe negative cases that do not require corrupting production data:
+## 13. Filesystem tamper test (optional, disposable lab only)
 
-- attempt selected review with no selected checkbox: no write must occur;
-- current/non-update rows must not become selectable through normal UI interaction;
-- open history as a normal administrator: history may be visible, but rollback action must not be offered;
-- open update/rollback write action as a non-super-admin: permission must be denied;
-- leave the explicit confirmation unchecked: write action must be rejected by input validation;
-- choose a template with unresolved/conflict/local-overwrite state: controlled automatic update must not be offered;
-- choose an artifact already matching current state: rollback write control must not be offered.
+If a stored backup YAML or JSON manifest is altered, the artifact must become invalid and must not be accepted as verified rollback evidence.
 
-Optional filesystem tamper tests should be performed only in the disposable lab. If a stored YAML or manifest is altered, the artifact must become invalid and must not be eligible for rollback.
+Do not perform this on a production backup store.
 
-## 14. Logs and evidence to capture
+## 14. Evidence to capture
 
-For each tested Zabbix generation, record:
+Record for each Zabbix generation:
 
 ```text
 Zabbix version:
@@ -316,57 +289,63 @@ Visible templates:
 Official UUID matches:
 Updates available:
 Selected template IDs/count:
+Batch summary Ready/Review/Conflict/Blocked:
+Ready template IDs:
+Batch result status:
+Updated template IDs:
+Failed template ID/status/write_performed:
+Not-attempted template IDs:
 Requested upstream index:
-Upstream transport state:
-Upstream failure detail (if any):
-Test template name:
-Template UUID:
+Upstream ref/commit/cache state:
+Individual test template name/UUID:
 Installed version before:
 Available version:
 Readiness state:
 Update preflight fingerprint:
-Update result:
 Installed version after update:
 Rollback target manifest:
-Rollback preflight fingerprint:
 Rollback result:
 Installed version after rollback:
 Backup directory permissions:
 Any frontend/PHP errors:
 ```
 
-Screenshots are useful for UI evidence, but CLI/log evidence should also be retained for failures.
+Screenshots are useful, but retain logs/CLI evidence for failures.
 
 ## 15. Stop conditions
 
-Stop the test and do not perform another configuration write if any of these occurs:
+Stop all further writes if any occurs:
 
 - PHP fatal/uncaught exception around update or rollback;
+- batch continues after the first failed/ambiguous template;
 - an operation reports `write_performed = true` but final validation is not proven;
-- the installed template UUID changes unexpectedly;
+- UUID changes unexpectedly;
 - duplicate template objects appear;
-- backup artifact integrity fails unexpectedly;
-- the recovery backup does not match the current export;
-- the module offers a write action for conflict/unresolved/local-overwrite state;
-- selected-template review includes IDs that were not selected;
+- backup integrity fails unexpectedly;
+- recovery backup does not match the current export;
+- a conflict/manual-review/unresolved item is offered as Ready;
+- selected review contains IDs that were not selected;
 - frontend logs indicate an ambiguous `configuration.import` result.
 
-In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing any next operation. Do not retry automatically.
+In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for the beta field-validation pass
+## 16. Exit criteria for beta.4 laboratory validation
 
-The beta can advance beyond initial laboratory status only after both a Zabbix 7.x and a Zabbix 8.x lab have demonstrated, with evidence:
+A Zabbix generation passes beta.4 only after evidence demonstrates:
 
 ```text
 module discovery/enable
 inventory
-upstream UUID match
-native checkbox/select-all subset selection
-selected-template review
-comparison
-historical baseline where applicable
-backup creation + verification
-controlled update + post-validation
+upstream UUID/version matching
+native subset selection
+selected review
+batch safety preparation
+Ready/Review/Conflict/Blocked classification
+persistent rollback creation + verification
+controlled sequential update
+stop-on-first-failure behavior (real or safely simulated)
+post-update validation
+individual comparison/preflight regression
 rollback review
 recovery backup
 controlled rollback + post-validation
@@ -374,4 +353,4 @@ permission/CSRF negative checks
 no unexpected PHP/frontend errors
 ```
 
-A green GitHub CI run is necessary but is not a substitute for this runtime validation.
+Run Zabbix 7.x first. Repeat on Zabbix 8.x after the 7.x path is understood. A green GitHub CI run is necessary but does not replace runtime field validation.
