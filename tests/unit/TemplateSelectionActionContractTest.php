@@ -9,7 +9,7 @@ $requiredControllerFragments = [
 	"'templateids' => 'required|array_id'",
 	'USER_TYPE_ZABBIX_ADMIN',
 	'USER_TYPE_SUPER_ADMIN',
-	'MAX_SELECTED_TEMPLATES = 100',
+	'MAX_SELECTED_TEMPLATES = 25',
 	'UpstreamIndexRepository',
 	'TemplateVersionComparator'
 ];
@@ -43,9 +43,15 @@ foreach ($requiredViewFragments as $fragment) {
 	}
 }
 
-if (strpos($reviewView, 'This page performs no bulk import.') === false) {
-	fwrite(STDERR, "Selected-template review must state that it performs no bulk import.\n");
-	exit(1);
+foreach ([
+	'ztum.templates.prepare_selected',
+	'Prepare selected updates',
+	'CCsrfTokenHelper::get'
+] as $fragment) {
+	if (strpos($reviewView, $fragment) === false) {
+		fwrite(STDERR, "Selected-template review batch-preparation contract missing: {$fragment}\n");
+		exit(1);
+	}
 }
 
 $forbidden = [
