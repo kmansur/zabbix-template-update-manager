@@ -2,6 +2,8 @@
 
 namespace Modules\ZabbixTemplateUpdateManager\Service;
 
+require_once __DIR__.'/ImportCompareEntityExtractor.php';
+
 /**
  * Reconstructs BASE / LOCAL / UPSTREAM states from two native Zabbix
  * configuration.importcompare results that share the same LOCAL state.
