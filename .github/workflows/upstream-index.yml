@@ -11,6 +11,11 @@ on:
       - '.github/workflows/upstream-index.yml'
       - 'tools/build_upstream_index.py'
       - 'requirements-dev.txt'
+      - 'VERSION'
+      - 'src/Repository/UpstreamIndexRepository.php'
+      - 'src/Support/ProjectVersion.php'
+      - 'src/Support/ZabbixVersion.php'
+      - 'tests/validate_generated_indexes.php'
 
 permissions:
   contents: write
@@ -119,6 +124,16 @@ jobs:
           build_line '7.4'
           build_line '8.0'
 
+      - name: Validate generated indexes with runtime decoder
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v php >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y php-cli
+          fi
+          php tests/validate_generated_indexes.php build/upstream
+
       - name: Verify canonical raw source endpoint
         shell: bash
         run: |
@@ -132,6 +147,7 @@ jobs:
           )"
           path='templates/os/linux/template_os_linux.yaml'
           url="https://git.zabbix.com/projects/ZBX/repos/zabbix/raw/${path}?at=${commit}"
+          user_agent="Zabbix-Template-Update-Manager/$(cat VERSION)"
 
           curl \
             --fail \
@@ -142,7 +158,7 @@ jobs:
             --max-time 30 \
             --retry 2 \
             --retry-delay 2 \
-            --user-agent 'Zabbix-Template-Update-Manager/0.1.0-dev' \
+            --user-agent "$user_agent" \
             "$url" \
             --output /tmp/ztum-upstream-source.yaml
 
@@ -161,6 +177,7 @@ jobs:
           PY
           )"
           endpoint='https://git.zabbix.com/rest/api/1.0/projects/ZBX/repos/zabbix/commits'
+          user_agent="Zabbix-Template-Update-Manager/$(cat VERSION)"
 
           curl \
             --fail \
@@ -171,7 +188,7 @@ jobs:
             --max-time 30 \
             --retry 2 \
             --retry-delay 2 \
-            --user-agent 'Zabbix-Template-Update-Manager/0.1.0-dev' \
+            --user-agent "$user_agent" \
             --get \
             --data-urlencode 'path=templates/os/linux/template_os_linux.yaml' \
             --data-urlencode "until=${commit}" \
