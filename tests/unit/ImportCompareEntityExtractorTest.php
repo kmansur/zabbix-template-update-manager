@@ -138,4 +138,39 @@ assertEntityExtractor(false, $ambiguousRecords[1]['identity_reliable'], 'Second 
 assertEntityExtractor('ambiguous_identity', $ambiguousRecords[0]['identity_issue'], 'First collision must expose the ambiguity reason.');
 assertEntityExtractor('ambiguous_identity', $ambiguousRecords[1]['identity_issue'], 'Second collision must expose the ambiguity reason.');
 
+// CConfigurationImportcompare strips direct before/after state from an updated
+// structured entity when only nested children changed. This shape occurs in
+// real templates (for example discovery-rule containers whose prototypes
+// changed). The extractor must keep the nested diff instead of throwing, but it
+// cannot prove the anonymous parent identity and must therefore fail closed for
+// descendants.
+$structuralOnly = ImportCompareEntityExtractor::extract([
+	'discovery_rules' => [
+		'updated' => [[
+			'item_prototypes' => [
+				'updated' => [[
+					'before' => [
+						'uuid' => str_repeat('c', 32),
+						'name' => 'Prototype',
+						'key' => 'prototype.key',
+						'delay' => '30s'
+					],
+					'after' => [
+						'uuid' => str_repeat('c', 32),
+						'name' => 'Prototype',
+						'key' => 'prototype.key',
+						'delay' => '1m'
+					]
+				]]
+			]
+		]]
+	]
+]);
+assertEntityExtractor(1, count($structuralOnly), 'Structural-only wrappers must retain nested entity changes.');
+$structuralRecord = reset($structuralOnly);
+assertEntityExtractor(false, $structuralRecord['identity_reliable'], 'A child under an anonymous structural wrapper must remain fail-closed.');
+assertEntityExtractor('unresolved_parent_identity', $structuralRecord['identity_issue'], 'Structural wrapper descendants must expose the unresolved parent reason.');
+assertEntityExtractor('30s', $structuralRecord['before']['delay'], 'Structural-wrapper child before state must be retained.');
+assertEntityExtractor('1m', $structuralRecord['after']['delay'], 'Structural-wrapper child after state must be retained.');
+
 echo "ImportCompareEntityExtractor tests passed.\n";
