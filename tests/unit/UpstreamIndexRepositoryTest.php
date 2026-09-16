@@ -55,6 +55,22 @@ assertUpstreamValue('release/7.0', $decoded['source']['ref'], 'Valid index sourc
 assertUpstreamValue('7.0-4', $decoded['templates'][$uuid]['vendor_version'], 'Valid template record was not preserved.');
 assertUpstreamValue(1, count($decoded['templates'][$uuid]['paths']), 'Valid template source paths were not preserved.');
 
+$officialPlusPath = 'templates/net/mikrotik/mikrotik_CRS305-1G-4S+IN_snmp/template_net_mikrotik_CRS305-1G-4S+IN_snmp.yaml';
+assertUpstreamValue(
+	true,
+	UpstreamIndexRepository::isValidTemplatePath($officialPlusPath),
+	'An official Zabbix source path containing a literal plus sign must be accepted.'
+);
+
+$validPlus = json_decode($valid, true);
+$validPlus['templates'][$uuid]['paths'] = [$officialPlusPath];
+$decodedPlus = UpstreamIndexRepository::decodeIndex(json_encode($validPlus, JSON_UNESCAPED_SLASHES), '7.0');
+assertUpstreamValue(
+	$officialPlusPath,
+	$decodedPlus['templates'][$uuid]['paths'][0],
+	'The official plus-sign path must survive index validation.'
+);
+
 assertUpstreamThrows(
 	fn() => UpstreamIndexRepository::decodeIndex($valid, '8.0'),
 	'An index for the wrong Zabbix line must be rejected.'
@@ -74,6 +90,13 @@ $invalidPath['templates'][$uuid]['paths'] = ['../outside.yaml'];
 assertUpstreamThrows(
 	fn() => UpstreamIndexRepository::decodeIndex(json_encode($invalidPath), '7.0'),
 	'An invalid source path must be rejected.'
+);
+
+$traversalWithPlus = json_decode($valid, true);
+$traversalWithPlus['templates'][$uuid]['paths'] = ['templates/net/device+name/../outside.yaml'];
+assertUpstreamThrows(
+	fn() => UpstreamIndexRepository::decodeIndex(json_encode($traversalWithPlus), '7.0'),
+	'Allowing plus signs must not weaken traversal protection.'
 );
 
 $invalidHash = json_decode($valid, true);
