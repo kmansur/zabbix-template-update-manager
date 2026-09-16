@@ -13,7 +13,7 @@ use RuntimeException;
  */
 final class HistoricalBaselineCacheRepository {
 
-	private const SCHEMA_VERSION = 1;
+	private const SCHEMA_VERSION = 2;
 	private const MAX_CACHE_BYTES = 12582912;
 
 	private string $cacheDir;
@@ -91,6 +91,11 @@ final class HistoricalBaselineCacheRepository {
 			'vendor_version' => $key['target_vendor_version'],
 			'commits_examined' => max(0, (int) ($baseline['commits_examined'] ?? 0)),
 			'history_truncated' => (bool) ($baseline['history_truncated'] ?? false),
+			'candidate_count' => max(0, (int) ($baseline['candidate_count'] ?? 0)),
+			'distinct_candidate_count' => max(0, (int) ($baseline['distinct_candidate_count'] ?? 0)),
+			'exact_match_count' => max(0, (int) ($baseline['exact_match_count'] ?? 0)),
+			'selection' => (string) ($baseline['selection'] ?? 'cached_authoritative'),
+			'semantic_distance' => isset($baseline['semantic_distance']) ? max(0, (int) $baseline['semantic_distance']) : null,
 			'source' => $source
 		];
 	}
@@ -137,6 +142,11 @@ final class HistoricalBaselineCacheRepository {
 				'vendor_version' => $key['target_vendor_version'],
 				'commits_examined' => max(0, (int) ($baseline['commits_examined'] ?? 0)),
 				'history_truncated' => (bool) ($baseline['history_truncated'] ?? false),
+				'candidate_count' => max(0, (int) ($baseline['candidate_count'] ?? 0)),
+				'distinct_candidate_count' => max(0, (int) ($baseline['distinct_candidate_count'] ?? 0)),
+				'exact_match_count' => max(0, (int) ($baseline['exact_match_count'] ?? 0)),
+				'selection' => (string) ($baseline['selection'] ?? ''),
+				'semantic_distance' => isset($baseline['semantic_distance']) ? max(0, (int) $baseline['semantic_distance']) : null,
 				'source' => $source
 			]
 		];
