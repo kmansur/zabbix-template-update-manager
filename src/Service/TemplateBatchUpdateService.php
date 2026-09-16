@@ -107,7 +107,7 @@ final class TemplateBatchUpdateService {
 			$normalized[$templateId] = true;
 		}
 
-		$ids = array_keys($normalized);
+		$ids = array_map('strval', array_keys($normalized));
 		if ($ids === [] || count($ids) > TemplateBatchPlanService::MAX_TEMPLATES) {
 			throw new RuntimeException('Batch update requires between 1 and '.TemplateBatchPlanService::MAX_TEMPLATES.' templates.');
 		}
