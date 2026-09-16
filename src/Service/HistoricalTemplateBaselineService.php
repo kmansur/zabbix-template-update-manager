@@ -37,13 +37,24 @@ final class HistoricalTemplateBaselineService {
 		$this->documentReader = $documentReader;
 	}
 
+	/**
+	 * Resolve an official historical baseline for the installed vendor version.
+	 *
+	 * vendor.version is not a unique source revision: several consecutive file
+	 * commits may legitimately carry the same value. When more than one distinct
+	 * official template body exists for that vendor version, an evaluator can
+	 * compare each candidate against LOCAL using Zabbix importcompare semantics.
+	 * Only an exact semantic LOCAL match is then authoritative. Otherwise the
+	 * baseline is reported as ambiguous and update readiness remains fail-closed.
+	 */
 	public function find(
 		string $path,
 		string $currentCommit,
 		string $uuid,
 		string $targetVendorVersion,
 		string $expectedVendorName = 'Zabbix',
-		int $maxCommits = 75
+		int $maxCommits = 75,
+		?callable $candidateEvaluator = null
 	): array {
 		$targetVendorVersion = trim($targetVendorVersion);
 		if ($targetVendorVersion === '') {
@@ -56,6 +67,14 @@ final class HistoricalTemplateBaselineService {
 		}
 
 		$examined = 0;
+		$matchingCommitCount = 0;
+		$seenTargetVersion = false;
+		$versionBoundaryReached = false;
+		$candidatesByHash = [];
+
+		// The canonical Bitbucket commit endpoint returns newest -> oldest for the path.
+		// Once the requested version block has been entered and an older version is
+		// reached, all revisions for this vendor version have been enumerated.
 		foreach ($history['commits'] as $commit) {
 			$id = strtolower(trim((string) ($commit['id'] ?? '')));
 			if (!preg_match('/^[a-f0-9]{40}$/', $id)) {
@@ -75,8 +94,15 @@ final class HistoricalTemplateBaselineService {
 
 			$metadata = UpstreamTemplateDocumentService::templateMetadata($document, $uuid);
 			if ($metadata['vendor_version'] !== $targetVendorVersion) {
+				if ($seenTargetVersion) {
+					$versionBoundaryReached = true;
+					break;
+				}
 				continue;
 			}
+
+			$seenTargetVersion = true;
+			$matchingCommitCount++;
 
 			if ($expectedVendorName !== '' && $metadata['vendor_name'] !== $expectedVendorName) {
 				throw new RuntimeException('The historical template vendor does not match the expected official vendor.');
@@ -88,26 +114,132 @@ final class HistoricalTemplateBaselineService {
 				$targetVendorVersion,
 				$expectedVendorName
 			);
+			$sourceHash = hash('sha256', $isolated['source']);
 
+			if (!array_key_exists($sourceHash, $candidatesByHash)) {
+				$candidatesByHash[$sourceHash] = [
+					'commit' => $id,
+					'source' => $isolated['source'],
+					'source_sha256' => $sourceHash,
+					'commit_count' => 1,
+					'semantic_distance' => null
+				];
+			}
+			else {
+				$candidatesByHash[$sourceHash]['commit_count']++;
+			}
+		}
+
+		$historyTruncated = (bool) ($history['truncated'] ?? false) && !$versionBoundaryReached;
+		$candidates = array_values($candidatesByHash);
+		$distinctCandidateCount = count($candidates);
+
+		if ($distinctCandidateCount === 0) {
 			return [
-				'status' => 'found',
-				'commit' => $id,
+				'status' => $historyTruncated ? 'history_limit_reached' : 'not_found',
+				'commit' => '',
 				'path' => $path,
 				'vendor_version' => $targetVendorVersion,
 				'commits_examined' => $examined,
-				'history_truncated' => (bool) ($history['truncated'] ?? false),
-				'source' => $isolated['source']
+				'history_truncated' => $historyTruncated,
+				'candidate_count' => 0,
+				'distinct_candidate_count' => 0,
+				'exact_match_count' => 0,
+				'selection' => 'none',
+				'source' => null
 			];
 		}
 
+		$exactMatches = [];
+		$closest = null;
+		if ($candidateEvaluator !== null) {
+			foreach ($candidates as $index => $candidate) {
+				$distance = ($candidateEvaluator)($candidate['source'], $candidate['commit']);
+				if (!is_int($distance) || $distance < 0) {
+					throw new RuntimeException('The historical baseline candidate evaluator returned an invalid distance.');
+				}
+				$candidates[$index]['semantic_distance'] = $distance;
+				if ($distance === 0) {
+					$exactMatches[] = $candidates[$index];
+				}
+				if ($closest === null || $distance < $closest['semantic_distance']) {
+					$closest = $candidates[$index];
+				}
+			}
+		}
+
+		if ($distinctCandidateCount === 1) {
+			$selected = $candidates[0];
+			return $this->foundResult(
+				$selected,
+				$path,
+				$targetVendorVersion,
+				$examined,
+				$historyTruncated,
+				$matchingCommitCount,
+				$distinctCandidateCount,
+				count($exactMatches),
+				($selected['semantic_distance'] ?? null) === 0 ? 'exact_local_match' : 'single_official_content'
+			);
+		}
+
+		if ($exactMatches !== []) {
+			// Candidates retain newest -> oldest order, so choose the newest exact
+			// semantic match if several source revisions normalize identically to LOCAL.
+			return $this->foundResult(
+				$exactMatches[0],
+				$path,
+				$targetVendorVersion,
+				$examined,
+				$historyTruncated,
+				$matchingCommitCount,
+				$distinctCandidateCount,
+				count($exactMatches),
+				'exact_local_match'
+			);
+		}
+
 		return [
-			'status' => (bool) ($history['truncated'] ?? false) ? 'history_limit_reached' : 'not_found',
+			'status' => 'ambiguous',
 			'commit' => '',
 			'path' => $path,
 			'vendor_version' => $targetVendorVersion,
 			'commits_examined' => $examined,
-			'history_truncated' => (bool) ($history['truncated'] ?? false),
+			'history_truncated' => $historyTruncated,
+			'candidate_count' => $matchingCommitCount,
+			'distinct_candidate_count' => $distinctCandidateCount,
+			'exact_match_count' => 0,
+			'selection' => 'no_exact_local_match',
+			'closest_commit' => $closest['commit'] ?? '',
+			'closest_changes' => $closest['semantic_distance'] ?? null,
 			'source' => null
+		];
+	}
+
+	private function foundResult(
+		array $candidate,
+		string $path,
+		string $vendorVersion,
+		int $examined,
+		bool $historyTruncated,
+		int $candidateCount,
+		int $distinctCandidateCount,
+		int $exactMatchCount,
+		string $selection
+	): array {
+		return [
+			'status' => 'found',
+			'commit' => $candidate['commit'],
+			'path' => $path,
+			'vendor_version' => $vendorVersion,
+			'commits_examined' => $examined,
+			'history_truncated' => $historyTruncated,
+			'candidate_count' => $candidateCount,
+			'distinct_candidate_count' => $distinctCandidateCount,
+			'exact_match_count' => $exactMatchCount,
+			'selection' => $selection,
+			'semantic_distance' => $candidate['semantic_distance'],
+			'source' => $candidate['source']
 		];
 	}
 }
