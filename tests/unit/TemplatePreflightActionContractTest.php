@@ -4,6 +4,7 @@ $root = dirname(__DIR__, 2);
 $manifest = json_decode(file_get_contents($root.'/manifest.json'), true);
 $action = file_get_contents($root.'/actions/TemplatePreflight.php');
 $view = file_get_contents($root.'/views/template.preflight.php');
+$compareView = file_get_contents($root.'/views/template.compare.php');
 $listView = file_get_contents($root.'/views/template.list.php');
 
 function assertPreflightActionContract(bool $condition, string $message): void {
@@ -43,9 +44,15 @@ assertPreflightActionContract(
 );
 
 assertPreflightActionContract(
-	strpos($listView, "CCsrfTokenHelper::get('ztum.template.preflight')") !== false
-		&& strpos($listView, "new CForm('post')") !== false,
-	'Inventory must invoke preflight through a CSRF-protected POST form.'
+	strpos($compareView, "CCsrfTokenHelper::get('ztum.template.preflight')") !== false
+		&& strpos($compareView, "new CForm('post')") !== false
+		&& strpos($compareView, "'backup_verified'") !== false,
+	'Comparison must invoke preflight through a CSRF-protected POST form only after backup verification.'
+);
+assertPreflightActionContract(
+	strpos($listView, "ztum.template.compare") !== false
+		&& strpos($listView, "Review") !== false,
+	'Inventory must route update candidates into the comparison/review workflow rather than bypassing it.'
 );
 assertPreflightActionContract(
 	strpos($view, "'write_enabled'") !== false || strpos($view, "write_enabled") !== false,
