@@ -4,6 +4,36 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.4] - 2026-09-16
+
+### Added
+
+- Bounded multi-template safety preparation for up to 25 explicitly selected official update candidates.
+- Batch classification into `Ready`, `Manual review`, `Conflict / local overwrite` and `Blocked` using the existing per-template analysis/readiness pipeline.
+- Persistent rollback artifact creation/refresh during batch preparation only for templates that reached `candidate_for_backup`.
+- Fresh per-template preflight evidence binding for every batch candidate classified `Ready`.
+- Super-administrator-only controlled sequential batch execution.
+- Stop-on-first-non-success behavior with explicit `updated`, `failed` and `not_attempted` result groups.
+- Batch result page that reports whether any configuration write occurred and whether the stopping template itself performed a write.
+- Unit coverage for batch planning categories, rollback preparation, sequential order, evidence validation and stop behavior.
+- Static batch-action contract coverage for CSRF, Super Admin authorization, explicit confirmation and the single approved configuration-write boundary.
+
+### Changed
+
+- Selected-template review is now bounded to 25 templates so the review limit matches the batch safety-preparation/execution limit.
+- The selected-template review page can advance eligible candidates into `Prepare selected updates` for full safety analysis and rollback preparation.
+- Batch execution reuses `TemplateControlledUpdateService` for every template instead of introducing a second import path.
+- Every template reruns the complete server-side preflight immediately before its own `configuration.import`; stale evidence stops the batch before that template is written.
+- Automatic rollback remains deliberately disabled. If one template fails after a write, execution stops and the operator must inspect/choose the correct rollback artifact.
+
+### Validation status
+
+- Zabbix 7.0.30 field validation has already confirmed inventory, upstream index retrieval, official UUID matching, version comparison and native selection controls.
+- The upstream-index workflow now completes end-to-end with generated-index runtime-decoder validation, canonical raw/history endpoint smoke tests and publication.
+- Beta.4 is the first laboratory candidate for end-to-end selected batch preparation and controlled sequential update testing.
+- Zabbix 8.x runtime validation remains pending.
+- Production use is not recommended.
+
 ## [0.1.0-beta.3] - 2026-09-15
 
 ### Added
@@ -29,8 +59,8 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 ### Test-release status
 
 - Zabbix 7.0.30 local inventory is field-validated with 303 visible templates in the first lab environment.
-- Beta.3 must confirm that the 7.0 upstream index now validates and UUID/version summaries populate.
-- Native selected-template checkbox behavior must be field-validated on Zabbix 7.0.30 before batch execution work is enabled.
+- Beta.3 confirmed that the 7.0 upstream index validates, yielding 298 official UUID matches, 290 updates available and zero repository-unavailable results in the lab.
+- Native selected-template checkbox behavior is visible in Zabbix 7.0.30.
 - Zabbix 8.x runtime validation remains pending.
 - Production use is not recommended.
 
