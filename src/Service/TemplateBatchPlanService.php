@@ -152,7 +152,7 @@ final class TemplateBatchPlanService {
 			$normalized[$templateId] = true;
 		}
 
-		$ids = array_keys($normalized);
+		$ids = array_map('strval', array_keys($normalized));
 		if ($ids === [] || count($ids) > self::MAX_TEMPLATES) {
 			throw new RuntimeException('Batch planning requires between 1 and '.self::MAX_TEMPLATES.' templates.');
 		}
