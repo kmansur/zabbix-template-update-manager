@@ -119,4 +119,23 @@ assertEntityExtractor(
 	'Fallback identity must use the shared LOCAL state as the stable three-way pivot.'
 );
 
+// A real-world importcompare may still contain two no-UUID records that our
+// fallback cannot distinguish. That must never abort the whole template
+// analysis. Both records are retained and marked unreliable so downstream
+// readiness remains fail-closed while other entities can still be analyzed.
+$ambiguous = ImportCompareEntityExtractor::extract([
+	'dashboards' => [
+		'added' => [
+			['after' => ['name' => 'Overview', 'display_period' => '30']],
+			['after' => ['name' => 'Overview', 'display_period' => '60']]
+		]
+	]
+]);
+assertEntityExtractor(2, count($ambiguous), 'Ambiguous fallback identities must retain both native records.');
+$ambiguousRecords = array_values($ambiguous);
+assertEntityExtractor(false, $ambiguousRecords[0]['identity_reliable'], 'First colliding identity must be downgraded to unreliable.');
+assertEntityExtractor(false, $ambiguousRecords[1]['identity_reliable'], 'Second colliding identity must be downgraded to unreliable.');
+assertEntityExtractor('ambiguous_identity', $ambiguousRecords[0]['identity_issue'], 'First collision must expose the ambiguity reason.');
+assertEntityExtractor('ambiguous_identity', $ambiguousRecords[1]['identity_issue'], 'Second collision must expose the ambiguity reason.');
+
 echo "ImportCompareEntityExtractor tests passed.\n";
