@@ -2,6 +2,8 @@
 
 namespace Modules\ZabbixTemplateUpdateManager\Service;
 
+require_once __DIR__.'/ImportCompareEntityExtractor.php';
+
 /**
  * Converts the current LOCAL -> UPSTREAM import comparison into field-level
  * update operations without reimplementing Zabbix import semantics.
