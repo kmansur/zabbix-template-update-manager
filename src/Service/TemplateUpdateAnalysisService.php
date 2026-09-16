@@ -114,7 +114,7 @@ final class TemplateUpdateAnalysisService {
 					$this->logFailure('Update preview analysis', $templateId, $exception);
 					$data['update_risk_error'] = _(
 						'Unable to normalize the current update preview for risk analysis. The native import comparison summary remains available.'
-					);
+					).' '.$this->diagnosticMessage($exception);
 				}
 			}
 
@@ -144,7 +144,7 @@ final class TemplateUpdateAnalysisService {
 					$this->logFailure('Update risk analysis', $templateId, $exception);
 					$data['update_risk_error'] = _(
 						'Unable to complete conservative update risk analysis. No update-safety conclusion is available.'
-					);
+					).' '.$this->diagnosticMessage($exception);
 				}
 			}
 
@@ -176,7 +176,7 @@ final class TemplateUpdateAnalysisService {
 					$this->logFailure('Backup verification', $templateId, $exception);
 					$data['backup_verification_error'] = _(
 						'Unable to inspect or verify the persistent rollback backup. The workflow remains at backup candidacy and no configuration-write step is enabled.'
-					);
+					).' '.$this->diagnosticMessage($exception);
 				}
 			}
 		}
@@ -184,7 +184,7 @@ final class TemplateUpdateAnalysisService {
 			$this->logFailure('Content comparison', $templateId, $exception);
 			$data['comparison_error'] = _(
 				'Unable to complete the read-only content comparison. Check frontend logs, network access to the official Zabbix repository and the current user role permissions.'
-			);
+			).' '.$this->diagnosticMessage($exception);
 		}
 
 		return $data;
@@ -265,7 +265,7 @@ final class TemplateUpdateAnalysisService {
 					$this->logFailure('Three-way analysis', $templateId, $exception);
 					$data['three_way_error'] = _(
 						'Unable to complete the three-way change analysis. Historical and current comparison summaries remain available.'
-					);
+					).' '.$this->diagnosticMessage($exception);
 				}
 			}
 
@@ -280,7 +280,7 @@ final class TemplateUpdateAnalysisService {
 			$this->logFailure('Historical baseline lookup', $templateId, $exception);
 			$data['historical_error'] = _(
 				'Unable to resolve the historical official baseline. The current-upstream comparison remains valid as an update preview.'
-			);
+			).' '.$this->diagnosticMessage($exception);
 		}
 	}
 
@@ -305,6 +305,22 @@ final class TemplateUpdateAnalysisService {
 			'backup_verification' => null,
 			'backup_verification_error' => null
 		];
+	}
+
+	private function diagnosticMessage(Throwable $exception): string {
+		$message = preg_replace('/[\x00-\x1F\x7F]+/', ' ', $exception->getMessage());
+		$message = is_string($message) ? trim($message) : '';
+		$message = preg_replace('/\s+/', ' ', $message);
+		$message = is_string($message) ? trim($message) : '';
+		if ($message === '') {
+			$message = get_class($exception);
+		}
+
+		if (strlen($message) > 400) {
+			$message = substr($message, 0, 399).'…';
+		}
+
+		return 'Diagnostic: '.$message;
 	}
 
 	private function logFailure(string $stage, string $templateId, Throwable $exception): void {
