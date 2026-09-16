@@ -75,6 +75,8 @@ $page
 	->addItem(new CTag('h4', true, _('Selected update candidates')))
 	->addItem($table);
 
+$batchLimit = (int) ($data['batch_prepare_limit'] ?? 25);
+
 if ($eligibleIds !== [] && !empty($data['can_prepare'])) {
 	$prepareAction = (new CUrl('zabbix.php'))
 		->setArgument('action', 'ztum.templates.prepare_selected')
@@ -96,6 +98,12 @@ if ($eligibleIds !== [] && !empty($data['can_prepare'])) {
 			'Preparation runs the full safety analysis for every selected candidate. For low-risk candidates it may create or refresh a persistent rollback backup and then run a fresh preflight. It does not import Zabbix configuration.'
 		)))
 		->addItem($form);
+}
+elseif ($eligibleIds !== [] && (int) $data['selected_count'] > $batchLimit) {
+	$page->addItem(new CTag('p', true, sprintf(
+		_('Review is available for this large selection, but controlled batch preparation is limited to %1$d templates. Return to the inventory and select a smaller subset.'),
+		$batchLimit
+	)));
 }
 elseif ($eligibleIds !== [] && empty($data['can_prepare'])) {
 	$page->addItem(new CTag('p', true, _(
