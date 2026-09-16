@@ -27,7 +27,7 @@ $page = (new CHtmlPage())
 		(int) $data['selected_count']
 	)))
 	->addItem(new CTag('p', true, _(
-		'Selection scopes review only. Every template must still pass its own comparison, backup verification, fresh preflight and explicit confirmation before any configuration import can occur.'
+		'Selection scopes review only. Every template still has to pass comparison, historical baseline, three-way analysis, risk evaluation, rollback verification and fresh preflight before any configuration import can occur.'
 	)));
 
 if ($data['error'] !== null) {
@@ -45,9 +45,10 @@ $table = (new CTableInfo())
 		_('Version status'),
 		_('Upstream identity'),
 		_('Linked hosts'),
-		_('Next step')
+		_('Individual review')
 	]);
 
+$eligibleIds = [];
 foreach ($data['templates'] as $template) {
 	$compareUrl = (new CUrl('zabbix.php'))
 		->setArgument('action', 'ztum.template.compare')
@@ -55,6 +56,9 @@ foreach ($data['templates'] as $template) {
 
 	$eligible = ($template['upstream_status'] ?? null) === 'official_match'
 		&& ($template['version_status'] ?? null) === 'update_available';
+	if ($eligible) {
+		$eligibleIds[] = (string) $template['templateid'];
+	}
 
 	$table->addRow([
 		$template['name'],
@@ -63,14 +67,45 @@ foreach ($data['templates'] as $template) {
 		$versionLabels[$template['version_status'] ?? 'not_applicable'] ?? _('Unknown'),
 		$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
 		(int) $template['host_count'],
-		$eligible ? new CLink(_('Review update'), $compareUrl) : _('No longer eligible for selected update review')
+		$eligible ? new CLink(_('Review update'), $compareUrl) : _('No longer eligible')
 	]);
 }
 
 $page
 	->addItem(new CTag('h4', true, _('Selected update candidates')))
-	->addItem($table)
-	->addItem(new CTag('p', true, _(
-		'This page performs no bulk import. A future batch executor will reuse the same per-template safety boundary and stop on the first ambiguous write; the current beta keeps writes explicit per template while the selection workflow is field-validated.'
-	)))
-	->show();
+	->addItem($table);
+
+if ($eligibleIds !== [] && !empty($data['can_prepare'])) {
+	$prepareAction = (new CUrl('zabbix.php'))
+		->setArgument('action', 'ztum.templates.prepare_selected')
+		->getUrl();
+	$form = (new CForm('post'))
+		->setId('ztum-batch-prepare-form')
+		->setAction($prepareAction)
+		->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.templates.prepare_selected')))->removeId());
+
+	foreach ($eligibleIds as $index => $templateId) {
+		$form->addItem((new CVar('templateids['.$index.']', $templateId))->removeId());
+	}
+
+	$form->addItem(new CSubmitButton(_('Prepare selected updates')));
+
+	$page
+		->addItem(new CTag('h4', true, _('Batch safety preparation')))
+		->addItem(new CTag('p', true, _(
+			'Preparation runs the full safety analysis for every selected candidate. For low-risk candidates it may create or refresh a persistent rollback backup and then run a fresh preflight. It does not import Zabbix configuration.'
+		)))
+		->addItem($form);
+}
+elseif ($eligibleIds !== [] && empty($data['can_prepare'])) {
+	$page->addItem(new CTag('p', true, _(
+		'A Zabbix super administrator is required to prepare selected candidates for controlled sequential update.'
+	)));
+}
+else {
+	$page->addItem(new CTag('p', true, _(
+		'None of the selected templates is still an authoritative official update candidate.'
+	)));
+}
+
+$page->show();
