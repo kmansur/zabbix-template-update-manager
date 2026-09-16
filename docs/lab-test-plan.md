@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.2
+# Laboratory test plan — 0.1.0-beta.3
 
 ## Release state
 
@@ -6,12 +6,14 @@ This is a laboratory test release, not a production recommendation.
 
 Status at publication:
 
-- implementation: ready for laboratory testing;
+- implementation: ready for continued laboratory testing;
 - automation validation: must be green on the release snapshot commit;
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The repository uses the fixed test snapshot branch `release/0.1.0-beta.2` for this laboratory build. A formal Git tag/GitHub release remains a later publication step; do not infer a tag from the version string.
+The repository uses the fixed test snapshot branch `release/0.1.0-beta.3` for this laboratory build. A formal Git tag/GitHub release remains a later publication step; do not infer a tag from the version string.
+
+Beta.3 exists because the beta.2 Zabbix 7.0.30 field pass reached the upstream decoder and exposed an official MikroTik path containing `+`. Beta.3 fixes that narrow validation mismatch and adds native Zabbix checkbox/select-all selection for choosing only the update candidates the administrator wants to review.
 
 The first field-validation pass should be performed on Zabbix 7.x. Repeat the same functional path on Zabbix 8.x only after the Zabbix 7.x pass is understood.
 
@@ -76,8 +78,8 @@ For a Git checkout:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.2
-git checkout -B release/0.1.0-beta.2 origin/release/0.1.0-beta.2
+git fetch origin release/0.1.0-beta.3
+git checkout -B release/0.1.0-beta.3 origin/release/0.1.0-beta.3
 cat VERSION
 git rev-parse HEAD
 ```
@@ -85,7 +87,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.2
+0.1.0-beta.3
 ```
 
 Record the exact `git rev-parse HEAD` output with the laboratory evidence. Do not test a later moving development branch while reporting results for this beta snapshot.
@@ -100,7 +102,7 @@ In the Zabbix frontend:
 Administration → General → Modules → Scan directory
 ```
 
-Locate **Zabbix Template Update Manager**, confirm version `0.1.0-beta.2`, then enable it.
+Locate **Zabbix Template Update Manager**, confirm version `0.1.0-beta.3`, then enable it.
 
 Expected navigation:
 
@@ -124,15 +126,17 @@ Record:
 - update-available count;
 - repository/cache state.
 
-Expected:
+Expected for the existing Zabbix 7.0.30 lab:
 
-- module version shown as `0.1.0-beta.2`, not a hard-coded development value;
+- module version shown as `0.1.0-beta.3`;
+- visible-template count remains plausible compared with the previous 303-template passes;
+- the 7.0 upstream index validates instead of failing on official paths containing `+`;
+- official UUID matches become non-zero;
+- version summary becomes populated;
 - no PHP fatal error;
-- no direct database requirement;
-- official identity based on UUID;
-- unsupported/unknown upstream states fail closed instead of being guessed.
+- no direct database requirement.
 
-If the upstream index cannot be loaded, an administrator/super administrator should see **Upstream diagnostics**. Record all fields from that table:
+If the upstream index still cannot be loaded, capture the complete **Upstream diagnostics** table:
 
 ```text
 Requested index:
@@ -148,13 +152,26 @@ The requested Zabbix 7.0 index is expected to be:
 https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/upstream-index/indexes/7.0.json
 ```
 
-The loader first tries cURL when available. If cURL fails and `allow_url_fopen` is enabled, beta.2 also tries the PHP stream transport. A repository failure must still leave all templates in the fail-closed `Repository unavailable` state rather than guessing official identity.
+A repository failure must still leave templates in the fail-closed `Repository unavailable` state rather than guessing official identity. If the failure detail reports another source path, stop and report that exact path before write-path testing.
 
-Do not proceed to comparison/update validation until upstream identity works for at least one official template.
+## 6. Native selected-template checkbox test
 
-## 6. Comparison test
+Proceed only after upstream identity and version comparison work.
 
-Choose a single official template with an authoritative UUID match and open its comparison page.
+Expected inventory behavior:
+
+- the leftmost table header contains the standard Zabbix select-all checkbox;
+- row checkboxes appear only for templates with `Official UUID match` + `Update available`;
+- current, unresolved, custom or repository-unavailable rows are not selectable for the selected-update workflow;
+- clicking the header checkbox selects/deselects the eligible rows using native Zabbix `checkAll()` behavior;
+- selecting only two or three update candidates and pressing **Review selected updates** shows only those selected template IDs;
+- the selected review page performs no `configuration.import` and states that each template still needs its own safety workflow.
+
+For this beta, do not select more than 100 templates in one review operation. The controller intentionally fails closed above that bound.
+
+## 7. Comparison test
+
+From the selected review page, choose a single official outdated template and open **Review update**.
 
 Confirm that the page can show, when applicable:
 
@@ -168,7 +185,7 @@ Confirm that the page can show, when applicable:
 
 For the first write-path test, continue only with a template whose evidence reaches `candidate_for_backup`.
 
-## 7. Backup and verification test
+## 8. Backup and verification test
 
 Use **Create rollback backup**.
 
@@ -194,7 +211,7 @@ backup_verified
 
 The verification must prove that the newest intact stored artifact exactly matches a fresh `configuration.export` of the currently installed template.
 
-## 8. Controlled update preflight
+## 9. Controlled update preflight
 
 Run the controlled preflight.
 
@@ -208,7 +225,7 @@ Expected:
 
 Record the preflight evidence fingerprint for the test evidence log.
 
-## 9. Controlled update
+## 10. Controlled update
 
 Read the confirmation carefully and submit the explicit update confirmation.
 
@@ -233,7 +250,7 @@ remaining differences = 0
 
 Afterward, re-open the inventory/comparison and confirm the template is current and its content matches current upstream.
 
-## 10. Rollback review
+## 11. Rollback review
 
 Open the template's **Rollback backups** history.
 
@@ -249,7 +266,7 @@ Expected review behavior:
 - a deterministic rollback evidence fingerprint is generated;
 - an invalid artifact cannot be selected.
 
-## 11. Controlled rollback
+## 12. Controlled rollback
 
 Submit the explicit rollback confirmation.
 
@@ -271,10 +288,12 @@ Verify that both artifacts remain available:
 
 The rollback must never be triggered automatically from an update failure.
 
-## 12. Negative/fail-closed tests
+## 13. Negative/fail-closed tests
 
 At minimum, exercise safe negative cases that do not require corrupting production data:
 
+- attempt selected review with no selected checkbox: no write must occur;
+- current/non-update rows must not become selectable through normal UI interaction;
 - open history as a normal administrator: history may be visible, but rollback action must not be offered;
 - open update/rollback write action as a non-super-admin: permission must be denied;
 - leave the explicit confirmation unchecked: write action must be rejected by input validation;
@@ -283,7 +302,7 @@ At minimum, exercise safe negative cases that do not require corrupting producti
 
 Optional filesystem tamper tests should be performed only in the disposable lab. If a stored YAML or manifest is altered, the artifact must become invalid and must not be eligible for rollback.
 
-## 13. Logs and evidence to capture
+## 14. Logs and evidence to capture
 
 For each tested Zabbix generation, record:
 
@@ -293,6 +312,10 @@ PHP version:
 Frontend/web runtime user:
 Module version:
 Module commit/snapshot branch:
+Visible templates:
+Official UUID matches:
+Updates available:
+Selected template IDs/count:
 Requested upstream index:
 Upstream transport state:
 Upstream failure detail (if any):
@@ -314,7 +337,7 @@ Any frontend/PHP errors:
 
 Screenshots are useful for UI evidence, but CLI/log evidence should also be retained for failures.
 
-## 14. Stop conditions
+## 15. Stop conditions
 
 Stop the test and do not perform another configuration write if any of these occurs:
 
@@ -325,11 +348,12 @@ Stop the test and do not perform another configuration write if any of these occ
 - backup artifact integrity fails unexpectedly;
 - the recovery backup does not match the current export;
 - the module offers a write action for conflict/unresolved/local-overwrite state;
+- selected-template review includes IDs that were not selected;
 - frontend logs indicate an ambiguous `configuration.import` result.
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing any next operation. Do not retry automatically.
 
-## 15. Exit criteria for the beta field-validation pass
+## 16. Exit criteria for the beta field-validation pass
 
 The beta can advance beyond initial laboratory status only after both a Zabbix 7.x and a Zabbix 8.x lab have demonstrated, with evidence:
 
@@ -337,6 +361,8 @@ The beta can advance beyond initial laboratory status only after both a Zabbix 7
 module discovery/enable
 inventory
 upstream UUID match
+native checkbox/select-all subset selection
+selected-template review
 comparison
 historical baseline where applicable
 backup creation + verification

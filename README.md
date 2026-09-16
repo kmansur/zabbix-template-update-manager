@@ -6,18 +6,18 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.2**
+Current version: **0.1.0-beta.3**
 
 This version is intended for **laboratory testing**.
 
-- Implementation: ready for laboratory testing.
+- Implementation: ready for continued laboratory testing.
 - Automation validation: must be green for the beta snapshot commit.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.2 fixes runtime version reporting and adds administrator-only upstream transport diagnostics so failures reaching the official index can be distinguished from template-matching failures.
+Beta.3 incorporates the first Zabbix 7.0.30 field findings: it accepts official Zabbix template source paths containing the literal `+` character, keeps path traversal protections intact, and adds native Zabbix checkbox/select-all controls so administrators can choose a subset of official update candidates for review.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.2` after the beta.2 branch is merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.3` after the beta.3 branch is merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -36,6 +36,8 @@ ZTUM currently provides:
 - official-template identification by UUID;
 - installed/upstream vendor-version comparison;
 - official upstream source indexing by Zabbix release line;
+- native Zabbix checkbox/select-all selection of specific update candidates;
+- read-only selected-template review that rebuilds authoritative inventory/upstream/version state for the chosen subset;
 - current-upstream comparison through `configuration.importcompare`;
 - historical official baseline resolution;
 - BASE / LOCAL / UPSTREAM three-way analysis;
@@ -54,6 +56,8 @@ ZTUM currently provides:
 - post-rollback validation;
 - runtime module-version reporting from the repository `VERSION` file;
 - administrator-only diagnostics for upstream index endpoint and PHP HTTP transport capabilities.
+
+The selected-template page is deliberately a review scope in beta.3. It does **not** perform a bulk `configuration.import`. Each selected template still advances through its own comparison, backup verification, fresh preflight and explicit confirmation. A future batch executor must reuse those same per-template gates and stop on the first ambiguous write.
 
 ## Safety model
 
@@ -101,8 +105,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.2
-git checkout -B release/0.1.0-beta.2 origin/release/0.1.0-beta.2
+git fetch origin release/0.1.0-beta.3
+git checkout -B release/0.1.0-beta.3 origin/release/0.1.0-beta.3
 cat VERSION
 git rev-parse HEAD
 ```
@@ -110,7 +114,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.2
+0.1.0-beta.3
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -126,29 +130,35 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.2**, enable the module and open:
+Confirm version **0.1.0-beta.3**, enable the module and open:
 
 ```text
 Data collection → Template updates
 ```
 
-If the upstream index cannot be loaded, an administrator/super administrator should now see an **Upstream diagnostics** table showing the requested index URL, cURL availability, `allow_url_fopen`, OpenSSL availability and a bounded failure detail. This is diagnostic information only; the module still fails closed and does not guess official identity when the repository cannot be reached.
+If the upstream index cannot be loaded, an administrator/super administrator sees an **Upstream diagnostics** table showing the requested index URL, cURL availability, `allow_url_fopen`, OpenSSL availability and a bounded failure detail. The module still fails closed and does not guess official identity when the repository cannot be validated.
+
+When upstream identity and version comparison succeed, checkboxes are shown only on official templates whose upstream vendor version is newer. The header checkbox uses the native Zabbix `CCheckBox` + `checkAll()` pattern. **Review selected updates** sends only those selected template IDs to a bounded, CSRF-protected review action.
 
 For the exact beta test sequence, including update and rollback validation, follow [`docs/lab-test-plan.md`](docs/lab-test-plan.md).
 
 ## High-level workflow
 
 ```text
-installed template
+installed templates
       |
       v
-UUID official identity
+UUID official identity + vendor-version comparison
+      |
+      +--> checkbox/select specific update candidates
+      |             |
+      |             v
+      |      selected-template review
+      |             |
+      +-------------+
       |
       v
-vendor-version comparison
-      |
-      v
-current upstream import preview
+per-template current upstream import preview
       |
       v
 historical BASE resolution
@@ -205,7 +215,9 @@ post-rollback validation
 
 Compact indexes are generated from the canonical Zabbix source repository and record official template UUIDs, source paths, vendor metadata, exact source commit and content fingerprints. Runtime source retrieval is constrained to validated immutable commits and `templates/.../*.yaml` paths.
 
-The module may use a previously validated stale local index when refresh fails. If no validated index is available, upstream identity becomes unavailable instead of being guessed.
+The runtime path validator uses an explicit allow-list suitable for current official source names, including the literal `+` used by some MikroTik model paths. `.` and `..` path segments remain forbidden. The upstream-index workflow now feeds every generated index through the same PHP runtime decoder before publication, so generator/runtime path-policy drift fails CI instead of reaching the lab.
+
+The module may use a previously validated stale local index when refresh fails. If no validated cache exists, upstream identity becomes unavailable instead of being guessed.
 
 ## Documentation
 
@@ -219,6 +231,7 @@ Detailed design and safety documentation is available in:
 - [`docs/controlled-update.md`](docs/controlled-update.md)
 - [`docs/backup-and-rollback.md`](docs/backup-and-rollback.md)
 - [`docs/rollback.md`](docs/rollback.md)
+- [`docs/runtime-validation-notes.md`](docs/runtime-validation-notes.md)
 - [`docs/lab-test-plan.md`](docs/lab-test-plan.md)
 
 ## Development validation
@@ -232,6 +245,7 @@ VERSION ↔ manifest version consistency
 controlled-write boundary
 PHP unit/contract tests
 upstream-index generator validation
+runtime decoder validation of generated upstream indexes before publication
 ```
 
 Local equivalent:

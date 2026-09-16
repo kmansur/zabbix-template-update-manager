@@ -76,8 +76,26 @@ $versionTable = (new CTableInfo())
 		$data['version_summary']['not_applicable']
 	]);
 
+$selectionForm = null;
+$selectAllHeader = '';
+if ($data['can_compare']) {
+	$selectionForm = (new CForm())
+		->addItem((new CVar(
+			CSRF_TOKEN_NAME,
+			CCsrfTokenHelper::get('ztum.templates.review_selected')
+		))->removeId())
+		->setId('ztum-template-list')
+		->setName('ztum_template_list');
+
+	$selectAllHeader = (new CColHeader(
+		(new CCheckBox('all_templates'))
+			->onClick("checkAll('".$selectionForm->getName()."', 'all_templates', 'templateids');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH);
+}
+
 $templateTable = (new CTableInfo())
 	->setHeader([
+		$selectAllHeader,
 		_('Template'),
 		_('Vendor'),
 		_('Installed version'),
@@ -86,7 +104,7 @@ $templateTable = (new CTableInfo())
 		_('Upstream identity'),
 		_('Template groups'),
 		_('Linked hosts'),
-		_('Update preflight'),
+		_('Update review'),
 		_('Rollback backups'),
 		_('UUID')
 	]);
@@ -97,29 +115,24 @@ foreach ($data['templates'] as $template) {
 		$templateName .= ' ('.$template['technical_name'].')';
 	}
 
+	$compareUrl = (new CUrl('zabbix.php'))
+		->setArgument('action', 'ztum.template.compare')
+		->setArgument('templateid', $template['templateid']);
+
 	$templateCell = $templateName;
 	if ($data['can_compare'] && ($template['upstream_status'] ?? null) === 'official_match') {
-		$compareUrl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'ztum.template.compare')
-			->setArgument('templateid', $template['templateid']);
 		$templateCell = new CLink($templateName, $compareUrl);
 	}
 
-	$preflightCell = '—';
-	if ($data['can_compare']
-			&& ($template['upstream_status'] ?? null) === 'official_match'
-			&& ($template['version_status'] ?? null) === 'update_available') {
-		$preflightAction = (new CUrl('zabbix.php'))
-			->setArgument('action', 'ztum.template.preflight')
-			->getUrl();
-		$preflightCell = (new CForm('post'))
-			->setAction($preflightAction)
-			->addItem([
-				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.preflight')))->removeId(),
-				(new CVar('templateid', (string) $template['templateid']))->removeId(),
-				new CSubmitButton(_('Run'))
-			]);
-	}
+	$selectionEligible = $data['can_compare']
+		&& ($template['upstream_status'] ?? null) === 'official_match'
+		&& ($template['version_status'] ?? null) === 'update_available';
+
+	$selectionCell = $selectionEligible
+		? new CCheckBox('templateids['.$template['templateid'].']', $template['templateid'])
+		: '';
+
+	$reviewCell = $selectionEligible ? new CLink(_('Review'), $compareUrl) : '—';
 
 	$backupCell = '—';
 	if ($data['can_compare']) {
@@ -130,6 +143,7 @@ foreach ($data['templates'] as $template) {
 	}
 
 	$templateTable->addRow([
+		$selectionCell,
 		$templateCell,
 		$template['vendor_name'] !== '' ? $template['vendor_name'] : '—',
 		$template['vendor_version'] !== '' ? $template['vendor_version'] : '—',
@@ -138,9 +152,22 @@ foreach ($data['templates'] as $template) {
 		$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
 		$template['groups'] !== [] ? implode(', ', $template['groups']) : '—',
 		$template['host_count'],
-		$preflightCell,
+		$reviewCell,
 		$backupCell,
 		$template['uuid'] !== '' ? $template['uuid'] : '—'
+	]);
+}
+
+if ($selectionForm !== null) {
+	$selectionForm->addItem([
+		$templateTable,
+		new CActionButtonList('action', 'templateids', [
+			'ztum.templates.review_selected' => [
+				'content' => (new CSimpleButton(_('Review selected updates')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-no-chkbxrange')
+			]
+		], 'ztum_selected_templates')
 	]);
 }
 
@@ -225,11 +252,16 @@ $page
 
 if ($data['can_compare']) {
 	$page->addItem(new CTag('p', true, _(
-		'For templates with an official UUID match, select the template name to run a content comparison. For an outdated official template, the preflight action independently recomputes the safety evidence and remains blocked until rollback verification is complete.'
+		'Checkboxes are shown only for official templates with an available vendor-version update. Select only the templates you want to advance into review. Selection never bypasses per-template comparison, backup, preflight or confirmation gates.'
 	)));
 }
 
-$page
-	->addItem(new CTag('h4', true, _('Visible templates')))
-	->addItem($templateTable)
-	->show();
+$page->addItem(new CTag('h4', true, _('Visible templates')));
+if ($selectionForm !== null) {
+	$page->addItem($selectionForm);
+}
+else {
+	$page->addItem($templateTable);
+}
+
+$page->show();

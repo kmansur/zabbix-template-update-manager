@@ -131,7 +131,9 @@ final class UpstreamIndexRepository {
 			}
 			foreach ($paths as $path) {
 				if (!self::isValidTemplatePath($path)) {
-					throw new RuntimeException('The upstream index contains an invalid source path.');
+					throw new RuntimeException(
+						'The upstream index contains an invalid source path: '.self::summarizePath($path)
+					);
 				}
 			}
 
@@ -151,7 +153,7 @@ final class UpstreamIndexRepository {
 
 	public static function isValidTemplatePath($path): bool {
 		if (!is_string($path)
-				|| preg_match('#^templates/(?:[A-Za-z0-9._-]+/)*[A-Za-z0-9._-]+\.yaml$#D', $path) !== 1) {
+				|| preg_match('#^templates/(?:[A-Za-z0-9._+-]+/)*[A-Za-z0-9._+-]+\.yaml$#D', $path) !== 1) {
 			return false;
 		}
 
@@ -162,6 +164,15 @@ final class UpstreamIndexRepository {
 		}
 
 		return true;
+	}
+
+	private static function summarizePath($path): string {
+		if (!is_string($path)) {
+			return '<non-string>';
+		}
+
+		$path = preg_replace('/[\x00-\x1F\x7F]+/', '?', $path) ?? '';
+		return strlen($path) > 220 ? substr($path, 0, 220).'…' : $path;
 	}
 
 	private function cacheFile(string $line): string {

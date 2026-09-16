@@ -4,6 +4,36 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.3] - 2026-09-15
+
+### Added
+
+- Native Zabbix `CCheckBox` row selection for official templates with an available upstream vendor-version update.
+- Native select-all behavior using the same `checkAll()` pattern used by Zabbix list views.
+- `Review selected updates` action using `CActionButtonList` and a CSRF-protected bounded selected-template review controller.
+- Read-only selected-template review page that rebuilds inventory, upstream identity and vendor-version state for only the explicitly selected subset.
+- Runtime validation notes promoted from the Zabbix 7.0.30 field pass.
+- Generated-index validation through the same PHP runtime decoder before the upstream-index workflow may publish indexes.
+
+### Fixed
+
+- Runtime upstream-index validation now accepts the literal `+` character used by official MikroTik source paths such as `mikrotik_CRS305-1G-4S+IN_snmp`, while continuing to reject `.` / `..` traversal segments and paths outside `templates/.../*.yaml`.
+- Invalid upstream paths now include a bounded sanitized path value in diagnostics, making future generator/runtime mismatches actionable in the lab.
+
+### Changed
+
+- The inventory's per-row `Update preflight` form was replaced by an `Update review` link so the table can use one native Zabbix selection form without invalid nested forms.
+- Selection is intentionally a review scope in beta.3. Bulk `configuration.import` is not performed; every selected template still uses its own backup, preflight, explicit confirmation and single approved import boundary.
+- Upstream index CI is triggered when runtime index-validation code changes and uses the packaged VERSION in canonical endpoint smoke tests.
+
+### Test-release status
+
+- Zabbix 7.0.30 local inventory is field-validated with 303 visible templates in the first lab environment.
+- Beta.3 must confirm that the 7.0 upstream index now validates and UUID/version summaries populate.
+- Native selected-template checkbox behavior must be field-validated on Zabbix 7.0.30 before batch execution work is enabled.
+- Zabbix 8.x runtime validation remains pending.
+- Production use is not recommended.
+
 ## [0.1.0-beta.2] - 2026-09-15
 
 ### Added
@@ -22,7 +52,7 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 ### Test-release status
 
 - First Zabbix 7.x runtime inventory pass observed successfully.
-- Upstream index retrieval still requires runtime validation; beta.2 adds diagnostics specifically for this stage.
+- The beta.2 upstream request reached and downloaded the index, but runtime validation rejected an official source path containing `+`; this is fixed in beta.3.
 - Zabbix 8.x runtime validation remains pending.
 - Production use is not recommended.
 

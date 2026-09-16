@@ -57,6 +57,7 @@ foreach ($expected as $key => $value) {
 
 $expectedActions = [
 	'ztum.templates' => ['class' => 'TemplateList', 'view' => 'template.list'],
+	'ztum.templates.review_selected' => ['class' => 'TemplateSelectionReview', 'view' => 'template.selection.review'],
 	'ztum.template.compare' => ['class' => 'TemplateCompare', 'view' => 'template.compare'],
 	'ztum.template.backup' => ['class' => 'TemplateBackup'],
 	'ztum.template.backups' => ['class' => 'TemplateBackupList', 'view' => 'template.backup.list'],
@@ -94,6 +95,8 @@ $requiredFiles = [
 	$root.'/Module.php',
 	$root.'/actions/TemplateList.php',
 	$root.'/views/template.list.php',
+	$root.'/actions/TemplateSelectionReview.php',
+	$root.'/views/template.selection.review.php',
 	$root.'/actions/TemplateCompare.php',
 	$root.'/views/template.compare.php',
 	$root.'/actions/TemplateBackup.php',
