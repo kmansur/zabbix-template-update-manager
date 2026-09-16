@@ -26,15 +26,16 @@ require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
  */
 class TemplateSelectionReview extends CController {
 
-	private const MAX_SELECTED_TEMPLATES = 100;
+	private const MAX_SELECTED_TEMPLATES = 25;
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput([
 			'templateids' => 'required|array_id'
 		]);
 
-		if ($ret && count($this->getInput('templateids', [])) > self::MAX_SELECTED_TEMPLATES) {
-			$ret = false;
+		if ($ret) {
+			$count = count(array_unique(array_map('strval', $this->getInput('templateids', []))));
+			$ret = $count >= 1 && $count <= self::MAX_SELECTED_TEMPLATES;
 		}
 
 		if (!$ret) {
@@ -59,6 +60,7 @@ class TemplateSelectionReview extends CController {
 			'zabbix_version' => ZabbixVersion::current(),
 			'selected_count' => count($selectedIds),
 			'templates' => [],
+			'can_prepare' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
 			'error' => null
 		];
 
