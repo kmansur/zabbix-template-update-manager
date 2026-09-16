@@ -21,12 +21,13 @@ require_once dirname(__DIR__).'/src/Service/UpstreamMatcher.php';
 require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
 
 /**
- * Rebuilds inventory/upstream/version state for a bounded set of explicitly
- * selected templates. This action is review-only and never imports config.
+ * Rebuilds inventory/upstream/version state for an explicitly selected review
+ * set. Review may be broad; controlled batch preparation remains bounded to 25.
  */
 class TemplateSelectionReview extends CController {
 
-	private const MAX_SELECTED_TEMPLATES = 25;
+	private const MAX_SELECTED_TEMPLATES = 500;
+	private const BATCH_PREPARE_LIMIT = 25;
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput([
@@ -54,13 +55,16 @@ class TemplateSelectionReview extends CController {
 			'strval',
 			$this->getInput('templateids', [])
 		)));
+		$selectedCount = count($selectedIds);
 
 		$data = [
 			'title' => _('Selected template updates'),
 			'zabbix_version' => ZabbixVersion::current(),
-			'selected_count' => count($selectedIds),
+			'selected_count' => $selectedCount,
+			'batch_prepare_limit' => self::BATCH_PREPARE_LIMIT,
 			'templates' => [],
-			'can_prepare' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
+			'can_prepare' => $this->getUserType() === USER_TYPE_SUPER_ADMIN
+				&& $selectedCount <= self::BATCH_PREPARE_LIMIT,
 			'error' => null
 		];
 
