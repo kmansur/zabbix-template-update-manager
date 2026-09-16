@@ -73,7 +73,11 @@ final class ImportCompareEntityExtractor {
 					$entityPath = $parentPath.'/'.(string) $entityType.':'.$identity['token'];
 
 					if (array_key_exists($entityPath, $entities)) {
-						throw new RuntimeException('The import comparison contains an ambiguous entity identity.');
+						throw new RuntimeException(sprintf(
+							'The import comparison contains an ambiguous %s identity (%s).',
+							(string) $entityType,
+							$identity['label']
+						));
 					}
 
 					$entities[$entityPath] = [
@@ -113,7 +117,12 @@ final class ImportCompareEntityExtractor {
 	}
 
 	private static function identity(string $entityType, ?array $before, ?array $after, int $ordinal): array {
-		$source = $after ?? $before ?? [];
+		// For updated entities, LOCAL (before) is the stable pivot shared by both
+		// historical and current comparisons. Added entities naturally fall back
+		// to the after state.
+		$source = $before ?? $after ?? [];
+		$other = $after ?? [];
+
 		$uuid = self::normalizeUuid((string) ($source['uuid'] ?? ''));
 		if (preg_match('/^[a-f0-9]{32}$/', $uuid)) {
 			return [
@@ -123,7 +132,6 @@ final class ImportCompareEntityExtractor {
 			];
 		}
 
-		$other = $before ?? [];
 		$uuid = self::normalizeUuid((string) ($other['uuid'] ?? ''));
 		if (preg_match('/^[a-f0-9]{32}$/', $uuid)) {
 			return [
@@ -133,18 +141,7 @@ final class ImportCompareEntityExtractor {
 			];
 		}
 
-		$fields = self::FALLBACK_IDENTITY_FIELDS[$entityType] ?? [];
-		$values = [];
-		foreach ($fields as $field) {
-			$value = $source[$field] ?? $other[$field] ?? null;
-			if (is_scalar($value) || $value === null) {
-				$values[$field] = (string) $value;
-			}
-			else {
-				$values[$field] = self::canonicalJson($value);
-			}
-		}
-
+		$values = self::fallbackIdentityValues($entityType, $source, $other);
 		if ($values !== [] && count(array_filter($values, static fn(string $value): bool => $value !== '')) > 0) {
 			return [
 				'token' => 'key-'.substr(hash('sha256', self::canonicalJson([$entityType, $values])), 0, 24),
@@ -158,6 +155,63 @@ final class ImportCompareEntityExtractor {
 			'label' => $entityType,
 			'reliable' => false
 		];
+	}
+
+	private static function fallbackIdentityValues(string $entityType, array $source, array $other): array {
+		$fields = self::FALLBACK_IDENTITY_FIELDS[$entityType] ?? [];
+		$values = [];
+
+		foreach ($fields as $field) {
+			$value = $source[$field] ?? $other[$field] ?? null;
+			if (is_scalar($value) || $value === null) {
+				$values[$field] = (string) $value;
+			}
+			else {
+				$values[$field] = self::canonicalJson($value);
+			}
+		}
+
+		// Zabbix 7.x/8.x importcompare does not identify graphs by name alone.
+		// Its uniqueness rule also incorporates the host values referenced by
+		// graph_items[].item.host. Mirroring that here prevents valid same-name
+		// graph/graph-prototype records from collapsing into one local identity.
+		if (in_array($entityType, ['graphs', 'graph_prototypes'], true)) {
+			$graphHosts = self::graphItemHosts($source);
+			if ($graphHosts === []) {
+				$graphHosts = self::graphItemHosts($other);
+			}
+			if ($graphHosts !== []) {
+				$values['graph_item_hosts'] = self::canonicalJson($graphHosts);
+			}
+		}
+
+		return $values;
+	}
+
+	private static function graphItemHosts(array $snapshot): array {
+		$graphItems = $snapshot['graph_items'] ?? [];
+		if (!is_array($graphItems)) {
+			return [];
+		}
+
+		$hosts = [];
+		foreach ($graphItems as $graphItem) {
+			if (!is_array($graphItem)) {
+				continue;
+			}
+			$item = $graphItem['item'] ?? null;
+			if (!is_array($item)) {
+				continue;
+			}
+			$host = trim((string) ($item['host'] ?? ''));
+			if ($host !== '') {
+				$hosts[$host] = true;
+			}
+		}
+
+		$hosts = array_keys($hosts);
+		sort($hosts, SORT_STRING);
+		return $hosts;
 	}
 
 	private static function displayLabel(array $snapshot, string $fallback): string {
