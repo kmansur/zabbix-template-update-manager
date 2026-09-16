@@ -1,9 +1,7 @@
 <?php
 
-use Modules\ZabbixTemplateUpdateManager\Service\ImportCompareEntityExtractor;
 use Modules\ZabbixTemplateUpdateManager\Service\ThreeWayChangeAnalyzer;
 
-require_once dirname(__DIR__, 2).'/src/Service/ImportCompareEntityExtractor.php';
 require_once dirname(__DIR__, 2).'/src/Service/ThreeWayChangeAnalyzer.php';
 
 function assertThreeWay($expected, $actual, string $message): void {
