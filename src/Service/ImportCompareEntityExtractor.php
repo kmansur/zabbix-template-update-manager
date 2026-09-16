@@ -35,12 +35,17 @@ final class ImportCompareEntityExtractor {
 
 	public static function extract(array $diff): array {
 		$entities = [];
-		self::walkContainer($diff, '', $entities);
+		self::walkContainer($diff, '', $entities, true);
 		ksort($entities, SORT_STRING);
 		return $entities;
 	}
 
-	private static function walkContainer(array $container, string $parentPath, array &$entities): void {
+	private static function walkContainer(
+		array $container,
+		string $parentPath,
+		array &$entities,
+		bool $parentReliable
+	): void {
 		foreach ($container as $entityType => $changeBlock) {
 			if ($entityType === 'before' || $entityType === 'after' || !is_array($changeBlock)) {
 				continue;
@@ -65,11 +70,39 @@ final class ImportCompareEntityExtractor {
 					$before = $beforeExists ? self::snapshot($entityDiff['before']) : null;
 					$after = $afterExists ? self::snapshot($entityDiff['after']) : null;
 
+					/*
+					 * Zabbix compareByStructure() intentionally removes direct before/after
+					 * state from an updated structured entity when only one of its nested
+					 * children changed. The node then acts only as a structural wrapper.
+					 *
+					 * There is no authoritative identity left in that wrapper, so recurse
+					 * through it using a deterministic scope and downgrade descendant
+					 * identity reliability. This preserves the useful native diff while
+					 * keeping readiness fail-closed instead of aborting the entire analysis.
+					 */
 					if (!$beforeExists && !$afterExists) {
-						throw new RuntimeException('The import comparison entity has neither before nor after state.');
+						if (!self::hasNestedChangeBlock($entityDiff)) {
+							throw new RuntimeException(
+								'The import comparison entity has neither before/after state nor nested changes.'
+							);
+						}
+
+						$scopePath = $parentPath.'/'.(string) $entityType
+							.':structural-'.(string) $operation.'-'.(int) $ordinal;
+						self::walkContainer($entityDiff, $scopePath, $entities, false);
+						continue;
 					}
 
 					$identity = self::identity((string) $entityType, $before, $after, (int) $ordinal);
+					$identityReliable = $identity['reliable'] && $parentReliable;
+					$identityIssue = null;
+					if (!$parentReliable) {
+						$identityIssue = 'unresolved_parent_identity';
+					}
+					elseif (!$identity['reliable']) {
+						$identityIssue = 'unresolved_identity';
+					}
+
 					$entityPath = $parentPath.'/'.(string) $entityType.':'.$identity['token'];
 					$record = [
 						'path' => $entityPath,
@@ -77,8 +110,8 @@ final class ImportCompareEntityExtractor {
 						'entity_type' => (string) $entityType,
 						'identity' => $identity['token'],
 						'label' => $identity['label'],
-						'identity_reliable' => $identity['reliable'],
-						'identity_issue' => $identity['reliable'] ? null : 'unresolved_identity',
+						'identity_reliable' => $identityReliable,
+						'identity_issue' => $identityIssue,
 						'operation' => $operation,
 						'before_exists' => $beforeExists,
 						'after_exists' => $afterExists,
@@ -95,7 +128,8 @@ final class ImportCompareEntityExtractor {
 						(int) $ordinal
 					);
 
-					self::walkContainer($entityDiff, $storedPath, $entities);
+					$storedReliable = (bool) ($entities[$storedPath]['identity_reliable'] ?? false);
+					self::walkContainer($entityDiff, $storedPath, $entities, $storedReliable);
 				}
 			}
 		}
@@ -126,6 +160,7 @@ final class ImportCompareEntityExtractor {
 
 		$entities[$entityPath]['identity_reliable'] = false;
 		$entities[$entityPath]['identity_issue'] = 'ambiguous_identity';
+		self::markDescendantsUnreliable($entities, $entityPath, 'ambiguous_parent_identity');
 
 		$fingerprint = substr(hash('sha256', self::canonicalJson([
 			$entityType,
@@ -147,6 +182,35 @@ final class ImportCompareEntityExtractor {
 		$entities[$collisionPath] = $record;
 
 		return $collisionPath;
+	}
+
+	private static function markDescendantsUnreliable(array &$entities, string $parentPath, string $issue): void {
+		$prefix = $parentPath.'/';
+		foreach ($entities as &$entity) {
+			$path = (string) ($entity['path'] ?? '');
+			if (!str_starts_with($path, $prefix)) {
+				continue;
+			}
+
+			$entity['identity_reliable'] = false;
+			if (($entity['identity_issue'] ?? null) === null) {
+				$entity['identity_issue'] = $issue;
+			}
+		}
+		unset($entity);
+	}
+
+	private static function hasNestedChangeBlock(array $entityDiff): bool {
+		foreach ($entityDiff as $key => $value) {
+			if ($key === 'before' || $key === 'after' || !is_array($value)) {
+				continue;
+			}
+			if (self::isChangeBlock($value)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private static function isChangeBlock(array $value): bool {
