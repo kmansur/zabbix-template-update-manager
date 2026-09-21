@@ -88,6 +88,14 @@ final class TemplateUpdatePreflightService {
 			return $result;
 		}
 
+		if ($readinessStatus === 'review_backup_verified'
+				&& (!$manualRequired || $manualReasons === [])) {
+			$result['status'] = 'blocked_readiness';
+			$result['next_step'] = 'resolve_readiness';
+			$result['reason'] = 'invalid_manual_review_evidence';
+			return $result;
+		}
+
 		if ($readinessStatus === 'review_backup_verified' && !$manualOverride) {
 			$result['status'] = 'blocked_readiness';
 			$result['next_step'] = 'confirm_manual_review';
