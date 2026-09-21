@@ -18,13 +18,13 @@ A template reaches the controlled update path only after all of these gates succ
 6. LOCAL -> BASE comparison is available;
 7. BASE / LOCAL / UPSTREAM three-way identities are fully resolved;
 8. no three-way conflict exists;
-9. no known local-only customization would be overwritten;
-10. technical risk is `none` or `low` for the automatic path;
-11. a persistent rollback artifact has been created;
-12. the newest rollback artifact exactly matches a fresh `configuration.export` of LOCAL;
-13. fresh update preflight passes.
+9. a persistent rollback artifact has been created;
+10. the newest rollback artifact exactly matches a fresh `configuration.export` of LOCAL;
+11. fresh update preflight passes.
 
-Medium/high technical-risk changes remain manual-review states and do not automatically reach backup/update eligibility.
+The standard path still requires no local-overwrite condition and `none`/`low` technical risk.
+
+Beta.10 also provides a separate **explicit reviewed path** when all identities and baseline evidence are authoritative and no three-way conflict exists, but a known LOCAL-only difference would be overwritten/removed and/or technical risk is `medium`/`high`. The reviewed reasons are bound into the preflight evidence and require a second explicit super-administrator checkbox immediately before import. This path is never promoted to unattended batch `Ready`.
 
 ## Permission and request boundary
 
@@ -41,6 +41,7 @@ Requirements:
 - `USER_TYPE_SUPER_ADMIN` only;
 - numeric `templateid`;
 - explicit confirmation checkbox;
+- for reviewed override mode, a second explicit acknowledgement checkbox accepting the bound local-overwrite/technical-risk reasons;
 - evidence SHA-256 from the immediately preceding reviewed preflight page.
 
 The frontend controller does not call the Zabbix import API directly. It delegates to `TemplateControlledUpdateService`.
@@ -69,7 +70,9 @@ Bound evidence includes:
 - upstream visible/technical names and vendor name;
 - verified rollback SHA-256;
 - fresh current-export SHA-256;
-- direct linked-host count.
+- direct linked-host count;
+- whether reviewed override mode is active;
+- the exact reviewed override reasons.
 
 ## Candidate reconstruction
 
