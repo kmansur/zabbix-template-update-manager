@@ -6,9 +6,13 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
  * Evaluates whether an official template update has enough proven comparison
  * evidence to advance through review, backup and controlled preflight.
  *
+ * Hard blockers (missing/ambiguous baseline, unresolved identities or real
+ * BASE/LOCAL/UPSTREAM conflicts) remain fail-closed. Known local-overwrite
+ * differences and medium/high technical risk can enter an explicitly reviewed
+ * manual path, but only after a verified rollback backup and a second explicit
+ * acknowledgement in the controlled update confirmation.
+ *
  * This evaluator never authorizes a configuration write by itself.
- * write_enabled remains false even at backup_verified; the separate preflight
- * and controlled-update services must still rerun and bind fresh evidence.
  */
 final class UpdateReadinessEvaluator {
 
@@ -25,6 +29,8 @@ final class UpdateReadinessEvaluator {
 			'next_step' => 'none',
 			'candidate_for_backup' => false,
 			'backup_verified' => false,
+			'manual_confirmation_required' => false,
+			'manual_reasons' => [],
 			'write_enabled' => false,
 			'blockers' => [],
 			'review_flags' => [],
@@ -70,15 +76,6 @@ final class UpdateReadinessEvaluator {
 			return self::blocked($result, 'blocked_conflict', 'resolve_conflicts', 'three_way_conflict');
 		}
 
-		if ((int) ($threeWaySummary['local_only_overwrite'] ?? 0) > 0) {
-			return self::blocked(
-				$result,
-				'blocked_local_overwrite',
-				'protect_local_customizations',
-				'local_customization_overwrite'
-			);
-		}
-
 		if (!is_array($updateRisk)) {
 			return self::blocked($result, 'blocked_unresolved', 'resolve_risk_analysis', 'risk_unavailable');
 		}
@@ -95,21 +92,39 @@ final class UpdateReadinessEvaluator {
 			return self::blocked($result, 'blocked_unresolved', 'resolve_risk_analysis', 'risk_unknown');
 		}
 
+		$manualReasons = [];
+		if ((int) ($threeWaySummary['local_only_overwrite'] ?? 0) > 0) {
+			$manualReasons[] = 'local_customization_overwrite';
+		}
 		if ($riskLevel === 'high') {
-			$result['status'] = 'review_high';
-			$result['next_step'] = 'manual_high_risk_review';
-			$result['review_flags'][] = 'high_technical_risk';
+			$manualReasons[] = 'high_technical_risk';
+		}
+		elseif ($riskLevel === 'medium') {
+			$manualReasons[] = 'medium_technical_risk';
+		}
+
+		if ($manualReasons !== []) {
+			$result['manual_confirmation_required'] = true;
+			$result['manual_reasons'] = $manualReasons;
+			$result['review_flags'] = $manualReasons;
+
+			if (is_array($backupVerification)
+					&& ($backupVerification['status'] ?? null) === 'current_match'
+					&& !empty($backupVerification['current_match'])) {
+				$result['status'] = 'review_backup_verified';
+				$result['next_step'] = 'run_manual_preflight';
+				$result['backup_verified'] = true;
+				return $result;
+			}
+
+			$result['status'] = 'review_required';
+			$result['next_step'] = 'create_and_verify_backup';
+			$result['candidate_for_backup'] = true;
 			return $result;
 		}
 
-		if ($riskLevel === 'medium') {
-			$result['status'] = 'review_medium';
-			$result['next_step'] = 'manual_change_review';
-			$result['review_flags'][] = 'medium_technical_risk';
-			return $result;
-		}
-
-		if (is_array($backupVerification) && ($backupVerification['status'] ?? null) === 'current_match'
+		if (is_array($backupVerification)
+				&& ($backupVerification['status'] ?? null) === 'current_match'
 				&& !empty($backupVerification['current_match'])) {
 			$result['status'] = 'backup_verified';
 			$result['next_step'] = 'run_controlled_preflight';
