@@ -2,13 +2,15 @@
 
 namespace Modules\ZabbixTemplateUpdateManager\Repository;
 
+use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
 use RuntimeException;
 use Throwable;
+
+require_once dirname(__DIR__).'/Support/ProjectVersion.php';
 
 final class UpstreamTemplateSourceRepository {
 
 	private const BASE_URL = 'https://git.zabbix.com/projects/ZBX/repos/zabbix/raw/';
-	private const USER_AGENT = 'Zabbix-Template-Update-Manager/0.1.0-dev';
 	private const MAX_SOURCE_BYTES = 10485760;
 
 	public function fetch(array $indexSource, array $upstreamTemplate): array {
@@ -124,7 +126,7 @@ final class UpstreamTemplateSourceRepository {
 				'method' => 'GET',
 				'timeout' => 15,
 				'follow_location' => 0,
-				'header' => 'User-Agent: '.self::USER_AGENT."\r\n"
+				'header' => 'User-Agent: '.ProjectVersion::userAgent()."\r\n"
 			],
 			'ssl' => [
 				'verify_peer' => true,
@@ -157,7 +159,7 @@ final class UpstreamTemplateSourceRepository {
 			CURLOPT_MAXREDIRS => 3,
 			CURLOPT_CONNECTTIMEOUT => 5,
 			CURLOPT_TIMEOUT => 15,
-			CURLOPT_USERAGENT => self::USER_AGENT,
+			CURLOPT_USERAGENT => ProjectVersion::userAgent(),
 			CURLOPT_SSL_VERIFYPEER => true,
 			CURLOPT_SSL_VERIFYHOST => 2,
 			CURLOPT_WRITEFUNCTION => static function ($handle, string $chunk) use (&$content, &$tooLarge): int {

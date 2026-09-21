@@ -3,12 +3,14 @@
 namespace Modules\ZabbixTemplateUpdateManager\Repository;
 
 use JsonException;
+use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
 use RuntimeException;
+
+require_once dirname(__DIR__).'/Support/ProjectVersion.php';
 
 final class UpstreamTemplateHistoryRepository {
 
 	private const BASE_URL = 'https://git.zabbix.com/rest/api/1.0/projects/ZBX/repos/zabbix/commits';
-	private const USER_AGENT = 'Zabbix-Template-Update-Manager/0.1.0-dev';
 	private const PAGE_SIZE = 25;
 	private const MAX_COMMITS = 75;
 	private const MAX_RESPONSE_BYTES = 2097152;
@@ -151,7 +153,7 @@ final class UpstreamTemplateHistoryRepository {
 				CURLOPT_MAXREDIRS => 3,
 				CURLOPT_CONNECTTIMEOUT => 5,
 				CURLOPT_TIMEOUT => 15,
-				CURLOPT_USERAGENT => self::USER_AGENT,
+				CURLOPT_USERAGENT => ProjectVersion::userAgent(),
 				CURLOPT_SSL_VERIFYPEER => true,
 				CURLOPT_SSL_VERIFYHOST => 2,
 				CURLOPT_WRITEFUNCTION => static function ($handle, string $chunk) use (&$content, &$tooLarge): int {
@@ -192,7 +194,7 @@ final class UpstreamTemplateHistoryRepository {
 				'method' => 'GET',
 				'timeout' => 15,
 				'follow_location' => 0,
-				'header' => 'User-Agent: '.self::USER_AGENT."\r\n"
+				'header' => 'User-Agent: '.ProjectVersion::userAgent()."\r\n"
 			],
 			'ssl' => [
 				'verify_peer' => true,
