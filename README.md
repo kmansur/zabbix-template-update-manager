@@ -17,7 +17,7 @@ This version is intended for **laboratory testing**.
 
 Beta.11 fixes the controlled-update upstream fingerprint contract discovered during Zabbix 7.x field testing. Generated indexes now bind each YAML path to the SHA-256 of its exact raw bytes while retaining the canonical per-template content fingerprint separately. Fresh preflight binds both values and the write path re-fetches the immutable commit/path and verifies the raw source fingerprint before parsing or calling the single controlled import boundary. The explicit reviewed-update path introduced in beta.10 remains available with the same rollback and acknowledgement requirements.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.11` after the beta.10 branch is merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.11` after the beta.11 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
