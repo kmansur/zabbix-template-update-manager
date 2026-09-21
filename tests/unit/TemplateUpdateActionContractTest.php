@@ -35,6 +35,12 @@ assertTemplateUpdateContract(
 	'Controlled update action must require template ID, evidence fingerprint and explicit confirmation.'
 );
 assertTemplateUpdateContract(
+	strpos($action, "'manual_override' => 'in 1'") !== false
+		&& strpos($action, "'confirm_manual_override' => 'in 1'") !== false
+		&& strpos($preflightView, "new CCheckBox('confirm_manual_override', '1')") !== false,
+	'Reviewed update path must require a second explicit acknowledgement and bind manual override through POST.'
+);
+assertTemplateUpdateContract(
 	strpos($action, 'TemplateControlledUpdateService') !== false,
 	'Controlled update action must delegate write orchestration to TemplateControlledUpdateService.'
 );
