@@ -17,7 +17,7 @@ $analysisRunner = static function (string $templateId) use (&$backupCreated, &$a
 	$analysisCalls[$templateId] = ($analysisCalls[$templateId] ?? 0) + 1;
 	$status = match ($templateId) {
 		'101' => isset($backupCreated[$templateId]) ? 'backup_verified' : 'candidate_for_backup',
-		'102' => 'review_medium',
+		'102' => isset($backupCreated[$templateId]) ? 'review_backup_verified' : 'review_required',
 		'103' => 'blocked_conflict',
 		default => 'blocked_unresolved'
 	};
@@ -32,11 +32,20 @@ $analysisRunner = static function (string $templateId) use (&$backupCreated, &$a
 		],
 		'update_readiness' => [
 			'status' => $status,
-			'next_step' => $status === 'candidate_for_backup' ? 'create_and_verify_backup' : 'none',
+			'next_step' => in_array($status, ['candidate_for_backup', 'review_required'], true)
+				? 'create_and_verify_backup'
+				: 'none',
+			'candidate_for_backup' => in_array($status, ['candidate_for_backup', 'review_required'], true),
+			'backup_verified' => in_array($status, ['backup_verified', 'review_backup_verified'], true),
+			'manual_confirmation_required' => in_array($status, ['review_required', 'review_backup_verified'], true),
 			'blockers' => $status === 'blocked_conflict' ? ['three_way_conflict'] : [],
-			'review_flags' => $status === 'review_medium' ? ['medium_technical_risk'] : []
+			'review_flags' => in_array($status, ['review_required', 'review_backup_verified'], true)
+				? ['medium_technical_risk']
+				: []
 		],
-		'backup_verification' => $status === 'backup_verified' ? ['status' => 'current_match'] : null,
+		'backup_verification' => in_array($status, ['backup_verified', 'review_backup_verified'], true)
+			? ['status' => 'current_match']
+			: null,
 		'comparison_error' => null
 	];
 };
@@ -60,8 +69,9 @@ assertBatchPlan(1, $plan['summary']['review'], 'Medium-risk template must requir
 assertBatchPlan(1, $plan['summary']['conflict'], 'Conflict template must be separated.');
 assertBatchPlan(1, $plan['summary']['blocked'], 'Unresolved template must remain blocked.');
 assertBatchPlan(true, isset($backupCreated['101']), 'Candidate-for-backup template must receive a rollback artifact during preparation.');
+assertBatchPlan(true, isset($backupCreated['102']), 'Manual-review candidate may prepare rollback evidence without becoming batch-ready.');
 assertBatchPlan('ready', $plan['items'][0]['category'], 'Prepared and preflighted template must be ready.');
-assertBatchPlan('review', $plan['items'][1]['category'], 'Medium-risk template must classify as review.');
+assertBatchPlan('review', $plan['items'][1]['category'], 'Reviewed manual-update template must remain review-only in batch mode.');
 assertBatchPlan('conflict', $plan['items'][2]['category'], 'Conflict template must classify as conflict.');
 assertBatchPlan('blocked', $plan['items'][3]['category'], 'Unresolved template must classify as blocked.');
 assertBatchPlan(hash('sha256', 'evidence-101'), $plan['items'][0]['evidence_sha256'], 'Ready template must retain fresh preflight evidence.');
