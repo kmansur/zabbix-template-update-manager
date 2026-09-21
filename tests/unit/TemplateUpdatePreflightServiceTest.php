@@ -132,4 +132,31 @@ catch (RuntimeException $exception) {
 }
 assertPreflight(true, $threw, 'Preflight must validate template IDs independently.');
 
+
+$reviewed = $analysis;
+$reviewed['update_readiness'] = [
+	'status' => 'review_backup_verified',
+	'write_enabled' => false,
+	'manual_confirmation_required' => true,
+	'manual_reasons' => ['local_customization_overwrite', 'high_technical_risk']
+];
+$reviewedService = new TemplateUpdatePreflightService(static fn(string $templateId): array => $reviewed);
+$result = $reviewedService->run('12345');
+assertPreflight('blocked_readiness', $result['status'], 'Reviewed update path must not pass without explicit manual override mode.');
+assertPreflight('manual_override_required', $result['reason'], 'Missing manual override must be explicit.');
+
+$result = $reviewedService->run('12345', true);
+assertPreflight('passed', $result['status'], 'Reviewed update path may pass after explicit manual override selection and verified rollback evidence.');
+assertPreflight(true, $result['manual_override'], 'Passing reviewed preflight must bind manual override into evidence.');
+assertPreflight(
+	['local_customization_overwrite', 'high_technical_risk'],
+	$result['manual_reasons'],
+	'Passing reviewed preflight must bind the exact reviewed reasons.'
+);
+assertPreflight(
+	false,
+	hash_equals($service->run('12345')['evidence_sha256'], $result['evidence_sha256']),
+	'Reviewed and standard preflight modes must produce different evidence fingerprints.'
+);
+
 echo "TemplateUpdatePreflightService tests passed.\n";
