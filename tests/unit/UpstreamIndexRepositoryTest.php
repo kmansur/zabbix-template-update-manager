@@ -45,7 +45,11 @@ $valid = json_encode([
 			'vendor_name' => 'Zabbix',
 			'vendor_version' => '7.0-4',
 			'paths' => ['templates/os/linux/template_os_linux.yaml'],
-			'content_sha256s' => [str_repeat('b', 64)]
+			'content_sha256s' => [str_repeat('b', 64)],
+			'sources' => [[
+				'path' => 'templates/os/linux/template_os_linux.yaml',
+				'sha256' => str_repeat('c', 64)
+			]]
 		]
 	]
 ], JSON_UNESCAPED_SLASHES);
@@ -64,6 +68,7 @@ assertUpstreamValue(
 
 $validPlus = json_decode($valid, true);
 $validPlus['templates'][$uuid]['paths'] = [$officialPlusPath];
+$validPlus['templates'][$uuid]['sources'][0]['path'] = $officialPlusPath;
 $decodedPlus = UpstreamIndexRepository::decodeIndex(json_encode($validPlus, JSON_UNESCAPED_SLASHES), '7.0');
 assertUpstreamValue(
 	$officialPlusPath,
@@ -104,6 +109,29 @@ $invalidHash['templates'][$uuid]['content_sha256s'] = ['invalid'];
 assertUpstreamThrows(
 	fn() => UpstreamIndexRepository::decodeIndex(json_encode($invalidHash), '7.0'),
 	'An invalid content hash must be rejected.'
+);
+
+$invalidSourceHash = json_decode($valid, true);
+$invalidSourceHash['templates'][$uuid]['sources'][0]['sha256'] = 'invalid';
+assertUpstreamThrows(
+	fn() => UpstreamIndexRepository::decodeIndex(json_encode($invalidSourceHash), '7.0'),
+	'An invalid raw source hash must be rejected.'
+);
+
+$mismatchedSourcePath = json_decode($valid, true);
+$mismatchedSourcePath['templates'][$uuid]['sources'][0]['path'] = 'templates/os/linux/other.yaml';
+assertUpstreamThrows(
+	fn() => UpstreamIndexRepository::decodeIndex(json_encode($mismatchedSourcePath), '7.0'),
+	'Raw source fingerprints must cover exactly the declared source paths.'
+);
+
+$legacy = json_decode($valid, true);
+unset($legacy['templates'][$uuid]['sources']);
+$decodedLegacy = UpstreamIndexRepository::decodeIndex(json_encode($legacy, JSON_UNESCAPED_SLASHES), '7.0');
+assertUpstreamValue(
+	1,
+	count($decodedLegacy['templates'][$uuid]['paths']),
+	'Legacy indexes without raw source fingerprints must remain readable for non-write analysis.'
 );
 
 echo "UpstreamIndexRepository tests passed.\n";

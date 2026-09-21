@@ -222,7 +222,36 @@ jobs:
             --output /tmp/ztum-upstream-source.yaml
 
           grep -q '^zabbix_export:' /tmp/ztum-upstream-source.yaml
-          echo "Verified canonical raw source at ${commit:0:12}: ${path}"
+
+          expected_source_sha="$(python - <<'PY'
+          import json
+
+          path = 'templates/os/linux/template_os_linux.yaml'
+          with open('build/upstream/7.0.json', encoding='utf-8') as handle:
+              data = json.load(handle)
+
+          matches = []
+          for template in data['templates'].values():
+              for source in template.get('sources', []):
+                  if source.get('path') == path:
+                      matches.append(source.get('sha256'))
+
+          unique = sorted(set(matches))
+          if len(unique) != 1:
+              raise SystemExit(f'expected one raw source fingerprint for {path}, got {unique!r}')
+          print(unique[0])
+          PY
+          )"
+          actual_source_sha="$(sha256sum /tmp/ztum-upstream-source.yaml | awk '{print $1}')"
+
+          if [[ "$actual_source_sha" != "$expected_source_sha" ]]; then
+            echo "Canonical raw source fingerprint mismatch." >&2
+            echo "Expected: $expected_source_sha" >&2
+            echo "Actual:   $actual_source_sha" >&2
+            exit 1
+          fi
+
+          echo "Verified canonical raw source at ${commit:0:12}: ${path} (${actual_source_sha:0:16})"
 
       - name: Verify canonical commit history endpoint
         shell: bash

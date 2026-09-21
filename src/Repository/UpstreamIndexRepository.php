@@ -146,6 +146,38 @@ final class UpstreamIndexRepository {
 					throw new RuntimeException('The upstream index contains an invalid content hash.');
 				}
 			}
+
+			$sources = $template['sources'] ?? null;
+			if ($sources !== null) {
+				if (!is_array($sources) || $sources === []) {
+					throw new RuntimeException('The upstream index contains an invalid source fingerprint map.');
+				}
+
+				$sourcePaths = [];
+				foreach ($sources as $source) {
+					if (!is_array($source)) {
+						throw new RuntimeException('The upstream index contains an invalid source fingerprint record.');
+					}
+					$sourcePath = $source['path'] ?? null;
+					$sourceSha256 = $source['sha256'] ?? null;
+					if (!self::isValidTemplatePath($sourcePath)
+							|| !is_string($sourceSha256)
+							|| !preg_match('/^[a-f0-9]{64}$/', $sourceSha256)) {
+						throw new RuntimeException('The upstream index contains an invalid raw source fingerprint.');
+					}
+					if (isset($sourcePaths[$sourcePath])) {
+						throw new RuntimeException('The upstream index contains a duplicate raw source path.');
+					}
+					$sourcePaths[$sourcePath] = true;
+				}
+
+				$declaredPaths = array_fill_keys($paths, true);
+				ksort($sourcePaths, SORT_STRING);
+				ksort($declaredPaths, SORT_STRING);
+				if ($sourcePaths !== $declaredPaths) {
+					throw new RuntimeException('The upstream index source fingerprints do not match the declared source paths.');
+				}
+			}
 		}
 
 		return $data;

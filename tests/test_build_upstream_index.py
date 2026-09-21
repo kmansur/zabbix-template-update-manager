@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import importlib.util
 import tempfile
 from pathlib import Path
@@ -53,7 +54,17 @@ with tempfile.TemporaryDirectory() as tmp:
         index["templates"][BASE_UUID]["paths"],
         "Template source path mismatch.",
     )
-    assert_equal(1, len(index["templates"][BASE_UUID]["content_sha256s"]), "Expected one content hash.")
+    assert_equal(1, len(index["templates"][BASE_UUID]["content_sha256s"]), "Expected one template content hash.")
+    assert_equal(
+        [
+            {
+                "path": "templates/os/linux/template_os_linux.yaml",
+                "sha256": hashlib.sha256(BASE_TEMPLATE.encode("utf-8")).hexdigest(),
+            }
+        ],
+        index["templates"][BASE_UUID]["sources"],
+        "Raw source fingerprints must bind each path to the exact YAML bytes.",
+    )
 
     duplicate_dir = root / "templates" / "bundle" / "linux"
     duplicate_dir.mkdir(parents=True)
@@ -68,6 +79,7 @@ with tempfile.TemporaryDirectory() as tmp:
     )
     assert_equal(2, len(merged["templates"][BASE_UUID]["paths"]), "Equivalent duplicate UUID paths must be retained.")
     assert_equal(1, len(merged["templates"][BASE_UUID]["content_sha256s"]), "Equivalent duplicate content must collapse to one hash.")
+    assert_equal(2, len(merged["templates"][BASE_UUID]["sources"]), "Every duplicate source path must retain its own raw fingerprint.")
     assert_equal(1, merged["statistics"]["duplicate_uuid_definitions"], "Duplicate UUID statistic mismatch.")
 
     variant_dir = root / "templates" / "variant" / "linux"

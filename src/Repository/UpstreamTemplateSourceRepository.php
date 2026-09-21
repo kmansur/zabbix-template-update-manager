@@ -29,6 +29,30 @@ final class UpstreamTemplateSourceRepository {
 		if (count(array_unique($hashes)) !== 1) {
 			throw new RuntimeException('The upstream template has multiple official content variants.');
 		}
+		$templateContentSha256 = strtolower(trim((string) $hashes[0]));
+
+		$sourceHashes = [];
+		$sources = $upstreamTemplate['sources'] ?? null;
+		if ($sources !== null) {
+			if (!is_array($sources) || $sources === []) {
+				throw new RuntimeException('The upstream template has an invalid raw source fingerprint map.');
+			}
+			foreach ($sources as $source) {
+				if (!is_array($source)) {
+					throw new RuntimeException('The upstream template has an invalid raw source fingerprint record.');
+				}
+				$sourcePath = (string) ($source['path'] ?? '');
+				$sourceSha256 = strtolower(trim((string) ($source['sha256'] ?? '')));
+				if (!UpstreamIndexRepository::isValidTemplatePath($sourcePath)
+						|| !preg_match('/^[a-f0-9]{64}$/', $sourceSha256)) {
+					throw new RuntimeException('The upstream template has an invalid raw source fingerprint.');
+				}
+				if (array_key_exists($sourcePath, $sourceHashes)) {
+					throw new RuntimeException('The upstream template has a duplicate raw source path.');
+				}
+				$sourceHashes[$sourcePath] = $sourceSha256;
+			}
+		}
 
 		$lastException = null;
 		foreach ($paths as $path) {
@@ -37,11 +61,27 @@ final class UpstreamTemplateSourceRepository {
 			}
 
 			try {
-				return $this->fetchAtCommit($commit, $path);
+				$fetched = $this->fetchAtCommit($commit, $path);
 			}
 			catch (Throwable $exception) {
 				$lastException = $exception;
+				continue;
 			}
+
+			$fetched['content_sha256'] = $templateContentSha256;
+			$fetched['source_sha256'] = '';
+			if ($sourceHashes !== []) {
+				if (!isset($sourceHashes[$path])) {
+					throw new RuntimeException('The selected upstream path has no raw source fingerprint.');
+				}
+				$actualSourceSha256 = hash('sha256', $fetched['content']);
+				if (!hash_equals($sourceHashes[$path], $actualSourceSha256)) {
+					throw new RuntimeException('The immutable upstream raw source fingerprint does not match the validated upstream index.');
+				}
+				$fetched['source_sha256'] = $actualSourceSha256;
+			}
+
+			return $fetched;
 		}
 
 		throw new RuntimeException(

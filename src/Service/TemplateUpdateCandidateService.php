@@ -35,6 +35,7 @@ final class TemplateUpdateCandidateService {
 		$candidate = is_array($preflight['candidate'] ?? null) ? $preflight['candidate'] : [];
 		$commit = strtolower(trim((string) ($candidate['commit'] ?? '')));
 		$path = trim((string) ($candidate['path'] ?? ''));
+		$expectedSourceSha256 = strtolower(trim((string) ($candidate['source_sha256'] ?? '')));
 		$expectedContentSha256 = strtolower(trim((string) ($candidate['content_sha256'] ?? '')));
 		$uuid = self::normalizeUuid((string) ($candidate['uuid'] ?? ''));
 		$name = trim((string) ($candidate['name'] ?? ''));
@@ -44,6 +45,7 @@ final class TemplateUpdateCandidateService {
 
 		if (!preg_match('/^[a-f0-9]{40}$/', $commit)
 				|| !self::isSafeTemplatePath($path)
+				|| !preg_match('/^[a-f0-9]{64}$/', $expectedSourceSha256)
 				|| !preg_match('/^[a-f0-9]{64}$/', $expectedContentSha256)
 				|| !preg_match('/^[a-f0-9]{32}$/', $uuid)
 				|| $name === ''
@@ -63,9 +65,9 @@ final class TemplateUpdateCandidateService {
 		}
 
 		$canonicalSource = $fetched['content'];
-		$canonicalSha256 = hash('sha256', $canonicalSource);
-		if (!hash_equals($expectedContentSha256, $canonicalSha256)) {
-			throw new RuntimeException('The immutable upstream source content hash does not match the validated upstream index.');
+		$sourceSha256 = hash('sha256', $canonicalSource);
+		if (!hash_equals($expectedSourceSha256, $sourceSha256)) {
+			throw new RuntimeException('The immutable upstream raw source fingerprint does not match the validated upstream index.');
 		}
 
 		$document = ($this->parser)($canonicalSource);
@@ -93,13 +95,13 @@ final class TemplateUpdateCandidateService {
 		return [
 			'commit' => $commit,
 			'path' => $path,
+			'source_sha256' => $sourceSha256,
 			'content_sha256' => $expectedContentSha256,
 			'uuid' => $uuid,
 			'name' => $name,
 			'technical_name' => $technicalName,
 			'vendor_name' => $vendorName,
 			'vendor_version' => $vendorVersion,
-			'canonical_sha256' => $canonicalSha256,
 			'import_sha256' => hash('sha256', $source),
 			'format' => 'json',
 			'source' => $source
