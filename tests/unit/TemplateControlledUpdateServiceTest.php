@@ -164,4 +164,31 @@ catch (RuntimeException $exception) {
 }
 assertControlledUpdate(true, $threw, 'Controlled update must validate template IDs independently.');
 
+
+$manualSeen = null;
+$manualPreflight = $preflight;
+$manualPreflight['manual_override'] = true;
+$manualPreflight['manual_reasons'] = ['local_customization_overwrite'];
+$manualService = new TemplateControlledUpdateService(
+	static function (string $templateId, bool $manualOverride = false) use ($manualPreflight, &$manualSeen): array {
+		$manualSeen = $manualOverride;
+		return $manualPreflight;
+	},
+	static fn(array $freshPreflight): array => $builtCandidate,
+	static function (array $candidateToImport): void {},
+	static fn(string $templateId, array $candidateToValidate): array => [
+		'status' => 'validated',
+		'valid' => true,
+		'expected_version' => '7.0-8',
+		'installed_version' => '7.0-8',
+		'content_status' => 'matches_current_upstream',
+		'remaining_changes' => 0,
+		'reasons' => []
+	]
+);
+$result = $manualService->execute('12345', $evidence, true);
+assertControlledUpdate(true, $manualSeen, 'Controlled update must rerun fresh preflight in the same explicit manual-review mode.');
+assertControlledUpdate(true, $result['manual_override'], 'Controlled update result must retain reviewed-override mode.');
+assertControlledUpdate(['local_customization_overwrite'], $result['manual_reasons'], 'Controlled update result must retain reviewed reasons.');
+
 echo "TemplateControlledUpdateService tests passed.\n";
