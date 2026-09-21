@@ -12,7 +12,8 @@ function assertPreflight($expected, $actual, string $message): void {
 }
 
 $backupSha = hash('sha256', 'current-template-export');
-$upstreamContentSha = hash('sha256', 'official-upstream-source');
+$upstreamSourceSha = hash('sha256', 'official-upstream-yaml-bytes');
+$upstreamContentSha = hash('sha256', 'canonical-template-content');
 $analysis = [
 	'template' => [
 		'templateid' => '12345',
@@ -27,7 +28,11 @@ $analysis = [
 			'technical_name' => 'Linux by Zabbix agent',
 			'vendor_name' => 'Zabbix',
 			'vendor_version' => '7.0-8',
-			'content_sha256s' => [$upstreamContentSha]
+			'content_sha256s' => [$upstreamContentSha],
+			'sources' => [[
+				'path' => 'templates/os/linux/template_os_linux.yaml',
+				'sha256' => $upstreamSourceSha
+			]]
 		]
 	],
 	'comparison_error' => null,
@@ -64,7 +69,8 @@ assertPreflight('12345', $result['template']['templateid'], 'Preflight must pres
 assertPreflight('f8f7908280354f2abeed07dc788c3747', $result['template']['uuid'], 'Preflight must normalize the template UUID.');
 assertPreflight('0123456789abcdef0123456789abcdef01234567', $result['candidate']['commit'], 'Preflight must bind the exact upstream commit.');
 assertPreflight('templates/os/linux/template_os_linux.yaml', $result['candidate']['path'], 'Preflight must bind the exact upstream path.');
-assertPreflight($upstreamContentSha, $result['candidate']['content_sha256'], 'Preflight must bind the validated upstream content fingerprint.');
+assertPreflight($upstreamSourceSha, $result['candidate']['source_sha256'], 'Preflight must bind the exact raw upstream source fingerprint.');
+assertPreflight($upstreamContentSha, $result['candidate']['content_sha256'], 'Preflight must bind the canonical template content fingerprint.');
 assertPreflight('Zabbix', $result['candidate']['vendor_name'], 'Preflight must bind upstream vendor identity.');
 assertPreflight('Linux by Zabbix agent', $result['candidate']['technical_name'], 'Preflight must bind upstream technical identity.');
 assertPreflight($backupSha, $result['rollback']['sha256'], 'Preflight must bind the verified rollback fingerprint.');
@@ -90,6 +96,11 @@ $missingCandidateIdentity = $analysis;
 $missingCandidateIdentity['template']['upstream']['vendor_name'] = '';
 $result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $missingCandidateIdentity))->run('12345');
 assertPreflight('blocked_candidate', $result['status'], 'Incomplete upstream candidate identity must fail closed.');
+
+$missingSourceFingerprint = $analysis;
+unset($missingSourceFingerprint['template']['upstream']['sources']);
+$result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $missingSourceFingerprint))->run('12345');
+assertPreflight('blocked_candidate', $result['status'], 'Legacy index data without a raw source fingerprint must block controlled update.');
 
 $ambiguousContent = $analysis;
 $ambiguousContent['template']['upstream']['content_sha256s'] = [$upstreamContentSha, hash('sha256', 'variant')];

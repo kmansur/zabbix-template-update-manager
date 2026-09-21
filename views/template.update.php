@@ -62,14 +62,16 @@ if (is_array($result['candidate'] ?? null)) {
 			_('Installed target version'),
 			_('Upstream commit'),
 			_('Source path'),
-			_('Canonical SHA-256'),
+			_('Raw source SHA-256'),
+			_('Template content SHA-256'),
 			_('Import SHA-256')
 		])
 		->addRow([
 			(string) ($candidate['vendor_version'] ?? '—'),
 			isset($candidate['commit']) ? substr((string) $candidate['commit'], 0, 16) : '—',
 			(string) ($candidate['path'] ?? '—'),
-			isset($candidate['canonical_sha256']) ? substr((string) $candidate['canonical_sha256'], 0, 20) : '—',
+			isset($candidate['source_sha256']) ? substr((string) $candidate['source_sha256'], 0, 20) : '—',
+			isset($candidate['content_sha256']) ? substr((string) $candidate['content_sha256'], 0, 20) : '—',
 			isset($candidate['import_sha256']) ? substr((string) $candidate['import_sha256'], 0, 20) : '—'
 		]);
 	$page->addItem(new CTag('h4', true, _('Imported candidate')))->addItem($candidateTable);

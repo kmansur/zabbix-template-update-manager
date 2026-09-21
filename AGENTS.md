@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.1`.
+Current test version: `0.1.0-beta.11`.
 
 ## Non-negotiable rules
 
@@ -69,7 +69,8 @@ Upstream indexes are generated from the official Zabbix source repository and mu
 - template UUID;
 - technical/visible names;
 - vendor metadata;
-- source content SHA-256 fingerprints.
+- canonical per-template content SHA-256 fingerprints;
+- per-path SHA-256 fingerprints for the exact raw YAML source bytes.
 
 Index generation must fail on malformed UUIDs, invalid source hashes or conflicting identity metadata.
 
@@ -81,12 +82,13 @@ A write candidate must be bound to all of the following before update import:
 
 - exact 40-character immutable upstream commit;
 - validated `templates/.../*.yaml` path;
-- one unambiguous validated upstream content SHA-256;
+- one unambiguous validated canonical template-content SHA-256;
+- one validated raw-source SHA-256 bound to the selected YAML path;
 - normalized template UUID;
 - visible and technical template names;
 - vendor name and vendor version.
 
-The immutable source is re-fetched immediately before update import and its SHA-256 must exactly match the upstream index fingerprint.
+The immutable source is re-fetched immediately before update import and the SHA-256 of its exact raw YAML bytes must exactly match the path-specific upstream index fingerprint. The canonical per-template content fingerprint remains separately bound into preflight evidence.
 
 ## UI/UX
 
@@ -152,11 +154,11 @@ The controlled update flow must include all of the following:
 8. persistent rollback backup created;
 9. newest rollback backup revalidated against a fresh installed-template export (`backup_verified`);
 10. fresh server-side preflight;
-11. immutable upstream commit/path/identity/content hash bound into preflight evidence;
+11. immutable upstream commit/path/identity plus separate raw-source and template-content hashes bound into preflight evidence;
 12. explicit super-administrator confirmation through HTTP POST with native CSRF validation;
 13. complete preflight rerun immediately before import;
 14. posted evidence fingerprint must exactly match freshly recomputed evidence;
-15. exact immutable upstream source re-fetched and content SHA-256 revalidated against the index;
+15. exact immutable upstream source re-fetched and raw-source SHA-256 revalidated against the path-specific index fingerprint;
 16. candidate identity revalidated and isolated to one template;
 17. `configuration.import` executed only through `TemplateConfigurationImportService`;
 18. fresh post-import analysis proving the template is current and content matches current upstream with zero remaining comparison differences.

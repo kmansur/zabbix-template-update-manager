@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.4
+# Laboratory test plan — 0.1.0-beta.11
 
 ## Release state
 
@@ -11,7 +11,7 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.4`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.11`. A formal Git tag/GitHub release remains a later publication step.
 
 Beta.4 builds on the successful Zabbix 7.0.30 beta.3 inventory/upstream pass and adds bounded multi-template preparation plus controlled sequential execution. The batch path must never bypass the existing per-template analysis, rollback, fresh preflight, immutable source/hash validation, explicit confirmation and single `configuration.import` boundary.
 
@@ -21,7 +21,7 @@ Use a disposable or otherwise non-production Zabbix environment.
 
 For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications, complete historical/three-way analysis and `none`/`low` technical risk.
 
-Do not begin with a business-critical template or host. Medium/high-risk, conflict, local-overwrite and unresolved templates must not enter the automatic batch execution set.
+Do not begin with a business-critical template or host. Medium/high-risk and local-overwrite candidates may use the explicit individual reviewed path after verified rollback evidence, but they must not enter the automatic batch execution set. Conflict and unresolved templates remain hard blocked.
 
 ## 1. Confirm frontend module and backup directory
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.4
-git checkout -B release/0.1.0-beta.4 origin/release/0.1.0-beta.4
+git fetch origin release/0.1.0-beta.11
+git checkout -B release/0.1.0-beta.11 origin/release/0.1.0-beta.11
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.4
+0.1.0-beta.11
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.4`, enable the module and open:
+Confirm `0.1.0-beta.11`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -132,7 +132,7 @@ Expected behavior:
 1. each selected template runs the full authoritative update analysis;
 2. historical baseline and BASE/LOCAL/UPSTREAM analysis are reused;
 3. conflict/local-overwrite/unresolved states remain blocked;
-4. medium/high risk becomes Manual review;
+4. medium/high risk and authoritative local-overwrite cases become Manual review and remain excluded from unattended batch execution;
 5. low/none-risk candidates that reached `candidate_for_backup` receive/refresh a persistent rollback artifact;
 6. analysis is rerun after backup creation;
 7. `backup_verified` candidates run fresh preflight;
@@ -155,7 +155,7 @@ Before any write, inspect at least one item from each category that naturally oc
 
 - **Ready**: eligible for controlled sequential execution;
 - **Manual review**: medium/high technical review state;
-- **Conflict / local overwrite**: must never be automatically executed;
+- **Conflict**: must never be executed; authoritative local-overwrite without conflict remains Manual review only;
 - **Blocked**: incomplete/unresolved/not-applicable evidence.
 
 If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
@@ -178,7 +178,7 @@ For each Ready template, immediately before its own write, the module must:
 2. compare the fresh evidence fingerprint with the reviewed evidence;
 3. reject stale/changed evidence before import;
 4. rebuild the immutable upstream candidate;
-5. validate exact commit/path/content SHA-256 and template identity;
+5. validate exact commit/path, the path-specific raw YAML SHA-256, the separately bound canonical template-content fingerprint and template identity;
 6. use the single approved `TemplateConfigurationImportService` boundary;
 7. run fresh post-update validation.
 
@@ -255,7 +255,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.4 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.11 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -267,7 +267,8 @@ Confirm:
 - direct POST without the valid action-specific CSRF token is rejected by native Zabbix handling;
 - tampering a reviewed evidence fingerprint prevents that template from being written;
 - submitting more than 25 template IDs fails closed;
-- conflict/manual-review/blocked items are absent from the hidden Ready execution set.
+- conflict/manual-review/blocked items are absent from the hidden Ready execution set;
+- a preflight built from a legacy index without a raw source fingerprint remains blocked until the refreshed index is available.
 
 ## 13. Filesystem tamper test (optional, disposable lab only)
 
@@ -329,9 +330,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.4 laboratory validation
+## 16. Exit criteria for beta.11 laboratory validation
 
-A Zabbix generation passes beta.4 only after evidence demonstrates:
+A Zabbix generation passes beta.11 only after evidence demonstrates:
 
 ```text
 module discovery/enable

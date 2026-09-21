@@ -15,7 +15,8 @@ $commit = '0123456789abcdef0123456789abcdef01234567';
 $path = 'templates/os/linux/template_os_linux.yaml';
 $uuid = 'f8f7908280354f2abeed07dc788c3747';
 $raw = "zabbix_export: fixture\n";
-$contentSha = hash('sha256', $raw);
+$sourceSha = hash('sha256', $raw);
+$contentSha = hash('sha256', 'canonical-template-content');
 $document = [
 	'zabbix_export' => [
 		'version' => '7.0',
@@ -36,6 +37,7 @@ $preflight = [
 	'candidate' => [
 		'commit' => $commit,
 		'path' => $path,
+		'source_sha256' => $sourceSha,
 		'content_sha256' => $contentSha,
 		'uuid' => $uuid,
 		'name' => 'Linux by Zabbix agent',
@@ -57,10 +59,11 @@ $service = new TemplateUpdateCandidateService(
 $result = $service->build($preflight);
 assertUpdateCandidate($commit, $result['commit'], 'Candidate must preserve immutable commit.');
 assertUpdateCandidate($path, $result['path'], 'Candidate must preserve validated path.');
-assertUpdateCandidate($contentSha, $result['content_sha256'], 'Candidate must preserve the validated index content hash.');
+assertUpdateCandidate($sourceSha, $result['source_sha256'], 'Candidate must verify exact raw source bytes against the index source fingerprint.');
+assertUpdateCandidate($contentSha, $result['content_sha256'], 'Candidate must preserve the canonical template content fingerprint.');
 assertUpdateCandidate($uuid, $result['uuid'], 'Candidate must preserve normalized UUID.');
 assertUpdateCandidate('7.0-8', $result['vendor_version'], 'Candidate must preserve upstream vendor version.');
-assertUpdateCandidate($contentSha, $result['canonical_sha256'], 'Candidate must verify canonical source bytes against the index hash.');
+assertUpdateCandidate(true, $sourceSha !== $contentSha, 'Regression fixture must use different raw-source and template-content fingerprints.');
 assertUpdateCandidate(true, is_string($result['source']) && $result['source'] !== '', 'Candidate must produce an isolated import source.');
 assertUpdateCandidate(hash('sha256', $result['source']), $result['import_sha256'], 'Candidate must fingerprint isolated import source.');
 
@@ -93,7 +96,7 @@ catch (RuntimeException $exception) {
 assertUpdateCandidate(true, $threw, 'Fetched source must match the preflight immutable commit exactly.');
 
 $wrongHash = $preflight;
-$wrongHash['candidate']['content_sha256'] = hash('sha256', 'tampered-index-fingerprint');
+$wrongHash['candidate']['source_sha256'] = hash('sha256', 'tampered-source-fingerprint');
 $threw = false;
 try {
 	$service->build($wrongHash);
@@ -101,6 +104,17 @@ try {
 catch (RuntimeException $exception) {
 	$threw = true;
 }
-assertUpdateCandidate(true, $threw, 'Fetched source bytes must match the content hash bound by preflight.');
+assertUpdateCandidate(true, $threw, 'Fetched source bytes must match the raw source hash bound by preflight.');
+
+$invalidContentFingerprint = $preflight;
+$invalidContentFingerprint['candidate']['content_sha256'] = 'invalid';
+$threw = false;
+try {
+	$service->build($invalidContentFingerprint);
+}
+catch (RuntimeException $exception) {
+	$threw = true;
+}
+assertUpdateCandidate(true, $threw, 'Canonical template content fingerprints must still be structurally validated.');
 
 echo "TemplateUpdateCandidateService tests passed.\n";

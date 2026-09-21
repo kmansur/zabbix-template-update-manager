@@ -47,10 +47,11 @@ The preflight passes only when all of the following are true:
 5. the upstream source is bound to an exact 40-character immutable Git commit;
 6. the selected source path is a validated `templates/.../*.yaml` path without traversal segments;
 7. template UUID, visible/technical names and vendor identity/version are present and valid;
-8. the validated upstream index contains exactly one distinct 64-character content SHA-256 for the candidate;
-9. rollback verification is freshly `current_match`;
-10. the newest rollback SHA-256 exactly equals the fresh current `configuration.export` SHA-256;
-11. stored and freshly exported byte counts match.
+8. the selected source path has a validated 64-character SHA-256 for the exact raw YAML bytes;
+9. the validated upstream index contains exactly one distinct canonical template-content SHA-256 for the candidate;
+10. rollback verification is freshly `current_match`;
+11. the newest rollback SHA-256 exactly equals the fresh current `configuration.export` SHA-256;
+12. stored and freshly exported byte counts match.
 
 Anything else fails closed.
 
@@ -68,7 +69,7 @@ Examples include missing historical baseline, unresolved comparison identities, 
 
 ### `blocked_candidate`
 
-The immutable upstream candidate identity cannot be proven from exact commit + validated path + one validated content SHA-256 + template UUID + names + vendor identity/version.
+The immutable upstream candidate identity cannot be proven from exact commit + validated path + path-specific raw source SHA-256 + one canonical template-content SHA-256 + template UUID + names + vendor identity/version.
 
 ### `blocked_backup`
 
@@ -98,7 +99,8 @@ A passing result produces a deterministic SHA-256 over a canonical evidence stru
 - available vendor version;
 - exact upstream commit;
 - exact upstream YAML path;
-- validated upstream source-content SHA-256;
+- validated raw upstream source SHA-256 for the exact path;
+- canonical upstream template-content SHA-256;
 - upstream visible/technical names;
 - upstream vendor name;
 - verified rollback SHA-256;
@@ -136,7 +138,7 @@ fresh TemplateUpdatePreflightService::run(templateid) again
 re-fetch exact commit + path
         |
         v
-verify source SHA-256 against validated upstream index
+verify raw source SHA-256 against the path-specific validated upstream index fingerprint
         |
         v
 revalidate candidate identity + isolate one template

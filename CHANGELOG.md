@@ -4,6 +4,32 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.11] - 2026-09-21
+
+### Fixed
+
+- Controlled update now distinguishes the SHA-256 of the exact raw upstream YAML file from the canonical per-template content fingerprint stored by the upstream index.
+- `TemplateUpdateCandidateService` verifies the immutable commit/path raw source bytes against a dedicated per-path source fingerprint instead of incorrectly comparing whole-file YAML bytes with a template-object hash.
+- Legacy validated indexes remain usable for read-only inventory/comparison, but controlled update fails closed until an index with raw source fingerprints is available.
+- Upstream source and commit-history HTTP clients now use the packaged project version in their User-Agent instead of the stale `0.1.0-dev` literal.
+
+### Added
+
+- Per-source-path raw SHA-256 fingerprints in generated upstream indexes under `sources`, while retaining `content_sha256s` as canonical template-content fingerprints.
+- Preflight evidence schema 5 binds both `upstream_source_sha256` and `upstream_content_sha256`.
+- Regression coverage using intentionally different raw-source and template-content fingerprints so the beta.10 hash-contract bug cannot silently return.
+- Upstream-index workflow smoke validation that compares bytes fetched from the canonical raw endpoint with the generated source fingerprint.
+
+### Changed
+
+- Preflight and update result views display raw source and template-content fingerprints separately.
+- The controlled update candidate contract now carries both fingerprints through fresh preflight, TOCTOU evidence comparison, candidate reconstruction and result reporting.
+
+### Safety
+
+- The failing beta.10 path stopped before `configuration.import`; beta.11 preserves that fail-closed behavior and strengthens the immutable-source verification contract.
+- No additional Zabbix configuration-write boundary was introduced.
+
 ## [0.1.0-beta.10] - 2026-09-21
 
 ### Added

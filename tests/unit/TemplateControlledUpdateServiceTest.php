@@ -12,10 +12,12 @@ function assertControlledUpdate($expected, $actual, string $message): void {
 }
 
 $evidence = hash('sha256', 'fresh-preflight');
-$contentSha = hash('sha256', 'canonical');
+$sourceSha = hash('sha256', 'raw-source');
+$contentSha = hash('sha256', 'canonical-template-content');
 $candidate = [
 	'commit' => '0123456789abcdef0123456789abcdef01234567',
 	'path' => 'templates/os/linux/template_os_linux.yaml',
+	'source_sha256' => $sourceSha,
 	'content_sha256' => $contentSha,
 	'uuid' => 'f8f7908280354f2abeed07dc788c3747',
 	'name' => 'Linux by Zabbix agent',
@@ -33,7 +35,6 @@ $preflight = [
 	]
 ];
 $builtCandidate = $candidate + [
-	'canonical_sha256' => $contentSha,
 	'import_sha256' => hash('sha256', 'isolated'),
 	'format' => 'json',
 	'source' => '{"zabbix_export":{"version":"7.0","templates":[]}}'
@@ -62,7 +63,8 @@ assertControlledUpdate('updated', $result['status'], 'Matching fresh evidence sh
 assertControlledUpdate(true, $result['write_performed'], 'Successful controlled update must report that a write occurred.');
 assertControlledUpdate(true, $imported, 'Importer must run only after fresh preflight and evidence match.');
 assertControlledUpdate($evidence, $result['preflight_evidence_sha256'], 'Result must retain confirmed fresh evidence.');
-assertControlledUpdate($contentSha, $result['candidate']['canonical_sha256'], 'Result must retain verified upstream content evidence.');
+assertControlledUpdate($sourceSha, $result['candidate']['source_sha256'], 'Result must retain verified raw upstream source evidence.');
+assertControlledUpdate($contentSha, $result['candidate']['content_sha256'], 'Result must retain canonical template content evidence.');
 
 $imported = false;
 $result = $service->execute('12345', hash('sha256', 'stale-page'));
@@ -108,7 +110,7 @@ assertControlledUpdate(true, $threw, 'Candidate identity drift after preflight m
 assertControlledUpdate(false, $imported, 'Candidate identity drift must not invoke importer.');
 
 $hashDriftCandidate = $builtCandidate;
-$hashDriftCandidate['canonical_sha256'] = hash('sha256', 'different-source');
+$hashDriftCandidate['source_sha256'] = hash('sha256', 'different-source');
 $imported = false;
 $hashDriftService = new TemplateControlledUpdateService(
 	static fn(string $templateId): array => $preflight,

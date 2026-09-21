@@ -134,10 +134,10 @@ final class TemplateControlledUpdateService {
 			'candidate' => [
 				'commit' => (string) ($candidate['commit'] ?? ''),
 				'path' => (string) ($candidate['path'] ?? ''),
+				'source_sha256' => (string) ($candidate['source_sha256'] ?? ''),
 				'content_sha256' => (string) ($candidate['content_sha256'] ?? ''),
 				'uuid' => (string) ($candidate['uuid'] ?? ''),
 				'vendor_version' => (string) ($candidate['vendor_version'] ?? ''),
-				'canonical_sha256' => (string) ($candidate['canonical_sha256'] ?? ''),
 				'import_sha256' => (string) ($candidate['import_sha256'] ?? '')
 			],
 			'validation' => $validation
@@ -147,15 +147,14 @@ final class TemplateControlledUpdateService {
 	private function assertCandidateMatchesPreflight(array $candidate, array $preflight): void {
 		$expected = is_array($preflight['candidate'] ?? null) ? $preflight['candidate'] : [];
 
-		foreach (['commit', 'path', 'content_sha256', 'uuid', 'name', 'technical_name', 'vendor_name', 'vendor_version'] as $field) {
+		foreach (['commit', 'path', 'source_sha256', 'content_sha256', 'uuid', 'name', 'technical_name', 'vendor_name', 'vendor_version'] as $field) {
 			if ((string) ($candidate[$field] ?? '') !== (string) ($expected[$field] ?? '')) {
 				throw new RuntimeException('The rebuilt update candidate does not match the fresh preflight identity.');
 			}
 		}
 
-		if (!preg_match('/^[a-f0-9]{64}$/', (string) ($candidate['content_sha256'] ?? ''))
-				|| !preg_match('/^[a-f0-9]{64}$/', (string) ($candidate['canonical_sha256'] ?? ''))
-				|| !hash_equals((string) $candidate['content_sha256'], (string) $candidate['canonical_sha256'])
+		if (!preg_match('/^[a-f0-9]{64}$/', (string) ($candidate['source_sha256'] ?? ''))
+				|| !preg_match('/^[a-f0-9]{64}$/', (string) ($candidate['content_sha256'] ?? ''))
 				|| !preg_match('/^[a-f0-9]{64}$/', (string) ($candidate['import_sha256'] ?? ''))
 				|| !is_string($candidate['source'] ?? null)
 				|| $candidate['source'] === '') {

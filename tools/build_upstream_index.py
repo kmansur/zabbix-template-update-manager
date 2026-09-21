@@ -54,12 +54,19 @@ def merge_record(
     identity: dict[str, Any],
     relative_path: str,
     content_hash: str,
+    source_hash: str,
 ) -> None:
     if uuid not in records:
         records[uuid] = {
             **identity,
             "paths": [relative_path],
             "content_sha256s": [content_hash],
+            "sources": [
+                {
+                    "path": relative_path,
+                    "sha256": source_hash,
+                }
+            ],
         }
         return
 
@@ -79,6 +86,16 @@ def merge_record(
     if relative_path not in existing["paths"]:
         existing["paths"].append(relative_path)
         existing["paths"].sort()
+
+    source_by_path = {source["path"]: source["sha256"] for source in existing["sources"]}
+    if relative_path in source_by_path and source_by_path[relative_path] != source_hash:
+        raise RuntimeError(
+            f"conflicting raw source fingerprint for {relative_path}: "
+            f"{source_by_path[relative_path]} != {source_hash}"
+        )
+    if relative_path not in source_by_path:
+        existing["sources"].append({"path": relative_path, "sha256": source_hash})
+        existing["sources"].sort(key=lambda source: source["path"])
 
     if content_hash not in existing["content_sha256s"]:
         existing["content_sha256s"].append(content_hash)
@@ -101,9 +118,12 @@ def build_index(
     for yaml_path in sorted(templates_root.rglob("*.yaml")):
         relative_path = yaml_path.relative_to(source_dir).as_posix()
         try:
-            document = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
+            raw_source = yaml_path.read_bytes()
+            document = yaml.safe_load(raw_source.decode("utf-8"))
         except Exception as exc:
             raise RuntimeError(f"unable to parse {relative_path}: {exc}") from exc
+
+        source_hash = hashlib.sha256(raw_source).hexdigest()
 
         if not isinstance(document, dict):
             continue
@@ -130,6 +150,7 @@ def build_index(
                 identity=template_identity(template, uuid),
                 relative_path=relative_path,
                 content_hash=template_sha256(template),
+                source_hash=source_hash,
             )
 
     if not records:

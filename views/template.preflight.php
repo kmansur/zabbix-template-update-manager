@@ -83,13 +83,17 @@ if ($candidate !== []) {
 			_('Available version'),
 			_('Vendor'),
 			_('Upstream commit'),
-			_('Official source path')
+			_('Official source path'),
+			_('Raw source SHA-256'),
+			_('Template content SHA-256')
 		])
 		->addRow([
 			(string) ($candidate['vendor_version'] ?? '—'),
 			(string) ($candidate['vendor_name'] ?? '—'),
 			isset($candidate['commit']) ? substr((string) $candidate['commit'], 0, 16) : '—',
-			(string) ($candidate['path'] ?? '—')
+			(string) ($candidate['path'] ?? '—'),
+			isset($candidate['source_sha256']) ? substr((string) $candidate['source_sha256'], 0, 20) : '—',
+			isset($candidate['content_sha256']) ? substr((string) $candidate['content_sha256'], 0, 20) : '—'
 		]);
 
 	$page->addItem(new CTag('h4', true, _('Bound upstream candidate')))->addItem($candidateTable);

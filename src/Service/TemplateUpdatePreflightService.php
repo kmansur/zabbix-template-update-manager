@@ -137,13 +137,14 @@ final class TemplateUpdatePreflightService {
 		$result['rollback'] = $rollback;
 
 		$evidence = [
-			'schema_version' => 4,
+			'schema_version' => 5,
 			'templateid' => $result['template']['templateid'],
 			'uuid' => $result['template']['uuid'],
 			'installed_version' => $result['template']['installed_version'],
 			'available_version' => $result['template']['available_version'],
 			'upstream_commit' => $candidate['commit'],
 			'upstream_path' => $candidate['path'],
+			'upstream_source_sha256' => $candidate['source_sha256'],
 			'upstream_content_sha256' => $candidate['content_sha256'],
 			'upstream_name' => $candidate['name'],
 			'upstream_technical_name' => $candidate['technical_name'],
@@ -185,9 +186,20 @@ final class TemplateUpdatePreflightService {
 		)));
 		$contentSha256 = count($hashes) === 1 ? $hashes[0] : '';
 
+		$sourceSha256 = '';
+		$sources = is_array($upstream['sources'] ?? null) ? $upstream['sources'] : [];
+		foreach ($sources as $source) {
+			if (!is_array($source) || (string) ($source['path'] ?? '') !== $path) {
+				continue;
+			}
+			$sourceSha256 = strtolower(trim((string) ($source['sha256'] ?? '')));
+			break;
+		}
+
 		if (!preg_match('/^[a-f0-9]{40}$/', $commit)
 				|| !self::isSafeTemplatePath($path)
 				|| !preg_match('/^[a-f0-9]{32}$/', $uuid)
+				|| !preg_match('/^[a-f0-9]{64}$/', $sourceSha256)
 				|| !preg_match('/^[a-f0-9]{64}$/', $contentSha256)
 				|| $availableVersion === ''
 				|| $name === ''
@@ -199,6 +211,7 @@ final class TemplateUpdatePreflightService {
 		return [
 			'commit' => $commit,
 			'path' => $path,
+			'source_sha256' => $sourceSha256,
 			'content_sha256' => $contentSha256,
 			'uuid' => $uuid,
 			'name' => $name,
