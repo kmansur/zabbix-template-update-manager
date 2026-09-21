@@ -73,7 +73,7 @@ final class TemplateBatchPlanService {
 			$readiness = is_array($analysis['update_readiness'] ?? null) ? $analysis['update_readiness'] : [];
 			$status = (string) ($readiness['status'] ?? 'blocked_unresolved');
 
-			if ($prepareBackups && $status === 'candidate_for_backup' && $template !== []) {
+			if ($prepareBackups && !empty($readiness['candidate_for_backup']) && $template !== []) {
 				($this->backupCreator)($template);
 				$analysis = ($this->analysisRunner)($templateId);
 				$template = is_array($analysis['template'] ?? null) ? $analysis['template'] : [];
@@ -164,7 +164,7 @@ final class TemplateBatchPlanService {
 		if ($status === 'backup_verified') {
 			return 'blocked';
 		}
-		if (in_array($status, ['review_medium', 'review_high'], true)) {
+		if (in_array($status, ['review_medium', 'review_high', 'review_required', 'review_backup_verified'], true)) {
 			return 'review';
 		}
 		if (in_array($status, ['blocked_conflict', 'blocked_local_overwrite'], true)) {
