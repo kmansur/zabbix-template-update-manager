@@ -25,6 +25,12 @@
       ],
       "content_sha256s": [
         "6be57ab52c11c7dd4b9963c5bab635b9235ac2c1b8f2e6282e8be3449cc01242"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/mssql_odbc/template_db_mssql_odbc.yaml",
+          "sha256": "d75a67708afdd7327131ab1b2b9884790727ee57d144277cc34ebfc62693212b"
+        }
       ]
     },
     "00ade9277d7c41e8b57d638b22d54372": {
@@ -38,6 +44,12 @@
       ],
       "content_sha256s": [
         "3c812e49b24d13bcebd40fe90b4a78a4e97c1d65eb386927506106687ffc5411"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/oracle_odbc/template_db_oracle_odbc.yaml",
+          "sha256": "60a24313ce743ecaa5cc72be1758498f009d06ecd1ebd1f70bba5bb759459387"
+        }
       ]
     },
     "012e7043ff9849e197c42bf41cdf4d9a": {
@@ -51,6 +63,12 @@
       ],
       "content_sha256s": [
         "9b414f64d1054705e9044ae477a3de53ae272afa526813254945f55338ef4dc7"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR1009-7G-1C-PC_snmp/template_net_mikrotik_CCR1009-7G-1C-PC_snmp.yaml",
+          "sha256": "6c60d5b157676b3e0c063bdb7a0c103929f4a6e58b84736a9e40793c91a754c4"
+        }
       ]
     },
     "01deb47efa1f4a9092de67fd61820a7d": {
@@ -64,6 +82,12 @@
       ],
       "content_sha256s": [
         "99f891d247b54671919301de642287f6d6023e3d6b3b98794ac2b585c4dec159"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_mgs-3712f_snmp/template_net_zyxel_mgs-3712f_snmp.yaml",
+          "sha256": "8e455bb97d3be9c1ce1aa07dea4d748c1c800c6eec271b64beb0e7e854843f27"
+        }
       ]
     },
     "024cf4f0711c4c39a4e016858efc5e37": {
@@ -77,6 +101,12 @@
       ],
       "content_sha256s": [
         "b849209d2be509c06dfb36fc0f8e1a6616c546123992418abb0666e5a6d3a99f"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "02aac022a62c48bba810d07bbaa712cc": {
@@ -90,6 +120,12 @@
       ],
       "content_sha256s": [
         "78d42df15c4c1adac069689db3387378d5242d34111f96844419b948501cd107"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml",
+          "sha256": "7940c9a366868499163bc3e4de69099af989078bd23d1d0e4ff18c0e82f5a02e"
+        }
       ]
     },
     "02f35169a5a54a5aad8b3f06e798ab1f": {
@@ -103,6 +139,12 @@
       ],
       "content_sha256s": [
         "e31dc78fefb0ff499153255ee2d4969e1457ff5f76c1931a8831127602ae713e"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/chassis_ipmi/template_server_chassis_ipmi.yaml",
+          "sha256": "8405da741435e6dd43a51fc4cfd04e55e9c50754078f8104d3e171f6c8bd6432"
+        }
       ]
     },
     "0368ca599bbb49729587b9c43ac83084": {
@@ -116,6 +158,12 @@
       ],
       "content_sha256s": [
         "97e7c4ed4a896f825f0fdfd5e14c437c9f61f95afb89dccb5e8111ae80344a42"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/envoy_proxy_http/template_app_envoy_proxy_http.yaml",
+          "sha256": "2363084321b67dd38e20e7c5b3e32bd7c72d7cdb20de727458aeadcc5baca6f5"
+        }
       ]
     },
     "03e93dc9a8194a17958544a056d02316": {
@@ -129,6 +177,12 @@
       ],
       "content_sha256s": [
         "7902c160c55d5c09629f1eacfbbf6b4433bd3ba5458325cf58f711af4e14fa4e"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/ms365_http/template_app_microsoft_365_http.yaml",
+          "sha256": "352728211be5129a4f9118a51282fd9de43609146bef66970e838079a87998b8"
+        }
       ]
     },
     "057558a26d934b4683d73a7058499d62": {
@@ -142,6 +196,12 @@
       ],
       "content_sha256s": [
         "d9db3dfdb567f7e4548498184ffc37a9798cfa435ca109c3d0f4d037c08a658e"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
+          "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
+        }
       ]
     },
     "05894ba2c9184d33992bf1bd21c347f6": {
@@ -155,6 +215,12 @@
       ],
       "content_sha256s": [
         "2b4277cb86e69bf54c83ba922ad428dc8323235075091ecab2683b2d1b6fa465"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/memcached/template_app_memcached.yaml",
+          "sha256": "4e33a7980acb42a1312b92e1f2734203089d296c678aefe1da496f76558bdf03"
+        }
       ]
     },
     "07695028a2ba4b66a5414797bec791df": {
@@ -168,6 +234,12 @@
       ],
       "content_sha256s": [
         "5bd8f43f22db5c55100e1863abf5c02a5477a2ef90593cd062d018192eb2a22a"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/kubernetes_http/kubernetes_state_http/template_kubernetes_state.yaml",
+          "sha256": "328e5278e328ec619e161fbc1b1b572a2cf948c7bb187d007aab9e5394dcc455"
+        }
       ]
     },
     "07b32152c3654e8ead4c1eeae24efa8f": {
@@ -181,6 +253,12 @@
       ],
       "content_sha256s": [
         "c0ea7f06f42b0943c30bb70ae5aa7c2912decae4a2a0d4211fc80c56b1bee298"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/morningstar/morningstar_tristar_mppt_snmp/template_net_morningstar_tristar_mppt_snmp.yaml",
+          "sha256": "82ad919e0bf53b7f45da46ade2b5472392c680fb29dfb0e606035f8523f89eea"
+        }
       ]
     },
     "08ef3d687d754b0aba17e1dcbd77d4bd": {
@@ -194,6 +272,12 @@
       ],
       "content_sha256s": [
         "ed4ad660da0a555140c278e5122d25dfa2ad971d55ab3f088a558cd4f2f7f2e0"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/cloudflare_http/template_app_cloudflare_http.yaml",
+          "sha256": "0023a8469b03749e8ec66b6f693542d8220d1c824e0d52a622e82f02730088e0"
+        }
       ]
     },
     "09fb25d089f7467f860895f6e71d3fa2": {
@@ -207,6 +291,12 @@
       ],
       "content_sha256s": [
         "db83db63e609d7461f2c85a2e23e6b51179576c206bad71dc08fdbfb1625fe72"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/ceph_agent2/template_app_ceph_agent2.yaml",
+          "sha256": "0f037f499495c64ffaf3aec3d0cadbc06903cad4c0a51a1f75569f458253ff7f"
+        }
       ]
     },
     "0b9a899ff8f1467c9fdf999d02b9fd77": {
@@ -220,6 +310,12 @@
       ],
       "content_sha256s": [
         "2628d76a99f65fda38ec9d20cf4ac911d2b37e3526260b3e09014270467daae5"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_symmetra_lx_snmp/template_power_apc_ups_symmetra_lx_snmp.yaml",
+          "sha256": "a766aaa1bf0669c2be5920461d704aac89caa9412467b745cce424f9e0e8d37e"
+        }
       ]
     },
     "0bb43a48a33f48ad910441384486edb4": {
@@ -233,6 +329,12 @@
       ],
       "content_sha256s": [
         "beca08491c1ea3e0c0ce967749703d1c48c05594044dcd5aba743656df244f84"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nutanix_http/template_app_nutanix_prism_element_http.yaml",
+          "sha256": "027d3769c1bd9a50f4f5be0834392bf024f065b16d6d10b535132da770b8e986"
+        }
       ]
     },
     "0c7b3c03a5854f868b56f3ab63e2d3f7": {
@@ -246,6 +348,12 @@
       ],
       "content_sha256s": [
         "b3dc729f48e7d7704979ac306aaa23137aa882d5b7f68d2a13d226448a9668e8"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_PowerBox_snmp/template_net_mikrotik_PowerBox_snmp.yaml",
+          "sha256": "fc68234ae3b0578b153770e5107e70ef014a5964f42ab8209d42cc3833e1a407"
+        }
       ]
     },
     "0c94915edb4c41bf8c627dddb4f68f5a": {
@@ -259,6 +367,12 @@
       ],
       "content_sha256s": [
         "ea648a5e75561314148cf9368d118f78bf75280118ab9992d587536edf2df980"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/opnsense_snmp/template_app_opnsense_snmp.yaml",
+          "sha256": "f02a84ccdcb103acb2065a1966758ee01c86d6670b2eaf1a174439571bd9d1c7"
+        }
       ]
     },
     "0f6889282f6048e2b1370e569e578985": {
@@ -272,6 +386,12 @@
       ],
       "content_sha256s": [
         "2ad7ee9dee0b056684ef5fe97ae348ff0f3ee3b8b940da87449b9cf01e925ed7"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/process/template_module_process.yaml",
+          "sha256": "e202102d2567b7099719a3fd42f3b42343ea3e242df3b0961c9f2cde1311e905"
+        }
       ]
     },
     "0ffde4421f524bcbac2f47fec87c0f95": {
@@ -285,6 +405,12 @@
       ],
       "content_sha256s": [
         "2f86437e2d2f5b9cb31552dd507adb00d8ffd6fc21c0555cd990f391fdd8c99c"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/hpe_synergy_http/template_server_hpe_synergy_http.yaml",
+          "sha256": "d75b72241ea9ba2526c4eb3f815fb485557263f48b1eda32a56b7fa9257836e4"
+        }
       ]
     },
     "10537641cfa3416ab0f1451cdb61d804": {
@@ -298,6 +424,12 @@
       ],
       "content_sha256s": [
         "653212937ce21722b20a53e34df152ecabed17d2797c03d09832119183742142"
+      ],
+      "sources": [
+        {
+          "path": "templates/san/hpe_msa2060_http/template_san_hpe_msa2060_http.yaml",
+          "sha256": "3937bd3bbf81a58bf26fd7c69f85eb7de0976161013d28f47d8db4f9dbf9b18c"
+        }
       ]
     },
     "11144543d1144a3693aa0b97a1c20dac": {
@@ -311,6 +443,12 @@
       ],
       "content_sha256s": [
         "ee95948d4f3fba17fb3920e0b68ef20906489ae729d4661269ddf3ed2c2d62ce"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/github_http/template_app_github_http.yaml",
+          "sha256": "b699b4654d063ffe333977da4617c2fad4befe4f9f2897a667e6ada4aa326be8"
+        }
       ]
     },
     "13b06904a6bf41cbb795e3193d896340": {
@@ -324,6 +462,12 @@
       ],
       "content_sha256s": [
         "0749dd1101e09a92588dcec9d42615fbd2fcc3f7f60184f197660cab9649bf75"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/windows_agent/template_os_windows_agent.yaml",
+          "sha256": "1734d3bc226b091a243260f86c97743cfb071f2f74bfeb301401f4ef08154517"
+        }
       ]
     },
     "13d5bb0a4ae84228bff408aab5be338e": {
@@ -337,6 +481,12 @@
       ],
       "content_sha256s": [
         "94671836003dec58f6c10301b427f1fbe160d78284cce69de9dc51d43a88b5c1"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nginx_http/template_app_nginx_http.yaml",
+          "sha256": "d91198c72b5a4c1e6761b4cbb3d18a860f8a880b6bebf18fdff58b0ac9c50723"
+        }
       ]
     },
     "141438a05f904b518c7d3ddfbbabf91f": {
@@ -350,6 +500,12 @@
       ],
       "content_sha256s": [
         "1e2b282fb7125348019763b4d574bd8add337e3962c2f49ccc6f69fc5d56d4d1"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB2011iL-IN_snmp/template_net_mikrotik_RB2011iL-IN_snmp.yaml",
+          "sha256": "3b0b878735c81f16708b2ee2c50eb0cbe3ecfc7fb9ca97d00c8e23585c6c095e"
+        }
       ]
     },
     "16f281aeb8904d3db8b66dda94611fcc": {
@@ -363,6 +519,12 @@
       ],
       "content_sha256s": [
         "c741959360de7aa020c5980e919d7018fd188db3ca4b938fbaf0c96dc00a36fa"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/pfsense_snmp/template_app_pfsense_snmp.yaml",
+          "sha256": "76fa456f250c9a6ae30c266cf0ee76de788baa15c847cbc2d412667f71000b6c"
+        }
       ]
     },
     "172ec7e51f1c4a6ba49baffbab3dda97": {
@@ -376,6 +538,12 @@
       ],
       "content_sha256s": [
         "702b5ce3319f265ca4604431ffe1f29cf8095ac5e0171cce34aeeec087a8bd75"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/hp/hp_bl460_snmp/template_server_hp_bl460_snmp.yaml",
+          "sha256": "ab73a62d33822513b93d6ae09fca0a463fa16200f9ba5ca42978fdd2a1e9527b"
+        }
       ]
     },
     "1782caa5bf724f66a23e7dbb96ef7ba2": {
@@ -389,6 +557,12 @@
       ],
       "content_sha256s": [
         "a62e2a0b58410837bd031222b0b9b7b3f9bfb6cbc992456682d25e8df3d99b07"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_netPower_Lite_7R_snmp/template_net_mikrotik_netPower_Lite_7R_snmp.yaml",
+          "sha256": "ec7ed7df473646c22847e398ac6083dc410a1c855988a799b471912b320f97ec"
+        }
       ]
     },
     "178645e229484bcf9cb030dc1edccebb": {
@@ -402,6 +576,12 @@
       ],
       "content_sha256s": [
         "f3dcde1110a9d99685d8ffbfe7d73a27ff02d72312353263377b253bb8206482"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
+          "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
+        }
       ]
     },
     "1818cd052f174772a48bfc275d0016dd": {
@@ -415,6 +595,12 @@
       ],
       "content_sha256s": [
         "fbeb734c663652ff69db2ce306b9e2b40aad7abf3f1e631e147d66febf63bdc3"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_secure_ftd_http/template_net_cisco_secure_ftd_http.yaml",
+          "sha256": "785af7284546ebce50332caae1c522551334e9c47de330f0fb6d49e75079dd5e"
+        }
       ]
     },
     "185867ae9b4a46b59d53931d3330c770": {
@@ -428,6 +614,12 @@
       ],
       "content_sha256s": [
         "389a5faf42061958743614a08c7e905a71e3cc92a1a209fd32f7ab2b9a0cdf77"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r660_http/template_server_dell_r660_http.yaml",
+          "sha256": "636199bba4f516cbefc85e2b72df36d51747344dc42c76eb0eec605564f8f16b"
+        }
       ]
     },
     "1945f22f8ba84ce89454d9513979a3c6": {
@@ -441,6 +633,12 @@
       ],
       "content_sha256s": [
         "814b19a7b22646b6b989cd994d9394610e493335ac35ff7b69ad8bf2292ce865"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/stormshield_sns/template_net_stormshield_sns_snmp.yaml",
+          "sha256": "b3ce2bb6cbc405ac5b8a7dd54db61d9e1ad4f39019f095415b79b449d694f335"
+        }
       ]
     },
     "1a74dd95e7244493a1b13b94fe9dd9e8": {
@@ -454,6 +652,12 @@
       ],
       "content_sha256s": [
         "1ae4ea8cd0b28e4cbb861695849735c915f09c59e1e608cb1bdbcffbd8c45c68"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB260GS_snmp/template_net_mikrotik_RB260GS_snmp.yaml",
+          "sha256": "06024944a9cdac3d4adb1fdd0b8a78bf90bf7a15b5ab29785da0b8f7d81aea89"
+        }
       ]
     },
     "1ae69b01417849b180717f62ad7819d6": {
@@ -467,6 +671,12 @@
       ],
       "content_sha256s": [
         "197a63fb7d5fa9f122f3596b56044509ad2884e30100aaf12c3c0d78c84327e1"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/mysql_agent_active/template_db_mysql_agent_active.yaml",
+          "sha256": "11c1b27d434e74c4d6a1e9dc3d4be0ffcb9df8676167a0ded880184ae0355a7c"
+        }
       ]
     },
     "1bb42fbdb9054645a62ff81f14ba3b99": {
@@ -480,6 +690,12 @@
       ],
       "content_sha256s": [
         "eb87eed7c933e09938bed05d8d658258a0ee6c6775a12ce3a05f00290afd52be"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml",
+          "sha256": "42e5dcb6e65bf1b7cc92a8e8a9a21dcc8f5277acc9075c88391abf54492dde49"
+        }
       ]
     },
     "1cbda0970410435684135884d0cb7090": {
@@ -493,6 +709,12 @@
       ],
       "content_sha256s": [
         "46e5e876cb4f0d67dcf26bd9562e5496dbd917e0d583edcaea0beb2512ad5b31"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/php-fpm_agent/template_app_php-fpm_agent.yaml",
+          "sha256": "7369de980a7b325260fc13be2fe17181d6aa7805903ee7a324cadba772311591"
+        }
       ]
     },
     "1dac0a88c3774315b90622a48031e369": {
@@ -506,6 +728,12 @@
       ],
       "content_sha256s": [
         "f52eb57e0910d63a7ffef47a603ed3a8460caba436766617f6881bb1c0679887"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_symmetra_rm_snmp/template_power_apc_ups_symmetra_rm_snmp.yaml",
+          "sha256": "1ad589703913146efc79da8a2958e67a6d2346caf0bd71e14eb5126ca4bc086d"
+        }
       ]
     },
     "1e9fe6b88c7542638c0f5d94484858b2": {
@@ -519,6 +747,12 @@
       ],
       "content_sha256s": [
         "fc8279d438f09d64b756716dcfa35c4e280e7bff779cc2112a45bb89d17e93be"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r820_http/template_server_dell_r820_http.yaml",
+          "sha256": "54ab8edccc4a352ec0cfafeb91a3fffe29dd6d5f6b52ebd883cee9c7c1e93d41"
+        }
       ]
     },
     "1f38deb487fc4a8d965e407ba7c5247f": {
@@ -532,6 +766,12 @@
       ],
       "content_sha256s": [
         "7b36ef04ad4c886ab7550ddd369ec7917db2648432120aae0e269eefefa218dc"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/fortinet/fortigate_snmp/template_net_fortigate_snmp.yaml",
+          "sha256": "d7f16f18d625759d33f82b4b41ae3927c06bc499a26a826bbae2ffb8242e3853"
+        }
       ]
     },
     "20147f00f92d4240aab0b70cf578c022": {
@@ -545,6 +785,12 @@
       ],
       "content_sha256s": [
         "358ec26a509483062b2d5e477ea5cc98a28d320ab9e715a9ece2e9594e363790"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r840_http/template_server_dell_r840_http.yaml",
+          "sha256": "179b57e348197c17d1c2b34ac57183bbe88fe21f28a206eedd31f3a849b1bbf2"
+        }
       ]
     },
     "20ea139663264c21bca0dcecf2e95589": {
@@ -558,6 +804,12 @@
       ],
       "content_sha256s": [
         "33c9642e3486aa9c5bdb3d9cd6adf1afc21e840bb9e5dc829dcae14f08c56280"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS106-1C-5S_snmp/template_net_mikrotik_CRS106-1C-5S_snmp.yaml",
+          "sha256": "48515a088b6aebbda2d46a5d724f0b498aabf9e30ace66f9b924e5ad8a362424"
+        }
       ]
     },
     "21a95afef0e74fb19691693090403d1d": {
@@ -571,6 +823,12 @@
       ],
       "content_sha256s": [
         "ba8c5a2ca5cce9c38695764f450ad94023e7fbcc25fb1202e7b966e202b57983"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_mes3500-10_snmp/template_net_zyxel_mes3500-10_snmp.yaml",
+          "sha256": "8bd5e924586fd0e325e010baec6bc86c3d631912ca95516c57bc4bc2c1d7a822"
+        }
       ]
     },
     "21cca24cec1d40cdb0c2999aa6ac3037": {
@@ -584,6 +842,12 @@
       ],
       "content_sha256s": [
         "89b5c3d30c511d96ddb6aceb36760f5ef3afbbe4f226bb839896f326e3d7d0e8"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/postgresql_agent2_active/template_db_postgresql_agent2_active.yaml",
+          "sha256": "b24306f2bb899f990cc47d4300835d1ff6856b196af1320e6d541302565a0890"
+        }
       ]
     },
     "21f3e79e1d2e4f5e868d1ef81c94bbfd": {
@@ -597,6 +861,12 @@
       ],
       "content_sha256s": [
         "097ab6a62a0dec570ab7954dbd666e48fcf8243e09373ef40de4c5e07b08cd1e"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/qtech_snmp/template_net_qtech_snmp.yaml",
+          "sha256": "58cdfae698f2b999e94ca6ea0acf8a850b2b7f7f51007fa2b1cd3c068f3ef7f6"
+        }
       ]
     },
     "223101f878704022a04c30c3ff066e3f": {
@@ -610,6 +880,12 @@
       ],
       "content_sha256s": [
         "11cee9e246a609b3b32bfd0917a920700b32b6edf1dac981f113bd1b1c2ebed2"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS305-1G-4S+IN_snmp/template_net_mikrotik_CRS305-1G-4S+IN_snmp.yaml",
+          "sha256": "6a755bd1f5ff9a2b3caaf7c7e156d48e3170961db51022475fb38566d6d3f092"
+        }
       ]
     },
     "230fa9f7c1774821bbe6cdcbbba5cbc6": {
@@ -623,6 +899,12 @@
       ],
       "content_sha256s": [
         "8471d8af7b1bcd5a24e6ac41c170e885e74db5a9d48649d4df45c93bbcdc7e0c"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/morningstar/morningstar_tristar_pwm_snmp/template_net_morningstar_tristar_pwm_snmp.yaml",
+          "sha256": "b5e26eaf03e7547f8bb501934fa7877417afeea65e19c5bad0b974b32a8478fa"
+        }
       ]
     },
     "2327c665b46e4aa781d41240168c3867": {
@@ -636,6 +918,12 @@
       ],
       "content_sha256s": [
         "15f21d8aa01228d7e321d673779b3df657d0ca110e035acab534fba72fa9b7c3"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/intel_sr1630_ipmi/template_server_intel_sr1630_ipmi.yaml",
+          "sha256": "a5d7010d5be2e80e9cab58081d128a57850e5a85116b885f14088483f2b24766"
+        }
       ]
     },
     "2420a8a4fda74fbc81743aed69fafa3b": {
@@ -649,6 +937,12 @@
       ],
       "content_sha256s": [
         "105fa022bfe373610e6a82a2e8649ef05fe648b3b56d0dd9744cf2cde2cc0682"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/kubernetes_http/kubernetes_controller_manager_http/template_kubernetes_controller_manager.yaml",
+          "sha256": "93fe1476658c833abcb8a7c013bf34a209bafe85017f285097f66f3e08e0e86f"
+        }
       ]
     },
     "249de8d8d21e4dda9c3f766ab6201378": {
@@ -662,6 +956,12 @@
       ],
       "content_sha256s": [
         "363429099472140948ee424bc63d2b703949b2444c034677af4cdda6c33522f7"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_mes-3528_snmp/template_net_zyxel_mes-3528_snmp.yaml",
+          "sha256": "47244fd153b62fa00be117251cc8ea35e769bd42a8512a257d0e50492e419f28"
+        }
       ]
     },
     "24b64f6d22b446dabecc86ee3f199004": {
@@ -675,6 +975,12 @@
       ],
       "content_sha256s": [
         "3c833bdc1a3db15f970536b942494fa6dbd7e5645017cb260364f8efefeea8ff"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/controlm_http/template_app_controlm_http.yaml",
+          "sha256": "87abd136c7c4fc94370d2ab6761c6d4f902d839582ebd1bb5475c7b59148cc6d"
+        }
       ]
     },
     "24bed6339f0a492fab86fe757394b937": {
@@ -688,6 +994,12 @@
       ],
       "content_sha256s": [
         "fe929828e58ccb26e358e0a9077c893f559b7cf2bffabb26743191b29b419332"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/morningstar/morningstar_prostar_pwm_snmp/template_net_morningstar_prostar_pwm_snmp.yaml",
+          "sha256": "3adee8b2a69bc30cce2d8033a4e2f509f637e626396e44f4e5ba907974df9dc9"
+        }
       ]
     },
     "2506b0ca01884903b547b1e19b76ce6d": {
@@ -701,6 +1013,12 @@
       ],
       "content_sha256s": [
         "7d20d9314cb180aff59a502650c668bd42c98c1d646fc3a7bef0f1f506cbd208"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/linux_prom/template_os_linux_prom.yaml",
+          "sha256": "0520cc57d88a92454803325c66f5d2c49c1c70c623fb1367054ae74d63680c56"
+        }
       ]
     },
     "2526dce71d714e31bd545e96370c67b2": {
@@ -714,6 +1032,12 @@
       ],
       "content_sha256s": [
         "042036b51ff70e534e6da701a88baafa67430bfb79385b9c326e44f8252a05cb"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/website_browser/template_app_website_browser.yaml",
+          "sha256": "f1c13dfba6ed85cec6bb8ead8dde9c0bd094eb1d8724731c757e6ecca15747cb"
+        }
       ]
     },
     "26674f62500e4e79b9f470bbf962130d": {
@@ -727,6 +1051,12 @@
       ],
       "content_sha256s": [
         "ab04f0c2b90a81b7d4218eb34f048ca344196c74ca575a87b9e7b8807e09e404"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/arista_snmp/template_net_arista_snmp.yaml",
+          "sha256": "44bcc655235b89d54ce559bd2f93411185bab9013443653c5cc34d8856dd057f"
+        }
       ]
     },
     "2785d83763c641a7a7937b516665d93a": {
@@ -740,6 +1070,12 @@
       ],
       "content_sha256s": [
         "63f89762e0ae70c664ce2ca4ac2b4deeb7036e71c939ed9aba2dba727a733b72"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_hEX_lite_snmp/template_net_mikrotik_hEX_lite_snmp.yaml",
+          "sha256": "2d21b8850f5e3b24cce76db481a5a8ee8c7e4160b1a825e1f7b88f686743bade"
+        }
       ]
     },
     "27f6424905884dbb96ab9210d987a56c": {
@@ -753,6 +1089,12 @@
       ],
       "content_sha256s": [
         "37b8067bfb5a1579cef01657490e8ecf92551569b33e456a39bca0c6416333bc"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nginx_agent/template_app_nginx_agent.yaml",
+          "sha256": "881f22154f5c4210722f78bc57c5ae0aa1c4e2f9b662a8f4b8c8d1be65fc2c82"
+        }
       ]
     },
     "28e31ef9402d4c1ba2fbc730a288d2d8": {
@@ -766,6 +1108,12 @@
       ],
       "content_sha256s": [
         "c65af6639788fa553f8b90b9d6351a0ec765e8c3705d71a532fb6fa830ed756f"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/truenas_snmp/template_app_truenas_core_snmp.yaml",
+          "sha256": "b9a759592f55491935e86205534bbaee7153fcd6c0b751bfdd0971c7200ff806"
+        }
       ]
     },
     "292970ad91204722b5e5cb3233fc0026": {
@@ -779,6 +1127,12 @@
       ],
       "content_sha256s": [
         "8bb8191ebaa9d3805035adaacffb4165bec842f12b77dcc0d5b7fa6cd737bb9b"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_mes3500-24_snmp/template_net_zyxel_mes3500-24_snmp.yaml",
+          "sha256": "db3a74e170d8bf3a6c24fc6689561c9848e2828e1a63c037e17edd2cc9040ea3"
+        }
       ]
     },
     "29325098807848aa928b4192ad5e020f": {
@@ -792,6 +1146,12 @@
       ],
       "content_sha256s": [
         "fb6fcec2dc0f0d557186f18bcfff518e6983d0afc1ead218562d4f90fd68eab0"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "2b9039885edf45b8bdd39f16dd069133": {
@@ -805,6 +1165,12 @@
       ],
       "content_sha256s": [
         "5ba817e3165b426af14ac403189e1f080f6969b53df9eb1fc4ac86be3998f1e6"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/tplink_snmp/template_net_tplink_snmp.yaml",
+          "sha256": "0eb099e0078e51720d42d86ee4f74219ca6e31cbbd7b23dd822d9c73e4cf5096"
+        }
       ]
     },
     "2bd6f566391d49dab6bee184522ab5fa": {
@@ -818,6 +1184,12 @@
       ],
       "content_sha256s": [
         "550eb538618ba7a0b722ae75bf30e6611a45f0cd593f87ebc9b23cfb73d8ca10"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_FiberBox_snmp/template_net_mikrotik_FiberBox_snmp.yaml",
+          "sha256": "e1a07deb9da47388b90453c6074c881df93864e38420d1a6fe69f543b735c661"
+        }
       ]
     },
     "2bf5827343f0420792ad953f290baa05": {
@@ -831,6 +1203,12 @@
       ],
       "content_sha256s": [
         "8ee20c6fcca794e5a02c5e51f1781a07cff7a7e31831a0ccd830de74ee96742b"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/wildfly_server_jmx/template_app_wildfly_server_jmx.yaml",
+          "sha256": "384e16d705dfc803e58daf9dd9a52f8d07a9bce72c76858e810846edd6250dab"
+        }
       ]
     },
     "2c96393f8f2945c1a9f03f86adf5eb57": {
@@ -844,6 +1222,12 @@
       ],
       "content_sha256s": [
         "81fe122e5214d8a1eb817d4af73bd37fd0f192d74b68e364cba552ac1cc9bf0e"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/mantisbt_http/template_app_mantisbt_http.yaml",
+          "sha256": "36ac61e7a77ef9f8453107d97f94cf394a66c38abaed70672e1cd472ddd2e994"
+        }
       ]
     },
     "2cae7d2eeca04e6fa7419759ac9ad814": {
@@ -857,6 +1241,12 @@
       ],
       "content_sha256s": [
         "5b31c55ca5b9296a83c2d9c0a4bb9f2cc55e37719c3f44384832bbeaf14cbb5f"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/meraki_http/template_net_meraki_http.yaml",
+          "sha256": "0114a5acb5c9f4df8123a21007499f724f9d57dcf547e3921362902b6bb62771"
+        }
       ]
     },
     "2ce384bafd524db5b910d7f55bca1fbb": {
@@ -870,6 +1260,12 @@
       ],
       "content_sha256s": [
         "03ad74562bbb6c3aece1b48eb459340c65450d1de2ce44bef0c7e256be1a96c2"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/veeam/enterprise_manager_http/template_veeam_enterprise_manager_http.yaml",
+          "sha256": "2bbb8b3d3a1aae0abb108a122f6f8f5290ee414bd977f2f5658605316bd56594"
+        }
       ]
     },
     "2d20a2fbd540492089fdcafc8feb60e3": {
@@ -883,6 +1279,12 @@
       ],
       "content_sha256s": [
         "b32cc3aa3f6540863e8729e0d026b4d51582517e27cca32a244ddba58fd31a4e"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/morningstar/morningstar_tristar_mppt_600V_snmp/template_net_morningstar_tristar_mppt_600V_snmp.yaml",
+          "sha256": "dacb04d2f23b65ede59d5c04258cea17140d735f8490d55d3cf0128fae38e34b"
+        }
       ]
     },
     "2d8b9329b5d04cdf85bf17d2d0db2b29": {
@@ -896,6 +1298,12 @@
       ],
       "content_sha256s": [
         "ef86b23d8197fb65ccaaaf225b3c078e5dad71628935c93c87da7ca323815843"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "2eb43a3c9666467683b9ce09d2bd26d7": {
@@ -909,6 +1317,12 @@
       ],
       "content_sha256s": [
         "3cb51b4005550cae8c5029a0d731f86ba8a8ff6c1d7d3ce6cb067700864a4a06"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/kafka_jmx/template_app_kafka_jmx.yaml",
+          "sha256": "820e12468c570167f71d0350d28a0a0b690340844c0818f97d23fa7963b67141"
+        }
       ]
     },
     "2ef2f2eb75ee4a0bae839e22aa76e5fc": {
@@ -922,6 +1336,12 @@
       ],
       "content_sha256s": [
         "aaa61e36a22d7521b208d275a7c661f677e4d28793b5d01c8ee79cf649e9cfc4"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/jenkins/template_app_jenkins.yaml",
+          "sha256": "e1666b2921f354d02e35d6fe49679d0e3683bde9968ff70d6c8c05ad37274d34"
+        }
       ]
     },
     "2f82248e411340429d390e8389850401": {
@@ -935,6 +1355,12 @@
       ],
       "content_sha256s": [
         "25d6ad2af9f0642980f62b449424cfafc05c91dad0cbcf227213e39582de9b00"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/vault_http/template_app_vault_http.yaml",
+          "sha256": "d773975e52410d80f91a48654791de625db3652656b7988bd2f08300f12bce7b"
+        }
       ]
     },
     "2fca6b60914b4fa98132b1a7885ab014": {
@@ -948,6 +1374,12 @@
       ],
       "content_sha256s": [
         "14109bb9af65f07fe55a78b241c1468b327cbc27da10f8bf2749eb7b09ba09ac"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/meraki_http/template_net_meraki_http.yaml",
+          "sha256": "0114a5acb5c9f4df8123a21007499f724f9d57dcf547e3921362902b6bb62771"
+        }
       ]
     },
     "30cc187a4e994c39b07f53d86b5cc6bc": {
@@ -961,6 +1393,12 @@
       ],
       "content_sha256s": [
         "dc87b6f6c9c3b1be2845009a91fac4a5524299eb4b56ba1a8c02cd2db0b2951a"
+      ],
+      "sources": [
+        {
+          "path": "templates/tel/asterisk_http/template_tel_asterisk_http.yaml",
+          "sha256": "0c4983e05614684bbe3faafa4e36efdd5074b8f6573697bfa1971e9cc080a045"
+        }
       ]
     },
     "30d084c6b7844b7cab6cf820b00bb7b2": {
@@ -974,6 +1412,12 @@
       ],
       "content_sha256s": [
         "8de7b200d5750c2855d7927e2965589b3e77b51fb2b4f63c3e730e0174230f0f"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_catalyst_3750_24ts_snmp/template_net_cisco_catalyst_3750_24ts_snmp.yaml",
+          "sha256": "01cc64ebf23d7841dabd4ae12a662f60fa0cf9a06486df82a4db8a2eceb4ad4e"
+        }
       ]
     },
     "318fd61c22fa4f1a92a71376814d6c32": {
@@ -987,6 +1431,12 @@
       ],
       "content_sha256s": [
         "caf00aaffd3e4d7fa576d59e57f15ea537eac73c11275cff2fa73a969aa21b13"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB2011iLS-IN_snmp/template_net_mikrotik_RB2011iLS-IN_snmp.yaml",
+          "sha256": "3bb45d0949cc277fbe82b64861456d5c408716b56b526051560eb8fb7c13f6e8"
+        }
       ]
     },
     "32d3c78ff44c4c3c9ff5b893ad7f5fc9": {
@@ -1000,6 +1450,12 @@
       ],
       "content_sha256s": [
         "cc1acbd7b0fffa4c67b49d148916f135e88c5d68c95592405f221b7a94f946f5"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_smart_rt_1000_xl_snmp/template_power_apc_ups_smart_rt_1000_xl_snmp.yaml",
+          "sha256": "1d01f6b46854543d7c83664530e8482c8d4f570764be18ad23c3496556f26ccc"
+        }
       ]
     },
     "33c77d08d94242b88703eea0fb6c2d91": {
@@ -1013,6 +1469,12 @@
       ],
       "content_sha256s": [
         "cdcee5418b30cef5daeeb682d0eab39aacc1aa69760663d971db7acd22783154"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/vyatta_virtual_router/template_net_vyatta_virtual_router_snmp.yaml",
+          "sha256": "d642e2b3595c1d0339f3733a4dd87226659f63202a0c6a163a6d56413cef5ff6"
+        }
       ]
     },
     "340ec6917c274ead8fab36925e57f30a": {
@@ -1026,6 +1488,12 @@
       ],
       "content_sha256s": [
         "073cdcbe15c70ff4f0b039ebf83d01fa785cc5976451c6ba2f461063e2f79231"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_smart_rt_1000_rm_xl_snmp/template_power_apc_ups_smart_rt_1000_rm_xl_snmp.yaml",
+          "sha256": "7b1064e178c8391e8074f9a6dd62c07cdf4dd4364c2be06e32c076b37eaa7c88"
+        }
       ]
     },
     "34f386276a094e8e9a6e46653fdf05b1": {
@@ -1039,6 +1507,12 @@
       ],
       "content_sha256s": [
         "32148d7edd39d3cae4112d73a0f044558be5579003a2e2fc83cdb49e3365334f"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nextcloud/template_app_nextcloud_http.yaml",
+          "sha256": "6937f2408acd81655f2acc4679da0d7472ec5ffccc1fe51fe571caf0bdb6014c"
+        }
       ]
     },
     "35ef29f24158444097272d2ea7fa6044": {
@@ -1052,6 +1526,12 @@
       ],
       "content_sha256s": [
         "e27daabdf77a6a191f21ef763540bc7c62ac1a5db48aa917d3e8801e33e282d6"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "36116d8675da47b8a678193969d5a787": {
@@ -1065,6 +1545,12 @@
       ],
       "content_sha256s": [
         "f9d5c5fcd5d082bc3b4d141866bf38d5cefede2c85e520b701c08f8bfc3b96bc"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/cockroachdb_http/template_db_cockroachdb_http.yaml",
+          "sha256": "e6d69bde40d87dda36634170b075937e2970a06edd247c52eab879ee0c4dd2ff"
+        }
       ]
     },
     "3645654baaf04f11927b171bcb048349": {
@@ -1078,6 +1564,12 @@
       ],
       "content_sha256s": [
         "93f68005c3411aef6a08bccb846548fc4d4f405b5e473edfdcbf67224a36064e"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_ies-6000_snmp/template_net_zyxel_ies-6000_snmp.yaml",
+          "sha256": "c98e0546b01be0599b35e1a36c8a9b061e475c73beafa3fdb7217ff75d5a2e4e"
+        }
       ]
     },
     "379aaf7e87574debb4f5c3947a22ec68": {
@@ -1091,6 +1583,12 @@
       ],
       "content_sha256s": [
         "d6a3368148f530969dbdb182eaf94e2ed5e6b40a5c5e562355bd399e944073c5"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/hp/hp_dl380_snmp/template_server_hp_dl380_snmp.yaml",
+          "sha256": "6fde333db9ef1dcb551bdf8410c40d69f0c3c881a7a1575e98c99647ed642031"
+        }
       ]
     },
     "37e5eb5606bc4abba66c8b20381a1e8a": {
@@ -1104,6 +1602,12 @@
       ],
       "content_sha256s": [
         "83eadcd5bb74680f5eb3b5818964a6e5d028ba20632bba3b059cfca0ba8807ce"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/icmp_ping/template_module_icmp_ping.yaml",
+          "sha256": "1c5815e87c23152eca8e2d050e265c11f80ecf988c870186e077f1a2b2181143"
+        }
       ]
     },
     "38456af4aedd4b168ec3fa4ad2acb256": {
@@ -1117,6 +1621,12 @@
       ],
       "content_sha256s": [
         "e48477138e7ecd9c1e2c88cdd5d956590561793855064550284771645247b0dc"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
+          "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
+        }
       ]
     },
     "395184b5d5b048a68e06c91154c56847": {
@@ -1130,6 +1640,12 @@
       ],
       "content_sha256s": [
         "466d3cda5b62fdfd0a8eff58b92eb31ea3f49f7319d60bbae4dbb53af2cba14a"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/dlink_des7200_snmp/template_net_dlink_des7200_snmp.yaml",
+          "sha256": "7e80c0e71507ce9585e56e432a9e4e02dac604a670f28026659713cc3557346d"
+        }
       ]
     },
     "399bd1ee587245ecac6f39beaa99886f": {
@@ -1143,6 +1659,12 @@
       ],
       "content_sha256s": [
         "02d9d728c3f9f91370aea1f6e69f4da0b1b408c725d21a2e0a88be48620f564b"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/postgresql_agent/template_db_postgresql_agent.yaml",
+          "sha256": "e12ec7a0b42ddaee8ddf8515521b0a0368fdd7fab1e7b489a57c5a5310540f2a"
+        }
       ]
     },
     "39e2f742d0b24ea489b7f61d27a5df1c": {
@@ -1156,6 +1678,12 @@
       ],
       "content_sha256s": [
         "8909b0ca5d380b6735d020b79433a9404708ba9c8479b7a1dbb8702ab8324bbd"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/meraki_http/template_net_meraki_http.yaml",
+          "sha256": "0114a5acb5c9f4df8123a21007499f724f9d57dcf547e3921362902b6bb62771"
+        }
       ]
     },
     "3a0bbbb2ec0a4c58bba3ba3a3d6ce660": {
@@ -1169,6 +1697,12 @@
       ],
       "content_sha256s": [
         "a1296b33f85ae1cc884fbdad502ebf1162983f1dc130e0ae90f2a8ce448e0fd5"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/tidb_http/tidb_tikv_http/template_db_tidb_tikv_http.yaml",
+          "sha256": "ed2d36900ffb76d1d5e3076d7f89194431963801dddeadb9776b7dc01692f5cf"
+        }
       ]
     },
     "3a71dcdcfe0b4a0e8284d8939d335cce": {
@@ -1182,6 +1716,12 @@
       ],
       "content_sha256s": [
         "b4e1b723530981aa3882d42c261c2d370392ad6f762cbe39ca2db04de2078d09"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_aam1212-51_snmp/template_net_zyxel_aam1212-51_snmp.yaml",
+          "sha256": "3ebcfca6e1bd79af2701260783d2f802ddfeb3b37dd9c542cc362e469f138e78"
+        }
       ]
     },
     "3a7ff6eb19bb4a42b5b5b34a7179b30c": {
@@ -1195,6 +1735,12 @@
       ],
       "content_sha256s": [
         "4c0958e1cae84e519ba8329bc99362b1ef1b68861daac2c3c6d2547f338da779"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/checkpoint/quantum_ngfw_snmp/template_net_checkpoint_ngfw_snmp.yaml",
+          "sha256": "c0309f731bfacb248143f4c2a90448e519751fedb14e4d664af77c45e4dbfbe0"
+        }
       ]
     },
     "3ba7dec7c0034d86ad1c73b4f8ee8994": {
@@ -1208,6 +1754,12 @@
       ],
       "content_sha256s": [
         "54041ea421b5464413924fddd4f572ac168a252dcad4c989978cd8fa5ae9c5d2"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r660_snmp/template_server_dell_r660_snmp.yaml",
+          "sha256": "c8c0bc285ab281604ba0620653da6cdfebdca7baf6b3c27254d05c33ebe47bc1"
+        }
       ]
     },
     "3bbfe42c78c74f04a2565431fbdd19e2": {
@@ -1221,6 +1773,12 @@
       ],
       "content_sha256s": [
         "2afa8bdd7b0f96a00f87d57d3705d927c5b696876e94ed278cc5c6c5c71dcd6d"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/morningstar/morningstar_suresine_snmp/template_net_morningstar_suresine_snmp.yaml",
+          "sha256": "e38147acf04e1968dd1954669080518bd0e346bd55c398ddf67b92b91dafa996"
+        }
       ]
     },
     "3cc8c9ae7055458c9a803597007f70bd": {
@@ -1234,6 +1792,12 @@
       ],
       "content_sha256s": [
         "1605718dbb4ef8e38321fd723c51d1c224665c9dac47b3a3bd4c9e3c6c99d25d"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/tomcat_jmx/template_app_tomcat_jmx.yaml",
+          "sha256": "43432304fb56e121c8357c5f80c8827d6cc9f1183d1a911a4c3c8aded08c2ff3"
+        }
       ]
     },
     "3d527f609e344ed8a4ec19762c31c619": {
@@ -1247,6 +1811,12 @@
       ],
       "content_sha256s": [
         "a679a370b9ab59005170ece35c6bbd283d76d8bb509d97e9833956235e7f7956"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "3db29bb6b2b14fa289ba7915264efcdf": {
@@ -1260,6 +1830,12 @@
       ],
       "content_sha256s": [
         "b7c4d1e44420a3732c9898e447b44062ef638bfb7da141fa4b02c98af0bc138e"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/consul_http/consul_cluster/template_consul_cluster_http.yaml",
+          "sha256": "62ad78b6c1daf1842a737b01a400059cef948229332c76c356ae4c5e5f9afb68"
+        }
       ]
     },
     "3db86b0d235e4c7b80f7d6144ca08925": {
@@ -1273,6 +1849,12 @@
       ],
       "content_sha256s": [
         "999f3754014bfd36f969d307a8a856b72a166dc01f83a8b9d8628c0263523663"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_ies-500x_snmp/template_net_zyxel_ies-500x_snmp.yaml",
+          "sha256": "5d03243d32856db1f49bf63cbfdf469652045798754e8383023ff03408d8eeff"
+        }
       ]
     },
     "3dfd1a55987848e5aa6ffe92c228f63b": {
@@ -1286,6 +1868,12 @@
       ],
       "content_sha256s": [
         "7ef1eebb54dc38ecc4dd888c1c55509117ce5d3c7448a9fb4a5ad8e680efadc0"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB1100AHx4_snmp/template_net_mikrotik_RB1100AHx4_snmp.yaml",
+          "sha256": "98e473a50dfe70b810d5ea8392133612dcb9c9ea2d0cfb794616654cf29dcf3f"
+        }
       ]
     },
     "3ec55c9966624ef5bc1b50502812d581": {
@@ -1299,6 +1887,12 @@
       ],
       "content_sha256s": [
         "e2f5bf74ebfef9fef23bf6ea465837cd2d238517e794275cf8e8289797774998"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_snmp/template_power_apc_ups_snmp.yaml",
+          "sha256": "172372231042ea7526f85842ae462892e426887750df7fedff453a73c3e849b2"
+        }
       ]
     },
     "3f707f39c32a4b6e8b214c38a260f6f9": {
@@ -1312,6 +1906,12 @@
       ],
       "content_sha256s": [
         "bdec5007e96ec32fa114b7a3892ba76aa5e227af13a6dcb7b60707161dd1bc26"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r740_http/template_server_dell_r740_http.yaml",
+          "sha256": "a7d9462b412be328c11681f950f69db50fb4c78e2af73b2c0391427280ce92ab"
+        }
       ]
     },
     "3fb4020df2984b0ab64dfd8355ff5c65": {
@@ -1325,6 +1925,12 @@
       ],
       "content_sha256s": [
         "5b6ce714a75810beb4b557db7b46994467eae9af569c89bcfd8e77967f579c99"
+      ],
+      "sources": [
+        {
+          "path": "templates/cctv/hikvision/template_cctv_hikvision.yaml",
+          "sha256": "a22cd3f421f8dca428ef409fad9ceff57646db24c36d5b14d08aabea7d3bb108"
+        }
       ]
     },
     "40c233aaa3424fd29dc378022ff3461d": {
@@ -1338,6 +1944,12 @@
       ],
       "content_sha256s": [
         "c847b1628cf0cbe8ce3926cf8918e98c658da39ffa16f107072a4f8360c3f1ad"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml",
+          "sha256": "42e5dcb6e65bf1b7cc92a8e8a9a21dcc8f5277acc9075c88391abf54492dde49"
+        }
       ]
     },
     "419145c8af7e4b8eb30af8460bbed566": {
@@ -1351,6 +1963,12 @@
       ],
       "content_sha256s": [
         "4341222b03a027b30235e4eb39532b52c5d0277c7705ac96e771b777c17765c1"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r750_snmp/template_server_dell_r750_snmp.yaml",
+          "sha256": "45c3950fe510f3cfc090115caeaa2d9aae025e060d9488e91b32bf638ff251a9"
+        }
       ]
     },
     "42b18986c8b34c2d9c36f9cd00565bd5": {
@@ -1364,6 +1982,12 @@
       ],
       "content_sha256s": [
         "4ae4bc0ae4723e1d99cf8e83af6ec81c2d4740789c351efcecc1a796e6b1268c"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r750_http/template_server_dell_r750_http.yaml",
+          "sha256": "a1ea99dec8b955e80860cd34ba174b1b9198fe9d21db07c17dae35fa9da8a458"
+        }
       ]
     },
     "43596328d4d74a5592906a9e08e3fd96": {
@@ -1377,6 +2001,12 @@
       ],
       "content_sha256s": [
         "cef36eba46998c6d0188262f6e34cc1faa174e6f199a560bf1e464488907f9ff"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/tidb_http/tidb_pd_http/template_db_tidb_pd_http.yaml",
+          "sha256": "1d7298dcd3573b3cc69ffbc25965d27ab78aaeab10d176d87701bcb1cf1ab597"
+        }
       ]
     },
     "43dc5c8a9a0e4786b64e44422c7f32b4": {
@@ -1390,6 +2020,12 @@
       ],
       "content_sha256s": [
         "a857b4c464b3d5f6020677933b1eb3517abc803b8757e98e49ddc24996c97524"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell_idrac_snmp/template_server_dell_idrac_snmp.yaml",
+          "sha256": "24454a10890f84561bfdf77bc5dae943e35e3145a7cceb3e17a00b020447274f"
+        }
       ]
     },
     "44990575121d4798b9e10520604c786c": {
@@ -1403,6 +2039,12 @@
       ],
       "content_sha256s": [
         "27112058986a6496ae2f55e8404fa91f701300b4b451ea0561f2eac211d02e2d"
+      ],
+      "sources": [
+        {
+          "path": "templates/san/pure_storage_flasharray/template_pure_storage_flasharray_http.yaml",
+          "sha256": "221dbfba744c99417d7ea9188d9231f8cd17aaa2258b1e4cccf651cc744e6de8"
+        }
       ]
     },
     "44c2c2d94a4447c6a924386640e4854a": {
@@ -1416,6 +2058,12 @@
       ],
       "content_sha256s": [
         "f69efc192c26a4a5ee83542e2553047abceb8516e3369336983184ed475a2ddd"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/f5_bigip_snmp/template_net_f5_bigip_snmp.yaml",
+          "sha256": "f56b3848640377ffe4a73fa7e554e1ddf41635bcc35f9556089c74fde9569eaf"
+        }
       ]
     },
     "44eac6a1abe34999b85ad6d0e40073fd": {
@@ -1429,6 +2077,12 @@
       ],
       "content_sha256s": [
         "51bc187c247af60d8ee54e1e6d2b9979062edb3f123a7b21b210da330be9da79"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nomad/template_app_nomad_http.yaml",
+          "sha256": "49db24b4f9b50858a79890a1011e6e430693d1eac8ff0b2be796dd6d204cc4db"
+        }
       ]
     },
     "4583f0c3bc894251a6c5e7129cb5b9aa": {
@@ -1442,6 +2096,12 @@
       ],
       "content_sha256s": [
         "1f3b28b43504b006652db14a699b5da86fc3ef7973bf5d9e8b7d22e70fceae7c"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_catalyst_3750_24ps_snmp/template_net_cisco_catalyst_3750_24ps_snmp.yaml",
+          "sha256": "7a46e6d861003e4bcddc0e9f196c8436a16a78db108438fd205c35ef25e1e5a7"
+        }
       ]
     },
     "4677be3e07bf4f3285496f2f4230b928": {
@@ -1455,6 +2115,12 @@
       ],
       "content_sha256s": [
         "fa0dafa8387298fc1cca31bce81cba80942c742ab024ffadd269adaac681f96d"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/iis_agent_active/template_app_iis_agent_active.yaml",
+          "sha256": "84c015d4dfb6195834b0b18c29ce79814f1339ae4298fbcc4455bc14ac1aecbc"
+        }
       ]
     },
     "47d87c39c121429b98a18f641aa443ea": {
@@ -1468,6 +2134,12 @@
       ],
       "content_sha256s": [
         "d81d95bc8d72eb3535659e3bfc7b48205c282681dd17088371cd0910a227477d"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/gridgain_jmx/template_db_gridgain_jmx.yaml",
+          "sha256": "711692b5fbab4b686bde4d1784a399938379a4aba4c0abeba72e39c66b10554e"
+        }
       ]
     },
     "4904f84303c74c5e955b7849730c3155": {
@@ -1481,6 +2153,12 @@
       ],
       "content_sha256s": [
         "6eac20884bff1c4bf33078aeb5a4460a4900ef815df9cb4ee16f61e9ac80bf91"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/mysql_agent2/template_db_mysql_agent2.yaml",
+          "sha256": "3b68ca413b1ea28561bf20d2512b0d6db8a40839ea5c85410408fe9ef56b7491"
+        }
       ]
     },
     "4958b76448d74ff1b6d7d6280449beee": {
@@ -1494,6 +2172,12 @@
       ],
       "content_sha256s": [
         "738e493eb0ddc27a27220c849b1b844b9a9346906a1133b5f5eb489ae0e382d1"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/proxmox/template_app_proxmox.yaml",
+          "sha256": "0cc620659d2c1cbb6d84555907a0fba27917edfe6f1a0de8ebd84a5e9a590344"
+        }
       ]
     },
     "49c77ce207f8478da53e761526d6eca5": {
@@ -1507,6 +2191,12 @@
       ],
       "content_sha256s": [
         "f23f2fbba25a4b66fdab5b29cf0d8ef73a56d86d3d44ab0f051245f5b43be761"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/php-fpm_http/template_app_php-fpm_http.yaml",
+          "sha256": "fda637ae21a7eeed683f41d3324f04b8539c4ccdfdc1097a2cb572dd30bd5d77"
+        }
       ]
     },
     "4b27e636b6ad4ce68511d344d5604999": {
@@ -1520,6 +2210,12 @@
       ],
       "content_sha256s": [
         "c6131613e2c9fa3b0ccfe3bcf2222399903cec7a5092b5016c57d0ac5141a68d"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/wildfly_domain_jmx/template_app_wildfly_domain_jmx.yaml",
+          "sha256": "9e367be9f7cae159f9898ed52a3989f5d9735c92bf7c1e942dd9ef264a1f921d"
+        }
       ]
     },
     "4c7d0c6e342b40458611bdb6e9dd958f": {
@@ -1533,6 +2229,12 @@
       ],
       "content_sha256s": [
         "05bad47f9d5247eca543350bbd8bad87d27de6fb5a8608536fc330b52cb710cf"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "4cb1aabe2b704b5c882963c2ef87d8f6": {
@@ -1546,6 +2248,12 @@
       ],
       "content_sha256s": [
         "94e4a2e7678b06d9ba9e41182753b9cb92d70e072c756e31dfe0099aada1ac45"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/generic_snmp_snmp/template_module_generic_snmp_snmp.yaml",
+          "sha256": "67ae25b1643910727e2921c6eeb0640a381a773a6b5dcf051490f40a78d0494c"
+        }
       ]
     },
     "4d3a7adbb6964bd08f2b9d28e0da6496": {
@@ -1559,6 +2267,12 @@
       ],
       "content_sha256s": [
         "3099b7613e3b734fbd85d2647f6587c0d954a1e1b27e9be7ed2d662d71b7ebad"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/linux_snmp_snmp/template_os_linux_snmp_snmp.yaml",
+          "sha256": "be329a5e99befab4472f29c8c7f3b8d4e2d4b30d78c8a733a10df7f51e7fa838"
+        }
       ]
     },
     "4e1e9372a5fe4297936210bc4fc4b1c0": {
@@ -1572,6 +2286,12 @@
       ],
       "content_sha256s": [
         "de1746eee55ecd4cfd1c08e65ee9c0f7e65431a86d8e951fa14c097a5c3cf3f9"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
+          "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
+        }
       ]
     },
     "4e3fb27f028e4c35b8c9fc43b11c07d7": {
@@ -1585,6 +2305,12 @@
       ],
       "content_sha256s": [
         "281ac3bb570d236f800dae653bfe78edef573d16b44f8aef775590ecd9bcf35a"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/openstack/template_cloud_openstack_http.yaml",
+          "sha256": "2660ba99e986029b791abc8b79978dc2cd67cfc6bc212907b49510870652475b"
+        }
       ]
     },
     "4ffb0f9103084384a98379ed533865e9": {
@@ -1598,6 +2324,12 @@
       ],
       "content_sha256s": [
         "8062a2eacef3dcc378e508bba3a067e1a3c097388bc052ec72de245c413f9af1"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_symmetra_rx_snmp/template_power_apc_ups_symmetra_rx_snmp.yaml",
+          "sha256": "3c4ec0a7c2efddd90b933298a031a3f279d594c63b4a91af8e38da44131b4ab0"
+        }
       ]
     },
     "507d70db18554a4e9ee5e09bb29bc85f": {
@@ -1611,6 +2343,12 @@
       ],
       "content_sha256s": [
         "ee52f19dca58b372e8432e214db4ab49746f6319b7744d2e75591535fac7cbdf"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
+          "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
+        }
       ]
     },
     "5175afdf713744d9a81ce53864ccfc1d": {
@@ -1624,6 +2362,12 @@
       ],
       "content_sha256s": [
         "324c5a4f1ecf82fd53c2469813bf9407e712d5a432620d0aeda10ee55cf9535c"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "51ffd432b9324ce2b04e1d4dc4122d16": {
@@ -1637,6 +2381,12 @@
       ],
       "content_sha256s": [
         "5f51fe00d6f8f91e09334dfda43c6c9f9d398a2ace6ead040db9905e51d204f3"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/mysql_agent2_active/template_db_mysql_agent2_active.yaml",
+          "sha256": "e02ffdb85e799ef407c2fbcd284794415c482885ac6f81343e125fad57e55298"
+        }
       ]
     },
     "521d864fe8574f19b350f7ddbe259042": {
@@ -1650,6 +2400,12 @@
       ],
       "content_sha256s": [
         "0b3c6744d0786b36d5230562a2a79c274f7f0b96f68825dec074b87cff5cbe25"
+      ],
+      "sources": [
+        {
+          "path": "templates/san/huawei_dorado_snmp/template_san_huawei_dorado_snmp.yaml",
+          "sha256": "0c9a197e2971f73499b48ee7fad19c600b102fecd9c7660191d1b557e42c990f"
+        }
       ]
     },
     "5265860748e14dea8ed58b35fd9fe3d1": {
@@ -1663,6 +2419,12 @@
       ],
       "content_sha256s": [
         "d5a217694a23e9237312642e01f1c27e6861af64a717996cb04550319ed801b6"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/aruba/aruba_cx8300s_snmp/template_net_aruba_cx8300s_snmp.yaml",
+          "sha256": "ecd6cc5ed79e0c7a40a8d64bd42b8e2af25137a43117172633148ea7b54508e9"
+        }
       ]
     },
     "52b2664578884d9eba62e47375c99f8e": {
@@ -1676,6 +2438,12 @@
       ],
       "content_sha256s": [
         "937402da291d78e25dbff9aff175ba3c379a749740d75b20aa211b453536680d"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/elasticsearch_http/template_app_elasticsearch_http.yaml",
+          "sha256": "6da79d3d1eb612b3b6b3effe476efb20791b0c7fa28f35b4a9a06a199926ef97"
+        }
       ]
     },
     "53044571fb864d87af32473e08c76d0b": {
@@ -1689,6 +2457,12 @@
       ],
       "content_sha256s": [
         "052f7f79d439b1a9cc2978871d389ef7885b36f56894361eee9944d65888abda"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/alcatel_timetra_snmp/template_net_alcatel_timetra_snmp.yaml",
+          "sha256": "7a2d2a64263c557e401c77adb44200550d06857fdd1348ff0d31dfd0c3386bab"
+        }
       ]
     },
     "5331ecc3be9f47d6a8eb0732ae141239": {
@@ -1702,6 +2476,12 @@
       ],
       "content_sha256s": [
         "3670e67194f94dc70fc649e1100cd9ab60931166e49789651c4ee3d0424f28a0"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB260GSP_snmp/template_net_mikrotik_RB260GSP_snmp.yaml",
+          "sha256": "9c3beb2e9ffe28672e33a695fb02f534c51fd24bb12ca1ea84f7d4bc3dd35d4c"
+        }
       ]
     },
     "538ec67ce01341a9b281dbd86d86d2a2": {
@@ -1715,6 +2495,12 @@
       ],
       "content_sha256s": [
         "9c959761d0d7f0a9cecd06ac5766275b7cb37e55aba11892ae0e7e55cb4b645d"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS112-8P-4S-IN_snmp/template_net_mikrotik_CRS112-8P-4S-IN_snmp.yaml",
+          "sha256": "4174da85eb1cdb1d238f4cb9210abe11de2645e6d994fffd2d59e1673651277e"
+        }
       ]
     },
     "54f0ffb538d94a9bb8062df3e63c4cb6": {
@@ -1728,6 +2514,12 @@
       ],
       "content_sha256s": [
         "583a28cfa78e0d73be2f21e122efb5cafd873297c16da4a7ea06ccc815c23ea0"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
+          "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
+        }
       ]
     },
     "56079badd056419383cc26e6a4fcc7e0": {
@@ -1741,6 +2533,12 @@
       ],
       "content_sha256s": [
         "2b8934222f6f5e871f25fd730d3df68b1c6288093022674d001bb55a30a9143d"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/vmware/template_app_vmware.yaml",
+          "sha256": "2e3d7a73da4bcfab68d5cd3043c17027d4e0dff887597393f6ce660e0c66fb5f"
+        }
       ]
     },
     "5630ec1b1baf449abe1bc5521f85fe6c": {
@@ -1754,6 +2552,12 @@
       ],
       "content_sha256s": [
         "f307eb38a65c52663c0dd53e6c6418ef87349fafc34400b9889dcdfbb0590858"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/certificate_agent2/template_app_certificate_agent2.yaml",
+          "sha256": "dfade7f7633601dd1ced0bf1b90ba532eb8407c757b68bb8113c8d993aff623e"
+        }
       ]
     },
     "57aeccd43b744942b9555269b79a96ad": {
@@ -1767,6 +2571,12 @@
       ],
       "content_sha256s": [
         "f34203282c3682ea0e0b68c413dfd50d30ef3c179f65cd3f26430bade6af1294"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/hp_hh3c_snmp/template_net_hp_hh3c_snmp.yaml",
+          "sha256": "e08b22aa87522cab1d4a79dccf7845863497bd91be08bf3c027e11f31f602e7a"
+        }
       ]
     },
     "586119e5e27e4062a3cce8601ecb8d71": {
@@ -1780,6 +2590,12 @@
       ],
       "content_sha256s": [
         "867f32455c0e1c0b086c03eb4e64d97af362021e5e07eeb8efa972a361ddef41"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/hp/hp_bl920_snmp/template_server_hp_bl920_snmp.yaml",
+          "sha256": "ef282a374a5cd8e8382bad8c04d0f8a17889288002991ddf50f970b08cdb6cbd"
+        }
       ]
     },
     "5899b2f0aced4085b5ac25d0461b3425": {
@@ -1794,6 +2610,16 @@
       ],
       "content_sha256s": [
         "01babb8f7161d06fa01163b7b84e70c52eb1bb8716380574a6615d261a5e5a4b"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/vmware/template_app_vmware.yaml",
+          "sha256": "2e3d7a73da4bcfab68d5cd3043c17027d4e0dff887597393f6ce660e0c66fb5f"
+        },
+        {
+          "path": "templates/app/vmware_fqdn/template_app_vmware_fqdn.yaml",
+          "sha256": "62cf2779fb156c771dde1fb927671d0a23b54f5ce90bb879841810baaca4d85a"
+        }
       ]
     },
     "5920713da492452889adabc25e259caa": {
@@ -1807,6 +2633,12 @@
       ],
       "content_sha256s": [
         "f33dab92813e26a87349b9b3b50f5384d0bb559b102d071cf02d0bc4d7150471"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/netgear_snmp/template_net_netgear_snmp.yaml",
+          "sha256": "1091ce551176011ffec9221bae9b54ee2b7f4e86886b3ea92bbd54ea46981eb3"
+        }
       ]
     },
     "5c42de26643c4b43b23a11159df021ce": {
@@ -1820,6 +2652,12 @@
       ],
       "content_sha256s": [
         "c7618a545d5cac209401fe5f2a1d5a4e312672185f2307d1e6f01b4d4143b013"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/cassandra_jmx/template_db_cassandra_jmx.yaml",
+          "sha256": "8f7451e53f3429c6faf82630bf48c25b52e5f8d7bc1d1dbef3ca6177bc694587"
+        }
       ]
     },
     "5d3971cd973b46e7915d7ae0750bac57": {
@@ -1833,6 +2671,12 @@
       ],
       "content_sha256s": [
         "357fcb6c8d5c1f9c1bc766cc4ca93da851dccc6cc874b23040b115b6bed3b39a"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_galaxy_3500_snmp/template_power_apc_ups_galaxy_3500_snmp.yaml",
+          "sha256": "9d6a48f66c51fcc26fe406dc0ef03643284eebb02655a98db8e3cd904e2fc3a7"
+        }
       ]
     },
     "5e225ad1c2cc4d0bbf75586e7bf8871b": {
@@ -1846,6 +2690,12 @@
       ],
       "content_sha256s": [
         "8b89f609d938c7cdd9dbe3be4f8f81c2f54879c031a3a548a78da4b6ba7fb370"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "5ed19d1f74224588bf5f53ac47003acc": {
@@ -1859,6 +2709,12 @@
       ],
       "content_sha256s": [
         "055a97a59fe46d22a73e3dce2d2c4844577ecebf42599ecbe79b2bc3f3a29dfa"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR1016-12G_snmp/template_net_mikrotik_CCR1016-12G_snmp.yaml",
+          "sha256": "1b04d9cef9d236f0f3d7181f2c244ebeb5cb4a750a2a2223b039eec085a6f75c"
+        }
       ]
     },
     "5fa761bc51e4432a90c6c9eece930c4a": {
@@ -1872,6 +2728,12 @@
       ],
       "content_sha256s": [
         "67a10b6d6085eb09387b4171a686c4b72373942650449c2223581d1e04a460e2"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/rabbitmq_agent/template_app_rabbitmq_agent.yaml",
+          "sha256": "9d8f0f351df6c764191c8f3a4ba7e50d188783920183292e6c0b60bf6ddad170"
+        }
       ]
     },
     "5fdd2ca8b8f84962aaea5a218b46ea7d": {
@@ -1885,6 +2747,12 @@
       ],
       "content_sha256s": [
         "c645ed4c12a0bbfc03be7669758d1ca5fc305a13b93f2962630d7cd7a56b8f58"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/windows_agent_active/template_os_windows_agent_active.yaml",
+          "sha256": "1db2c1e516ea74105de846d4e122a8017c092e9c15f1ebd064bb110326262985"
+        }
       ]
     },
     "6095f32a1e6f432a8a053e6245891632": {
@@ -1898,6 +2766,12 @@
       ],
       "content_sha256s": [
         "160767f2a9a9464c756e2d79e542e8691fece28be32dbaeca8de3b26553daac0"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/ribbon/ribbon_sbc_edge/template_net_ribbon_sbc_edge_http.yaml",
+          "sha256": "33cbe544fc34991683c03c7d93491ab911efaaea2cd79e6075eaa4eb3e907014"
+        }
       ]
     },
     "60cb9ccb922e4fd194a1d9573db10237": {
@@ -1911,6 +2785,12 @@
       ],
       "content_sha256s": [
         "259dbd91ea500ff4254c19ee0f6cd4956d2b0ac0e3403f943e17ff4ac0ed601f"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/hp/hp_dl360_snmp/template_server_hp_dl360_snmp.yaml",
+          "sha256": "e95ea9ae74023b417bf5100e86213c31da8d5ac4bdaa29531c7482c71d8a08b9"
+        }
       ]
     },
     "62d99b55585e41dd89736f5f46074dcb": {
@@ -1924,6 +2804,12 @@
       ],
       "content_sha256s": [
         "4c61fceeaece15728c627d16bfbe4c6a9e65ecd42251c61b010d2b23a7577689"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
+          "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
+        }
       ]
     },
     "650bec3f2f364a478b82317396949459": {
@@ -1937,6 +2823,12 @@
       ],
       "content_sha256s": [
         "4ae822e4964ebfa0b438d18f52149f44ccdca1f2ac446dca0a590087fe36b9d3"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zabbix_agent/template_module_zabbix_agent.yaml",
+          "sha256": "2a3e02b7976257ff05e760d437254bc653e166369414e84fc071978d33a8edd7"
+        }
       ]
     },
     "654910b270d9464f863ed085ba7302ce": {
@@ -1950,6 +2842,12 @@
       ],
       "content_sha256s": [
         "2f111fbfaa284ad13bbbb718c7e6b3eedf65451f9a7a53271eb5162c6c496b88"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR1016-12S-1S+_snmp/template_net_mikrotik_CCR1016-12S-1S+_snmp.yaml",
+          "sha256": "243f654042c664b1bcc226b686efdb79875fceaa3b02f1e54d7957c15b56284d"
+        }
       ]
     },
     "67332e679035423f85090aa985947c36": {
@@ -1963,6 +2861,12 @@
       ],
       "content_sha256s": [
         "257e4b48cd6f069755c49fd794c2405e53ff715e7bda606813306971da756870"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/generic_snmp/template_net_generic_snmp.yaml",
+          "sha256": "b8f580439e5fdca095ee3ed7a51bb85034d99dd1a3c428767e5d376dcebfde50"
+        }
       ]
     },
     "6742f5ed33ca4c19b8e61203770e5fe5": {
@@ -1976,6 +2880,12 @@
       ],
       "content_sha256s": [
         "90cffa5b1bbf7d974798063ce6a5628ddbc0188150c072aad1e640858f903baf"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS328-4C-20S-4S+RM_snmp/template_net_mikrotik_CRS328-4C-20S-4S+RM_snmp.yaml",
+          "sha256": "6e96b9e96464ba7873fcfe8d2e66cd53fc4c35781f760b5d294ac77648610465"
+        }
       ]
     },
     "682ac14a5d294f4790ac8411ab6c33bf": {
@@ -1989,6 +2899,12 @@
       ],
       "content_sha256s": [
         "b84c7733a5ef12ac086dcc28475b7fc7d7389e50863d9936537fa38bba38e9ab"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/ribbon/ribbon_sbc_swe_core/template_net_ribbon_sbc_swe_core_http.yaml",
+          "sha256": "346e17fd28cacdbd20c4fd4291eb6e31a877371bfdd8d81a8f259c53c50ea757"
+        }
       ]
     },
     "68c2034014f24115ae9e910962530472": {
@@ -2002,6 +2918,12 @@
       ],
       "content_sha256s": [
         "b15f80a2ccb882c9d26db0d377ddb90ba8148b0084dc167e4c322684c3047e78"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_hEX_snmp/template_net_mikrotik_hEX_snmp.yaml",
+          "sha256": "56c9787a17556924930a83c791e8a3144e1dda481233e9f5400cd8651b598368"
+        }
       ]
     },
     "6c235d126c1f4895acfe2156b140a886": {
@@ -2015,6 +2937,12 @@
       ],
       "content_sha256s": [
         "1d995ca39ed5520d64991dff212d68c4770672e45903f9288ec7a15faf97b69e"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/ubiquiti_airos_snmp/template_net_ubiquiti_airos_snmp.yaml",
+          "sha256": "8da9403828f3818fae168df2231f7ccb23fac632e20d23b3e4c689b0d728aed0"
+        }
       ]
     },
     "6d2443db49e54d59a82b9b525f2424ef": {
@@ -2028,6 +2956,12 @@
       ],
       "content_sha256s": [
         "dd2a513c6490423e92cf36b28104ea918ae5285e8d6fee98b7cf476c25b78080"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
+          "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
+        }
       ]
     },
     "6d6c147c87de4af1b09cf0f55bac50a0": {
@@ -2041,6 +2975,12 @@
       ],
       "content_sha256s": [
         "b6f9ec64e35b236ffe13efd1f9169646348eb9d45a705dfabad6e59f013be486"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
+          "sha256": "b7ab58a4091478d0c080264d68cf94ee4c0d6f03b2836d1e7b673ce3b1333406"
+        }
       ]
     },
     "6d9737c72e5540d39e3553b773a587b1": {
@@ -2054,6 +2994,12 @@
       ],
       "content_sha256s": [
         "1c84f4f06cccc52c0bd25fd3a05d42bba7c3385fb252d673a984b5a306af1d61"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB2011iL-RM_snmp/template_net_mikrotik_RB2011iL-RM_snmp.yaml",
+          "sha256": "2a9c05c4266d86349bd1714c6a5c86bb34a33c66fa2b243bb4783834cfbc8d34"
+        }
       ]
     },
     "6ecfb7083ddf45f183ab4be50cfba37a": {
@@ -2067,6 +3013,12 @@
       ],
       "content_sha256s": [
         "2ff3419ac804fe0f3d656844fe05a096af53715085406e29ee391b5f51ddbbee"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/brocade_foundry_sw_snmp/template_net_brocade_foundry_sw_snmp.yaml",
+          "sha256": "389e07187bf60d232e39053459987986a17035900677c41e0c5cea9bc37747ee"
+        }
       ]
     },
     "6f7f2c44e13a46a4b219fbb5db92f3f7": {
@@ -2080,6 +3032,12 @@
       ],
       "content_sha256s": [
         "d57572add3a9aa9b1f979bd4b6d89814d00eb98f03c9eadf1d377fc55ae04386"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/intel_qlogic_infiniband_snmp/template_net_intel_qlogic_infiniband_snmp.yaml",
+          "sha256": "67209ce9496f084c70b536df21ef48fd679ba59543e0bab9a3d19a4fbd8efc90"
+        }
       ]
     },
     "6fd1bd7226934f498169202ba4e9a482": {
@@ -2093,6 +3051,12 @@
       ],
       "content_sha256s": [
         "78b889f9ac42454bd89137026587cf1284a6fc47e31cc5ba97088f6b1739bfb5"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/velocloud_http/template_net_velocloud_http.yaml",
+          "sha256": "2a0cf64bb29cd2dcb16f1cb9ae436bc6567ee159181670bae86b7b64df75f66c"
+        }
       ]
     },
     "6ff896f545e043cc98de6d98698d41df": {
@@ -2106,6 +3070,12 @@
       ],
       "content_sha256s": [
         "591a0e2b553ff74b30d6b16de9c409f4e31bdaaa2c1264dfec3bb940bdefffda"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_catalyst_3750_24fs_snmp/template_net_cisco_catalyst_3750_24fs_snmp.yaml",
+          "sha256": "5dd3103d2065c8a83ba59b5a971ded45339606b2ed40a7cf3b57f5fc1d4d2b6b"
+        }
       ]
     },
     "7005acc9123e4bc290805a3a16dab9cf": {
@@ -2119,6 +3089,12 @@
       ],
       "content_sha256s": [
         "8b6705e3614190db623143141372706fea9280549462fff9857e9244ebb48f9e"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/postgresql_agent_active/template_db_postgresql_agent_active.yaml",
+          "sha256": "2da59af0bdf5b24c4b73c330d58cd378a47a9a292376959b510ed0818fbd9942"
+        }
       ]
     },
     "72aab08f7f27406a8f2c291648e5ba95": {
@@ -2132,6 +3108,12 @@
       ],
       "content_sha256s": [
         "c91df0ad8a8a32cbb08eea716862ea68cc9ea7ec67274d7442bba8e23309d386"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/generic_java_jmx/template_app_generic_java_jmx.yaml",
+          "sha256": "6bd903cf11b27c5862f2417827cbadb7d91025976045ecdcd7649dfc8c4c4022"
+        }
       ]
     },
     "738085dde4e749d49199e5e6fd4d56ab": {
@@ -2145,6 +3127,12 @@
       ],
       "content_sha256s": [
         "9433d36ce8b9506659db4fb39990c6d3ac6e3e8ef0eda5b4992e81d291666551"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/veeam/backup_replication_http/template_veeam_backup_replication_http.yaml",
+          "sha256": "be6bfc4db8a708645f976e7ffddeef7636615e940d665faff5fa810ad5a16671"
+        }
       ]
     },
     "73f123bb9ffe4587a0269c7e8752b2ed": {
@@ -2158,6 +3146,12 @@
       ],
       "content_sha256s": [
         "3eda1f61b268c3609d8d530680ff67740d5e9ee7ef04cfc67844e34b00dad017"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_gs4012f_snmp/template_net_zyxel_gs4012f_snmp.yaml",
+          "sha256": "256b7fe12bf6fffab733e36fc0a7f50c71ec2f2b05949fdbc6674f65db52042f"
+        }
       ]
     },
     "75ada0d6fb22416a9e6e5f44c2c3f64a": {
@@ -2171,6 +3165,12 @@
       ],
       "content_sha256s": [
         "22a275eeb6fa182c77173edae8cf2621151c3d16f8787a477bf542eac08a9796"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CSS326-24G-2S+RM_snmp/template_net_mikrotik_CSS326-24G-2S+RM_snmp.yaml",
+          "sha256": "97ec2d287fff358fca124d6de075eb09acd2a8fee6675017aad810da12e59bfa"
+        }
       ]
     },
     "75d009cd4dc84ee7a8fc479fa2fbaeee": {
@@ -2184,6 +3184,12 @@
       ],
       "content_sha256s": [
         "6654dc90536bd67153091f6ec54733c08e61327ccd23adaf297ba299bbefc9d9"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_asav_snmp/template_net_cisco_asav_snmp.yaml",
+          "sha256": "d1d4a5d22d760b909befe4cb8e2a0190b0d6e4ceee4a11738c99d9a89d8834ac"
+        }
       ]
     },
     "75fc96367e8d4588ba8314145fc12d35": {
@@ -2197,6 +3203,12 @@
       ],
       "content_sha256s": [
         "f05afdab6960f9cbad0a41f3a6912f99812db9affd1560edbda313fbf4c2a51a"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/mssql_agent2/template_db_mssql_agent2.yaml",
+          "sha256": "1dc2dece4775791ba49e676b19c773f7f8cce5a597f004014d78356e61ab2336"
+        }
       ]
     },
     "760be6e1c2194a5bb7c0df47cc5f71ca": {
@@ -2210,6 +3222,12 @@
       ],
       "content_sha256s": [
         "576850781780f83116ac8458a9dd4412dbd317e3959c91a450d8b5e6f4a9be27"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/openbsd/template_os_openbsd.yaml",
+          "sha256": "8d355409be54fd21a286d3c11a9f568f2be77936d3742f2bfa7986b84c0fcd75"
+        }
       ]
     },
     "7802db8c2f9c4a7eba7b381b8f3fa5c5": {
@@ -2223,6 +3241,12 @@
       ],
       "content_sha256s": [
         "fb763de87e2e4b62ec31249e2b97209c5551355b9605e7aa0550d98a633ad4cd"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_hEX_S_snmp/template_net_mikrotik_hEX_S_snmp.yaml",
+          "sha256": "68b47f0533b59c977c1b952c2e69c0496fc3517dfe040a553045684b8ca392fd"
+        }
       ]
     },
     "780c4a9a657e42fc83f1ab9a535f5184": {
@@ -2236,6 +3260,12 @@
       ],
       "content_sha256s": [
         "725266f924135b2c7b97600b1d952db0fa3f83d1670276fb3bcfe92c0825716d"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB4011iGS+RM_snmp/template_net_mikrotik_RB4011iGS+RM_snmp.yaml",
+          "sha256": "cdc18a92385f96309c87eb6bd645398f9e80eb8b64106a8984d9f78435ee4357"
+        }
       ]
     },
     "79267c69f54a4e59b4152aba4e8c4bd5": {
@@ -2249,6 +3279,12 @@
       ],
       "content_sha256s": [
         "ea339f6bf3b5bde110e34db86848e3df222a5e461e1f09a27d16d5800c3bb7b1"
+      ],
+      "sources": [
+        {
+          "path": "templates/san/netapp_aff_a700_http/template_san_netapp_aff_a700_http.yaml",
+          "sha256": "c1b9aa0e943d79c459cc9af7b8de4ddd8b6811394803ed229855d0356141d1aa"
+        }
       ]
     },
     "7942fb93ae3b47cf9ca0ea4beb0675ce": {
@@ -2263,6 +3299,16 @@
       ],
       "content_sha256s": [
         "5b7ac9ff8cf3678321233332fcfb32ca7413dc0bec1f7298527148b4bac60577"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/vmware/template_app_vmware.yaml",
+          "sha256": "2e3d7a73da4bcfab68d5cd3043c17027d4e0dff887597393f6ce660e0c66fb5f"
+        },
+        {
+          "path": "templates/app/vmware_fqdn/template_app_vmware_fqdn.yaml",
+          "sha256": "62cf2779fb156c771dde1fb927671d0a23b54f5ce90bb879841810baaca4d85a"
+        }
       ]
     },
     "79b16cbbe593444eae3de66de0cb566b": {
@@ -2276,6 +3322,12 @@
       ],
       "content_sha256s": [
         "a489aed66ca2c1eda855c6fa893b10826fd84ec532bbd72e72c9366ea381ebd5"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
+          "sha256": "b7ab58a4091478d0c080264d68cf94ee4c0d6f03b2836d1e7b673ce3b1333406"
+        }
       ]
     },
     "7af6d68b223a43d4bf8526cc5dc3fe2e": {
@@ -2289,6 +3341,12 @@
       ],
       "content_sha256s": [
         "e8c6c4574eeb60650b4e3c37ee0d678a3c79d414a4a7dbc8bfb8e5204416b805"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "7b3ecb24366f4685970df8e1143323f0": {
@@ -2302,6 +3360,12 @@
       ],
       "content_sha256s": [
         "52173c2580e2be74181cf0d585eaba46416b502c7fc78bb88b7adf0bcb48a480"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR1036-8G-2S+EM_snmp/template_net_mikrotik_CCR1036-8G-2S+EM_snmp.yaml",
+          "sha256": "8a9b3bc80e3c9280cf8bd1e22c4b29443947637c775fe8ab8e50df0ae385b7b3"
+        }
       ]
     },
     "7b6c6228b25f4586b42cd1bf37ff8034": {
@@ -2315,6 +3379,12 @@
       ],
       "content_sha256s": [
         "dbe4c5d3780b9b30278eccbb3c189c764eaedc6d6772b986b05c1d9e9fc2b03f"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/smart_agent2/template_module_smart_agent2.yaml",
+          "sha256": "3d07a729044efe1f71167a777a5d335fcd63dccc9eb691f6a3a6c78a07a71f7b"
+        }
       ]
     },
     "7b6f7a12a6b449ca926e74c894eca354": {
@@ -2328,6 +3398,12 @@
       ],
       "content_sha256s": [
         "2e1515b11a6508f859254e8c063b55eb4937ab7904daa25ea96d459d362e43e3"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB5009UG+S+IN_snmp/template_net_mikrotik_RB5009UG+S+IN_snmp.yaml",
+          "sha256": "44e3dfb8926671b146f78f4ff2049fcaa9b617a517de77d5fc8a73a093a53048"
+        }
       ]
     },
     "7e6bb0931a72459db9514aa924b420bc": {
@@ -2341,6 +3417,12 @@
       ],
       "content_sha256s": [
         "b75c30f09b36ae2f2ce4caad5f79f90e191dd2c9d1e9781d6fdf84ff1de97651"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/aix/template_os_aix.yaml",
+          "sha256": "8afb34559ac20f80786576837b627351f12001171aa6edbf9ebed3bc0d7c62f0"
+        }
       ]
     },
     "7f44e67e3f564ec9894c9142d7276553": {
@@ -2354,6 +3436,12 @@
       ],
       "content_sha256s": [
         "ff8c0db00475e2a025feafc54e88afa3bc3c5bed4cb27e8e50370dba5b20bbfa"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR1036-8G-2S+_snmp/template_net_mikrotik_CCR1036-8G-2S+_snmp.yaml",
+          "sha256": "e24f27f361558f433284803e9cab3d3403bbc0d613e164c546b317f23e082115"
+        }
       ]
     },
     "8098b3c157ab456abd55d3840eef79c1": {
@@ -2367,6 +3455,12 @@
       ],
       "content_sha256s": [
         "9e286845ac76dd8dff86db25db649e86ce77c5b8d36279c2c49e5621c135bd6d"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/openweathermap_http/template_app_openweathermap_http.yaml",
+          "sha256": "960d0530c3aac5bb7426343b55e46220105af6c3dc21a482712b7e1c6f3ae640"
+        }
       ]
     },
     "80fc469750f84061924662a98c33580c": {
@@ -2380,6 +3474,12 @@
       ],
       "content_sha256s": [
         "79395dfe35c51ef92f50fb8e840290e5fc8391d4b678b3bbcdd0f3b1c51adac8"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_nexus_9000_series_snmp/template_net_cisco_nexus_9000_series_snmp.yaml",
+          "sha256": "bb41fe808721634e07370779782790a5c970b64ad0160ee3e1f648f8bb7aad18"
+        }
       ]
     },
     "812073bf8df143bcae2a84b32c3965e5": {
@@ -2393,6 +3493,12 @@
       ],
       "content_sha256s": [
         "d4e9a797b12d5d2716c6b3f478242f05ecb345767e096b1fb9cc66d23c755c42"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/haproxy_agent/template_app_haproxy_agent.yaml",
+          "sha256": "44bd4d7af5f7904341c9bdd641c82917897fd55fd8a7a871e2a1ce8e978eed63"
+        }
       ]
     },
     "815b5a81b29a477695fddbd533ad9c84": {
@@ -2406,6 +3512,12 @@
       ],
       "content_sha256s": [
         "1c5cb10b3b7286dec7042246557cf516b987804c0ce8925b2c01bd6d0cfa04b9"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_snmp/template_net_mikrotik_snmp.yaml",
+          "sha256": "f4fae7bb054e10d04897246874a111cf2ec38dd3d3aef1c9000ae3b69f8fcb95"
+        }
       ]
     },
     "81aa8c5ab5594f77a2b26fb7f5094048": {
@@ -2419,6 +3531,12 @@
       ],
       "content_sha256s": [
         "5d4e1b5fab88a93a60af4e1da0a70e33b9726773c8bcafef65a5a23c40836ed2"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/mongodb/template_db_mongodb.yaml",
+          "sha256": "e31c6a4cf3c3bc796901ce7497df95b46e78a73dbcbec0c12edc334e57e1f8f7"
+        }
       ]
     },
     "820fa4a1565c43e4aac07a691a5bface": {
@@ -2432,6 +3550,12 @@
       ],
       "content_sha256s": [
         "8cbc9dbff0a17ddf3c599408365b47925cbd2393cf50288ead6052b398e7b61b"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "82b428ad78d34988b93f3d577f2b6adc": {
@@ -2445,6 +3569,12 @@
       ],
       "content_sha256s": [
         "5a2b7ef41892955e2e53a59c247599bdd6db2ab37ec2ef788129b93fa0e84acb"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR1036-12G-4S_snmp/template_net_mikrotik_CCR1036-12G-4S_snmp.yaml",
+          "sha256": "6f1517602ad1aea94b5c3cabe035fca5b2bd64d5baf566b6a79a30d54496a755"
+        }
       ]
     },
     "8598d0e2bd6f4903832ec91b7b300062": {
@@ -2458,6 +3588,12 @@
       ],
       "content_sha256s": [
         "ed35f1c19dfdf3c6bb0ea2225ecda432e6c7021a9c15cd2b55bfb67709a5bf49"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nomad/template_app_nomad_http.yaml",
+          "sha256": "49db24b4f9b50858a79890a1011e6e430693d1eac8ff0b2be796dd6d204cc4db"
+        }
       ]
     },
     "85ce114c802e4e28a5f3597e07d07032": {
@@ -2471,6 +3607,12 @@
       ],
       "content_sha256s": [
         "65f24b5d04f964ecb2108eb4349b03272fd87a45b391f836bb4f05d5454973dc"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/kubernetes_http/kubernetes_api_server_http/template_kubernetes_api_servers.yaml",
+          "sha256": "e60b441d20e7d1084d2e7dfdc6b52b167183beb60a9f0defeb4fadd4132d13a9"
+        }
       ]
     },
     "861dbdece18f4b8f85214a319995eb3e": {
@@ -2484,6 +3626,12 @@
       ],
       "content_sha256s": [
         "605501f531a0913dc2749c05a8b51133a7b4d162ca7bcccb889a42bb5714a185"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/extreme_snmp/template_net_extreme_snmp.yaml",
+          "sha256": "6f7a86eb2ee2f3cb0599c7837a96e69ca43ce95201a796a6d529fe8811dfd010"
+        }
       ]
     },
     "86702e8bc514434e8c914d50c206cb94": {
@@ -2497,6 +3645,12 @@
       ],
       "content_sha256s": [
         "2bd2b30be02d22e26792abe38ac22863e17ddd65277abd3cb252326b3d30ae49"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/apache_http/template_app_apache_http.yaml",
+          "sha256": "2267d7e7733374f18e5d8960e47c578ceb3253856c3baf287ae93e49b803ad5f"
+        }
       ]
     },
     "884bdbeea93c4be0a11a2c92a5f8adce": {
@@ -2510,6 +3664,12 @@
       ],
       "content_sha256s": [
         "fd4edef0a1c7fccdbd1e118bf62e2b439b5f58960de3375ee3f91b15d55ad86f"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/consul_http/consul/template_consul_node_http.yaml",
+          "sha256": "2643dbb4991b98f050aa9d0a620ce512ec12b74388ca54c4d969ad7515c2d425"
+        }
       ]
     },
     "89eef2fe23964f44bf9aec6d00e39efd": {
@@ -2523,6 +3683,12 @@
       ],
       "content_sha256s": [
         "228c9e576ca725d49a2730fbf877061193155799e0f0185250844f3051a0cf96"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_mgs3500-24s_snmp/template_net_zyxel_mgs3500-24s_snmp.yaml",
+          "sha256": "cb24943cf05186d7b7fa85b250a77245311273b59b4518c34ba0067e5bbf27f7"
+        }
       ]
     },
     "8aa4557f6c3f4aadbc03447fca3af9f6": {
@@ -2536,6 +3702,12 @@
       ],
       "content_sha256s": [
         "729fee8a51303897a2ed9fb73319c717a2856504ba53c591f6734c9a6fcc3eac"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zabbix_agent/template_module_zabbix_agent.yaml",
+          "sha256": "2a3e02b7976257ff05e760d437254bc653e166369414e84fc071978d33a8edd7"
+        }
       ]
     },
     "8ab5387c8887435587cce8383b2fc6c5": {
@@ -2549,6 +3721,12 @@
       ],
       "content_sha256s": [
         "c7699d41305a5df9ec71bb2bf4bcc8a46b968803d94c7125e0043858ac682edc"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nutanix_http/template_app_nutanix_prism_element_http.yaml",
+          "sha256": "027d3769c1bd9a50f4f5be0834392bf024f065b16d6d10b535132da770b8e986"
+        }
       ]
     },
     "8afa1796d280425b99c7ea36900dac24": {
@@ -2562,6 +3740,12 @@
       ],
       "content_sha256s": [
         "5ac8719a3f5e60a371b81be40d8d8f3e04e4a7c15f799d38e68b6dd4284e88f8"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
+          "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
+        }
       ]
     },
     "8c8474148c2a4eaeabe5a9331ea99d77": {
@@ -2575,6 +3759,12 @@
       ],
       "content_sha256s": [
         "07e67a271a1078b808d5c3b019f1d8d7b2c27f51cefa0848ad76980875b81b57"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/rabbitmq_http/template_app_rabbitmq_http.yaml",
+          "sha256": "c12c3fe454bc3f6e65f1c71cb6482cb649bcb798bf8240cb090c24a125283110"
+        }
       ]
     },
     "8cad0f2564694416b60bd8a414948641": {
@@ -2588,6 +3778,12 @@
       ],
       "content_sha256s": [
         "a319b0ea3e15175b792f1604c2d7d52ec3054fc48101323ad04ed013a9b9605c"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nginx_plus_http/template_app_nginx_plus_http.yaml",
+          "sha256": "a98907dc1f1a77dab64bb541b56c7d7e4862f670ebf4126be9eca99617131a0d"
+        }
       ]
     },
     "8cd15d3b39654eb7b7423e6b109037b2": {
@@ -2601,6 +3797,12 @@
       ],
       "content_sha256s": [
         "19aeb07a1f2149aa9a4655030c639f7c686b50d2458ff0ea8fb94316032ba455"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml",
+          "sha256": "7940c9a366868499163bc3e4de69099af989078bd23d1d0e4ff18c0e82f5a02e"
+        }
       ]
     },
     "8cdbe00a2a3046ee962d28d32567968a": {
@@ -2614,6 +3816,12 @@
       ],
       "content_sha256s": [
         "d095c7698841f24a59dd8401605db2c27c5293f76327cc2e20a2b84cea881a17"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/travis_ci_http/template_app_travis_ci_http.yaml",
+          "sha256": "6338e6d127b46e5c7bebf6b74abad32409b872a9afaa8c46382d867a3ece85be"
+        }
       ]
     },
     "8cf537f34600403b9de31d3db4eb2a1d": {
@@ -2627,6 +3835,12 @@
       ],
       "content_sha256s": [
         "af649b539e9ebfd8258ad616795e862d428eba58dcdc2503752210ad3ca04bf0"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB2011UiAS-IN_snmp/template_net_mikrotik_RB2011UiAS-IN_snmp.yaml",
+          "sha256": "9c381d828684c9c329bb54bfc9e5de726c498b01766b6b99e9fa116c0c38d128"
+        }
       ]
     },
     "8d22b4d1a9c6457fbd6fd959263f91db": {
@@ -2640,6 +3854,12 @@
       ],
       "content_sha256s": [
         "c7341e52267c5d3c3cb7df6dd584d2e1914ccd5a2c7d5d6a453c445a9bca65ce"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CSS610-8G-2S+IN_snmp/template_net_mikrotik_CSS610-8G-2S+IN_snmp.yaml",
+          "sha256": "0b9c3dd80172484276cddd039ac61ba0cf22c238b8ba823d1a6153228accc9f4"
+        }
       ]
     },
     "8d5fe5b4ebb64255a2429b34c7dd3681": {
@@ -2653,6 +3873,12 @@
       ],
       "content_sha256s": [
         "106c9f51a37f0b3a8305b4b27e3c7d58f11aeb573df4e62183979d5c96e2817b"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/sharepoint_http/template_app_sharepoint_http.yaml",
+          "sha256": "7ffba845d3996746781e72ba41ac17af897f4646f79322507c8a3a2c430281b3"
+        }
       ]
     },
     "8d7d49fd0b3f4b1f9046dc0e94457931": {
@@ -2666,6 +3892,12 @@
       ],
       "content_sha256s": [
         "de52e37cd595e95efff8fc43ae3be90533c546645431f969ccc6a182e417252a"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS112-8G-4S-IN_snmp/template_net_mikrotik_CRS112-8G-4S-IN_snmp.yaml",
+          "sha256": "8aadad9f9dc7da529d519442401467779ca1591c77d072522f1773e495d60002"
+        }
       ]
     },
     "8da94e2f01ff46e28becf0b08ff09ace": {
@@ -2679,6 +3911,12 @@
       ],
       "content_sha256s": [
         "dd78060723d1b1c85e20f0f8397f8ae05c53ee14b796246ea99f73edbb50a971"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS312-4C+8XG-RM_snmp/template_net_mikrotik_CRS312-4C+8XG-RM_snmp.yaml",
+          "sha256": "ece19e610493987d5052c8afec6a9d55355d2484909fca461121481fcee0659e"
+        }
       ]
     },
     "8e5236f799b347a8ae90a979198be85e": {
@@ -2692,6 +3930,12 @@
       ],
       "content_sha256s": [
         "db534aabb93487d48b173fb2797da2581025c2362d281de6dd140151ffb4045c"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/squid_snmp/template_app_squid_snmp.yaml",
+          "sha256": "17a9bb583a81e5a20dc84ecd3fdb665e1957cddd18406fce2cab8345b5973d0f"
+        }
       ]
     },
     "8e6d7067cd094e56a52db999b3199edc": {
@@ -2705,6 +3949,12 @@
       ],
       "content_sha256s": [
         "b77fd3703fb46cffe6316a43b0ec75afc60225f2d865624c06a8b419d6fc2bfa"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_ies1248-51_snmp/template_net_zyxel_ies1248-51_snmp.yaml",
+          "sha256": "2814d160d5988819d66ed69df3531e7e1e2cb65844ff0b2274b1a3d144d5bd9a"
+        }
       ]
     },
     "8ea7299983f24d0a913606e334f0e526": {
@@ -2718,6 +3968,12 @@
       ],
       "content_sha256s": [
         "868333ac9f2430e7263fa8060f0e1069411f7c04da006ea93ee35b4f89b513fb"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_mgs-3712_snmp/template_net_zyxel_mgs-3712_snmp.yaml",
+          "sha256": "56f16cbf15b27ea3dbe49c970e35269196b9dd623b26fdf21d95efb3d10093e8"
+        }
       ]
     },
     "8ec72ebbe3204d7789429640abcac610": {
@@ -2731,6 +3987,12 @@
       ],
       "content_sha256s": [
         "6ab72606dc597a139c33cd7bc88ab5429a7d6c23fe5e38092a07a4c8da46f005"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/tidb_http/tidb_tidb_http/template_db_tidb_tidb_http.yaml",
+          "sha256": "ce28952df3f3111ba945824b4d928db4ecf158b01e6da93eba867f7deb6792e5"
+        }
       ]
     },
     "8ec76aeb703747a5affdf435bc12f572": {
@@ -2744,6 +4006,12 @@
       ],
       "content_sha256s": [
         "e1a307590291fb1122edce42d204c896473173d8ee0305bf742f296cfe3d9e64"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_smart_srt_5000_snmp/template_power_apc_ups_smart_srt_5000_snmp.yaml",
+          "sha256": "0292dd713688c4943e4b739dad6621704c3900ebead79404639b69bea18eb0b4"
+        }
       ]
     },
     "90ac276995294a6aa88462c032d2ddaf": {
@@ -2757,6 +4025,12 @@
       ],
       "content_sha256s": [
         "00012f72db40e89098b43c2c86aa3ac8aa7365ab725ead2e8ddaf90d090bc4a3"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/systemd/template_app_systemd.yaml",
+          "sha256": "4b298b037939e36b67d4f8993ceb1c7a17194197bd7518e65c81c60dd9772dfd"
+        }
       ]
     },
     "930c0e0534a9424fb01f2b6218d8ce59": {
@@ -2770,6 +4044,12 @@
       ],
       "content_sha256s": [
         "b0e46341c969451b582aca9ae1bc95a97669ded9e9c413707f714138d897baa2"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR1036-12G-4S-EM_snmp/template_net_mikrotik_CCR1036-12G-4S-EM_snmp.yaml",
+          "sha256": "97ab083eaa8f6563abcf0ce097f46197bf009e05dc4484a728bc4ad1f812c0bf"
+        }
       ]
     },
     "948d046cb2894e5c8d07767a518cc1a9": {
@@ -2783,6 +4063,12 @@
       ],
       "content_sha256s": [
         "59505c543905fefa86082ab7a09727bc26091077ebb8f9a49136fea6da5bd29e"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/haproxy_http/template_app_haproxy_http.yaml",
+          "sha256": "39b0882101ad59d86b913024cfe2ccbadd946b0607604ada6ff0438190f3c5de"
+        }
       ]
     },
     "95f2053c21094ad4968440b562cc7ea2": {
@@ -2796,6 +4082,12 @@
       ],
       "content_sha256s": [
         "286cf6c60abe846633b1f3f3cf73698dd4d5e71e36e1498d0f77d1f06c2da1f9"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/clickhouse_http/template_db_clickhouse_http.yaml",
+          "sha256": "3104c53aa7c3d991d825dfd33c8bec2b07cfc92cc5d57d76d3518783e35dcad1"
+        }
       ]
     },
     "9643f22821104f809e2486be83e1816e": {
@@ -2809,6 +4101,12 @@
       ],
       "content_sha256s": [
         "24208ac652afae559a8d4a77cec54d7cac5dbc8b9d03be99de75e0754f9cd729"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r720_http/template_server_dell_r720_http.yaml",
+          "sha256": "39b6a2b55965bf17e8fddff94a51c38fb2d58c5124aef7e9adcd3f221eb5f62e"
+        }
       ]
     },
     "969cf5dca58f47f0b271ccf62ef79c13": {
@@ -2822,6 +4120,12 @@
       ],
       "content_sha256s": [
         "25b68d9488013e80d150d8a49733df0d17b697801145703f4c7ee6208388a0f7"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB2011UiAS-RM_snmp/template_net_mikrotik_RB2011UiAS-RM_snmp.yaml",
+          "sha256": "484323ea20bf52a7bdb30b63e442e7ecc6f2eae372efd0acb0f5bf97a5ee4747"
+        }
       ]
     },
     "970c2342146549768e6b91a26089bcdf": {
@@ -2835,6 +4139,12 @@
       ],
       "content_sha256s": [
         "cd21f2087807fb900e571c4f32ea67fe5d7869f3e97fb03dcf9417d6f6a84c52"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml",
+          "sha256": "7940c9a366868499163bc3e4de69099af989078bd23d1d0e4ff18c0e82f5a02e"
+        }
       ]
     },
     "9cc843a085bb4ee5af0dc4d764a7eee9": {
@@ -2848,6 +4158,12 @@
       ],
       "content_sha256s": [
         "31a179c534f127d072c982aabe1a892fd6eddeacd5c0c70c759647907b7d07aa"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_mgs3520-28x_snmp/template_net_zyxel_mgs3520-28x_snmp.yaml",
+          "sha256": "858463a8a1afac8e2f2ad448042543395db282009e1dfcec1c00b0c63f1176e1"
+        }
       ]
     },
     "9d7871c093f9489293421396b9fea668": {
@@ -2861,6 +4177,12 @@
       ],
       "content_sha256s": [
         "1a6ae82d72dceb735c187763ce6f18317d75dcd3d97035195cd78ca5781445e3"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
+          "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
+        }
       ]
     },
     "9fde0e1c36f8453da72f97535d4e74ca": {
@@ -2874,6 +4196,12 @@
       ],
       "content_sha256s": [
         "3e5868deb043b65efff716e680d46e574e0be37952dc42584e01d7637d68bb05"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r740_snmp/template_server_dell_r740_snmp.yaml",
+          "sha256": "d78b4378058c38fa968c9e6d69dc69cd9f07ab970387c0d97daa3b9e4b4082d9"
+        }
       ]
     },
     "a0e05ca631034676821b7e0e1ce25488": {
@@ -2887,6 +4215,12 @@
       ],
       "content_sha256s": [
         "0cc2246b001aeaaa37438268c66e941375bd46744e8dc18e1dd1484e20f9681e"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/exchange_active/template_app_exchange_active.yaml",
+          "sha256": "b17ce46f50ed470f50a65c10e344b9db72c559a9cb35802132503162330cddc6"
+        }
       ]
     },
     "a14ab6b4e80643fe8daa9d7288658f79": {
@@ -2900,6 +4234,12 @@
       ],
       "content_sha256s": [
         "ae32008cedb9dd12bca6f19e2d2b3474d108d3ca02c56f7d771220b1b7ac5610"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "a326034825984bbd8a3a5885f3939bb3": {
@@ -2913,6 +4253,12 @@
       ],
       "content_sha256s": [
         "aff499ccab267f97b5d72b7eaad01323d17fd4448aa25fff6ea316d657d32e0b"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/juniper_snmp/template_net_juniper_snmp.yaml",
+          "sha256": "a52ec8853c7c6e9f0f57575e676a95f63a06e3144c86e70d82dd2df55d5b1402"
+        }
       ]
     },
     "a3dc630729e443139f4e608954fa6e19": {
@@ -2926,6 +4272,12 @@
       ],
       "content_sha256s": [
         "aee0ccdc8bd2d3db97e1bb99c4c4aa4d5cd5cd706d046b23ef942a5e62b18813"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/freebsd/template_os_freebsd.yaml",
+          "sha256": "f20cd69ba95b8b47f837c908945c8848d8320121537d11ee12490f09054fa4fc"
+        }
       ]
     },
     "a5ddacdd5ac64b82bf5183769cc03e8c": {
@@ -2939,6 +4291,12 @@
       ],
       "content_sha256s": [
         "35f54e98228696fdeedefcadb59d6339df996bba8edfca12b35de6a5a817e2eb"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_hEX_PoE_lite_snmp/template_net_mikrotik_hEX_PoE_lite_snmp.yaml",
+          "sha256": "c2b777c918e0d75c5e8a78854492d209b6e50a74410830d4e3ad33ba5cb30663"
+        }
       ]
     },
     "a60798c651604d93a062bec0f8a89751": {
@@ -2952,6 +4310,12 @@
       ],
       "content_sha256s": [
         "a0f0b67a5eedde8ebf085045a3debb582bcdcf41680c27d48e0fa0329baf2c7e"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mellanox_snmp/template_net_mellanox_snmp.yaml",
+          "sha256": "aaa9ef49e1c6edf10a311d001a1744ad56c408856eb0429c8122f7193827cd03"
+        }
       ]
     },
     "a6fe3640b23544e7ae15d438b38ce1cd": {
@@ -2965,6 +4329,12 @@
       ],
       "content_sha256s": [
         "7ce1c6a13f3cc96b35393c19932b7e4f2c84b42e26af7c453efbe60bb9215f8a"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/influxdb_http/template_db_influxdb_http.yaml",
+          "sha256": "7177d4649f62cf78367b990943a54d2d33e48fbe8a36bb38c2bd120a9677bd8b"
+        }
       ]
     },
     "a7f0c853c6634b1dacaaf43c2a0d9375": {
@@ -2978,6 +4348,12 @@
       ],
       "content_sha256s": [
         "11fa3f3cb64ebe7a2dd1e6d6c588c478280165e3f47702745a2911bce353797e"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/jira_datacenter_jmx/template_app_jira_datacenter_jmx.yaml",
+          "sha256": "fe4cdfac80f11f094c7ca4cee692fac68e0bae9f349307431991cea5a869df83"
+        }
       ]
     },
     "a809695fbc784b75adcd4833c86bca8d": {
@@ -2991,6 +4367,12 @@
       ],
       "content_sha256s": [
         "552bfb4ca925a8224d0b7d6c9061503a2c775ac301e72eca35964d52eebd053a"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR1009-7G-1C-1S+_snmp/template_net_mikrotik_CCR1009-7G-1C-1S+_snmp.yaml",
+          "sha256": "13d9399ed3165201b9fa6156997e6f91f7b2ce85064a0161c80adc6c297b0520"
+        }
       ]
     },
     "a8d91e4f36794e32b73090d5edf3d7ae": {
@@ -3004,6 +4386,12 @@
       ],
       "content_sha256s": [
         "495c57ff605338f37b0928a85dba9461f619cebaa735d15a30ea793788e237aa"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/apache_agent/template_app_apache_agent.yaml",
+          "sha256": "52ebb9795cec63dbe483f615e7b613a8b3e884b739809b3c26d482146c9c594d"
+        }
       ]
     },
     "a93f57ccc68e442da79bf4a20fe46570": {
@@ -3017,6 +4405,12 @@
       ],
       "content_sha256s": [
         "7a7ec1a34b23a5d25c0a144fea74a98c2ad506164192de3b6a96aba0688d448c"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "a9e83f950e9f41a78474d523c8376338": {
@@ -3030,6 +4424,12 @@
       ],
       "content_sha256s": [
         "de49ee4de84998e0a65b4c97b7ba46a4db72b1ec7cb413bbff066ff245511330"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/php-fpm_agent_active/template_app_php-fpm_agent_active.yaml",
+          "sha256": "54419e6db763cac4a76d1db02756a347c63b116bd9585efce24d663b3708fd49"
+        }
       ]
     },
     "aa3286a824464020863ead141e8f0afc": {
@@ -3043,6 +4443,12 @@
       ],
       "content_sha256s": [
         "2e261d77a9c807886eb6ad3529b59fcd2dd251d2253e2e80940330cafd06babf"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/apache_agent_active/template_app_apache_agent_active.yaml",
+          "sha256": "c6f1beaf01339b928a020794f1c92aa361032e680e9cd173a76ec9500c5dc391"
+        }
       ]
     },
     "aa3ce9bd8c1d40a2b0f83f9e642e88ee": {
@@ -3056,6 +4462,12 @@
       ],
       "content_sha256s": [
         "4fe26f2da1660bdb61c853484ff7676aba971d2c3d6bcb2c126c469ec87e9bfa"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml",
+          "sha256": "42e5dcb6e65bf1b7cc92a8e8a9a21dcc8f5277acc9075c88391abf54492dde49"
+        }
       ]
     },
     "ab05dbb15ff047f192782f617f0627ac": {
@@ -3069,6 +4481,12 @@
       ],
       "content_sha256s": [
         "b91a75a53a84c5184e4c379e1d8218d887105e9d4a8d60be712d0c1906730a20"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/ignite_jmx/template_db_ignite_jmx.yaml",
+          "sha256": "5ba3ba878f6a032cb8c91676cd959107f58d59c5553b49853e6fad8758b134dd"
+        }
       ]
     },
     "ab18a5665b7d4bed876881b5c4e8ce51": {
@@ -3082,6 +4500,12 @@
       ],
       "content_sha256s": [
         "d5aec841d76fdaf4bdb4c2d1bba7deca9ca349428267e00f9a43b317d703492a"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_xgs-4728f_snmp/template_net_zyxel_xgs-4728f_snmp.yaml",
+          "sha256": "4c0374cffba2630c8115045c3dfebf99bff532498f56a4d4cb11f1e36b275cb6"
+        }
       ]
     },
     "ab871d051e304f83950171c5243aa4db": {
@@ -3095,6 +4519,12 @@
       ],
       "content_sha256s": [
         "eb05d537ab05fb75d5e146b02d58f9d1d5db387c32e57191cedd39d1b5ff9325"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR2004-16G-2S+_snmp/template_net_mikrotik_CCR2004-16G-2S+_snmp.yaml",
+          "sha256": "806aa1d1a3a54c9ac742ea4dfe06540c37afa005340a2b8456d316be26535dfb"
+        }
       ]
     },
     "ad4c3dad4b7b492685d1fd3bd3a664f9": {
@@ -3108,6 +4538,12 @@
       ],
       "content_sha256s": [
         "10d3222ea9bf10cddfc678f11fcafcba50247d201b4af44734c2ba69581e93a0"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/huawei_snmp/template_net_huawei_snmp.yaml",
+          "sha256": "b934d483cd8dc41556d6b6627d8e266c0a18080eedc3b592f40a4f9aef4096cc"
+        }
       ]
     },
     "ae3ce7156aae4ae79a72742365c884ea": {
@@ -3121,6 +4557,12 @@
       ],
       "content_sha256s": [
         "192c1532fedb740e9c832662e6279f0c3bd2bb3b5e07cce3a15faa69ae314b4b"
+      ],
+      "sources": [
+        {
+          "path": "templates/san/pure_storage_flasharray/template_pure_storage_flasharray_http.yaml",
+          "sha256": "221dbfba744c99417d7ea9188d9231f8cd17aaa2258b1e4cccf651cc744e6de8"
+        }
       ]
     },
     "af21edc47557400583e537904ea632aa": {
@@ -3134,6 +4576,12 @@
       ],
       "content_sha256s": [
         "a5669d27b6d6adcb8541e19658fb201b7e8f7536030c4353fb6bede91c6e65a7"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/aranet_http/template_app_aranet_http.yaml",
+          "sha256": "18496447728c2a6b768652433fc231204cb2f2b933019e74d318a3cda0e10d0b"
+        }
       ]
     },
     "b126aaf4499d49d7b4fcee0329b7dea7": {
@@ -3147,6 +4595,12 @@
       ],
       "content_sha256s": [
         "389c8a5e333247da959e49f593f203dbfe53e9fe5addb016d0bd344ebdc8c99e"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_netPower_16P_snmp/template_net_mikrotik_netPower_16P_snmp.yaml",
+          "sha256": "f974f437eff8edbed99e4ba30b9ee28ce0fa739aac570232650258bfe040a4bc"
+        }
       ]
     },
     "b1271833815f46499458a8631d0bda20": {
@@ -3160,6 +4614,12 @@
       ],
       "content_sha256s": [
         "cee23ce76cf8c9ea4b60b285cca32a2d5ae150383997c34eeed8a43e0621b28a"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/ciena/template_net_ciena_3906_snmp.yaml",
+          "sha256": "49c7bc68194c4a73e87a49de834e34bdd9c2e1da52a4dacfa801a7f7885ff3f2"
+        }
       ]
     },
     "b1fd823d262042e08291313f72be9452": {
@@ -3173,6 +4633,12 @@
       ],
       "content_sha256s": [
         "19eb1031b8af3dc8f62ad94cec597db7ca94ae59d0babf4f7af5c212feae52de"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/hp-ux/template_os_hp-ux.yaml",
+          "sha256": "ddf483d70868e69b3415ad4bec533eadd89d978973c4c1ae7c5b31267835bdda"
+        }
       ]
     },
     "b25b8b517a4743c48037bfa10af3dc3c": {
@@ -3186,6 +4652,12 @@
       ],
       "content_sha256s": [
         "1d2c047f8d3725099c81c0ea69e6f7a701af7e39bc8fd532943392b65e3cf760"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/etcd_http/template_app_etcd_http.yaml",
+          "sha256": "4e7e15fa132bc81c3c41e0e2ceef77a6b470e3d4607d8e98b42b0b85f8736297"
+        }
       ]
     },
     "b3caafda8c5345cc832ac3be3cefa615": {
@@ -3199,6 +4671,12 @@
       ],
       "content_sha256s": [
         "afc4bdd3a22dc3312ea89d3817fe12134b1361c2f4468229147c4bf141b9fc57"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_smart_srt_8000_snmp/template_power_apc_ups_smart_srt_8000_snmp.yaml",
+          "sha256": "cbccb70689fc525f756fdffcdee189f487c544645b598e2f86f01714ef073cc4"
+        }
       ]
     },
     "b43a7c5f1d1d43d28e2eb8f0a9f6f16f": {
@@ -3212,6 +4690,12 @@
       ],
       "content_sha256s": [
         "393e04ae423bfe43f93db50b8efb48887b84070a35acae8ba9e3bd0bb3a520b6"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
+          "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
+        }
       ]
     },
     "b6027e374e424481951ca2256099515c": {
@@ -3225,6 +4709,12 @@
       ],
       "content_sha256s": [
         "7b98ad45ea1bd7b2bece5d74e804b2d3ccac8e8bed46b21034cbade7aa3c036d"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nutanix_http/template_app_nutanix_prism_element_http.yaml",
+          "sha256": "027d3769c1bd9a50f4f5be0834392bf024f065b16d6d10b535132da770b8e986"
+        }
       ]
     },
     "b606eda347ea4663a33ad4d12a482750": {
@@ -3238,6 +4728,12 @@
       ],
       "content_sha256s": [
         "edc38b877c826f2b41b1efecb5cc9d55687636c01321a58d32f7c28f6a8d5d00"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zookeeper_http/template_app_zookeeper_http.yaml",
+          "sha256": "0507837d7ec8343bb98dfb3e9c5484ffb56bc9d7909036ed73d6a39e2c9faa5a"
+        }
       ]
     },
     "b84324c2a40a496dbbb379bbf5dde8d5": {
@@ -3251,6 +4747,12 @@
       ],
       "content_sha256s": [
         "322a9762e81ce9657b3c80df7b2886bb0c14098b4829a10dec711f8fb4ef3804"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/morningstar/morningstar_prostar_mppt_snmp/template_net_morningstar_prostar_mppt_snmp.yaml",
+          "sha256": "2da4369eaa1a8f3c0636f78660c1db200d9a7c32c5e22f03dbd9ea2e237a04e6"
+        }
       ]
     },
     "b8750c02b5624c6889979b129735bd56": {
@@ -3264,6 +4766,12 @@
       ],
       "content_sha256s": [
         "134a0764e43a8dd6815df565855ea030098d84ca64cd9357ed337ab42fac7d79"
+      ],
+      "sources": [
+        {
+          "path": "templates/san/hpe_primera_http/template_san_hpe_primera_http.yaml",
+          "sha256": "bc8eeb76349dbd8fd0d0e2a319549d2fb668c8896aa63fca7c5338aeecd0ad2e"
+        }
       ]
     },
     "b8a6f34fd5c447b1b9310746a96f4e80": {
@@ -3277,6 +4785,12 @@
       ],
       "content_sha256s": [
         "95b31a8aba2b0de18cf15110efc8a93dc26e2414630d35c0d7eafcff9308f9f9"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/zyxel_snmp/zyxel_es3500-8pd_snmp/template_net_zyxel_es3500-8pd_snmp.yaml",
+          "sha256": "4028fadcdcec5664206f1b111ef297d934685f8ab0c01c1a73a9e2c63cafa587"
+        }
       ]
     },
     "b917e122785c4bd4bd004e69badc93de": {
@@ -3290,6 +4804,12 @@
       ],
       "content_sha256s": [
         "50d7b43b28899b040d50ff0962ba2ad49ef9195b8a5e7df1f005f9424b705c2b"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/ribbon/ribbon_sbc_swe_core/template_net_ribbon_sbc_swe_core_http.yaml",
+          "sha256": "346e17fd28cacdbd20c4fd4291eb6e31a877371bfdd8d81a8f259c53c50ea757"
+        }
       ]
     },
     "b9514029d03b44de9adf24251778dbf3": {
@@ -3303,6 +4823,12 @@
       ],
       "content_sha256s": [
         "75cb0d26d52fec14b02b9521a484c70a312b215bcfe874a4cb15f15fb865b203"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/rabbitmq_http/template_app_rabbitmq_http.yaml",
+          "sha256": "c12c3fe454bc3f6e65f1c71cb6482cb649bcb798bf8240cb090c24a125283110"
+        }
       ]
     },
     "bc056b1724e748bba50928f8cc605f8e": {
@@ -3316,6 +4842,12 @@
       ],
       "content_sha256s": [
         "a57ac9c00b7ea744b1fd50856142b5f248be2034d3455e78bf65796fb7caccb7"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/yugabytedb_http/template_db_yugabyte_http.yaml",
+          "sha256": "b76d32e04a09f511d955376e97b41c07c69fb885298fa0c3370ba20cc36257d6"
+        }
       ]
     },
     "bc80883918ac4f879427ca145122b5cb": {
@@ -3329,6 +4861,12 @@
       ],
       "content_sha256s": [
         "357bceb8856aa97c30e76f349829f40f9a75e214c5869ec1ea8d112f7df763c9"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS326-24G-2S+RM_snmp/template_net_mikrotik_CRS326-24G-2S+RM_snmp.yaml",
+          "sha256": "c8c00d4a6705fee62faeedcd7bf4287c6dd0ef8a9a0ad1158786eeb119c7143b"
+        }
       ]
     },
     "bcc01f2b466345c4bcbe0cea1a7884d1": {
@@ -3342,6 +4880,12 @@
       ],
       "content_sha256s": [
         "1cd12c83ed172af191a6875210a8368d00b0a0da6caab57b0c28bf2a745b7f79"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS309-1G-8S+IN_snmp/template_net_mikrotik_CRS309-1G-8S+IN_snmp.yaml",
+          "sha256": "df3155a3dff8e88c9ffa6f2b771518fce589ee3997e639f8ec6b7ca8d14b963b"
+        }
       ]
     },
     "be10b1140fce4cc08247260b71bcd037": {
@@ -3355,6 +4899,12 @@
       ],
       "content_sha256s": [
         "30b324148b3fa50ea272bbf681737419e767f9a034ec636ae7f22040ee9cdb2c"
+      ],
+      "sources": [
+        {
+          "path": "templates/san/hpe_msa2040_http/template_san_hpe_msa2040_http.yaml",
+          "sha256": "c200c6f692f850a10d2c5c8314d401fdf229c463156bdb2aa60ca1849e7b914d"
+        }
       ]
     },
     "bf3107deff3a4aabab1e1c0ee71a3281": {
@@ -3368,6 +4918,12 @@
       ],
       "content_sha256s": [
         "cf0c3c19344af11c6c70c3322f091217a4ef9ea848262d7d3e988d70de5df801"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/acronis/template_app_acronis_cyber_protect_cloud_http.yaml",
+          "sha256": "b6e8e0ace055584828a2d8d2b7c1821a6ce7da2554355ce6372d2c8a8f3915c6"
+        }
       ]
     },
     "c0263df8d8c14d30b24afcf45a6a354f": {
@@ -3381,6 +4937,12 @@
       ],
       "content_sha256s": [
         "4be889fa15a4b4a4e828b870e1f2b8c6eb1ed6315841478da6c5de519f0da4f5"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "c03e1ab0128a4ae1847bc04a34f5634e": {
@@ -3394,6 +4956,12 @@
       ],
       "content_sha256s": [
         "b84b0dea4d53f4848597330d1a031030df614b2bf79bb539f7ddcb253db92b1a"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_PowerBox_Pro_snmp/template_net_mikrotik_PowerBox_Pro_snmp.yaml",
+          "sha256": "335586c7ab1fb26f946d818bcd1c5eddfbd9c5b471048b263cf4eaf495d278f6"
+        }
       ]
     },
     "c077d6c381904e94a4df88136588b551": {
@@ -3407,6 +4975,12 @@
       ],
       "content_sha256s": [
         "e5dea57072f71338a81520f2f3b4cd6260d18f74ddfaadc16f5ac95aa5cdd012"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/controlm_http/template_app_controlm_http.yaml",
+          "sha256": "87abd136c7c4fc94370d2ab6761c6d4f902d839582ebd1bb5475c7b59148cc6d"
+        }
       ]
     },
     "c1396bf1e8cf46f6a407e88ddceef0b8": {
@@ -3420,6 +4994,12 @@
       ],
       "content_sha256s": [
         "0d357117350427eef089c765350a99747ac67293a87cd1e497e37e96e7fefa10"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "c2a7ddca051d4b4a9553f339c57e47a9": {
@@ -3433,6 +5013,12 @@
       ],
       "content_sha256s": [
         "6c3f6ce3b9ab40bbacc67ce95d8fed1249b12aa78c23f637274477db77f2440b"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/hp_ilo_snmp/template_server_hp_ilo_snmp.yaml",
+          "sha256": "39a2d33c0e0c65d34c8c90d02617cb5d7f7ab2ca92562d253620f68b4bf24f7c"
+        }
       ]
     },
     "c3a9fa0e07be4c1bbe19ae65c3375d17": {
@@ -3446,6 +5032,12 @@
       ],
       "content_sha256s": [
         "c96177549c14cd306e2573628fb4cb5c14967b8ac1ef13ad1f970432684a4ed4"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "c5564dd58c394b969d5365cc5de3e7f8": {
@@ -3459,6 +5051,12 @@
       ],
       "content_sha256s": [
         "3e9e59c0837e53d20d6c30e4a1961646917a729fe368884c1e4e2e9d3b4ddc71"
+      ],
+      "sources": [
+        {
+          "path": "templates/san/huawei_5300v5_snmp/template_san_huawei_5300v5_snmp.yaml",
+          "sha256": "40f5309095e9c377dca0fe9ed94c575ee4543a589f04f76e5c27a14fe1fa6ef1"
+        }
       ]
     },
     "c5f41fe0f54f470f9e304384838f150a": {
@@ -3472,6 +5070,12 @@
       ],
       "content_sha256s": [
         "195eadeaa20b2c8e32a66cd1e4d374970e5404af67bc1ffe726a77ee48cc4710"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS326-24G-2S+IN_snmp/template_net_mikrotik_CRS326-24G-2S+IN_snmp.yaml",
+          "sha256": "1f7ffbac5a6e4d579dc36dcbf34cdfbc5e437c7262e83cf7eabbd84abd057000"
+        }
       ]
     },
     "c5fd214cdd0d4b3b8272e73b022ba5c2": {
@@ -3485,6 +5089,12 @@
       ],
       "content_sha256s": [
         "b96d931622ac2104f7f6dc1f178587f35054e5bcad73713d26da366cead4cd9c"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/docker/template_app_docker.yaml",
+          "sha256": "da58e4ee27782c5997d50da0366e886249925e3595c60b25c14b4a67d446b0ff"
+        }
       ]
     },
     "c60e5929ab474f67bbe67dc6b04e709d": {
@@ -3498,6 +5108,12 @@
       ],
       "content_sha256s": [
         "2c9bbd283afa7da552ee5e18e8d6d2b6a424826ae0f7c968f8f2a7d7cf49ba8f"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "c6d9475847f44d9193f8253e5995b8f8": {
@@ -3511,6 +5127,12 @@
       ],
       "content_sha256s": [
         "af334124c24c8f9a423519bc890b424ea73cf987cdb22578faec99ce2c2707fa"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "c7c7e5dc319b4801982e719beb1c5191": {
@@ -3524,6 +5146,12 @@
       ],
       "content_sha256s": [
         "da02d77d666116d45e58a4bc00d752f5a481bff8fcb4b06cecff0ccaee94b4e6"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/iis_agent/template_app_iis_agent.yaml",
+          "sha256": "184e5146343d4818c13dd4934c13af148e0379edd1fa78f179a48a1fe15db366"
+        }
       ]
     },
     "c87e0a2e0683483ab7c6f3c380e9f840": {
@@ -3537,6 +5165,12 @@
       ],
       "content_sha256s": [
         "8fd0ee5a14d27793bca21f4c8e260677e486a59ca09ae17ad183cfd974cfd3eb"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/activemq_jmx/template_app_activemq_jmx.yaml",
+          "sha256": "48972b6f89b20089910048b9b0065fe46471e1b9d0e9941c7b72aa8f1c73809a"
+        }
       ]
     },
     "c8db153405704d859ba5ee19f08b46f3": {
@@ -3550,6 +5184,12 @@
       ],
       "content_sha256s": [
         "1cf1b07dedb48a383009878023acfae85ece817527f29156724bdc75d06427cf"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS125-24G-1S-2HnD-IN_snmp/template_net_mikrotik_CRS125-24G-1S-2HnD-IN_snmp.yaml",
+          "sha256": "4d17f76891d084e7195d0aac10f31099446a51b094d580a9ce45dce3c0d910eb"
+        }
       ]
     },
     "c8e6452eb3924cab9ec51eeaf91435fa": {
@@ -3563,6 +5203,12 @@
       ],
       "content_sha256s": [
         "ef61098c6fc6c9cddf14ca8d6e4ee4203f258ed37dc73fa9af72c3bf9d78adea"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cradlepoint/ncm_v2_http/template_net_cradlepoint_http.yaml",
+          "sha256": "ec1ff5a33effb7e4a031d310999e203b6c5caa7d82f66dfcd00f7320848cf944"
+        }
       ]
     },
     "c94105c23220452baed03ba87f09ca12": {
@@ -3576,6 +5222,12 @@
       ],
       "content_sha256s": [
         "a6c7a0782fb7a5822a1f49a75d446ec251022df76032973cfe5d324d7f5833ac"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "c9e1acd3ae4a427ab39724b6bcaf839e": {
@@ -3589,6 +5241,12 @@
       ],
       "content_sha256s": [
         "9140599ab0cd47a61e53d1617b72dedaa71a4831766d208ec4b724cc6f653f83"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/ibm_imm_snmp/template_server_ibm_imm_snmp.yaml",
+          "sha256": "c3a9f8ec3d861bf8f411ef2b324215704ff5939e4a7394ddcc7d2e672cff015e"
+        }
       ]
     },
     "ca02e82e6c414d0aa7aedc8d78468a49": {
@@ -3602,6 +5260,12 @@
       ],
       "content_sha256s": [
         "3ad1468c91b5aeb969ee2a6933d227760343219d5341f0f3426bf73eeb134b9b"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/vmware_fqdn/template_app_vmware_fqdn.yaml",
+          "sha256": "62cf2779fb156c771dde1fb927671d0a23b54f5ce90bb879841810baaca4d85a"
+        }
       ]
     },
     "cb66d34564e44b3893442fc74cf6e951": {
@@ -3615,6 +5279,12 @@
       ],
       "content_sha256s": [
         "2c60ab4451f4886f24191e5cbaf1dc582b825e6c085f8eaa2646bb3b71f5bd7c"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/cisco_ucs_snmp/template_server_cisco_ucs_snmp.yaml",
+          "sha256": "12f4f8419097186fe3ce8c5c7775522c5c11cff408ceb6e68b3fbd2df129b0b3"
+        }
       ]
     },
     "cbf70ed444394566bcf213dd63d4d352": {
@@ -3628,6 +5298,12 @@
       ],
       "content_sha256s": [
         "00789744c5a2f0b65b1f38705cdef16ae7f9ec57b659f53e8f1a7f0b904f29af"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/exchange/template_app_exchange.yaml",
+          "sha256": "ff4002a7a25095996184345406fa486822f75a7d42544701b6743899b5a78cc1"
+        }
       ]
     },
     "cc762a057f0f467ab571b6d76a9bb278": {
@@ -3641,6 +5317,12 @@
       ],
       "content_sha256s": [
         "b22971fcfc838e0ef01797d3cea915c898f5c13346f8fc5e89c4f49abac581fb"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB3011UiAS-RM_snmp/template_net_mikrotik_RB3011UiAS-RM_snmp.yaml",
+          "sha256": "6fc38a288d1a10e53080de4b63c11a4d4f0cea8de310f6b1f5b810a2f75fb04d"
+        }
       ]
     },
     "cce20a5d149a48b7ac7f5383c3510883": {
@@ -3654,6 +5336,12 @@
       ],
       "content_sha256s": [
         "a89dda2a6f0e3e1742a02773594ac7ac3839af1bc175748f382ab8ac69a6f62e"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/hp_hpn_snmp/template_net_hp_hpn_snmp.yaml",
+          "sha256": "dc0aedfb2b809e018aed8f1b34856622b185a2de46a92638461daf9d240eb911"
+        }
       ]
     },
     "cdb6ebceb1174bada392dd24889b14d9": {
@@ -3667,6 +5355,12 @@
       ],
       "content_sha256s": [
         "3abecb6c644791c8f56d4c6470743ef0c5750d60eda2ee65a013ade6874e0e8c"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS212-1G-10S-1S+IN_snmp/template_net_mikrotik_CRS212-1G-10S-1S+IN_snmp.yaml",
+          "sha256": "ac371c7a8ad9e6333b9b0aea4d2adba70a52991a4366faba81ccdedf8feccb6d"
+        }
       ]
     },
     "cf0947cc05d3450b9a6d66b2eb180482": {
@@ -3680,6 +5374,12 @@
       ],
       "content_sha256s": [
         "6d0dac0dc628368db4c8c142d1adec06177cc413c6d0631d5e6a72b2ca98cf0b"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/supermicro_aten_snmp/template_server_supermicro_aten_snmp.yaml",
+          "sha256": "0b6928d24fc8923b77257f0fd4e25b6438f7a533cf1aaf7f8964345823cb2398"
+        }
       ]
     },
     "d023e2cd326c486f908e3e361d1fe157": {
@@ -3693,6 +5393,12 @@
       ],
       "content_sha256s": [
         "cc0f271aa3f8e115e00d7382d3abafad07a54c5160b3eee5c34e23de712734a3"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "d0571c5f2c204b7ab244843040288a35": {
@@ -3706,6 +5412,12 @@
       ],
       "content_sha256s": [
         "045bba76479de0b32662415c8575fb6f25dc0e3a9e59434ed66f7c43c2238e3e"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/acronis/template_app_acronis_cyber_protect_cloud_http.yaml",
+          "sha256": "b6e8e0ace055584828a2d8d2b7c1821a6ce7da2554355ce6372d2c8a8f3915c6"
+        }
       ]
     },
     "d0ef7d659a8f4beaaabfc4b6134e737a": {
@@ -3719,6 +5431,12 @@
       ],
       "content_sha256s": [
         "f435b638f01f64488d68c277cf161e6071f485214d9822071d09e036cb5b8164"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/postgresql_agent2/template_db_postgresql_agent2.yaml",
+          "sha256": "93ae1a3fb4ec69a4a2b3764b4ae490a1d3f731f071062f3cb5b49383bb05ed1a"
+        }
       ]
     },
     "d0fd5d346b1740dda9d3a976371789dd": {
@@ -3732,6 +5450,12 @@
       ],
       "content_sha256s": [
         "1d82fe1a695671c931968bf0463b36eb10438555ac3f82aa42fc1ad4ae27fd7f"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "d1c1ab5db2c34c17ae3541407f8b7faa": {
@@ -3745,6 +5469,12 @@
       ],
       "content_sha256s": [
         "b52cafc05b16c4a1f90485ac8a69bf423bdd84459d924870fdac671cd0c4d5f2"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS354-48G-4S+2Q+RM_snmp/template_net_mikrotik_CRS354-48G-4S+2Q+RM_snmp.yaml",
+          "sha256": "15691a816fc212f5fd1f26f1bb156bc862d8ad4ec39093c641f1cc9a987bd2e1"
+        }
       ]
     },
     "d2cebb67b4d94a12a072db85e7be6a33": {
@@ -3758,6 +5488,12 @@
       ],
       "content_sha256s": [
         "90e9a527f720d00ea0325f2dc4b1a2f4293b94283c4e9908e1b440765e8f3341"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nginx_agent_active/template_app_nginx_agent_active.yaml",
+          "sha256": "509e46f48a91ca8085a7f27f19e1890549374576903f17589491f695debd4ea0"
+        }
       ]
     },
     "d3176749a5274264938f487cd89d17eb": {
@@ -3771,6 +5507,12 @@
       ],
       "content_sha256s": [
         "ed47175dbd9c3d82b933cc192944c2bafa0f8149e6125d9265c646bcad8ae1f0"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/dlink_des_snmp/template_net_dlink_des_snmp.yaml",
+          "sha256": "25e5edd4277dd19cfca1469a90551a1b48754e212d807202eb929a7c59952987"
+        }
       ]
     },
     "d31c888d12aa4bf68f280bc242501743": {
@@ -3784,6 +5526,12 @@
       ],
       "content_sha256s": [
         "ad7883d68d0623b1ef3daa8d529105b4e8395436fce9a8a5a944084dd088da18"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
+          "sha256": "b7ab58a4091478d0c080264d68cf94ee4c0d6f03b2836d1e7b673ce3b1333406"
+        }
       ]
     },
     "d38b271797bd41f2ad8c79d83b9d8d9c": {
@@ -3797,6 +5545,12 @@
       ],
       "content_sha256s": [
         "121b91e3812c24310c44933ff83840d58bedadefd622ff948efc0ab31394c752"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/mongodb_cluster/template_db_mongodb_cluster.yaml",
+          "sha256": "fd8d2c17a4bc7d5360db0bc975dcb30e37be0ae13d7513f53e4985badf45be21"
+        }
       ]
     },
     "d41c5d0fa91545d68cced1b5dabe4bf1": {
@@ -3810,6 +5564,12 @@
       ],
       "content_sha256s": [
         "4455bf6799ba8048a394efecfc6d21de109980fdd049e023679ef1f2d9bbf1b3"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r820_snmp/template_server_dell_r820_snmp.yaml",
+          "sha256": "ad97342f30a199ab72b7073f233b27479603b74642d228996fbc85e80ef0beb4"
+        }
       ]
     },
     "d50f6dcfc3e44244a0fc9fd933607024": {
@@ -3823,6 +5583,12 @@
       ],
       "content_sha256s": [
         "70cd54d73442c1a108fad9a9ecc7eb5e2285f7db0ca0ab68caa30fe0915bd5b8"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/hpe_ilo_http/template_server_hpe_ilo_http.yaml",
+          "sha256": "e6a59543d0fa87af39c7e61074feeec0ca62351726e2cc5f28d07856b4493cb5"
+        }
       ]
     },
     "d596d6d231bf49c08890aa3ff135ecc6": {
@@ -3836,6 +5602,12 @@
       ],
       "content_sha256s": [
         "ee2fbdeb773c3cfe05060a89b4ee4c301702dff4f0201f5a5f8be7764067c57e"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR1009-7G-1C-1S+PC_snmp/template_net_mikrotik_CCR1009-7G-1C-1S+PC_snmp.yaml",
+          "sha256": "f68a898d780ae9d790e9d3115158567189a7f82c8d99b8c6a13f552cc8c34a11"
+        }
       ]
     },
     "d5dc11ae9ab143a89c4be534bbb35188": {
@@ -3849,6 +5621,12 @@
       ],
       "content_sha256s": [
         "c07ebcdc60e0b41797c79e08ee47ac150e5ff361cdc90cb9b85267791423476e"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/rabbitmq_agent/template_app_rabbitmq_agent.yaml",
+          "sha256": "9d8f0f351df6c764191c8f3a4ba7e50d188783920183292e6c0b60bf6ddad170"
+        }
       ]
     },
     "d5eb4ce08a334098a85e6e02c534be90": {
@@ -3862,6 +5640,12 @@
       ],
       "content_sha256s": [
         "56add165f27d82158d35690ab884d7f82f3e624b5ed4c167008647288d703628"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/cisco_ucs_manager_snmp/template_server_cisco_ucs_manager_snmp.yaml",
+          "sha256": "18942a4117ccb9cb819821eff8c0db95e8c45f2f9dbf30ac22f1664140d70465"
+        }
       ]
     },
     "d670c32f007d438c9dcd32db57d2b691": {
@@ -3875,6 +5659,12 @@
       ],
       "content_sha256s": [
         "54ba8a251d774c73f326e9282a83fbed9e766ad5b21a7a2a7f814b0a6473e17e"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/oracle_agent2/template_db_oracle_agent2.yaml",
+          "sha256": "12eccd0fb6742ba01a88372df293cf1b05fddb867931467ee5d26c5e5d37cfd5"
+        }
       ]
     },
     "dce23cdaef364e139efa580d8a304ffe": {
@@ -3888,6 +5678,12 @@
       ],
       "content_sha256s": [
         "9414c53755dd6ba600847fad350df6716158718197e1890e99aefcd708d10ed8"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "dcf88bca5aaf4123a10eb3daab28a9af": {
@@ -3901,6 +5697,12 @@
       ],
       "content_sha256s": [
         "01004e610f9d1a985b3370c9ae0b9be894165a6bd0d1aae141a7978bb5301342"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS328-24P-4S+RM_snmp/template_net_mikrotik_CRS328-24P-4S+RM_snmp.yaml",
+          "sha256": "17cbb483b74ce8b6bc00afd0c997d7e4e9ff45a1410c7c4fbae4c50e406668cc"
+        }
       ]
     },
     "dd114bf0fb2f46bc84840f1bb24e2b23": {
@@ -3914,6 +5716,12 @@
       ],
       "content_sha256s": [
         "9f0a0221c53309acaae64993bb872ddb5ab2937812ce9738b816ee5759da4742"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml",
+          "sha256": "7940c9a366868499163bc3e4de69099af989078bd23d1d0e4ff18c0e82f5a02e"
+        }
       ]
     },
     "de38542cf4f24fafab33520677f392c4": {
@@ -3927,6 +5735,12 @@
       ],
       "content_sha256s": [
         "216f3a3c022495cb3d0339dfac099e3f95d8665dab5742da1e0e570cc7d9e568"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/certificate_agent2_active/template_app_certificate_agent2_active.yaml",
+          "sha256": "9274b5c0bfff05edd4fe4ae044b173642c8c5bca8d2de88b3030fd389647c76c"
+        }
       ]
     },
     "de96d02bd5f242bfa31308ae2131d03f": {
@@ -3940,6 +5754,12 @@
       ],
       "content_sha256s": [
         "6092cb9e1a437d90040cf3d01990340c37d102b10b3826e806236981da9cb854"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/brocade_fc_sw_snmp/template_net_brocade_fc_sw_snmp.yaml",
+          "sha256": "fff2b720fcde42881208667006a518073dc212f2333abf1b3651af92d91b9e84"
+        }
       ]
     },
     "e0a7c3e725c445228b03116dc6114fe9": {
@@ -3953,6 +5773,12 @@
       ],
       "content_sha256s": [
         "402bf404ff7dc972242b8bff9b3506a36d5ee75103048015eead2fd3555c4a64"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/postgresql_odbc/template_db_postgresql_odbc.yaml",
+          "sha256": "27d4a375f306d94cba209d1b5f1575673d1fc327e79323e20c07299a4e9803b4"
+        }
       ]
     },
     "e111446745a1425b862f8727ae63bce4": {
@@ -3966,6 +5792,12 @@
       ],
       "content_sha256s": [
         "68c85fad64a5c7c434079d6c5661a088a9e897f882569be205482959e71b5a66"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/redis/template_db_redis.yaml",
+          "sha256": "0532b6d417f5a93c515377fb84a461aaa971f56910be03ecc0e971dd0d6bec9a"
+        }
       ]
     },
     "e118ab11c1ec4f9cbe21dfce1441c0f6": {
@@ -3979,6 +5811,12 @@
       ],
       "content_sha256s": [
         "52eae1f7089aaada9f391368ab20fe8b336faa75294cd67bff4ee6e96fc35949"
+      ],
+      "sources": [
+        {
+          "path": "templates/san/netapp_fas3220_snmp/template_san_netapp_fas3220_snmp.yaml",
+          "sha256": "035a062fbd5bcaeaf29f8d0f5cdc3ab254f2dc0aaafbacd7650240983c4ea44e"
+        }
       ]
     },
     "e129aeba7c814bf189772cf5919b4bbb": {
@@ -3992,6 +5830,12 @@
       ],
       "content_sha256s": [
         "6dbfa9bd6b745990f3a1a7f71957506dde37e1243901fb4012df2ee1f2cdf751"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/hadoop_http/template_app_hadoop_http.yaml",
+          "sha256": "b31d02e0f7e4059e96df046f0ad2ca45b1e7930e21a41ecfe84e180b12fd416e"
+        }
       ]
     },
     "e19c120027e04da69b130e0f6cea29fc": {
@@ -4005,6 +5849,12 @@
       ],
       "content_sha256s": [
         "db8a4ec8b74c6553760b4387bceb65c88ee347157d9465dbe0e3e081339e2f32"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/mysql_odbc/template_db_mysql_odbc.yaml",
+          "sha256": "3838691e6ee0bfe5336282f15700d2f3261a59b606b2cbc7c519709a77ebc458"
+        }
       ]
     },
     "e1ca624566424496bff9d90c261ab37b": {
@@ -4018,6 +5868,12 @@
       ],
       "content_sha256s": [
         "0c08814cfcb3619ffddf3dc4b9238b1bd95b494c136383396ead69e3ad720de1"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/velocloud_http/template_net_velocloud_http.yaml",
+          "sha256": "2a0cf64bb29cd2dcb16f1cb9ae436bc6567ee159181670bae86b7b64df75f66c"
+        }
       ]
     },
     "e1e25df663204b099f2597caf89a0678": {
@@ -4031,6 +5887,12 @@
       ],
       "content_sha256s": [
         "7b4eca78e03f88111bd0bfa4dc6a2a548879a67a7cc4954fcfd4df89a575fcbd"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_sdwan_http/template_net_cisco_sdwan_http.yaml",
+          "sha256": "8b597beaf462489a21f65657b9932a3742b6a33ccc825c6a5e686560aeac096c"
+        }
       ]
     },
     "e2307c94f1744af7a8f1f458a67af424": {
@@ -4044,6 +5906,12 @@
       ],
       "content_sha256s": [
         "efac433c424e865539cf5374abbfe26ace23f8603dd28022148339576df07682"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/linux_active/template_os_linux_active.yaml",
+          "sha256": "ab9fc4e0e55ceec898cdd39de8601cf012922453a6f2871173d03da9b09cde6a"
+        }
       ]
     },
     "e2d2b4e4ac28483996cc11fe42823d57": {
@@ -4057,6 +5925,12 @@
       ],
       "content_sha256s": [
         "f6468ea9268b8044c58069f91f8f9e8050af4779e928a347183c31a688b2f709"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
+          "sha256": "b7ab58a4091478d0c080264d68cf94ee4c0d6f03b2836d1e7b673ce3b1333406"
+        }
       ]
     },
     "e518b1340ce44d7389d2cc7c304a97b4": {
@@ -4070,6 +5944,12 @@
       ],
       "content_sha256s": [
         "c48b5f694f6bd03ee761ac175062e872ab0c88008a20bea53eee448151818db8"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/smart_agent2_active/template_module_smart_agent2_active.yaml",
+          "sha256": "aec31cadd10caadf314e30691899ce51fa9a3902ad652da6930467de8916cf6f"
+        }
       ]
     },
     "e5486d98ff414c1391de1bd369a7f9db": {
@@ -4083,6 +5963,12 @@
       ],
       "content_sha256s": [
         "10ec312f6f1221a662a45f1f4cfb17e945ae76c55b1a03110dc8c70ffff78a2a"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
+          "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
+        }
       ]
     },
     "e56c9577c225476eb6d8f1c2f5dc90a5": {
@@ -4096,6 +5982,12 @@
       ],
       "content_sha256s": [
         "d4deecaaba216b06497727d4783825340733305558135a480152d6e9d89da7b8"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/fortinet/fortigate_http/template_net_fortigate_http.yaml",
+          "sha256": "1ab2ce221b1ec794facda8668234b54714e6146853914e819fea4c2b983d631f"
+        }
       ]
     },
     "e5cf4e7ac41a470b99e4262d1c5ee104": {
@@ -4109,6 +6001,12 @@
       ],
       "content_sha256s": [
         "c6eb1f6d5cbc7ed632c06442d5da4c7e7c9963cbdebb3bceec103285b79863f3"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_sdwan_http/template_net_cisco_sdwan_http.yaml",
+          "sha256": "8b597beaf462489a21f65657b9932a3742b6a33ccc825c6a5e686560aeac096c"
+        }
       ]
     },
     "e5ec7acc7efc4ac491b6fa552ab077ae": {
@@ -4122,6 +6020,12 @@
       ],
       "content_sha256s": [
         "c691bb0463db26cb0c6e29c7a5d38d0a95700ba54b5d9275abaddf4a1d35caed"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/dell_force_s_series_snmp/template_net_dell_force_s_series_snmp.yaml",
+          "sha256": "6ccab96a00f7bb533e2c46edfeeb4d0405c3fa79f7163794f00c01199880e9f7"
+        }
       ]
     },
     "e6b0aada359944d09ee4bd46c1a55587": {
@@ -4135,6 +6039,12 @@
       ],
       "content_sha256s": [
         "e89975b8e968494df67347191ac25f2d64bb6feabb591013eee006b50f2140aa"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
+          "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
+        }
       ]
     },
     "e74c1e12f82e4d9880a368b53f5e65a4": {
@@ -4148,6 +6058,12 @@
       ],
       "content_sha256s": [
         "33064455732c007659158e8a0275a351be89f084c5d82c527f9806359c89f2ad"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
+          "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
+        }
       ]
     },
     "e785916967c14544b59c3644c3edda3a": {
@@ -4161,6 +6077,12 @@
       ],
       "content_sha256s": [
         "ab6907f7fc132b25e1a7108414c0f3c74557170535ee9b2caf014cd1fa84da88"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/kubernetes_http/kubernetes_kubelet_http/template_kubernetes_kubelet.yaml",
+          "sha256": "49240db1d678e4138ca4f10fb2316936344f9c1b5efcdf4b2b1e6463d3f56c6e"
+        }
       ]
     },
     "e7894db1c4c94e0f8715977e751368b3": {
@@ -4174,6 +6096,12 @@
       ],
       "content_sha256s": [
         "902ec58d0803aa6d6d3337358987f724e61d5f39c7c7fddc137d9f89f7e7163e"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR1072-1G-8S+_snmp/template_net_mikrotik_CCR1072-1G-8S+_snmp.yaml",
+          "sha256": "a684ae3fe99799f35cf2bb57c24b2f4b346b3a21b26b7fab5b92f4db8887b8b8"
+        }
       ]
     },
     "e7ed0e0cbd0b439394f6498ea90dc31d": {
@@ -4187,6 +6115,12 @@
       ],
       "content_sha256s": [
         "83d6bb212b185d6221247c7e3805536a14a746de7368200a95887b3a8b98c4a8"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS326-24S+2Q+RM_snmp/template_net_mikrotik_CRS326-24S+2Q+RM_snmp.yaml",
+          "sha256": "88734bfb02429ae9155491ce2a5a2dd1aaeea0755cff8e1f8c543213bb1b2eb7"
+        }
       ]
     },
     "e8c0b2c40e884f1598d86f3edf020ea7": {
@@ -4200,6 +6134,12 @@
       ],
       "content_sha256s": [
         "1b18216bf71d88e5d3a87e8526cb40ddb8ce37c1d5e4113f53f3157724b888d2"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_smart_2200_rm_snmp/template_power_apc_ups_smart_2200_rm_snmp.yaml",
+          "sha256": "de59b9b6c1fb679210e069ed12114cd750f757ea558fe2ccc8b28abecb990071"
+        }
       ]
     },
     "e8f89476695848e99ba900a5664d290b": {
@@ -4213,6 +6153,12 @@
       ],
       "content_sha256s": [
         "8453c9052b1ea8b7133259d9730ca1485bc9e4af12a3d1dd8363f974fe8b21f6"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
+          "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
+        }
       ]
     },
     "ea096c13a09b4d7a9be0aab1cec95206": {
@@ -4226,6 +6172,12 @@
       ],
       "content_sha256s": [
         "f3d643648df114b982e3120593ec9e1870017eebc74e37b77630fc256b7831cf"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_catalyst_3750_48ps_snmp/template_net_cisco_catalyst_3750_48ps_snmp.yaml",
+          "sha256": "56a8d05bcac5317d54f64fcf13251f47afb82934dccd13f5ed95f3e490210902"
+        }
       ]
     },
     "eaf36c98b91843b7b79bd5184a23d377": {
@@ -4239,6 +6191,12 @@
       ],
       "content_sha256s": [
         "78984f542244e8c67c5d2899fc454ca24d697890c67e89933b0cc88c967c9b2f"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/solaris/template_os_solaris.yaml",
+          "sha256": "aea735e4328a4f62f5c6ad75c74960f4c8d913f78d6f4259fb64c22bbc40e2f2"
+        }
       ]
     },
     "eafd78764fde4110b9e46ae184f327ba": {
@@ -4252,6 +6210,12 @@
       ],
       "content_sha256s": [
         "6104ba899e1fbc6813a8cff4732a27fef57bf7df7ca12208ee9a26d8ac6856c2"
+      ],
+      "sources": [
+        {
+          "path": "templates/power/apc/apc_ups_smart_3000_xlm_snmp/template_power_apc_ups_smart_3000_xlm_snmp.yaml",
+          "sha256": "b9a8815a782fa9099df71f36047f452e4805957dd2f81af7562fe9759875a1cd"
+        }
       ]
     },
     "ec92c7b0b1d14946b6ac61de89357199": {
@@ -4265,6 +6229,12 @@
       ],
       "content_sha256s": [
         "88b95b2799f4e7846bcd6fda711d3f31c33023a35885cf921fd11423153fcf32"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "ece96efdf0a045b99ede7978fa9366d6": {
@@ -4278,6 +6248,12 @@
       ],
       "content_sha256s": [
         "556838d78659af5983f874d09d2c4751ad322810804513132c24a78ceaf4a576"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/kubernetes_http/kubernetes_scheduler_http/template_kubernetes_scheduler.yaml",
+          "sha256": "60ce2afaeb1dd032112f55b9d7f5ab4f26ac0cc56a9ab7ede01a5ce5be6cff83"
+        }
       ]
     },
     "edc752f178f94b9dbaee459ec7bacc66": {
@@ -4291,6 +6267,12 @@
       ],
       "content_sha256s": [
         "7a5a730994291e63d47a9c2e0f4b8d1774595878b9b2984948ff60bcc74aa0b2"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/paloalto/paloalto_pa440/template_net_paloalto_pa440_http.yaml",
+          "sha256": "483fe338aed30e2f3506e3a109e086e5744a7c44422f9fec678f7b29e275c8fb"
+        }
       ]
     },
     "f01bd64eef4049fabe087cccae590226": {
@@ -4304,6 +6286,12 @@
       ],
       "content_sha256s": [
         "02cec87de34a762a800f0c848eac1ca257e44443ad27261d8ee4d7fb582b4bf5"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/intel_sr1530_ipmi/template_server_intel_sr1530_ipmi.yaml",
+          "sha256": "54d69125ea99162d7475b031cf5f00ea08d7ecc59f5ec5277af0add3bf1e87fd"
+        }
       ]
     },
     "f1336fd88ab0415a9c02892a71e50032": {
@@ -4317,6 +6305,12 @@
       ],
       "content_sha256s": [
         "55e1baa4de88e8bb101843d4343528800a60f854d27b46071550486104202a4b"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/morningstar/morningstar_sunsaver_mppt_snmp/template_net_morningstar_sunsaver_mppt_snmp.yaml",
+          "sha256": "8d2e6227a523d9034e84e39da69546b62510958d43281dc9aa705fbe6b244942"
+        }
       ]
     },
     "f1928e12f9554599a9adb516f38b6bf6": {
@@ -4330,6 +6324,12 @@
       ],
       "content_sha256s": [
         "74e3fa1526f034a073749e061262edebf117f6f51ae873bb1ba55ecdb0661aab"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_netPower_15FR_snmp/template_net_mikrotik_netPower_15FR_snmp.yaml",
+          "sha256": "fe349b3c4604f302bfc23f28bf45619f5e928d66f17bcd00f2c2586205a7d4f8"
+        }
       ]
     },
     "f255e3fc32124b55b2a17ef3c961e5f5": {
@@ -4343,6 +6343,12 @@
       ],
       "content_sha256s": [
         "14fb1d7e29443f32f1f4f92075cc133ea904c74b51686fb644ca95d991c9343e"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/mysql_agent/template_db_mysql_agent.yaml",
+          "sha256": "31e064558d76891649bf4cf5eaaf41bd4f2567252e919b466e77a50e0772d86a"
+        }
       ]
     },
     "f2efeb94f4bd4ed9ab34a973c0363eb8": {
@@ -4356,6 +6362,12 @@
       ],
       "content_sha256s": [
         "e5e082a980ff05819b267b8b3db2779431dc3c74441a0abdffca8eed677e4759"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CCR2004-1G-12S+2XS_snmp/template_net_mikrotik_CCR2004-1G-12S+2XS_snmp.yaml",
+          "sha256": "968928652b345d8ef8bb0a025db82e758c470ffb5c701d693a84fc60b33fb3dc"
+        }
       ]
     },
     "f397be2340734d24bc666102fbe184a5": {
@@ -4369,6 +6381,12 @@
       ],
       "content_sha256s": [
         "04d57c6389c6a6e62ebfc47ea5399e58fd380a7d13123fe4c098cecffe12549e"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/kubernetes_http/kubernetes_nodes_http/template_kubernetes_nodes.yaml",
+          "sha256": "94e6413e0682e750f8276bcdec0ab40dbdaf61c10a276d7049933c6cc686ea6c"
+        }
       ]
     },
     "f445dac89ff74deabaae9dcb84815998": {
@@ -4382,6 +6400,12 @@
       ],
       "content_sha256s": [
         "ca7bc697c960bc74cbc06ad8b16674d6dc8b118b5eb2bb37bdf0a80b05dc00b6"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/gitlab_http/template_app_gitlab_http.yaml",
+          "sha256": "70ca0e8ba25576e02e88448bfdc6eee0b5fa14d310695ef31620ac1ae6244c9a"
+        }
       ]
     },
     "f474ff823fe84d689b9e4c6a4f0ce59e": {
@@ -4395,6 +6419,12 @@
       ],
       "content_sha256s": [
         "0cfc0a00e8a560dfe77588ca698cc6d4f5af322e92eeaec32585e54f725102c4"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS317-1G-16S+RM_snmp/template_net_mikrotik_CRS317-1G-16S+RM_snmp.yaml",
+          "sha256": "a9b8ed2f39b711e1e0a5241806ea4017e67e22b621267c3232f29829f83b2426"
+        }
       ]
     },
     "f552ead096ff4ebb8e4cc44c437e1f2f": {
@@ -4408,6 +6438,12 @@
       ],
       "content_sha256s": [
         "b21c6dc301fe608fd51fca07d68f6d99fc31f296c0aecbb9948c6cd5797159ef"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cradlepoint/ncm_v2_http/template_net_cradlepoint_http.yaml",
+          "sha256": "ec1ff5a33effb7e4a031d310999e203b6c5caa7d82f66dfcd00f7320848cf944"
+        }
       ]
     },
     "f59c8b4156ec4386a7c724534ddd384d": {
@@ -4421,6 +6457,12 @@
       ],
       "content_sha256s": [
         "39091ab68e60658e17fb558634814c09b6b5c4813ab4a2047db38c9d215594e5"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "f5fff9a83f774f4688692ad58aa35d45": {
@@ -4434,6 +6476,12 @@
       ],
       "content_sha256s": [
         "4d3fae0870a06d2ed89076696552746af9212c4dc263939e1a8bb95d72a0dfc2"
+      ],
+      "sources": [
+        {
+          "path": "templates/db/yugabytedb_http/template_db_yugabyte_http.yaml",
+          "sha256": "b76d32e04a09f511d955376e97b41c07c69fb885298fa0c3370ba20cc36257d6"
+        }
       ]
     },
     "f64ad01567914165a493815e492fb315": {
@@ -4447,6 +6495,12 @@
       ],
       "content_sha256s": [
         "be0ee0fb36e8f7e40480055af02160e90c469bc5c6ce9a7b06d510faf5ccefcc"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/brocade_foundry_sw_snmp/template_net_brocade_foundry_sw_snmp.yaml",
+          "sha256": "389e07187bf60d232e39053459987986a17035900677c41e0c5cea9bc37747ee"
+        }
       ]
     },
     "f744679600844c07b2b4eedda9bc3d0c": {
@@ -4460,6 +6514,12 @@
       ],
       "content_sha256s": [
         "8662cf7962738604ef0ebc5bf50f81262b6f1743bd51158b7ba641becd6ff563"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/cisco/cisco_catalyst_3750_48ts_snmp/template_net_cisco_catalyst_3750_48ts_snmp.yaml",
+          "sha256": "d0297a770893253c544c89e0a9a4dcee482987d83f80bd414363bc220499ed3e"
+        }
       ]
     },
     "f74adf26d9ab44ada318002d31fd2881": {
@@ -4473,6 +6533,12 @@
       ],
       "content_sha256s": [
         "e7719c42c1e1de0bf80d45c78cd260f93eac99e384c015bc39a9ba368556f85f"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/nomad/template_app_nomad_http.yaml",
+          "sha256": "49db24b4f9b50858a79890a1011e6e430693d1eac8ff0b2be796dd6d204cc4db"
+        }
       ]
     },
     "f895df5b37494f668cde1a2388d7af8b": {
@@ -4486,6 +6552,12 @@
       ],
       "content_sha256s": [
         "529e1285b1a42681fd5742bf0471f9bc49792dac04f9a94133263e5a6ffb3770"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/macos/template_os_macos.yaml",
+          "sha256": "9eb8f807991bbfc8337914d77ba68236548dde08de7f4e95c2ad2bd2f1f61121"
+        }
       ]
     },
     "f8f7908280354f2abeed07dc788c3747": {
@@ -4499,6 +6571,12 @@
       ],
       "content_sha256s": [
         "a41ce6b32d340395b68b677b8adad75ccfa1a0c232e7bac3a491287e68a6742e"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/linux/template_os_linux.yaml",
+          "sha256": "6d4ebc020d78ff90791fa54e7bf2e407cfc0b8d9c5a972fbecc659d735ffa889"
+        }
       ]
     },
     "f9a59315c8944853bb91c0a9ec3056d7": {
@@ -4512,6 +6590,12 @@
       ],
       "content_sha256s": [
         "2de15a3fc67c11bf73d3f26c616052ac69b2b1011e08b6af95fb3e34619980ac"
+      ],
+      "sources": [
+        {
+          "path": "templates/os/windows_snmp/template_os_windows_snmp.yaml",
+          "sha256": "7fcb4efe6127761570aab9941581da56072d15bf6f48a2b08ca8c6b8833026cb"
+        }
       ]
     },
     "fa58228fee8a4e34a7c6503950d1c615": {
@@ -4525,6 +6609,12 @@
       ],
       "content_sha256s": [
         "e7f15b6c3c1a100ece205fe20ade3a9731d081d8830d6176b6a0738a1457e643"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
+          "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
+        }
       ]
     },
     "fa5e5e131eb34bbea1b1f7b2352a853d": {
@@ -4538,6 +6628,12 @@
       ],
       "content_sha256s": [
         "939e3a7f5f04afd7b9fc7b6ad01f074520435df5b4a30ef517558d62cbdb1cc1"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS354-48P-4S+2Q+RM_snmp/template_net_mikrotik_CRS354-48P-4S+2Q+RM_snmp.yaml",
+          "sha256": "7a2e33bb7b1b84edf5ca6f5334bc6b95de57f536b54ac9d29b2040ca02cde94e"
+        }
       ]
     },
     "fac16383680c4454be48b6db870d975e": {
@@ -4551,6 +6647,12 @@
       ],
       "content_sha256s": [
         "952f6d3c2f3b6efbfec473dbc9e420f71c1d93f974575eeaf3f8ebcceae6deb1"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_CRS109-8G-1S-2HnD-IN_snmp/template_net_mikrotik_CRS109-8G-1S-2HnD-IN_snmp.yaml",
+          "sha256": "64f0ebf0847d34e2d3761361e12eb1ce3bd5e68e113e5593adb6ded586195995"
+        }
       ]
     },
     "fac50638cb77468598c29a6a47520c24": {
@@ -4564,6 +6666,12 @@
       ],
       "content_sha256s": [
         "a3e9f9d01d44cdb52ca7550c76a8a0c83b7aabe800706d46024b966fde66667c"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_RB1100AHx4_Dude_Edition_snmp/template_net_mikrotik_RB1100AHx4_Dude_Edition_snmp.yaml",
+          "sha256": "a337305f23a2f440513c420c2ed8e84201dc296a8fc34aba628c50a1f05c3753"
+        }
       ]
     },
     "fc834b8da8864678b55557e9a237eac9": {
@@ -4577,6 +6685,12 @@
       ],
       "content_sha256s": [
         "d01b08a9012e3fcb2a40948a4c48a491c14e19c74f416acd4e57b9be047ed1dd"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r840_snmp/template_server_dell_r840_snmp.yaml",
+          "sha256": "58e9198a9750b54cf6f36f4e7e7a9bfa0cda401f28e33b020e3c81d5f07cf1ea"
+        }
       ]
     },
     "fd36e0a231d343d38a95d1ed789584ca": {
@@ -4590,6 +6704,12 @@
       ],
       "content_sha256s": [
         "fffd00d3efd67f399a2bcef016f48985e8be4d28cf5eec20f8748a0068c828bb"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
+          "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
+        }
       ]
     },
     "fe5b8448661f41b9a6d948fccd7f9045": {
@@ -4603,6 +6723,12 @@
       ],
       "content_sha256s": [
         "0b136d7bc9031bc56a114b2aafcc23a462051e02fe8631e478dd53c52ce1c626"
+      ],
+      "sources": [
+        {
+          "path": "templates/server/dell/dell_r720_snmp/template_server_dell_r720_snmp.yaml",
+          "sha256": "3f39536a72c6f850c37cb1467dd825ae014d98984c9b1f2e8cce715064aced7c"
+        }
       ]
     },
     "fe7eb8b22ce84017b07bcab36e9032dc": {
@@ -4616,6 +6742,12 @@
       ],
       "content_sha256s": [
         "ea19b08e2aa6e4583629130bd3d19da9fd613bd4117c23597e160bd3ee8ea610"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/juniper_mx_snmp/template_net_juniper_mx_snmp.yaml",
+          "sha256": "d554995c3dea8e4f4526959b06b67d88e77cb940f699217a55e2235eccc50ddc"
+        }
       ]
     },
     "ff57532daf924030b364e3b75acb74c4": {
@@ -4629,6 +6761,12 @@
       ],
       "content_sha256s": [
         "4b153db57e40606d1ecbcd36e8b6b63b6516a029a0dba8535522075903d07d48"
+      ],
+      "sources": [
+        {
+          "path": "templates/net/mikrotik/mikrotik_hEX_PoE_snmp/template_net_mikrotik_hEX_PoE_snmp.yaml",
+          "sha256": "43096974509ad97ed34caf323f98554a3d9ae3818b44cad2c45f46f8440a861f"
+        }
       ]
     },
     "ff637e001b91472d8730eb7f10e65800": {
@@ -4642,6 +6780,12 @@
       ],
       "content_sha256s": [
         "0ac16bed6ac91771a41002390677d0c3634c3e2fb365fcce2a6172bbd3289779"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/openstack/template_cloud_openstack_http.yaml",
+          "sha256": "2660ba99e986029b791abc8b79978dc2cd67cfc6bc212907b49510870652475b"
+        }
       ]
     }
   }
