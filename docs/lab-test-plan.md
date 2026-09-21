@@ -13,7 +13,7 @@ Status at publication:
 
 The fixed test snapshot branch is `release/0.1.0-beta.11`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.4 builds on the successful Zabbix 7.0.30 beta.3 inventory/upstream pass and adds bounded multi-template preparation plus controlled sequential execution. The batch path must never bypass the existing per-template analysis, rollback, fresh preflight, immutable source/hash validation, explicit confirmation and single `configuration.import` boundary.
+Beta.11 retains bounded multi-template preparation, controlled sequential execution and the explicit reviewed-update path, and fixes the immutable upstream fingerprint contract found during the Zabbix 7.x controlled-update field test. The batch and individual paths must never bypass analysis, rollback, fresh preflight, separate raw-source/template-content fingerprint evidence, explicit confirmation or the single `configuration.import` boundary.
 
 ## Safety assumptions
 
@@ -115,7 +115,7 @@ Confirm:
 - select only 2–3 candidates for the first test;
 - **Review selected updates** shows only those explicitly selected templates.
 
-Beta.4 intentionally bounds one selected batch to **25 templates**. Larger batch submissions must fail closed rather than silently truncate.
+Beta.11 intentionally bounds one selected batch to **25 templates**. Larger batch submissions must fail closed rather than silently truncate.
 
 ## 5. Selected review → batch preparation
 
