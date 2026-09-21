@@ -23,7 +23,7 @@ final class TemplateUpdatePreflightService {
 			=> (new TemplateUpdateAnalysisService())->analyze($templateId);
 	}
 
-	public function run(string $templateId): array {
+	public function run(string $templateId, bool $manualOverride = false): array {
 		$templateId = trim($templateId);
 		if ($templateId === '' || !ctype_digit($templateId) || (int) $templateId <= 0) {
 			throw new RuntimeException('A valid numeric template ID is required for update preflight.');
@@ -43,7 +43,9 @@ final class TemplateUpdatePreflightService {
 			'candidate' => null,
 			'rollback' => null,
 			'direct_host_count' => 0,
-			'evidence_sha256' => null
+			'evidence_sha256' => null,
+			'manual_override' => false,
+			'manual_reasons' => []
 		];
 
 		$template = is_array($analysis['template'] ?? null) ? $analysis['template'] : null;
@@ -72,16 +74,48 @@ final class TemplateUpdatePreflightService {
 		$readiness = is_array($analysis['update_readiness'] ?? null)
 			? $analysis['update_readiness']
 			: null;
-		if ($readiness === null || ($readiness['status'] ?? null) !== 'backup_verified') {
+		$readinessStatus = (string) ($readiness['status'] ?? 'unavailable');
+		$manualRequired = !empty($readiness['manual_confirmation_required']);
+		$manualReasons = is_array($readiness['manual_reasons'] ?? null)
+			? array_values(array_map('strval', $readiness['manual_reasons']))
+			: [];
+
+		if ($readiness === null
+				|| !in_array($readinessStatus, ['backup_verified', 'review_backup_verified'], true)) {
 			$result['status'] = 'blocked_readiness';
 			$result['next_step'] = 'resolve_readiness';
-			$result['reason'] = 'readiness_'.($readiness['status'] ?? 'unavailable');
+			$result['reason'] = 'readiness_'.$readinessStatus;
 			return $result;
+		}
+
+		if ($readinessStatus === 'review_backup_verified'
+				&& (!$manualRequired || $manualReasons === [])) {
+			$result['status'] = 'blocked_readiness';
+			$result['next_step'] = 'resolve_readiness';
+			$result['reason'] = 'invalid_manual_review_evidence';
+			return $result;
+		}
+
+		if ($readinessStatus === 'review_backup_verified' && !$manualOverride) {
+			$result['status'] = 'blocked_readiness';
+			$result['next_step'] = 'confirm_manual_review';
+			$result['reason'] = 'manual_override_required';
+			$result['manual_reasons'] = $manualReasons;
+			return $result;
+		}
+
+		if ($readinessStatus === 'backup_verified') {
+			$manualOverride = false;
+			$manualRequired = false;
+			$manualReasons = [];
 		}
 
 		if (!empty($readiness['write_enabled'])) {
 			throw new RuntimeException('Readiness unexpectedly enabled configuration writes.');
 		}
+
+		$result['manual_override'] = $manualOverride && $manualRequired;
+		$result['manual_reasons'] = $manualReasons;
 
 		$candidate = $this->candidateDescriptor($analysis, $template);
 		if ($candidate === null) {
@@ -103,7 +137,7 @@ final class TemplateUpdatePreflightService {
 		$result['rollback'] = $rollback;
 
 		$evidence = [
-			'schema_version' => 3,
+			'schema_version' => 4,
 			'templateid' => $result['template']['templateid'],
 			'uuid' => $result['template']['uuid'],
 			'installed_version' => $result['template']['installed_version'],
@@ -116,7 +150,9 @@ final class TemplateUpdatePreflightService {
 			'upstream_vendor_name' => $candidate['vendor_name'],
 			'rollback_sha256' => $rollback['sha256'],
 			'current_export_sha256' => $rollback['current_export_sha256'],
-			'direct_host_count' => $result['direct_host_count']
+			'direct_host_count' => $result['direct_host_count'],
+			'manual_override' => $result['manual_override'],
+			'manual_reasons' => $result['manual_reasons']
 		];
 
 		$encoded = json_encode($evidence, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

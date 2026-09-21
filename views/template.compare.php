@@ -22,6 +22,7 @@ $contentLabels = [
 
 $baselineLabels = [
 	'found' => _('Historical baseline found'),
+	'ambiguous' => _('Historical baseline ambiguous'),
 	'not_found' => _('Historical baseline not found'),
 	'history_limit_reached' => _('Historical scan limit reached')
 ];
@@ -65,6 +66,8 @@ $readinessStatusLabels = [
 	'blocked_local_overwrite' => _('Blocked — local customization overwrite risk'),
 	'review_high' => _('Manual high-risk review required'),
 	'review_medium' => _('Manual review required'),
+	'review_required' => _('Manual review path — rollback backup required'),
+	'review_backup_verified' => _('Manual review path — rollback backup verified'),
 	'candidate_for_backup' => _('Candidate for backup and continued review'),
 	'backup_verified' => _('Rollback backup verified')
 ];
@@ -80,7 +83,8 @@ $readinessNextStepLabels = [
 	'manual_high_risk_review' => _('Perform manual high-risk change review'),
 	'manual_change_review' => _('Perform manual change review'),
 	'create_and_verify_backup' => _('Create and verify rollback backup'),
-	'run_controlled_preflight' => _('Run fresh controlled update preflight')
+	'run_controlled_preflight' => _('Run fresh controlled update preflight'),
+	'run_manual_preflight' => _('Run explicit reviewed update preflight')
 ];
 
 $backupVerificationLabels = [
@@ -209,13 +213,22 @@ if (is_array($data['historical_baseline'])) {
 			_('Baseline status'),
 			_('Installed vendor version'),
 			_('Baseline commit'),
-			_('Commits examined')
+			_('Commits examined'),
+			_('Same-version commits'),
+			_('Distinct official contents'),
+			_('Exact LOCAL matches'),
+			_('Closest LOCAL differences')
 		])
 		->addRow([
 			$baselineLabels[$baselineStatus] ?? _('Unknown'),
 			(string) ($baseline['vendor_version'] ?? '—'),
 			($baseline['commit'] ?? '') !== '' ? substr((string) $baseline['commit'], 0, 12) : '—',
-			(int) ($baseline['commits_examined'] ?? 0)
+			(int) ($baseline['commits_examined'] ?? 0),
+			(int) ($baseline['candidate_count'] ?? 0),
+			(int) ($baseline['distinct_candidate_count'] ?? 0),
+			(int) ($baseline['exact_match_count'] ?? 0),
+			isset($baseline['closest_changes']) ? (int) $baseline['closest_changes']
+				: (isset($baseline['semantic_distance']) ? (int) $baseline['semantic_distance'] : '—')
 		]);
 
 	$page->addItem(new CTag('h4', true, _('Historical official baseline')))->addItem($baselineTable);
@@ -468,15 +481,27 @@ if (is_array($data['update_readiness'])
 			);
 			break;
 
+		case 'review_required':
+			$readinessText = _(
+				'The comparison is authoritative and has no unresolved identities or three-way conflicts, but one or more known local-overwrite and/or medium/high technical-risk conditions require explicit manual review. A rollback backup may be created next; no configuration write is authorized yet.'
+			);
+			break;
+
+		case 'review_backup_verified':
+			$readinessText = _(
+				'The reviewed manual-update path has an exact rollback backup matching the current installed template. The next step is a fresh reviewed preflight; the final import still requires a second explicit super-administrator acknowledgement of the reported overwrite/risk conditions.'
+			);
+			break;
+
 		case 'review_high':
 			$readinessText = _(
-				'The comparison evidence is complete, but the proposed upstream change has high technical review priority. Manual review is required before the workflow may advance to backup creation.'
+				'The comparison evidence is complete, but the proposed upstream change has high technical review priority.'
 			);
 			break;
 
 		case 'review_medium':
 			$readinessText = _(
-				'The comparison evidence is complete, but the proposed upstream change requires manual review before the workflow may advance to backup creation.'
+				'The comparison evidence is complete, but the proposed upstream change requires manual review.'
 			);
 			break;
 
@@ -510,7 +535,7 @@ if (is_array($data['update_readiness'])
 			'This comparison page does not call configuration.import. Controlled writes are available only through the separate preflight and confirmation flow after all safety gates pass.'
 		)));
 
-	if ($readinessStatus === 'candidate_for_backup' && is_array($data['template'])) {
+	if (!empty($readiness['candidate_for_backup']) && is_array($data['template'])) {
 		$backupAction = (new CUrl('zabbix.php'))
 			->setArgument('action', 'ztum.template.backup')
 			->getUrl();
@@ -530,18 +555,25 @@ if (is_array($data['update_readiness'])
 			)))
 			->addItem($backupForm);
 	}
-	elseif ($readinessStatus === 'backup_verified' && is_array($data['template'])) {
+	elseif (!empty($readiness['backup_verified']) && is_array($data['template'])) {
 		$preflightAction = (new CUrl('zabbix.php'))
 			->setArgument('action', 'ztum.template.preflight')
 			->getUrl();
 		$preflightForm = (new CForm('post'))
 			->setId('ztum-template-preflight-form')
 			->setAction($preflightAction)
-			->addItem([
+			->addItem(array_values(array_filter([
 				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.preflight')))->removeId(),
 				(new CVar('templateid', (string) $data['template']['templateid']))->removeId(),
-				new CSubmitButton(_('Run controlled preflight'))
-			]);
+				!empty($readiness['manual_confirmation_required'])
+					? (new CVar('manual_override', '1'))->removeId()
+					: null,
+				new CSubmitButton(
+					!empty($readiness['manual_confirmation_required'])
+						? _('Run reviewed controlled preflight')
+						: _('Run controlled preflight')
+				)
+			], static fn($item): bool => $item !== null)));
 
 		$page
 			->addItem(new CTag('h4', true, _('Controlled update preflight')))

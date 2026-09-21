@@ -20,7 +20,8 @@ class TemplatePreflight extends CController {
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput([
-			'templateid' => 'required|db hosts.hostid'
+			'templateid' => 'required|db hosts.hostid',
+			'manual_override' => 'in 1'
 		]);
 
 		if (!$ret) {
@@ -41,11 +42,12 @@ class TemplatePreflight extends CController {
 			'templateid' => $templateId,
 			'preflight' => null,
 			'preflight_error' => null,
-			'can_update' => $this->getUserType() === USER_TYPE_SUPER_ADMIN
+			'can_update' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
+			'manual_override' => (string) $this->getInput('manual_override', '') === '1'
 		];
 
 		try {
-			$data['preflight'] = (new TemplateUpdatePreflightService())->run($templateId);
+			$data['preflight'] = (new TemplateUpdatePreflightService())->run($templateId, $data['manual_override']);
 		}
 		catch (Throwable $exception) {
 			error_log(sprintf(

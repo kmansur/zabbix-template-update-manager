@@ -156,7 +156,7 @@ final class TemplateUpdateAnalysisService {
 				$data['update_risk']
 			);
 
-			if (($data['update_readiness']['status'] ?? null) === 'candidate_for_backup') {
+			if (!empty($data['update_readiness']['candidate_for_backup'])) {
 				try {
 					$data['backup_verification'] = (new TemplateBackupVerificationService(
 						new TemplateExportService(),

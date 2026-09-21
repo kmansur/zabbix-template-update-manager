@@ -29,6 +29,10 @@ $template = is_array($preflight['template'] ?? null) ? $preflight['template'] : 
 $candidate = is_array($preflight['candidate'] ?? null) ? $preflight['candidate'] : [];
 $rollback = is_array($preflight['rollback'] ?? null) ? $preflight['rollback'] : [];
 $evidenceSha = (string) ($preflight['evidence_sha256'] ?? '');
+$manualOverride = !empty($preflight['manual_override']);
+$manualReasons = is_array($preflight['manual_reasons'] ?? null)
+	? array_values(array_map('strval', $preflight['manual_reasons']))
+	: [];
 
 $stateTable = (new CTableInfo())
 	->setHeader([
@@ -111,6 +115,25 @@ if ($rollback !== []) {
 	$page->addItem(new CTag('h4', true, _('Verified rollback evidence')))->addItem($rollbackTable);
 }
 
+if ($manualOverride) {
+	$manualReasonLabels = [
+		'local_customization_overwrite' => _('Known local customization would be overwritten or removed'),
+		'medium_technical_risk' => _('Medium technical review priority'),
+		'high_technical_risk' => _('High technical review priority')
+	];
+	$labels = [];
+	foreach ($manualReasons as $reason) {
+		$labels[] = $manualReasonLabels[$reason] ?? $reason;
+	}
+
+	$page
+		->addItem(new CTag('h4', true, _('Explicit manual-review path')))
+		->addItem(new CTag('p', true, _(
+			'This candidate is not eligible for unattended update. The following reviewed conditions are bound into the preflight evidence and require an additional explicit acknowledgement before import:'
+		)))
+		->addItem(new CTag('p', true, implode('; ', $labels)));
+}
+
 if ($evidenceSha !== '') {
 	$page
 		->addItem(new CTag('h4', true, _('Preflight evidence fingerprint')))
@@ -119,25 +142,37 @@ if ($evidenceSha !== '') {
 
 if ($status === 'passed') {
 	$page->addItem(new CTag('p', true, _(
-		'All implemented safety prerequisites passed. The update action will rerun this complete preflight immediately before configuration.import and will refuse the write if this evidence changes.'
+		'All implemented safety prerequisites passed for this selected path. The update action will rerun this complete preflight immediately before configuration.import and will refuse the write if this evidence or the selected review mode changes.'
 	)));
 
 	if (!empty($data['can_update']) && $evidenceSha !== '' && $template !== []) {
 		$updateAction = (new CUrl('zabbix.php'))
 			->setArgument('action', 'ztum.template.update')
 			->getUrl();
+		$confirmationItems = [
+			(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.update')))->removeId(),
+			(new CVar('templateid', (string) $template['templateid']))->removeId(),
+			(new CVar('evidence_sha256', $evidenceSha))->removeId(),
+			(new CCheckBox('confirm', '1'))->setLabel(_(
+				'I reviewed the candidate and verified rollback evidence and want to update this template.'
+			))
+		];
+
+		if ($manualOverride) {
+			$confirmationItems[] = (new CVar('manual_override', '1'))->removeId();
+			$confirmationItems[] = (new CCheckBox('confirm_manual_override', '1'))->setLabel(_(
+				'I explicitly accept the reviewed local-overwrite and/or technical-risk conditions above. I understand that the official import may remove or replace those local differences.'
+			));
+		}
+
+		$confirmationItems[] = new CSubmitButton(
+			$manualOverride ? _('Update official template with reviewed override') : _('Update official template')
+		);
+
 		$updateForm = (new CForm('post'))
 			->setId('ztum-template-update-form')
 			->setAction($updateAction)
-			->addItem([
-				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.update')))->removeId(),
-				(new CVar('templateid', (string) $template['templateid']))->removeId(),
-				(new CVar('evidence_sha256', $evidenceSha))->removeId(),
-				(new CCheckBox('confirm', '1'))->setLabel(_(
-					'I reviewed the candidate and verified rollback evidence and want to update this template.'
-				)),
-				new CSubmitButton(_('Update official template'))
-			]);
+			->addItem($confirmationItems);
 
 		$page
 			->addItem(new CTag('h4', true, _('Controlled update confirmation')))

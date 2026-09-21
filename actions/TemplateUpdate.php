@@ -23,8 +23,14 @@ class TemplateUpdate extends CController {
 		$ret = $this->validateInput([
 			'templateid' => 'required|db hosts.hostid',
 			'evidence_sha256' => 'required|string',
-			'confirm' => 'required|in 1'
+			'confirm' => 'required|in 1',
+			'manual_override' => 'in 1',
+			'confirm_manual_override' => 'in 1'
 		]);
+
+		if ($ret && (string) $this->getInput('manual_override', '') === '1') {
+			$ret = (string) $this->getInput('confirm_manual_override', '') === '1';
+		}
 
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
@@ -49,7 +55,8 @@ class TemplateUpdate extends CController {
 		try {
 			$data['result'] = (new TemplateControlledUpdateService())->execute(
 				$templateId,
-				(string) $this->getInput('evidence_sha256')
+				(string) $this->getInput('evidence_sha256'),
+				(string) $this->getInput('manual_override', '') === '1'
 			);
 		}
 		catch (Throwable $exception) {

@@ -4,6 +4,28 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.10] - 2026-09-21
+
+### Added
+
+- Explicit reviewed-update path for authoritative candidates with no unresolved identity and no BASE / LOCAL / UPSTREAM conflict, but with known local-overwrite and/or medium/high technical-risk conditions.
+- Second super-administrator acknowledgement checkbox before a reviewed override can reach the single controlled `configuration.import` boundary.
+- Reviewed-mode and exact review reasons bound into the fresh preflight SHA-256 evidence to prevent changing update mode between review and write.
+- Historical-baseline provenance details in the comparison view: same-version commit count, distinct official contents, exact LOCAL matches and closest semantic distance.
+
+### Changed
+
+- Known local-overwrite is no longer an absolute dead-end when the historical baseline and three-way analysis are authoritative. It enters `review_required`, may create/verify a rollback backup, then advances to `review_backup_verified` and a manually acknowledged preflight.
+- Medium/high technical-risk candidates use the same explicit reviewed path instead of being permanently unable to advance.
+- True three-way conflicts, unresolved identities, ambiguous/missing baselines and incomplete risk coverage remain hard blockers and cannot be overridden.
+- Reviewed override candidates remain excluded from unattended batch `Ready`; batch execution continues to update only standard fully automatic candidates.
+- Backup verification now runs for both standard backup candidates and explicit reviewed candidates.
+
+### Safety
+
+- The reviewed path never bypasses rollback creation, backup/current-export equality, immutable upstream commit/path/hash validation, fresh server-side preflight, TOCTOU evidence matching or post-import validation.
+- No additional Zabbix write boundary was introduced.
+
 ## [0.1.0-beta.4] - 2026-09-16
 
 ### Added

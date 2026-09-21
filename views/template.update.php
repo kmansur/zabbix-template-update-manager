@@ -81,6 +81,18 @@ if (isset($result['preflight_evidence_sha256'])) {
 		->addItem(new CTag('p', true, (string) $result['preflight_evidence_sha256']));
 }
 
+if (!empty($result['manual_override'])) {
+	$manualReasons = is_array($result['manual_reasons'] ?? null)
+		? implode(', ', array_map('strval', $result['manual_reasons']))
+		: '';
+	$page
+		->addItem(new CTag('h4', true, _('Reviewed manual override')))
+		->addItem(new CTag('p', true, _(
+			'The update was executed through the explicit reviewed path. Bound reasons: '
+		).($manualReasons !== '' ? $manualReasons : '—')));
+}
+
+
 if (isset($result['rollback_sha256']) && (string) $result['rollback_sha256'] !== '') {
 	$page
 		->addItem(new CTag('h4', true, _('Rollback artifact used as prerequisite')))

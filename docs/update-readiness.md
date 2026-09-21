@@ -53,21 +53,21 @@ No optimistic fallback is used.
 
 At least one normalized field/entity has a confirmed BASE / LOCAL / UPSTREAM conflict. Conflict resolution is an explicit human-review task and is outside automatic update flow.
 
-### `blocked_local_overwrite`
+### `review_required`
 
-The installed template contains a known local customization for which current upstream still has the historical BASE value. A normal import would therefore tend to replace that customization.
+Authoritative baseline, identity coverage and three-way comparison are complete and there is no true BASE / LOCAL / UPSTREAM conflict, but at least one condition requires explicit human acceptance:
 
-The customization must first be preserved, reconciled or explicitly retired.
+- a known LOCAL-only difference would be overwritten or removed by current upstream;
+- technical review priority is `medium`;
+- technical review priority is `high`.
 
-### `review_high`
+This state may advance only to rollback-backup creation. It is never an unattended batch-ready state.
 
-Comparison coverage is complete and no conflict/local-overwrite blocker exists, but the technical change set is classified as high review priority.
+### `review_backup_verified`
 
-Manual high-risk review is required before backup creation becomes the next workflow step.
+The same reviewed conditions remain present and the newest rollback artifact exactly matches a fresh export of LOCAL. The next step is a reviewed preflight. The review reasons are bound into the evidence fingerprint and a second explicit super-administrator acknowledgement is required before import.
 
-### `review_medium`
-
-Comparison coverage is complete and no blocker exists, but the change set still requires normal manual review.
+`blocked_local_overwrite`, `review_medium` and `review_high` remain recognized for compatibility with earlier beta state labels but beta.10 routes authoritative non-conflicting cases into the explicit reviewed path instead.
 
 ### `candidate_for_backup`
 
@@ -79,9 +79,11 @@ All of the following are true:
 - historical official baseline is proven;
 - three-way analysis is complete;
 - no conflict exists;
-- no known local customization would be overwritten;
 - risk coverage is complete;
-- overall technical review priority is `none` or `low`.
+- overall technical review priority is `none` or `low`;
+- no manual-review reason is present.
+
+If local overwrite or medium/high technical risk is known but all hard evidence is resolved, the template uses `review_required` instead of standard `candidate_for_backup`.
 
 This means only that the next allowed workflow step is:
 
@@ -129,9 +131,18 @@ UpdateReadinessEvaluator
         +-- blocked_baseline
         +-- blocked_unresolved
         +-- blocked_conflict
-        +-- blocked_local_overwrite
-        +-- review_high
-        +-- review_medium
+        +-- blocked_conflict
+        +-- review_required
+        |          |
+        |          v
+        |   rollback backup
+        |          |
+        |          v
+        | review_backup_verified
+        |          |
+        |          v
+        | reviewed preflight + second acknowledgement
+        |
         +-- candidate_for_backup
                               |
                               v
@@ -152,9 +163,9 @@ UpdateReadinessEvaluator
                        backup_verified
 ```
 
-When `candidate_for_backup` is reached, the native comparison page exposes a CSRF-protected POST action that exports the currently installed template and stores a persistent local rollback artifact. That action does not advance directly to an update and does not alter Zabbix configuration.
+When `candidate_for_backup` or `review_required` is reached, the native comparison page exposes a CSRF-protected POST action that exports the currently installed template and stores a persistent local rollback artifact. That action does not advance directly to an update and does not alter Zabbix configuration.
 
-On subsequent comparison-page loads, the module inspects the newest artifact and compares it to a fresh current export. Only an exact match advances the readiness result to `backup_verified`.
+On subsequent comparison-page loads, the module inspects the newest artifact and compares it to a fresh current export. Only an exact match advances the readiness result to `backup_verified` for the standard path or `review_backup_verified` for the explicit reviewed path.
 
 If no artifact exists, the repository cannot be read, the newest artifact is invalid or the current installed export has changed, readiness remains at `candidate_for_backup` and the backup prerequisite is not satisfied.
 

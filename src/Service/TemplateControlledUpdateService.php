@@ -30,8 +30,8 @@ final class TemplateControlledUpdateService {
 		?callable $importer = null,
 		?callable $validator = null
 	) {
-		$this->preflightRunner = $preflightRunner ?? static fn(string $templateId): array
-			=> (new TemplateUpdatePreflightService())->run($templateId);
+		$this->preflightRunner = $preflightRunner ?? static fn(string $templateId, bool $manualOverride = false): array
+			=> (new TemplateUpdatePreflightService())->run($templateId, $manualOverride);
 		$this->candidateBuilder = $candidateBuilder ?? static fn(array $preflight): array
 			=> (new TemplateUpdateCandidateService())->build($preflight);
 		$this->importer = $importer ?? static function (array $candidate): void {
@@ -44,7 +44,7 @@ final class TemplateControlledUpdateService {
 			=> (new TemplatePostUpdateValidationService())->validate($templateId, $candidate);
 	}
 
-	public function execute(string $templateId, string $expectedEvidenceSha256): array {
+	public function execute(string $templateId, string $expectedEvidenceSha256, bool $manualOverride = false): array {
 		$templateId = trim($templateId);
 		$expectedEvidenceSha256 = strtolower(trim($expectedEvidenceSha256));
 
@@ -55,7 +55,7 @@ final class TemplateControlledUpdateService {
 			throw new RuntimeException('A valid preflight evidence fingerprint is required for controlled update.');
 		}
 
-		$preflight = ($this->preflightRunner)($templateId);
+		$preflight = ($this->preflightRunner)($templateId, $manualOverride);
 		if (!is_array($preflight)) {
 			throw new RuntimeException('Fresh update preflight returned an invalid result.');
 		}
@@ -128,6 +128,8 @@ final class TemplateControlledUpdateService {
 			'reason' => !empty($validation['valid']) ? null : 'post_update_validation_failed',
 			'preflight_status' => 'passed',
 			'preflight_evidence_sha256' => $freshEvidence,
+			'manual_override' => !empty($preflight['manual_override']),
+			'manual_reasons' => is_array($preflight['manual_reasons'] ?? null) ? $preflight['manual_reasons'] : [],
 			'rollback_sha256' => (string) ($preflight['rollback']['sha256'] ?? ''),
 			'candidate' => [
 				'commit' => (string) ($candidate['commit'] ?? ''),

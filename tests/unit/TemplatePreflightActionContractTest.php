@@ -34,6 +34,11 @@ assertPreflightActionContract(
 	'Preflight action must validate the selected template ID.'
 );
 assertPreflightActionContract(
+	strpos($action, "'manual_override' => 'in 1'") !== false
+		&& strpos($compareView, "new CVar('manual_override', '1')") !== false,
+	'Reviewed preflight mode must be explicit in both the comparison form and controller input validation.'
+);
+assertPreflightActionContract(
 	strpos($action, 'USER_TYPE_ZABBIX_ADMIN') !== false
 		&& strpos($action, 'USER_TYPE_SUPER_ADMIN') !== false,
 	'Preflight action must be restricted to Zabbix administrators and super administrators.'
