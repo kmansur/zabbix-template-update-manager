@@ -159,4 +159,10 @@ assertPreflight(
 	'Reviewed and standard preflight modes must produce different evidence fingerprints.'
 );
 
+$malformedReview = $reviewed;
+$malformedReview['update_readiness']['manual_reasons'] = [];
+$result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $malformedReview))->run('12345', true);
+assertPreflight('blocked_readiness', $result['status'], 'Malformed reviewed readiness evidence must fail closed.');
+assertPreflight('invalid_manual_review_evidence', $result['reason'], 'Malformed reviewed readiness reason must be explicit.');
+
 echo "TemplateUpdatePreflightService tests passed.\n";
