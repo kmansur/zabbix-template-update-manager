@@ -24,7 +24,7 @@ A template reaches the controlled update path only after all of these gates succ
 
 The standard path still requires no local-overwrite condition and `none`/`low` technical risk.
 
-Beta.10 also provides a separate **explicit reviewed path** when all identities and baseline evidence are authoritative and no three-way conflict exists, but a known LOCAL-only difference would be overwritten/removed and/or technical risk is `medium`/`high`. The reviewed reasons are bound into the preflight evidence and require a second explicit super-administrator checkbox immediately before import. This path is never promoted to unattended batch `Ready`.
+Beta.11 retains the separate **explicit reviewed path** introduced in beta.10 when all identities and baseline evidence are authoritative and no three-way conflict exists, but a known LOCAL-only difference would be overwritten/removed and/or technical risk is `medium`/`high`. The reviewed reasons are bound into the preflight evidence and require a second explicit super-administrator checkbox immediately before import. This path is never promoted to unattended batch `Ready`.
 
 ## Permission and request boundary
 
@@ -66,7 +66,8 @@ Bound evidence includes:
 - template ID and UUID;
 - installed and available versions;
 - exact upstream commit and YAML path;
-- upstream content SHA-256 from the validated index;
+- path-specific SHA-256 of the exact raw upstream YAML bytes;
+- canonical per-template content SHA-256 from the validated index;
 - upstream visible/technical names and vendor name;
 - verified rollback SHA-256;
 - fresh current-export SHA-256;
@@ -82,13 +83,14 @@ After fresh preflight passes, the candidate is rebuilt server-side. No upstream 
 
 1. accepts only the freshly recomputed preflight result;
 2. re-fetches the exact official `templates/.../*.yaml` path at the exact 40-character commit;
-3. computes SHA-256 over the returned canonical source bytes;
-4. requires an exact match with the content fingerprint recorded by the validated upstream index;
-5. parses the source with Zabbix's native YAML reader;
-6. validates UUID, visible/technical names, vendor name and vendor version;
-7. isolates only the selected template and required group definitions;
-8. emits the same minimal JSON import source used by the comparison pipeline;
-9. fingerprints the isolated import source for result/audit output.
+3. computes SHA-256 over the exact returned raw YAML bytes;
+4. requires an exact match with the path-specific raw source fingerprint recorded by the validated upstream index;
+5. preserves the separate canonical per-template content fingerprint bound by preflight;
+6. parses the source with Zabbix's native YAML reader;
+7. validates UUID, visible/technical names, vendor name and vendor version;
+8. isolates only the selected template and required group definitions;
+9. emits the same minimal JSON import source used by the comparison pipeline;
+10. fingerprints the isolated import source for result/audit output.
 
 Any mismatch fails before the write boundary.
 
