@@ -30,8 +30,8 @@ final class TemplateControlledUpdateService {
 		?callable $importer = null,
 		?callable $validator = null
 	) {
-		$this->preflightRunner = $preflightRunner ?? static fn(string $templateId): array
-			=> (new TemplateUpdatePreflightService())->run($templateId, false);
+		$this->preflightRunner = $preflightRunner ?? static fn(string $templateId, bool $manualOverride = false): array
+			=> (new TemplateUpdatePreflightService())->run($templateId, $manualOverride);
 		$this->candidateBuilder = $candidateBuilder ?? static fn(array $preflight): array
 			=> (new TemplateUpdateCandidateService())->build($preflight);
 		$this->importer = $importer ?? static function (array $candidate): void {
