@@ -7,6 +7,7 @@ $statusLabels = [
 	'blocked_already_installed' => _('Blocked — template is already installed'),
 	'blocked_collision' => _('Blocked — local technical-name collision'),
 	'blocked_dependencies' => _('Blocked — required template dependencies are missing'),
+	'blocked_isolation' => _('Blocked — template cannot be isolated safely'),
 	'blocked_preview' => _('Blocked — import preview is not creation-only')
 ];
 
@@ -17,6 +18,10 @@ $reasonLabels = [
 	'template_already_installed' => _('A local template with this official UUID already exists'),
 	'technical_name_collision' => _('A different local template already uses the same technical name'),
 	'missing_template_dependencies' => _('One or more linked templates must be installed first'),
+	'cross_template_graph_dependency' => _('The template has a top-level graph that references another template'),
+	'cross_template_trigger_dependency' => _('The template has a top-level trigger that references another template'),
+	'cross_template_dashboard_dependency' => _('The template dashboard references a graph from another template'),
+	'missing_dashboard_graph_dependency' => _('The template dashboard references a graph that cannot be included safely'),
 	'install_would_modify_existing_configuration' => _('The import preview would update or remove existing configuration'),
 	'install_preview_contains_no_creations' => _('The import preview did not contain any creation')
 ];
