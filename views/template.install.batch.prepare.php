@@ -326,7 +326,10 @@ $script = <<<'JS'
 			catch (error) {
 				failed++;
 				notAttempted = entries.length - index - 1;
-				setText('ztum-install-execution-' + uuid, labels.request_failed);
+				setText(
+					'ztum-install-execution-' + uuid,
+					labels.request_failed + (error?.message ? ': ' + error.message : '')
+				);
 
 				for (let pending = index + 1; pending < entries.length; pending++) {
 					setText('ztum-install-execution-' + entries[pending][0], labels.not_attempted);
