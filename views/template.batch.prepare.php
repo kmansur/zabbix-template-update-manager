@@ -216,6 +216,35 @@ $script = <<<'JS'
 		}
 	};
 
+	const setReviewedSelection = (templateId, category, manual = null) => {
+		const element = byId('ztum-select-' + templateId);
+		if (element === null) {
+			return;
+		}
+
+		element.replaceChildren();
+		if (category === 'review' && manual?.eligible === true
+				&& isValidEvidence(manual.evidence || '')) {
+			const checkbox = document.createElement('input');
+			checkbox.type = 'checkbox';
+			checkbox.id = 'ztum-review-select-' + templateId;
+			checkbox.title = labels.select_reviewed;
+			checkbox.addEventListener('change', () => {
+				updateReviewedSelectAll();
+				updateExecutionState();
+			});
+			element.appendChild(checkbox);
+			return;
+		}
+
+		const marker = document.createElement('span');
+		marker.textContent = '—';
+		if (category === 'review') {
+			marker.title = labels.review_individual_only;
+		}
+		element.appendChild(marker);
+	};
+
 	const setExecutionState = (templateId, category, text = null, manual = null) => {
 		const element = byId('ztum-execution-' + templateId);
 		if (element === null) {
@@ -224,26 +253,11 @@ $script = <<<'JS'
 
 		element.replaceChildren();
 		if (category === 'review') {
-			if (manual?.eligible === true && isValidEvidence(manual.evidence || '')) {
-				const checkbox = document.createElement('input');
-				checkbox.type = 'checkbox';
-				checkbox.id = 'ztum-review-select-' + templateId;
-				checkbox.addEventListener('change', updateExecutionState);
-
-				const label = document.createElement('label');
-				label.htmlFor = checkbox.id;
-				label.appendChild(document.createTextNode(labels.select_reviewed));
-
-				element.appendChild(checkbox);
-				element.appendChild(document.createTextNode(' '));
-				element.appendChild(label);
-				element.appendChild(document.createTextNode(' · '));
-			}
-			else {
-				const note = document.createElement('span');
-				note.textContent = labels.review_individual_only + ' · ';
-				element.appendChild(note);
-			}
+			const note = document.createElement('span');
+			note.textContent = manual?.eligible === true
+				? labels.review_batch_eligible + ' · '
+				: labels.review_individual_only + ' · ';
+			element.appendChild(note);
 
 			const link = document.createElement('a');
 			link.href = config.compareUrl + '&templateid=' + encodeURIComponent(templateId);
@@ -296,14 +310,16 @@ $script = <<<'JS'
 		setText('ztum-readiness-' + templateId, readinessStatus);
 		setText('ztum-category-' + templateId, labels[category] || labels.blocked);
 		setText('ztum-reason-' + templateId, reason);
+		const manualState = {
+			eligible: manualEligible,
+			evidence: manualEvidence
+		};
+		setReviewedSelection(templateId, category, manualState);
 		setExecutionState(
 			templateId,
 			category,
 			category === 'ready' ? labels.execution_ready : (labels[category] || labels.blocked),
-			{
-				eligible: manualEligible,
-				evidence: manualEvidence
-			}
+			manualState
 		);
 
 		requestFailures.delete(templateId);
@@ -330,6 +346,7 @@ $script = <<<'JS'
 		setText('ztum-readiness-' + templateId, 'request_failed');
 		setText('ztum-category-' + templateId, labels.blocked);
 		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
+		setReviewedSelection(templateId, 'blocked');
 		setExecutionState(templateId, 'blocked', labels.blocked);
 	};
 
