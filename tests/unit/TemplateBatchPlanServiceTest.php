@@ -161,6 +161,26 @@ assertBatchPlan(false, $unknownPlan['items'][0]['batch_manual_eligible'],
 assertBatchPlan('', $unknownPlan['items'][0]['manual_evidence_sha256'],
 	'Unrecognized manual-review reasons must not receive batch execution evidence.');
 
+$comparisonErrorService = new TemplateBatchPlanService(
+	static fn(string $templateId): array => [
+		'template' => [
+			'templateid' => $templateId,
+			'name' => 'Template '.$templateId,
+			'vendor_version' => '7.0-1',
+			'upstream_vendor_version' => '7.0-2',
+			'host_count' => 0
+		],
+		'update_readiness' => null,
+		'comparison_error' => 'Unable to complete comparison. Diagnostic: cross-template dependency Other template'
+	]
+);
+$comparisonErrorPlan = $comparisonErrorService->build(['107'], false);
+assertBatchPlan(
+	'comparison_error: Unable to complete comparison. Diagnostic: cross-template dependency Other template',
+	$comparisonErrorPlan['items'][0]['reason'],
+	'Batch preparation must surface the actual comparison diagnostic instead of a generic comparison_error token.'
+);
+
 $largeIds = array_map('strval', range(1001, 1026));
 $largeService = new TemplateBatchPlanService(
 	static fn(string $templateId): array => [
