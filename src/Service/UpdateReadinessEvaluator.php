@@ -8,9 +8,11 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
  *
  * Hard blockers (missing/ambiguous baseline, unresolved identities or real
  * BASE/LOCAL/UPSTREAM conflicts) remain fail-closed. Known local-overwrite
- * differences and medium/high technical risk can enter an explicitly reviewed
- * manual path, but only after a verified rollback backup and a second explicit
- * acknowledgement in the controlled update confirmation.
+ * differences and high technical risk enter an explicitly reviewed manual
+ * path. Medium technical impact remains manual by default, except for narrowly
+ * recognized standard-path-eligible changes proven by the risk analyzer (for
+ * example bounded discard-only preprocessing maintenance with complete
+ * three-way evidence and no local overwrite).
  *
  * This evaluator never authorizes a configuration write by itself.
  */
@@ -99,7 +101,7 @@ final class UpdateReadinessEvaluator {
 		if ($riskLevel === 'high') {
 			$manualReasons[] = 'high_technical_risk';
 		}
-		elseif ($riskLevel === 'medium') {
+		elseif ($riskLevel === 'medium' && empty($updateRisk['standard_path_eligible'])) {
 			$manualReasons[] = 'medium_technical_risk';
 		}
 
