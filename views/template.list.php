@@ -67,20 +67,29 @@ $catalogSummary = (new CTableInfo())
 		$data['version_summary']['update_available']
 	]);
 
+$installSelectionMode = $data['can_install'] && ($data['filter']['status'] ?? 'all') === 'not_installed';
 $selectionForm = null;
 $selectAllHeader = '';
+
 if ($data['can_compare']) {
 	$selectionForm = (new CForm())
 		->addItem((new CVar(
 			CSRF_TOKEN_NAME,
-			CCsrfTokenHelper::get('ztum.templates.review_selected')
+			CCsrfTokenHelper::get(
+				$installSelectionMode
+					? 'ztum.templates.install_prepare_selected'
+					: 'ztum.templates.review_selected'
+			)
 		))->removeId())
 		->setId('ztum-template-list')
 		->setName('ztum_template_list');
 
+	$selectionNamespace = $installSelectionMode ? 'uuids' : 'templateids';
 	$selectAllHeader = (new CColHeader(
 		(new CCheckBox('all_templates'))
-			->onClick("checkAll('".$selectionForm->getName()."', 'all_templates', 'templateids');")
+			->onClick(
+				"checkAll('".$selectionForm->getName()."', 'all_templates', '".$selectionNamespace."');"
+			)
 	))->addClass(ZBX_STYLE_CELL_WIDTH);
 }
 
@@ -131,14 +140,28 @@ foreach ($data['templates'] as $template) {
 		}
 	}
 
-	$selectionEligible = $isInstalled
+	$updateSelectionEligible = !$installSelectionMode
+		&& $isInstalled
 		&& $data['can_compare']
 		&& ($template['upstream_status'] ?? null) === 'official_match'
 		&& ($template['version_status'] ?? null) === 'update_available';
 
-	$selectionCell = $selectionEligible
-		? new CCheckBox('templateids['.$template['templateid'].']', $template['templateid'])
-		: '';
+	$installSelectionEligible = $installSelectionMode
+		&& !$isInstalled
+		&& ($template['upstream_status'] ?? null) === 'official_catalog'
+		&& ($template['version_status'] ?? null) === 'not_installed';
+
+	$selectionEligible = $updateSelectionEligible || $installSelectionEligible;
+
+	if ($installSelectionEligible) {
+		$selectionCell = new CCheckBox('uuids['.$template['uuid'].']', $template['uuid']);
+	}
+	elseif ($updateSelectionEligible) {
+		$selectionCell = new CCheckBox('templateids['.$template['templateid'].']', $template['templateid']);
+	}
+	else {
+		$selectionCell = '';
+	}
 
 	$actionCell = '—';
 	if ($selectionEligible && $compareUrl !== null) {
@@ -178,17 +201,28 @@ foreach ($data['templates'] as $template) {
 }
 
 if ($selectionForm !== null) {
-	$selectionForm->addItem([
-		$templateTable,
-		new CActionButtonList('action', 'templateids', [
+	if ($installSelectionMode) {
+		$actionButtons = new CActionButtonList('action', 'uuids', [
+			'ztum.templates.install_prepare_selected' => [
+				'name' => _('Review selected installations'),
+				'attributes' => [
+					'class' => ZBX_STYLE_BTN_ALT.' js-no-chkbxrange'
+				]
+			]
+		], 'ztum_selected_installations');
+	}
+	else {
+		$actionButtons = new CActionButtonList('action', 'templateids', [
 			'ztum.templates.review_selected' => [
 				'name' => _('Review selected updates'),
 				'attributes' => [
 					'class' => ZBX_STYLE_BTN_ALT.' js-no-chkbxrange'
 				]
 			]
-		], 'ztum_selected_templates')
-	]);
+		], 'ztum_selected_templates');
+	}
+
+	$selectionForm->addItem([$templateTable, $actionButtons]);
 }
 
 $page = (new CHtmlPage())
@@ -255,7 +289,9 @@ $page
 		$data['filtered_count']
 	)))
 	->addItem(new CTag('p', true, _(
-		'Update selection applies only to installed official templates with a newer version. Upstream-only templates use the separate Review installation workflow; installation is individual and fail-closed.'
+		$installSelectionMode
+			? 'Select up to 25 Not installed official templates to review them for controlled sequential installation. Missing dependencies and unsafe previews remain blocked.'
+			: 'Update selection applies only to installed official templates with a newer version. Use the Not installed filter to select multiple official templates for controlled installation.'
 	)))
 	->addItem(new CTag('h4', true, _('Templates')));
 
