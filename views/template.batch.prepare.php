@@ -104,10 +104,10 @@ $executionState = (new CSpan(_('Waiting for preparation.')))
 
 $confirm = (new CCheckBox('confirm', '1'))
 	->setId('ztum-batch-confirm')
-	->setLabel(_('I reviewed the completed batch plan and want to update the Ready templates sequentially.'))
+	->setLabel(_('I reviewed the completed batch plan and explicitly accept the Manual review reasons for any reviewed templates I selected.'))
 	->setEnabled(false);
 
-$submit = (new CButton('ztum-batch-update-submit', _('Update ready templates')))
+$submit = (new CButton('ztum-batch-update-submit', _('Update eligible templates')))
 	->setId('ztum-batch-update-submit')
 	->setEnabled(false);
 
@@ -124,7 +124,7 @@ $executionSummary = (new CTableInfo())
 $page
 	->addItem(new CTag('h4', true, _('Controlled sequential execution')))
 	->addItem(new CTag('p', true, _(
-		'After preparation completes, only Ready templates with valid bound preflight evidence can run. Each Ready template is executed in its own HTTP request, reruns fresh preflight immediately before import and is validated before the next template begins. Manual review, Conflict and Blocked rows never enter execution. Execution stops on the first failure and no automatic rollback is performed.'
+		'After preparation completes, Ready templates can run normally. Manual review templates that contain only technical-risk reasons and have valid reviewed-preflight evidence can be explicitly selected in the Execution column. Local-customization overwrite, Conflict and Blocked rows still require individual handling. Each selected template runs in its own HTTP request, reruns fresh preflight immediately before import and is validated before the next template begins. Execution stops on the first failure and no automatic rollback is performed.'
 	)))
 	->addItem(new CTag('p', true, $executionState))
 	->addItem(new CDiv([$confirm, ' ', $submit]))
@@ -165,14 +165,16 @@ $jsLabels = json_encode([
 	'stopping' => _('Stop requested; the current template will finish first.'),
 	'progress' => _('Preparing {current} of {total} templates...'),
 	'execution_waiting' => _('Waiting for preparation.'),
-	'execution_available' => _('Available — {ready} Ready template(s).'),
-	'execution_none' => _('Unavailable — no Ready templates.'),
-	'execution_review_only' => _('Unavailable for unattended batch — {review} template(s) require manual review. Use Review and update in the Execution column.'),
+	'execution_available' => _('Available — {ready} Ready + {review} selected reviewed template(s).'),
+	'execution_none' => _('Unavailable — no executable templates selected.'),
+	'execution_review_only' => _('No unattended Ready templates. Select eligible Manual review rows below, or use Review details for individual handling.'),
 	'execution_stopped' => _('Unavailable — preparation stopped.'),
 	'retrying_failed' => _('Retrying failed preparation...'),
 	'retry_complete' => _('Failed preparation retry complete.'),
 	'execution_ready' => _('Ready for execution'),
-	'review_and_update' => _('Review and update'),
+	'select_reviewed' => _('Include reviewed update'),
+	'review_details' => _('Review details'),
+	'review_individual_only' => _('Individual review required'),
 	'execution_running' => _('Running'),
 	'execution_completed' => _('Completed'),
 	'execution_failed' => _('Stopped on first failure'),
@@ -190,6 +192,7 @@ $script = <<<'JS'
 	const labels = __LABELS__;
 	const counts = {ready: 0, review: 0, conflict: 0, blocked: 0};
 	const readyEvidence = new Map();
+	const reviewEvidence = new Map();
 	const requestFailures = new Set();
 	let completed = 0;
 	let stopRequested = false;
@@ -205,7 +208,7 @@ $script = <<<'JS'
 		}
 	};
 
-	const setExecutionState = (templateId, category, text = null) => {
+	const setExecutionState = (templateId, category, text = null, manual = null) => {
 		const element = byId('ztum-execution-' + templateId);
 		if (element === null) {
 			return;
@@ -213,9 +216,30 @@ $script = <<<'JS'
 
 		element.replaceChildren();
 		if (category === 'review') {
+			if (manual?.eligible === true && isValidEvidence(manual.evidence || '')) {
+				const checkbox = document.createElement('input');
+				checkbox.type = 'checkbox';
+				checkbox.id = 'ztum-review-select-' + templateId;
+				checkbox.addEventListener('change', updateExecutionState);
+
+				const label = document.createElement('label');
+				label.htmlFor = checkbox.id;
+				label.appendChild(document.createTextNode(labels.select_reviewed));
+
+				element.appendChild(checkbox);
+				element.appendChild(document.createTextNode(' '));
+				element.appendChild(label);
+				element.appendChild(document.createTextNode(' · '));
+			}
+			else {
+				const note = document.createElement('span');
+				note.textContent = labels.review_individual_only + ' · ';
+				element.appendChild(note);
+			}
+
 			const link = document.createElement('a');
 			link.href = config.compareUrl + '&templateid=' + encodeURIComponent(templateId);
-			link.textContent = labels.review_and_update;
+			link.textContent = labels.review_details;
 			element.appendChild(link);
 			return;
 		}
@@ -250,6 +274,8 @@ $script = <<<'JS'
 		let readinessStatus = item.readiness_status || '—';
 		let reason = item.reason || '—';
 		const evidence = normalizeEvidence(item.evidence_sha256 || '');
+		const manualEvidence = normalizeEvidence(item.manual_evidence_sha256 || '');
+		const manualEligible = item.batch_manual_eligible === true && isValidEvidence(manualEvidence);
 
 		if (category === 'ready' && !isValidEvidence(evidence)) {
 			category = 'blocked';
@@ -265,12 +291,26 @@ $script = <<<'JS'
 		setExecutionState(
 			templateId,
 			category,
-			category === 'ready' ? labels.execution_ready : (labels[category] || labels.blocked)
+			category === 'ready' ? labels.execution_ready : (labels[category] || labels.blocked),
+			{
+				eligible: manualEligible,
+				evidence: manualEvidence
+			}
 		);
 
 		requestFailures.delete(templateId);
+		reviewEvidence.delete(templateId);
 		if (category === 'ready') {
 			readyEvidence.set(templateId, evidence);
+		}
+		else {
+			readyEvidence.delete(templateId);
+		}
+		if (category === 'review' && manualEligible) {
+			reviewEvidence.set(templateId, {
+				evidence: manualEvidence,
+				reasons: Array.isArray(item.manual_reasons) ? item.manual_reasons : []
+			});
 		}
 	};
 
@@ -278,6 +318,7 @@ $script = <<<'JS'
 		counts.blocked++;
 		requestFailures.add(templateId);
 		readyEvidence.delete(templateId);
+		reviewEvidence.delete(templateId);
 		setText('ztum-readiness-' + templateId, 'request_failed');
 		setText('ztum-category-' + templateId, labels.blocked);
 		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
@@ -310,12 +351,16 @@ $script = <<<'JS'
 		return payload.item;
 	};
 
-	const executeOne = async (templateId, evidence) => {
+	const executeOne = async (templateId, evidence, manualOverride = false) => {
 		const body = new FormData();
 		body.append(config.csrfName, config.executeCsrfToken);
 		body.append('templateid', templateId);
 		body.append('evidence_sha256', evidence);
 		body.append('confirm', '1');
+		if (manualOverride) {
+			body.append('manual_override', '1');
+			body.append('confirm_manual_override', '1');
+		}
 
 		const response = await fetch(config.executeOneUrl, {
 			method: 'POST',
