@@ -105,8 +105,10 @@ assertBatchContract(strpos($prepareView, 'let autoSelectReviewed = false;') !== 
 		&& strpos($prepareView, 'autoSelectReviewed = true;') !== false
 		&& strpos($prepareView, 'autoSelectReviewed = false;') !== false,
 	'Select-all chosen during preparation must automatically include reviewed rows that become eligible later and Clear must cancel sticky selection.');
-assertBatchContract(strpos($prepareView, 'selectAll.disabled = executionStarted || retryInProgress;') !== false,
-	'Select-all must stay available during preparation and disable only during retry/execution.');
+assertBatchContract(strpos($prepareView, 'selectAll.disabled = executionStarted || retryInProgress || (fullyPrepared && eligible.length === 0);') !== false
+		&& strpos($prepareView, "selectAll.textContent = labels.select_all_reviewed + ' (' + eligible.length + ')'") !== false
+		&& strpos($prepareView, "clearAll.textContent = labels.clear_all_reviewed + ' (' + selected + ')'") !== false,
+	'Selection controls must stay available during preparation, show explicit counts and disable an empty select-all after completion.');
 assertBatchContract(strpos($prepareView, 'Waiting for preparation to finish — {completed} of {total} completed.') !== false,
 	'Execution state must explain that updates wait for full preparation while selection can already be made.');
 assertBatchContract(strpos($prepareView, 'labels.review_batch_eligible') !== false
