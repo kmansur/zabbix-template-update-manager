@@ -232,7 +232,12 @@ final class TemplateBatchPlanService {
 		}
 
 		if (($analysis['comparison_error'] ?? null) !== null) {
-			return 'comparison_error';
+			$message = preg_replace('/\s+/', ' ', trim((string) $analysis['comparison_error']));
+			$message = is_string($message) ? $message : '';
+			if (strlen($message) > 500) {
+				$message = substr($message, 0, 499).'…';
+			}
+			return $message !== '' ? 'comparison_error: '.$message : 'comparison_error';
 		}
 
 		return (string) ($readiness['next_step'] ?? 'not_ready');
