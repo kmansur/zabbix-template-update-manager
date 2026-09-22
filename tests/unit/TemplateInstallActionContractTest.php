@@ -31,6 +31,10 @@ assertInstallContract(strpos($preflight, 'TemplateImportCompareService') !== fal
 	'Install preflight must use native configuration.importcompare.');
 assertInstallContract(strpos($preflight, 'TemplateInstallDependencyService') !== false,
 	'Install preflight must verify linked-template dependencies.');
+assertInstallContract(strpos($preflight, 'TemplateInstallReferenceAuditService') !== false
+		&& strpos($preflight, "'blocked_references'") !== false
+		&& strpos($preflight, "'reference_audit'") !== false,
+	'Install preflight must run the structural reference audit and fail closed on proven unresolved references.');
 assertInstallContract(strpos($preflight, 'TemplateInstallPreviewGate') !== false,
 	'Install preflight must enforce creation-only preview semantics.');
 assertInstallContract(
@@ -61,6 +65,10 @@ assertInstallContract(strpos($listController, 'CPagerHelper::paginate') !== fals
 		&& strpos($listController, "CPagerHelper::savePage('ztum.template.catalog'") !== false
 		&& strpos($list, 'setPageNavigation') !== false,
 	'Expanded official catalog must use native Zabbix pagination end to end.');
+assertInstallContract(strpos($reviewView, 'Structural reference audit') !== false
+		&& strpos($reviewView, "'blocked_references'") !== false
+		&& strpos($reviewView, "'unresolved_internal_references'") !== false,
+	'Installation review must expose structural-reference audit state and blockers.');
 assertInstallContract(strpos($reviewView, 'there is no prior local rollback artifact') !== false,
 	'Installation review must disclose the absence of a prior rollback artifact.');
 assertInstallContract(strpos($resultView, 'does not automatically uninstall') !== false,
