@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.28**
+Current version: **0.1.0-beta.29**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.28 makes controlled update execution request-bounded end to end: each evidence-backed Ready template now executes in its own CSRF-protected HTTP request, with browser-side sequential progress, stop-on-first-failure and Not attempted reporting. This removes the cumulative multi-template request that can exceed reverse-proxy or Cloudflare request deadlines while retaining the evidence, fresh-preflight and single-write-boundary safety model.
+Beta.29 keeps request-bounded update execution and improves preparation recovery: zero-Ready plans now synchronize the execution summary instead of remaining at Waiting for preparation, while per-template HTTP preparation failures can be retried explicitly without restarting the whole batch. Transport failures also show elapsed request time to make reverse-proxy/Cloudflare timeout diagnosis actionable.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.28` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.29` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -150,8 +150,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.28
-git checkout -B release/0.1.0-beta.28 origin/release/0.1.0-beta.28
+git fetch origin release/0.1.0-beta.29
+git checkout -B release/0.1.0-beta.29 origin/release/0.1.0-beta.29
 cat VERSION
 git rev-parse HEAD
 ```
@@ -159,7 +159,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.28
+0.1.0-beta.29
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -175,7 +175,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.28**, enable the module and open:
+Confirm version **0.1.0-beta.29**, enable the module and open:
 
 ```text
 Data collection → Template updates
