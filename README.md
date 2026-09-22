@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.27**
+Current version: **0.1.0-beta.28**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.27 hardens update-batch execution state so Ready is evidence-backed end to end: mixed Ready + Manual review/Conflict/Blocked plans remain executable for the Ready subset, while any row lacking valid SHA-256 preflight evidence fails closed as Blocked. It retains request-bounded multi-template installation and the structural reference audit introduced in beta.26.
+Beta.28 makes controlled update execution request-bounded end to end: each evidence-backed Ready template now executes in its own CSRF-protected HTTP request, with browser-side sequential progress, stop-on-first-failure and Not attempted reporting. This removes the cumulative multi-template request that can exceed reverse-proxy or Cloudflare request deadlines while retaining the evidence, fresh-preflight and single-write-boundary safety model.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.27` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.28` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -44,7 +44,7 @@ ZTUM currently provides:
 - bounded update-batch safety preparation for up to 25 explicitly selected update candidates, executed one candidate per HTTP request with visible progress;
 - automatic creation/refresh of rollback artifacts for standard-path candidates (none/low plus narrowly recognized bounded-medium changes) and explicitly reviewed manual-update candidates;
 - batch classification into Ready, Manual review, Conflict and Blocked; reviewed override candidates never become unattended batch Ready;
-- controlled sequential update of Ready templates only;
+- controlled sequential update of Ready templates only, with one HTTP request per Ready template;
 - stop-on-first-failure/evidence-change/ambiguous-state behavior with explicit not-attempted reporting;
 - current-upstream comparison through `configuration.importcompare`;
 - historical official baseline resolution;
@@ -150,8 +150,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.27
-git checkout -B release/0.1.0-beta.27 origin/release/0.1.0-beta.27
+git fetch origin release/0.1.0-beta.28
+git checkout -B release/0.1.0-beta.28 origin/release/0.1.0-beta.28
 cat VERSION
 git rev-parse HEAD
 ```
@@ -159,7 +159,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.27
+0.1.0-beta.28
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -175,7 +175,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.27**, enable the module and open:
+Confirm version **0.1.0-beta.28**, enable the module and open:
 
 ```text
 Data collection → Template updates
