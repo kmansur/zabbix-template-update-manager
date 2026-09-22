@@ -17,7 +17,7 @@ This version is intended for **laboratory testing**.
 
 Beta.19 adds an official template catalog and controlled installation for official templates that are present upstream but absent locally. Missing templates appear as `Not installed`; installation uses immutable source identity, dependency/collision checks, creation-only `configuration.importcompare`, explicit super-administrator confirmation, the existing single configuration-import boundary and fresh post-install validation. The expanded catalog also uses native Zabbix pagination.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.19` after the beta.17 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.19` after the beta.19 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -250,6 +250,31 @@ single configuration.import boundary
       v
 post-rollback validation
 ```
+
+official upstream catalog
+      |
+      +--> installed locally? yes -> update/comparison workflows above
+      |
+      +--> no -> Not installed
+                 |
+                 v
+        Review installation
+                 |
+                 +--> UUID/name collision? -> BLOCK
+                 +--> missing linked templates? -> BLOCK
+                 +--> importcompare updates/removes existing config? -> BLOCK
+                 |
+                 v
+        creation-only preflight evidence
+                 |
+                 v
+        explicit SUPER_ADMIN confirmation
+                 |
+                 v
+        single configuration.import boundary
+                 |
+                 v
+        post-install UUID/version/content validation
 
 ## Upstream source model
 
