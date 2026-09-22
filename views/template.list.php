@@ -1,11 +1,10 @@
 <?php
 
-$compatibility = $data['zabbix_supported']
-	? _('Supported')
-	: _('Unsupported or undetected');
+$compatibility = $data['zabbix_supported'] ? _('Supported') : _('Unsupported or undetected');
 
 $upstreamLabels = [
 	'official_match' => _('Official UUID match'),
+	'official_catalog' => _('Official catalog'),
 	'not_found' => _('Not found upstream'),
 	'no_uuid' => _('No UUID'),
 	'invalid_uuid' => _('Invalid UUID'),
@@ -15,6 +14,7 @@ $upstreamLabels = [
 $versionLabels = [
 	'current' => _('Current'),
 	'update_available' => _('Update available'),
+	'not_installed' => _('Not installed'),
 	'installed_newer' => _('Installed version is newer'),
 	'installed_version_missing' => _('Installed version missing'),
 	'upstream_version_missing' => _('Upstream version missing'),
@@ -22,58 +22,29 @@ $versionLabels = [
 	'not_applicable' => _('Not applicable')
 ];
 
-$summaryTable = (new CTableInfo())
+$localSummary = (new CTableInfo())
 	->setHeader([
-		_('Visible templates'),
+		_('Installed templates'),
 		_('Vendor: Zabbix'),
 		_('Other vendors'),
 		_('No vendor metadata'),
-		_('Without vendor version'),
-		_('Templates linked to hosts')
+		_('Linked to hosts')
 	])
 	->addRow([
 		$data['summary']['total'],
 		$data['summary']['zabbix_vendor'],
 		$data['summary']['other_vendor'],
 		$data['summary']['unidentified_vendor'],
-		$data['summary']['without_vendor_version'],
 		$data['summary']['in_use']
 	]);
 
-$upstreamTable = (new CTableInfo())
-	->setHeader([
-		_('Official UUID match'),
-		_('Not found upstream'),
-		_('No UUID'),
-		_('Invalid UUID'),
-		_('Repository unavailable')
-	])
+$catalogSummary = (new CTableInfo())
+	->setHeader([_('Official catalog'), _('Installed/visible'), _('Not installed'), _('Updates available')])
 	->addRow([
-		$data['upstream_summary']['official_match'],
-		$data['upstream_summary']['not_found'],
-		$data['upstream_summary']['no_uuid'],
-		$data['upstream_summary']['invalid_uuid'],
-		$data['upstream_summary']['repository_unavailable']
-	]);
-
-$versionTable = (new CTableInfo())
-	->setHeader([
-		_('Current'),
-		_('Updates available'),
-		_('Installed newer'),
-		_('Installed version missing'),
-		_('Upstream version missing'),
-		_('Cannot compare'),
-		_('Not applicable')
-	])
-	->addRow([
-		$data['version_summary']['current'],
-		$data['version_summary']['update_available'],
-		$data['version_summary']['installed_newer'],
-		$data['version_summary']['installed_version_missing'],
-		$data['version_summary']['upstream_version_missing'],
-		$data['version_summary']['version_uncomparable'],
-		$data['version_summary']['not_applicable']
+		$data['catalog_summary']['official_catalog_total'],
+		$data['catalog_summary']['installed_visible'],
+		$data['catalog_summary']['not_installed'],
+		$data['version_summary']['update_available']
 	]);
 
 $selectionForm = null;
@@ -98,33 +69,50 @@ $templateTable = (new CTableInfo())
 		$selectAllHeader,
 		_('Template'),
 		_('Vendor'),
-		_('Installed version'),
-		_('Available version'),
-		_('Version status'),
+		_('Installed'),
+		_('Available'),
+		_('Status'),
 		_('Upstream identity'),
-		_('Template groups'),
 		_('Linked hosts'),
-		_('Update review'),
-		_('Rollback backups'),
+		_('Action'),
+		_('Backups'),
 		_('UUID')
-	]);
+	])
+	->setPageNavigation($data['paging']);
 
 foreach ($data['templates'] as $template) {
-	$templateName = $template['name'];
-	if ($template['technical_name'] !== '' && $template['technical_name'] !== $template['name']) {
+	$isInstalled = ($template['installation_status'] ?? 'installed') === 'installed';
+	$templateName = (string) $template['name'];
+	if (($template['technical_name'] ?? '') !== '' && $template['technical_name'] !== $template['name']) {
 		$templateName .= ' ('.$template['technical_name'].')';
 	}
 
-	$compareUrl = (new CUrl('zabbix.php'))
-		->setArgument('action', 'ztum.template.compare')
-		->setArgument('templateid', $template['templateid']);
+	$compareUrl = null;
+	$installReviewUrl = null;
 
-	$templateCell = $templateName;
-	if ($data['can_compare'] && ($template['upstream_status'] ?? null) === 'official_match') {
-		$templateCell = new CLink($templateName, $compareUrl);
+	if ($isInstalled && ($template['templateid'] ?? '') !== '') {
+		$compareUrl = (new CUrl('zabbix.php'))
+			->setArgument('action', 'ztum.template.compare')
+			->setArgument('templateid', $template['templateid']);
+	}
+	elseif (!$isInstalled) {
+		$installReviewUrl = (new CUrl('zabbix.php'))
+			->setArgument('action', 'ztum.template.install.review')
+			->setArgument('uuid', $template['uuid']);
 	}
 
-	$selectionEligible = $data['can_compare']
+	$templateCell = $templateName;
+	if ($data['can_compare']) {
+		if ($compareUrl !== null && ($template['upstream_status'] ?? null) === 'official_match') {
+			$templateCell = new CLink($templateName, $compareUrl);
+		}
+		elseif ($installReviewUrl !== null) {
+			$templateCell = new CLink($templateName, $installReviewUrl);
+		}
+	}
+
+	$selectionEligible = $isInstalled
+		&& $data['can_compare']
 		&& ($template['upstream_status'] ?? null) === 'official_match'
 		&& ($template['version_status'] ?? null) === 'update_available';
 
@@ -132,27 +120,38 @@ foreach ($data['templates'] as $template) {
 		? new CCheckBox('templateids['.$template['templateid'].']', $template['templateid'])
 		: '';
 
-	$reviewCell = $selectionEligible ? new CLink(_('Review'), $compareUrl) : '—';
+	$actionCell = '—';
+	if ($selectionEligible && $compareUrl !== null) {
+		$actionCell = new CLink(_('Review update'), $compareUrl);
+	}
+	elseif (!$isInstalled && $installReviewUrl !== null && $data['can_compare']) {
+		$actionCell = new CLink(_('Review installation'), $installReviewUrl);
+	}
+	elseif ($isInstalled && $compareUrl !== null && $data['can_compare']
+			&& ($template['upstream_status'] ?? null) === 'official_match') {
+		$actionCell = new CLink(_('View'), $compareUrl);
+	}
 
 	$backupCell = '—';
-	if ($data['can_compare']) {
-		$backupsUrl = (new CUrl('zabbix.php'))
-			->setArgument('action', 'ztum.template.backups')
-			->setArgument('templateid', $template['templateid']);
-		$backupCell = new CLink(_('View'), $backupsUrl);
+	if ($isInstalled && $data['can_compare'] && ($template['templateid'] ?? '') !== '') {
+		$backupCell = new CLink(
+			_('View'),
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'ztum.template.backups')
+				->setArgument('templateid', $template['templateid'])
+		);
 	}
 
 	$templateTable->addRow([
 		$selectionCell,
 		$templateCell,
 		$template['vendor_name'] !== '' ? $template['vendor_name'] : '—',
-		$template['vendor_version'] !== '' ? $template['vendor_version'] : '—',
+		$isInstalled && $template['vendor_version'] !== '' ? $template['vendor_version'] : '—',
 		($template['upstream_vendor_version'] ?? '') !== '' ? $template['upstream_vendor_version'] : '—',
 		$versionLabels[$template['version_status'] ?? 'not_applicable'] ?? _('Unknown'),
 		$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
-		$template['groups'] !== [] ? implode(', ', $template['groups']) : '—',
-		$template['host_count'],
-		$reviewCell,
+		$isInstalled ? (int) $template['host_count'] : '—',
+		$actionCell,
 		$backupCell,
 		$template['uuid'] !== '' ? $template['uuid'] : '—'
 	]);
@@ -174,39 +173,34 @@ if ($selectionForm !== null) {
 
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
-	->addItem(
-		new CDiv([
-			new CTag('p', true, _('Module version: ').$data['version']),
-			new CTag('p', true, _('Zabbix version: ').$data['zabbix_version']),
-			new CTag('p', true, _('Compatibility: ').$compatibility),
-			new CTag('p', true, _('Status: ').$data['status'])
-		])
-	);
+	->addItem(new CTag('p', true, sprintf(
+		_('Module %1$s · Zabbix %2$s · %3$s'),
+		$data['version'],
+		$data['zabbix_version'],
+		$compatibility
+	)));
 
 if ($data['inventory_error'] !== null) {
-	$page->addItem(new CTag('p', true, $data['inventory_error']));
-	$page->show();
+	$page->addItem(new CTag('p', true, $data['inventory_error']))->show();
 	return;
 }
 
 $page
-	->addItem(new CTag('h4', true, _('Inventory summary')))
-	->addItem($summaryTable);
+	->addItem(new CTag('h4', true, _('Local inventory')))
+	->addItem($localSummary);
 
 if (is_array($data['upstream_source'])) {
-	$sourceRef = (string) ($data['upstream_source']['ref'] ?? '');
-	$sourceCommit = (string) ($data['upstream_source']['commit'] ?? '');
-	$sourceLine = (string) ($data['upstream_source']['line'] ?? '');
-	$cacheStatus = (string) ($data['upstream_runtime']['cache_status'] ?? 'unknown');
-
-	$page->addItem(
-		new CDiv([
-			new CTag('p', true, _('Upstream line: ').$sourceLine),
-			new CTag('p', true, _('Upstream ref: ').$sourceRef),
-			new CTag('p', true, _('Upstream commit: ').($sourceCommit !== '' ? substr($sourceCommit, 0, 12) : '—')),
-			new CTag('p', true, _('Index cache: ').$cacheStatus)
-		])
-	);
+	$page
+		->addItem(new CTag('h4', true, _('Official catalog')))
+		->addItem($catalogSummary)
+		->addItem(new CTag('p', true, sprintf(
+			_('Upstream %1$s · commit %2$s · index cache %3$s'),
+			(string) ($data['upstream_source']['line'] ?? '—'),
+			isset($data['upstream_source']['commit'])
+				? substr((string) $data['upstream_source']['commit'], 0, 12)
+				: '—',
+			(string) ($data['upstream_runtime']['cache_status'] ?? 'unknown')
+		)));
 }
 
 if ($data['upstream_warning'] !== null) {
@@ -220,44 +214,26 @@ if ($data['upstream_error'] !== null) {
 		$transports = is_array($data['upstream_diagnostics']['transports'] ?? null)
 			? $data['upstream_diagnostics']['transports']
 			: [];
-		$diagnosticTable = (new CTableInfo())
-			->setHeader([
-				_('Requested index'),
-				_('cURL'),
-				_('allow_url_fopen'),
-				_('OpenSSL'),
-				_('Failure detail')
-			])
-			->addRow([
-				$data['upstream_diagnostics']['endpoint'] ?? '—',
-				!empty($transports['curl']) ? _('Available') : _('Unavailable'),
-				!empty($transports['allow_url_fopen']) ? _('Enabled') : _('Disabled'),
-				!empty($transports['openssl']) ? _('Available') : _('Unavailable'),
-				$data['upstream_diagnostics']['detail'] ?? '—'
-			]);
-
-		$page
-			->addItem(new CTag('h4', true, _('Upstream diagnostics')))
-			->addItem($diagnosticTable);
+		$page->addItem(
+			(new CTableInfo())
+				->setHeader([_('Requested index'), _('cURL'), _('allow_url_fopen'), _('OpenSSL'), _('Failure detail')])
+				->addRow([
+					$data['upstream_diagnostics']['endpoint'] ?? '—',
+					!empty($transports['curl']) ? _('Available') : _('Unavailable'),
+					!empty($transports['allow_url_fopen']) ? _('Enabled') : _('Disabled'),
+					!empty($transports['openssl']) ? _('Available') : _('Unavailable'),
+					$data['upstream_diagnostics']['detail'] ?? '—'
+				])
+		);
 	}
 }
 
 $page
-	->addItem(new CTag('h4', true, _('Upstream identity summary')))
-	->addItem($upstreamTable)
-	->addItem(new CTag('h4', true, _('Official template version summary')))
-	->addItem($versionTable)
 	->addItem(new CTag('p', true, _(
-		'Version status compares official vendor versions only. It does not by itself determine update safety.'
-	)));
+		'Update selection applies only to installed official templates with a newer version. Upstream-only templates use the separate Review installation workflow; installation is individual and fail-closed.'
+	)))
+	->addItem(new CTag('h4', true, _('Templates')));
 
-if ($data['can_compare']) {
-	$page->addItem(new CTag('p', true, _(
-		'Checkboxes are shown only for official templates with an available vendor-version update. Select only the templates you want to advance into review. Selection never bypasses per-template comparison, backup, preflight or confirmation gates.'
-	)));
-}
-
-$page->addItem(new CTag('h4', true, _('Visible templates')));
 if ($selectionForm !== null) {
 	$page->addItem($selectionForm);
 }
