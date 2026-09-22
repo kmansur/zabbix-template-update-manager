@@ -98,6 +98,7 @@ final class TemplateBatchPlanService {
 				'manual_evidence_sha256' => '',
 				'manual_reasons' => $manualReasons,
 				'batch_manual_eligible' => false,
+				'batch_manual_requires_local_overwrite_ack' => false,
 				'reason' => $this->reason($analysis, $readiness),
 				'backup_prepared' => $prepareBackups && !empty($analysis['backup_verification'])
 			];
@@ -135,6 +136,11 @@ final class TemplateBatchPlanService {
 						&& !empty($preflight['manual_override'])
 						&& preg_match('/^[a-f0-9]{64}$/', $evidence)) {
 					$item['batch_manual_eligible'] = true;
+					$item['batch_manual_requires_local_overwrite_ack'] = in_array(
+						'local_customization_overwrite',
+						$manualReasons,
+						true
+					);
 					$item['manual_evidence_sha256'] = $evidence;
 				}
 			}
@@ -161,6 +167,7 @@ final class TemplateBatchPlanService {
 				'manual_evidence_sha256' => '',
 				'manual_reasons' => [],
 				'batch_manual_eligible' => false,
+				'batch_manual_requires_local_overwrite_ack' => false,
 				'reason' => 'analysis_exception',
 				'backup_prepared' => false
 			];
@@ -190,7 +197,7 @@ final class TemplateBatchPlanService {
 			return false;
 		}
 
-		$allowed = ['medium_technical_risk', 'high_technical_risk'];
+		$allowed = ['medium_technical_risk', 'high_technical_risk', 'local_customization_overwrite'];
 		foreach ($manualReasons as $reason) {
 			if (!in_array($reason, $allowed, true)) {
 				return false;
