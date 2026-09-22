@@ -3,6 +3,7 @@
 namespace Modules\ZabbixTemplateUpdateManager\Service;
 
 use API;
+use CMessageHelper;
 use RuntimeException;
 
 require_once __DIR__.'/TemplateImportCompareService.php';
@@ -24,6 +25,8 @@ final class TemplateConfigurationImportService {
 			throw new RuntimeException('The controlled template import format is not supported.');
 		}
 
+		$messagesBefore = CMessageHelper::getMessages();
+
 		$result = API::Configuration()->import([
 			'format' => $format,
 			'source' => $source,
@@ -31,7 +34,29 @@ final class TemplateConfigurationImportService {
 		]);
 
 		if ($result !== true) {
-			throw new RuntimeException('Zabbix configuration import did not report success.');
+			$messagesAfter = CMessageHelper::getMessages();
+			$newMessages = array_slice($messagesAfter, count($messagesBefore));
+			$details = [];
+
+			foreach ($newMessages as $message) {
+				if (!is_array($message) || ($message['type'] ?? null) !== CMessageHelper::MESSAGE_TYPE_ERROR) {
+					continue;
+				}
+
+				$text = trim((string) ($message['message'] ?? ''));
+				if ($text !== '') {
+					$details[] = $text;
+				}
+			}
+
+			$details = array_values(array_unique($details));
+			$message = 'Zabbix configuration import did not report success.';
+
+			if ($details !== []) {
+				$message .= ' '.implode(' | ', array_slice($details, -3));
+			}
+
+			throw new RuntimeException($message);
 		}
 	}
 }
