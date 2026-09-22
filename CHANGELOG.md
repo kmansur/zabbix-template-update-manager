@@ -4,6 +4,17 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.14] - 2026-09-22
+
+### Fixed
+
+- `Review selected updates` now uses `CActionButtonList` native submit mode so the selected-template review action is actually posted with `action=ztum.templates.review_selected`.
+- Removed the unbound `CSimpleButton` content override that displayed an enabled-looking button but provided neither a submit action nor JavaScript handler.
+
+### Tests
+
+- Strengthened the selected-template action contract to require native action-button submit semantics and reject the previous unbound button pattern.
+
 ## [0.1.0-beta.13] - 2026-09-22
 
 ### Fixed
