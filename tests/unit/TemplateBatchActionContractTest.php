@@ -4,6 +4,7 @@ $root = dirname(__DIR__, 2);
 $prepare = (string) file_get_contents($root.'/actions/TemplateBatchPrepare.php');
 $prepareOne = (string) file_get_contents($root.'/actions/TemplateBatchPrepareOne.php');
 $update = (string) file_get_contents($root.'/actions/TemplateBatchUpdate.php');
+$updateOne = (string) file_get_contents($root.'/actions/TemplateBatchUpdateOne.php');
 $prepareView = (string) file_get_contents($root.'/views/template.batch.prepare.php');
 $updateView = (string) file_get_contents($root.'/views/template.batch.update.php');
 $manifest = (string) file_get_contents($root.'/manifest.json');
@@ -15,7 +16,7 @@ function assertBatchContract(bool $condition, string $message): void {
 	}
 }
 
-foreach ([$prepare, $prepareOne, $update] as $controller) {
+foreach ([$prepare, $prepareOne, $update, $updateOne] as $controller) {
 	assertBatchContract(strpos($controller, 'disableCsrfValidation') === false,
 		'Batch actions must keep native CSRF validation enabled.');
 	assertBatchContract(strpos($controller, 'USER_TYPE_SUPER_ADMIN') !== false,
@@ -47,8 +48,15 @@ assertBatchContract(strpos($prepareView, 'for (let index = 0; index < config.tem
 	'Batch preparation queue must be sequential and bounded.');
 assertBatchContract(strpos($prepareView, 'Stop after current template') !== false,
 	'Batch preparation queue must be cancellable between templates.');
-assertBatchContract(strpos($prepareView, "CCsrfTokenHelper::get('ztum.templates.batch_update')") !== false,
-	'Batch execution form must carry its action-specific CSRF token.');
+assertBatchContract(strpos($prepareView, "CCsrfTokenHelper::get('ztum.templates.batch_update_one')") !== false,
+	'Request-bounded batch execution must carry its per-template action CSRF token.');
+assertBatchContract(strpos($prepareView, 'fetch(config.executeOneUrl') !== false,
+	'Batch update execution must use one bounded HTTP request per Ready template.');
+assertBatchContract(strpos($prepareView, 'for (let index = 0; index < entries.length; index++)') !== false,
+	'Batch update execution queue must remain sequential in the browser.');
+assertBatchContract(strpos($prepareView, "result.status !== 'updated'") !== false
+		&& strpos($prepareView, 'labels.not_attempted') !== false,
+	'Request-bounded execution must stop on first non-success and mark later templates not attempted.');
 assertBatchContract(strpos($prepareView, "category === 'ready' && !isValidEvidence(evidence)") !== false
 		&& strpos($prepareView, "reason = 'invalid_preflight_evidence'") !== false,
 	'Browser batch state must fail closed when a server-reported Ready row lacks valid SHA-256 evidence.');
@@ -63,15 +71,24 @@ assertBatchContract(strpos($prepareView, 'Unavailable — no Ready templates.') 
 	'Batch execution availability must be explicit for Ready, zero-Ready and stopped plans.');
 
 assertBatchContract(strpos($update, "'templateids' => 'required|array_id'") !== false,
-	'Batch execution must validate selected template IDs.');
-assertBatchContract(strpos($update, "'confirm' => 'required|in 1'") !== false,
-	'Batch execution must require explicit confirmation.');
-assertBatchContract(strpos($update, 'TemplateBatchUpdateService') !== false,
-	'Batch execution must delegate to TemplateBatchUpdateService.');
+	'Legacy batch execution must validate selected template IDs.');
+assertBatchContract(strpos($update, '$count === 1') !== false,
+	'Legacy synchronous batch execution must fail fast for more than one template.');
+assertBatchContract(strpos($updateOne, "'templateid' => 'required|id'") !== false,
+	'Request-bounded execution must validate exactly one template ID.');
+assertBatchContract(strpos($updateOne, "'evidence_sha256' => 'required|string'") !== false
+		&& strpos($updateOne, "'confirm' => 'required|in 1'") !== false,
+	'Request-bounded execution must require bound evidence and explicit confirmation.');
+assertBatchContract(strpos($updateOne, 'TemplateControlledUpdateService') !== false,
+	'Request-bounded execution must reuse TemplateControlledUpdateService.');
+assertBatchContract(strpos($manifest, '"ztum.templates.batch_update_one"') !== false
+		&& strpos($manifest, '"layout": "layout.json"') !== false
+		&& strpos($manifest, '"view": null') !== false,
+	'Request-bounded update route must be registered with layout.json and no view.');
 assertBatchContract(strpos($updateView, 'No automatic rollback is performed') !== false,
 	'Batch result view must state that rollback is not automatic.');
 
-$combined = $prepare.$prepareOne.$update.$prepareView.$updateView;
+$combined = $prepare.$prepareOne.$update.$updateOne.$prepareView.$updateView;
 foreach ([
 	'API::Configuration()->import(',
 	'API::Template()->update(',
