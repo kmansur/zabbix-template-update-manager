@@ -406,6 +406,23 @@ $script = <<<'JS'
 		return payload.result;
 	};
 
+	const updateReviewedSelectAll = () => {
+		const master = byId('ztum-reviewed-select-all');
+		if (master === null) {
+			return;
+		}
+
+		const eligible = Array.from(reviewEvidence.keys())
+			.map((templateId) => byId('ztum-review-select-' + templateId))
+			.filter((checkbox) => checkbox !== null && !checkbox.disabled);
+		const selected = eligible.filter((checkbox) => checkbox.checked).length;
+
+		master.disabled = executionStarted || retryInProgress || eligible.length === 0;
+		master.checked = eligible.length > 0 && selected === eligible.length;
+		master.indeterminate = selected > 0 && selected < eligible.length;
+		master.title = labels.select_all_reviewed;
+	};
+
 	const selectedReviewedEntries = () => {
 		const entries = [];
 		for (const [templateId, review] of reviewEvidence.entries()) {
@@ -484,6 +501,7 @@ $script = <<<'JS'
 		}
 		submit.disabled = !(canExecute && confirm.checked);
 		retry.disabled = !canRetry;
+		updateReviewedSelectAll();
 	};
 
 	const runExecution = async () => {
@@ -502,6 +520,7 @@ $script = <<<'JS'
 				checkbox.disabled = true;
 			}
 		}
+		updateReviewedSelectAll();
 		let updated = 0;
 		let failed = 0;
 		let notAttempted = entries.length;
@@ -616,6 +635,18 @@ $script = <<<'JS'
 		progress(completed, labels.retry_complete);
 		updateExecutionState();
 	};
+
+	byId('ztum-reviewed-select-all').addEventListener('change', (event) => {
+		const checked = event.currentTarget.checked;
+		for (const templateId of reviewEvidence.keys()) {
+			const checkbox = byId('ztum-review-select-' + templateId);
+			if (checkbox !== null && !checkbox.disabled) {
+				checkbox.checked = checked;
+			}
+		}
+		updateReviewedSelectAll();
+		updateExecutionState();
+	});
 
 	byId('ztum-batch-confirm').addEventListener('change', updateExecutionState);
 	byId('ztum-batch-update-submit').addEventListener('click', (event) => {
