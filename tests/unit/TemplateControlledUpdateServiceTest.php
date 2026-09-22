@@ -188,7 +188,27 @@ $manualService = new TemplateControlledUpdateService(
 		'reasons' => []
 	]
 );
-$result = $manualService->execute('12345', $evidence, true);
+$imported = false;
+$manualBlockedService = new TemplateControlledUpdateService(
+	static function (string $templateId, bool $manualOverride = false) use ($manualPreflight, &$manualSeen): array {
+		$manualSeen = $manualOverride;
+		return $manualPreflight;
+	},
+	static fn(array $freshPreflight): array => $builtCandidate,
+	static function (array $candidateToImport) use (&$imported): void {
+		$imported = true;
+	},
+	static fn(string $templateId, array $candidateToValidate): array => ['valid' => true]
+);
+$blockedManual = $manualBlockedService->execute('12345', $evidence, true, false);
+assertControlledUpdate('blocked_manual_confirmation', $blockedManual['status'],
+	'Local customization overwrite must require an additional explicit acknowledgement before batch import.');
+assertControlledUpdate(false, $blockedManual['write_performed'],
+	'Missing local-overwrite acknowledgement must block before configuration write.');
+assertControlledUpdate(false, $imported,
+	'Missing local-overwrite acknowledgement must not invoke importer.');
+
+$result = $manualService->execute('12345', $evidence, true, true);
 assertControlledUpdate(true, $manualSeen, 'Controlled update must rerun fresh preflight in the same explicit manual-review mode.');
 assertControlledUpdate(true, $result['manual_override'], 'Controlled update result must retain reviewed-override mode.');
 assertControlledUpdate(['local_customization_overwrite'], $result['manual_reasons'], 'Controlled update result must retain reviewed reasons.');
