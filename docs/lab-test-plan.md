@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.34
+# Laboratory test plan — 0.1.0-beta.35
 
 ## Release state
 
@@ -11,15 +11,15 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.34`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.35`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.34 retains the leading reviewed-selection column and makes select-all sticky during preparation. Field validation must prove that the header can be checked before eligible rows are discovered, that later eligible reviewed rows become selected automatically, and that ineligible/local-overwrite/blocked rows remain excluded.
+Beta.35 retains sticky reviewed select-all and allows explicitly acknowledged local-customization-overwrite Manual review rows into the reviewed batch. Field validation must prove that local-overwrite rows remain Manual review, require the second overwrite acknowledgement, and are blocked before import if that acknowledgement is absent.
 
 ## Safety assumptions
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.34 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.35 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. High-risk and local-overwrite candidates use the explicit individual reviewed path after verified rollback evidence. Conflict and unresolved templates remain hard blocked.
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.34
-git checkout -B release/0.1.0-beta.34 origin/release/0.1.0-beta.34
+git fetch origin release/0.1.0-beta.35
+git checkout -B release/0.1.0-beta.35 origin/release/0.1.0-beta.35
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.34
+0.1.0-beta.35
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.34`, enable the module and open:
+Confirm `0.1.0-beta.35`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -81,7 +81,7 @@ Data collection → Template updates
 
 ## 2A. Request-bounded update regression
 
-For the first beta.34 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.35 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -142,7 +142,7 @@ For one non-critical official template that is absent locally and has no missing
 
 Also test at least one blocked dependency case if naturally available. Missing linked templates must be listed and the write must remain disabled.
 
-Do not test recursive dependency installation: beta.34 intentionally requires dependencies to be installed individually first.
+Do not test recursive dependency installation: beta.35 intentionally requires dependencies to be installed individually first.
 
 ## 3B. Multi-template installation
 
@@ -166,7 +166,7 @@ Confirm **Install ready templates** when at least one candidate is Ready and ver
 - the batch reports Installed / Failed / Not attempted / Any configuration write;
 - returning to the catalog shows successful rows as installed/current.
 
-Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.34 does not recursively install selected dependencies.
+Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.35 does not recursively install selected dependencies.
 
 Stop-on-first-failure remains mandatory: if one controlled install returns a non-success, subsequent Ready UUIDs must be reported Not attempted.
 
@@ -180,7 +180,7 @@ Confirm:
 - select only 2–3 candidates for the first test;
 - **Review selected updates** shows only those explicitly selected templates.
 
-The former 25-template update-batch ceiling is removed in beta.34. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach review and preparation intact, and preparation must still run one template per HTTP request without silent truncation.
+The former 25-template update-batch ceiling is removed in beta.35. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach review and preparation intact, and preparation must still run one template per HTTP request without silent truncation.
 
 ## 4A. Large selected-update regression
 
@@ -283,7 +283,7 @@ Expected behavior:
 - reviewed rows POST both manual-override acknowledgement fields and rerun fresh reviewed preflight before import;
 - successful reviewed rows finish as `Updated and validated`;
 - stop-on-first-failure still applies across the combined queue;
-- a row containing `local_customization_overwrite` has no active leading checkbox and shows `Individual review required · Review details`;
+- a row containing `local_customization_overwrite` has an active reviewed checkbox only when rollback and manual preflight evidence are valid; Execution shows `Reviewed overwrite eligible · Review details`;
 - Conflict, Blocked, unresolved and request-failed rows must never be selectable or executable.
 
 ## 5D. Sticky select-all during preparation
@@ -295,10 +295,28 @@ Expected behavior:
 - the header checkbox is enabled even if zero eligible reviewed rows have completed so far;
 - the checked state remains active while preparation continues;
 - every later Manual review row that is technical-risk-only and has valid reviewed evidence appears checked automatically;
-- local-customization-overwrite rows continue to show no active checkbox;
+- local-customization-overwrite rows may be selected only after they receive valid reviewed evidence; they must never become unattended Ready;
 - Blocked/request-failed/unresolved rows never become selected;
 - manually clearing an individual reviewed row cancels sticky select-all and puts the header into the appropriate unchecked/indeterminate state;
 - execution remains disabled until preparation completes.
+
+## 5E. Local-overwrite reviewed batch regression
+
+Use one or more candidates that naturally report `local_customization_overwrite` plus technical-risk reasons.
+
+Expected behavior:
+
+- the row remains `Manual review` and keeps its local-overwrite reason visible;
+- after verified rollback and a passing reviewed preflight, the leading Include checkbox becomes active;
+- header `Include all eligible` may select it together with other reviewed candidates;
+- Execution shows `Reviewed overwrite eligible · Review details`;
+- selecting any local-overwrite row enables the additional acknowledgement:
+  `I explicitly accept overwriting local customizations for the selected templates.`;
+- `Update eligible templates` remains disabled until both the normal reviewed acknowledgement and the local-overwrite acknowledgement are checked;
+- the per-template request carries `manual_override=1`, `confirm_manual_override=1` and `confirm_local_overwrite=1`;
+- omitting the local-overwrite acknowledgement must return a no-write blocked result before import;
+- successful acknowledged rows still rerun fresh reviewed preflight, verify evidence, import through the single approved write boundary and validate afterward;
+- Conflict, unresolved, request-failed and unknown manual-reason rows remain unselectable.
 
 ## 6. Batch classification sanity checks
 
@@ -311,7 +329,7 @@ Before any write, inspect at least one item from each category that naturally oc
 
 If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
 
-### Beta.34 risk-calibration regression
+### Beta.35 risk-calibration regression
 
 When available in the lab, include `APC UPS Symmetra RM by SNMP` at installed version `7.0-3` with upstream `7.0-4`. The official delta removes `DISCARD_UNCHANGED_HEARTBEAT 6h` from a status item.
 
@@ -426,7 +444,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.34 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.35 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -501,9 +519,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.34 laboratory validation
+## 16. Exit criteria for beta.35 laboratory validation
 
-A Zabbix generation passes beta.34 only after evidence demonstrates:
+A Zabbix generation passes beta.35 only after evidence demonstrates:
 
 ```text
 module discovery/enable
