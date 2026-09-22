@@ -214,6 +214,16 @@ $installTriggerSource = json_decode($installTrigger['source'], true);
 assertDocumentValue(1, count($installTriggerSource['zabbix_export']['triggers']),
 	'Installation isolation must preserve the selected mixed-host trigger for dependency-aware preflight.');
 
+$historicalMixedTrigger = UpstreamTemplateDocumentService::buildHistoricalImportSource(
+	$mixedTrigger,
+	$uuid,
+	'7.0-4',
+	'Zabbix',
+	true
+);
+assertDocumentValue(['Other'], $historicalMixedTrigger['external_template_names'],
+	'Dependency-aware historical isolation must preserve and report external trigger hosts.');
+
 $missingDashboardGraph = $document;
 $missingDashboardGraph['zabbix_export']['graphs'] = [$document['zabbix_export']['graphs'][1]];
 assertIsolationReason(
