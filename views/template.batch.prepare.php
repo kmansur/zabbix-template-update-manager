@@ -63,12 +63,17 @@ $page
 		'Each template is prepared in its own request. Preparation may create or refresh rollback evidence, but it never imports Zabbix configuration.'
 	)));
 
-$reviewSelectAll = (new CCheckBox('ztum-reviewed-select-all', '1'))
-	->setId('ztum-reviewed-select-all');
+$selectAllReviewedButton = (new CButton('ztum-reviewed-select-all', _('Select all eligible')))
+	->setId('ztum-reviewed-select-all')
+	->addClass(ZBX_STYLE_BTN_ALT);
+
+$clearReviewedButton = (new CButton('ztum-reviewed-clear-all', _('Clear reviewed selection')))
+	->setId('ztum-reviewed-clear-all')
+	->addClass(ZBX_STYLE_BTN_ALT);
 
 $table = (new CTableInfo())
 	->setHeader([
-		new CDiv([$reviewSelectAll, ' ', _('Include all eligible')]),
+		_('Include'),
 		_('Template'),
 		_('Installed'),
 		_('Available'),
@@ -102,6 +107,11 @@ foreach ($data['templateids'] as $templateId) {
 
 $page
 	->addItem(new CTag('h4', true, _('Prepared templates')))
+	->addItem(new CDiv([
+		$selectAllReviewedButton,
+		' ',
+		$clearReviewedButton
+	]))
 	->addItem($table);
 
 $executionState = (new CSpan(_('Waiting for preparation.')))
@@ -177,6 +187,7 @@ $jsLabels = json_encode([
 	'stopping' => _('Stop requested; the current template will finish first.'),
 	'progress' => _('Preparing {current} of {total} templates...'),
 	'execution_waiting' => _('Waiting for preparation.'),
+	'execution_waiting_progress' => _('Waiting for preparation to finish — {completed} of {total} completed. You can select reviewed rows now; update execution starts only after preparation completes.'),
 	'execution_available' => _('Available — {ready} Ready + {review} selected reviewed template(s).'),
 	'execution_none' => _('Unavailable — no executable templates selected.'),
 	'execution_review_only' => _('No unattended Ready templates. Select eligible Manual review rows below, or use Review details for individual handling.'),
@@ -185,7 +196,8 @@ $jsLabels = json_encode([
 	'retry_complete' => _('Failed preparation retry complete.'),
 	'execution_ready' => _('Ready for execution'),
 	'select_reviewed' => _('Include reviewed update'),
-	'select_all_reviewed' => _('Include all eligible reviewed updates'),
+	'select_all_reviewed' => _('Select all eligible reviewed updates'),
+	'clear_all_reviewed' => _('Clear reviewed selection'),
 	'review_batch_eligible' => _('Reviewed batch eligible'),
 	'review_overwrite_eligible' => _('Reviewed overwrite eligible'),
 	'review_details' => _('Review details'),
@@ -429,8 +441,9 @@ $script = <<<'JS'
 	};
 
 	const updateReviewedSelectAll = () => {
-		const master = byId('ztum-reviewed-select-all');
-		if (master === null) {
+		const selectAll = byId('ztum-reviewed-select-all');
+		const clearAll = byId('ztum-reviewed-clear-all');
+		if (selectAll === null || clearAll === null) {
 			return;
 		}
 
@@ -439,16 +452,12 @@ $script = <<<'JS'
 			.filter((checkbox) => checkbox !== null && !checkbox.disabled);
 		const selected = eligible.filter((checkbox) => checkbox.checked).length;
 
-		master.disabled = executionStarted || retryInProgress;
-		if (autoSelectReviewed && !master.disabled) {
-			master.checked = true;
-			master.indeterminate = false;
-		}
-		else {
-			master.checked = eligible.length > 0 && selected === eligible.length;
-			master.indeterminate = selected > 0 && selected < eligible.length;
-		}
-		master.title = labels.select_all_reviewed;
+		selectAll.disabled = executionStarted || retryInProgress;
+		clearAll.disabled = executionStarted || retryInProgress || (selected === 0 && !autoSelectReviewed);
+		selectAll.textContent = labels.select_all_reviewed
+			+ (eligible.length > 0 ? ' (' + eligible.length + ')' : '');
+		clearAll.textContent = labels.clear_all_reviewed
+			+ (selected > 0 ? ' (' + selected + ')' : '');
 	};
 
 	const selectedReviewedEntries = () => {
@@ -503,7 +512,11 @@ $script = <<<'JS'
 				setText('ztum-batch-exec-status', labels.retrying_failed);
 			}
 			else if (!fullyPrepared) {
-				const state = stopRequested ? labels.execution_stopped : labels.execution_waiting;
+				const state = stopRequested
+					? labels.execution_stopped
+					: labels.execution_waiting_progress
+						.replace('{completed}', String(completed))
+						.replace('{total}', String(config.templateIds.length));
 				setText('ztum-batch-execution-state', state);
 				setText('ztum-batch-exec-status', state);
 			}
@@ -682,13 +695,26 @@ $script = <<<'JS'
 		updateExecutionState();
 	};
 
-	byId('ztum-reviewed-select-all').addEventListener('change', (event) => {
-		const checked = event.currentTarget.checked;
-		autoSelectReviewed = checked;
+	byId('ztum-reviewed-select-all').addEventListener('click', (event) => {
+		event.preventDefault();
+		autoSelectReviewed = true;
 		for (const templateId of reviewEvidence.keys()) {
 			const checkbox = byId('ztum-review-select-' + templateId);
 			if (checkbox !== null && !checkbox.disabled) {
-				checkbox.checked = checked;
+				checkbox.checked = true;
+			}
+		}
+		updateReviewedSelectAll();
+		updateExecutionState();
+	});
+
+	byId('ztum-reviewed-clear-all').addEventListener('click', (event) => {
+		event.preventDefault();
+		autoSelectReviewed = false;
+		for (const templateId of reviewEvidence.keys()) {
+			const checkbox = byId('ztum-review-select-' + templateId);
+			if (checkbox !== null && !checkbox.disabled) {
+				checkbox.checked = false;
 			}
 		}
 		updateReviewedSelectAll();
