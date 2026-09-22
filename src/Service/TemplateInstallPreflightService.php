@@ -16,6 +16,7 @@ require_once dirname(__DIR__).'/Support/ZabbixVersion.php';
 require_once __DIR__.'/ImportCompareSummary.php';
 require_once __DIR__.'/TemplateImportCompareService.php';
 require_once __DIR__.'/TemplateInstallDependencyService.php';
+require_once __DIR__.'/TemplateInstallPreviewGate.php';
 require_once __DIR__.'/UpdatePreviewAnalyzer.php';
 require_once __DIR__.'/UpstreamTemplateDocumentService.php';
 
@@ -88,21 +89,9 @@ final class TemplateInstallPreflightService {
 		$diff = (new TemplateImportCompareService())->compare($isolated['source'], 'json');
 		$summary = ImportCompareSummary::summarize($diff);
 		$preview = UpdatePreviewAnalyzer::analyze($diff, 200);
-		$previewSummary = is_array($preview['summary'] ?? null) ? $preview['summary'] : [];
-
-		if ((int) ($summary['updated'] ?? 0) > 0
-				|| (int) ($summary['removed'] ?? 0) > 0
-				|| (int) ($previewSummary['unresolved'] ?? 0) > 0) {
-			return self::blocked('blocked_preview', 'install_would_modify_existing_configuration', [
-				'candidate' => $candidate,
-				'dependencies' => $dependencies,
-				'comparison_summary' => $summary,
-				'preview' => $preview
-			]);
-		}
-
-		if ((int) ($summary['added'] ?? 0) <= 0) {
-			return self::blocked('blocked_preview', 'install_preview_contains_no_creations', [
+		$previewGate = TemplateInstallPreviewGate::evaluate($summary, $preview);
+		if (!$previewGate['safe']) {
+			return self::blocked('blocked_preview', (string) $previewGate['reason'], [
 				'candidate' => $candidate,
 				'dependencies' => $dependencies,
 				'comparison_summary' => $summary,
