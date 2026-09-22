@@ -60,15 +60,16 @@ assertBatchContract(strpos($prepareView, "result.status !== 'updated'") !== fals
 assertBatchContract(strpos($prepareView, "category === 'ready' && !isValidEvidence(evidence)") !== false
 		&& strpos($prepareView, "reason = 'invalid_preflight_evidence'") !== false,
 	'Browser batch state must fail closed when a server-reported Ready row lacks valid SHA-256 evidence.');
-assertBatchContract(strpos($prepareView, 'fullyPrepared && readyEvidence.size > 0') !== false,
-	'Completed mixed plans must enable execution whenever at least one evidence-backed Ready candidate exists.');
+assertBatchContract(strpos($prepareView, 'const executionCount = readyEvidence.size + selectedReviewed;') !== false
+		&& strpos($prepareView, 'fullyPrepared && executionCount > 0') !== false,
+	'Completed plans must enable execution for Ready candidates plus explicitly selected reviewed overrides.');
 assertBatchContract(strpos($prepareView, "if (category === 'ready') {") !== false
 		&& strpos($prepareView, 'readyEvidence.set(templateId, evidence);') !== false,
 	'Only Ready candidates may enter the request-bounded execution set.');
-assertBatchContract(strpos($prepareView, 'Unavailable — no Ready templates.') !== false
-		&& strpos($prepareView, 'Available — {ready} Ready template(s).') !== false
+assertBatchContract(strpos($prepareView, 'Unavailable — no executable templates selected.') !== false
+		&& strpos($prepareView, 'Available — {ready} Ready + {review} selected reviewed template(s).') !== false
 		&& strpos($prepareView, 'Unavailable — preparation stopped.') !== false,
-	'Batch execution availability must be explicit for Ready, zero-Ready and stopped plans.');
+	'Batch execution availability must be explicit for Ready, selected reviewed, zero-executable and stopped plans.');
 assertBatchContract(strpos($prepareView, "setText('ztum-batch-exec-status', labels.execution_none);") !== false,
 	'Zero-Ready plans must synchronize the execution summary status instead of leaving Waiting for preparation.');
 assertBatchContract(strpos($prepareView, 'Retry failed preparation') !== false
@@ -79,11 +80,20 @@ assertBatchContract(strpos($prepareView, "throw new Error('HTTP ' + response.sta
 	'Preparation transport failures must include elapsed-request timing for field diagnostics.');
 assertBatchContract(strpos($prepareView, "'compareUrl' => $compareUrl") !== false
 		&& strpos($prepareView, "link.href = config.compareUrl + '&templateid=' + encodeURIComponent(templateId);") !== false
-		&& strpos($prepareView, "link.textContent = labels.review_and_update;") !== false,
-	'Manual-review rows must provide a direct Review and update link to the individual comparison flow.');
-assertBatchContract(strpos($prepareView, 'Unavailable for unattended batch — {review} template(s) require manual review.') !== false
+		&& strpos($prepareView, "link.textContent = labels.review_details;") !== false,
+	'Manual-review rows must retain a direct Review details link to the individual comparison flow.');
+assertBatchContract(strpos($prepareView, "checkbox.id = 'ztum-review-select-' + templateId;") !== false
+		&& strpos($prepareView, 'labels.select_reviewed') !== false
+		&& strpos($prepareView, 'reviewEvidence.set(templateId') !== false,
+	'Eligible technical-risk Manual review rows must expose an explicit per-row reviewed-update checkbox.');
+assertBatchContract(strpos($prepareView, 'No unattended Ready templates. Select eligible Manual review rows below') !== false
 		&& strpos($prepareView, 'else if (counts.review > 0)') !== false,
-	'Zero-Ready plans containing Manual review candidates must explain how to continue.');
+	'Review-only plans must explain how to continue with explicit reviewed selection.');
+assertBatchContract(strpos($prepareView, "body.append('manual_override', '1')") !== false
+		&& strpos($prepareView, "body.append('confirm_manual_override', '1')") !== false,
+	'Reviewed batch execution must send both explicit manual-override signals.');
+assertBatchContract(strpos($prepareView, 'const reviewed = new Map(selectedReviewedEntries()') !== false,
+	'Ready and explicitly selected reviewed rows must be merged into one ordered request-bounded execution queue.');
 
 assertBatchContract(strpos($update, "'templateids' => 'required|array_id'") !== false,
 	'Legacy batch execution must validate selected template IDs.');
@@ -92,8 +102,10 @@ assertBatchContract(strpos($update, '$count === 1') !== false,
 assertBatchContract(strpos($updateOne, "'templateid' => 'required|id'") !== false,
 	'Request-bounded execution must validate exactly one template ID.');
 assertBatchContract(strpos($updateOne, "'evidence_sha256' => 'required|string'") !== false
-		&& strpos($updateOne, "'confirm' => 'required|in 1'") !== false,
-	'Request-bounded execution must require bound evidence and explicit confirmation.');
+		&& strpos($updateOne, "'confirm' => 'required|in 1'") !== false
+		&& strpos($updateOne, "'manual_override' => 'in 1'") !== false
+		&& strpos($updateOne, "'confirm_manual_override' => 'in 1'") !== false,
+	'Request-bounded execution must require bound evidence and explicit confirmation, including a second acknowledgement for reviewed overrides.');
 assertBatchContract(strpos($updateOne, 'TemplateControlledUpdateService') !== false,
 	'Request-bounded execution must reuse TemplateControlledUpdateService.');
 assertBatchContract(strpos($manifest, '"ztum.templates.batch_update_one"') !== false
