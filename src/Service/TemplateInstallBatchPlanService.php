@@ -52,6 +52,12 @@ final class TemplateInstallBatchPlanService {
 			$candidate = is_array($preflight['candidate'] ?? null) ? $preflight['candidate'] : [];
 			$dependencies = is_array($preflight['dependencies'] ?? null) ? $preflight['dependencies'] : [];
 			$status = (string) ($preflight['status'] ?? 'blocked_candidate');
+			$referenceAudit = is_array($preflight['reference_audit'] ?? null)
+				? $preflight['reference_audit']
+				: [];
+			$referenceIssues = is_array($referenceAudit['issues'] ?? null)
+				? array_values(array_filter($referenceAudit['issues'], 'is_array'))
+				: [];
 			$evidence = strtolower(trim((string) ($preflight['evidence_sha256'] ?? '')));
 			$ready = $status === 'passed'
 				&& !empty($preflight['write_enabled'])
@@ -70,7 +76,14 @@ final class TemplateInstallBatchPlanService {
 					: [],
 				'missing_dependencies' => is_array($dependencies['missing'] ?? null)
 					? array_values(array_map('strval', $dependencies['missing']))
-					: []
+					: [],
+				'reference_issues' => array_map(
+					static fn(array $issue): array => [
+						'code' => (string) ($issue['code'] ?? ''),
+						'reference' => (string) ($issue['reference'] ?? '')
+					],
+					array_slice($referenceIssues, 0, 10)
+				)
 			];
 		}
 		catch (Throwable $exception) {
@@ -89,7 +102,8 @@ final class TemplateInstallBatchPlanService {
 				'evidence_sha256' => '',
 				'reason' => 'analysis_exception',
 				'required_dependencies' => [],
-				'missing_dependencies' => []
+				'missing_dependencies' => [],
+				'reference_issues' => []
 			];
 		}
 	}
