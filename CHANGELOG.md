@@ -4,6 +4,30 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.22] - 2026-09-22
+
+### Added
+
+- Multi-select controlled installation for official catalog templates in the `Not installed` filter.
+- Request-bounded per-template installation preparation with `Ready` / `Blocked` classification.
+- Sequential Ready-only installation execution with stop-on-first-failure behavior.
+- Batch installation results showing installed, failed, not-attempted and any-write state.
+
+### Safety
+
+- Every selected candidate reuses the existing `TemplateInstallPreflightService`; only `passed` candidates with bound SHA-256 evidence become Ready.
+- Every write reuses `TemplateControlledInstallService`, which reruns fresh preflight/evidence immediately before the existing single `configuration.import` boundary.
+- Missing dependencies, collisions and unsafe import previews remain Blocked and never enter the execution set.
+- No recursive dependency installation is performed in beta.22, including when a missing dependency is also selected.
+- Batch execution stops at the first non-success/exception and never performs automatic uninstall.
+- Maximum selected installation batch size is 25.
+
+### Tests
+
+- Added multi-template install plan classification coverage.
+- Added sequential batch install success, invalid-evidence and stop-on-first-failure coverage.
+- Added controller/view/manifest safety contracts for CSRF, Super Admin access, request-bounded preparation and single-write-boundary preservation.
+
 ## [0.1.0-beta.21] - 2026-09-22
 
 ### Added

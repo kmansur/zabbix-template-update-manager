@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.21**
+Current version: **0.1.0-beta.22**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.21 adds native Zabbix catalog status filtering and an All/Pages pager toggle while retaining the beta.20 catalog and controlled installation workflow.
+Beta.22 adds controlled multi-template installation from the `Not installed` catalog filter. Candidates are prepared one request at a time, only preflight-passed candidates become Ready, and Ready templates are installed sequentially with fresh evidence checks and stop-on-first-failure behavior.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.21` after the beta.19 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.22` after the beta.22 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -89,6 +89,21 @@ Rollback is never automatic. A super administrator must explicitly select a vali
 
 If an import has occurred but final validation cannot prove the expected state, the module reports that a write occurred and does not retry automatically.
 
+## Installing multiple missing official templates
+
+In the `Not installed` status filter, Super Admins can select up to 25 official catalog entries and choose **Review selected installations**.
+
+The preparation page runs one bounded request per UUID and classifies every candidate:
+
+- `Ready`: the existing install preflight passed and produced bound SHA-256 evidence;
+- `Blocked`: dependency/collision/source/import-preview/evidence prerequisites did not pass.
+
+Only Ready candidates are submitted to **Install ready templates**. The execution is sequential, reruns the full controlled install preflight immediately before each write, and stops on the first non-success.
+
+Beta.22 deliberately does not recursively install dependencies. If a selected template requires another template that is still missing, it remains Blocked even if that dependency is also selected. Install the dependency first, then prepare the dependent template again.
+
+No automatic uninstall is performed after any ambiguous/failed install. Successful candidates remain installed and validated; candidates after the first failure are reported as Not attempted.
+
 ## Installing an official template that is not local
 
 Upstream-only catalog entries use a separate installation workflow. They are never treated as updates and never enter the update batch.
@@ -106,7 +121,7 @@ Only a super administrator can confirm the write. The install action reruns the 
 
 After import, ZTUM resolves the new template by UUID and performs a fresh current-upstream validation. Because the template did not exist before the operation, there is no prior local rollback artifact. ZTUM therefore does not automatically uninstall a newly imported template if validation fails.
 
-Beta.19 intentionally does **not** recursively install missing dependencies or batch-install catalog entries. Install required dependencies individually first.
+Beta.22 supports controlled batch installation, but still does **not** recursively install missing dependencies. Install required dependencies first, then prepare dependent templates again.
 
 ## Persistent storage
 
@@ -134,8 +149,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.21
-git checkout -B release/0.1.0-beta.21 origin/release/0.1.0-beta.21
+git fetch origin release/0.1.0-beta.22
+git checkout -B release/0.1.0-beta.22 origin/release/0.1.0-beta.22
 cat VERSION
 git rev-parse HEAD
 ```
@@ -143,7 +158,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.20
+0.1.0-beta.22
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
