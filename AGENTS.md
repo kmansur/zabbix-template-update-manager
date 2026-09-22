@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.23`.
+Current test version: `0.1.0-beta.24`.
 
 ## Non-negotiable rules
 
@@ -33,8 +33,8 @@ Current test version: `0.1.0-beta.23`.
 18. Installation of an upstream-only template must remain a distinct flow from update. It must verify official identity, immutable source fingerprints, local UUID/technical-name absence, linked-template dependencies and a creation-only import preview before write.
 19. Do not recursively or batch-install missing templates in the current milestone. Missing dependencies block installation and must be installed explicitly first.
 20. A newly installed template has no prior local rollback artifact. Never auto-uninstall it after ambiguous or failed post-install validation; require operator inspection.
-21. Multi-template installation must prepare one UUID per HTTP request and only submit candidates with passed install preflight plus bound evidence.
-22. Batch installation must reuse TemplateControlledInstallService per candidate and stop on the first non-success. Never bypass the existing single configuration-import boundary.
+21. Multi-template installation must prepare one UUID per HTTP request and only execute candidates with passed install preflight plus bound evidence.
+22. Batch installation must execute one Ready UUID per HTTP request, reuse TemplateControlledInstallService per candidate and stop on the first non-success. Never bypass the existing single configuration-import boundary.
 23. Do not auto-resolve selected missing dependencies in beta.22; dependency-blocked candidates require a later preparation after dependencies are actually installed.
 
 ## Architecture
