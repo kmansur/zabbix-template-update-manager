@@ -64,12 +64,11 @@ $page
 	)));
 
 $reviewSelectAll = (new CCheckBox('ztum-reviewed-select-all', '1'))
-	->setId('ztum-reviewed-select-all')
-	->setEnabled(false);
+	->setId('ztum-reviewed-select-all');
 
 $table = (new CTableInfo())
 	->setHeader([
-		new CDiv([$reviewSelectAll, ' ', _('Include')]),
+		new CDiv([$reviewSelectAll, ' ', _('Include all eligible')]),
 		_('Template'),
 		_('Installed'),
 		_('Available'),
@@ -207,6 +206,7 @@ $script = <<<'JS'
 	let fullyPrepared = false;
 	let executionStarted = false;
 	let retryInProgress = false;
+	let autoSelectReviewed = false;
 
 	const byId = (id) => document.getElementById(id);
 	const setText = (id, value) => {
@@ -229,7 +229,11 @@ $script = <<<'JS'
 			checkbox.type = 'checkbox';
 			checkbox.id = 'ztum-review-select-' + templateId;
 			checkbox.title = labels.select_reviewed;
+			checkbox.checked = autoSelectReviewed;
 			checkbox.addEventListener('change', () => {
+				if (!checkbox.checked) {
+					autoSelectReviewed = false;
+				}
 				updateReviewedSelectAll();
 				updateExecutionState();
 			});
@@ -336,6 +340,7 @@ $script = <<<'JS'
 				reasons: Array.isArray(item.manual_reasons) ? item.manual_reasons : []
 			});
 		}
+		updateReviewedSelectAll();
 	};
 
 	const applyRequestFailure = (templateId, error) => {
@@ -348,6 +353,7 @@ $script = <<<'JS'
 		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
 		setReviewedSelection(templateId, 'blocked');
 		setExecutionState(templateId, 'blocked', labels.blocked);
+		updateReviewedSelectAll();
 	};
 
 	const prepareOne = async (templateId) => {
@@ -417,9 +423,15 @@ $script = <<<'JS'
 			.filter((checkbox) => checkbox !== null && !checkbox.disabled);
 		const selected = eligible.filter((checkbox) => checkbox.checked).length;
 
-		master.disabled = executionStarted || retryInProgress || eligible.length === 0;
-		master.checked = eligible.length > 0 && selected === eligible.length;
-		master.indeterminate = selected > 0 && selected < eligible.length;
+		master.disabled = executionStarted || retryInProgress;
+		if (autoSelectReviewed && !master.disabled) {
+			master.checked = true;
+			master.indeterminate = false;
+		}
+		else {
+			master.checked = eligible.length > 0 && selected === eligible.length;
+			master.indeterminate = selected > 0 && selected < eligible.length;
+		}
 		master.title = labels.select_all_reviewed;
 	};
 
@@ -639,6 +651,7 @@ $script = <<<'JS'
 
 	byId('ztum-reviewed-select-all').addEventListener('change', (event) => {
 		const checked = event.currentTarget.checked;
+		autoSelectReviewed = checked;
 		for (const templateId of reviewEvidence.keys()) {
 			const checkbox = byId('ztum-review-select-' + templateId);
 			if (checkbox !== null && !checkbox.disabled) {
@@ -668,6 +681,7 @@ $script = <<<'JS'
 
 	const run = async () => {
 		updateSummary();
+		updateReviewedSelectAll();
 
 		for (let index = 0; index < config.templateIds.length; index++) {
 			if (stopRequested) {
