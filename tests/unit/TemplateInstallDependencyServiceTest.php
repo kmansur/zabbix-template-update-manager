@@ -46,4 +46,23 @@ $complete = TemplateInstallDependencyService::analyze($template, [
 assertInstallDependency([], $complete['missing'], 'All dependencies should resolve when locally installed.');
 assertInstallDependency(true, $complete['complete'], 'Complete dependency set must be explicit.');
 
+$structural = TemplateInstallDependencyService::analyze(
+	$template,
+	[
+		['host' => 'ICMP Ping', 'name' => 'ICMP Ping'],
+		['host' => 'Linux by Zabbix agent', 'name' => 'Linux by Zabbix agent'],
+		['host' => 'External trigger template', 'name' => 'External trigger template']
+	],
+	['External trigger template']
+);
+assertInstallDependency(
+	['External trigger template', 'ICMP Ping', 'Linux by Zabbix agent'],
+	$structural['required'],
+	'Cross-template trigger/graph/dashboard references must join linked-template dependencies.'
+);
+assertInstallDependency([], $structural['missing'],
+	'Installed structural dependencies must satisfy installation preflight.');
+assertInstallDependency(true, $structural['complete'],
+	'Structural dependencies already installed locally must allow preflight to continue.');
+
 echo "TemplateInstallDependencyService tests passed.\n";
