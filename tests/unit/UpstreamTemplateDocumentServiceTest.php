@@ -190,8 +190,14 @@ $mixedGraph['zabbix_export']['graphs'][0]['graph_items'][] = [
 assertIsolationReason(
 	fn() => UpstreamTemplateDocumentService::buildImportSource($mixedGraph, $uuid, $expected),
 	'cross_template_graph_dependency',
-	'Cross-template graph dependencies must fail closed with an explicit reason.'
+	'Strict isolation must still fail closed on cross-template graph dependencies.'
 );
+$installGraph = UpstreamTemplateDocumentService::buildImportSource($mixedGraph, $uuid, $expected, true);
+assertDocumentValue(['Other'], $installGraph['external_template_names'],
+	'Installation isolation must surface cross-template graph hosts as explicit external dependencies.');
+$installGraphSource = json_decode($installGraph['source'], true);
+assertDocumentValue(1, count($installGraphSource['zabbix_export']['graphs']),
+	'Installation isolation must preserve the selected mixed-host graph for dependency-aware preflight.');
 
 $mixedTrigger = $document;
 $mixedTrigger['zabbix_export']['triggers'][0]['expression'] =
@@ -199,8 +205,14 @@ $mixedTrigger['zabbix_export']['triggers'][0]['expression'] =
 assertIsolationReason(
 	fn() => UpstreamTemplateDocumentService::buildImportSource($mixedTrigger, $uuid, $expected),
 	'cross_template_trigger_dependency',
-	'Cross-template trigger dependencies must fail closed with an explicit reason.'
+	'Strict isolation must still fail closed on cross-template trigger dependencies.'
 );
+$installTrigger = UpstreamTemplateDocumentService::buildImportSource($mixedTrigger, $uuid, $expected, true);
+assertDocumentValue(['Other'], $installTrigger['external_template_names'],
+	'Installation isolation must surface cross-template trigger hosts as explicit external dependencies.');
+$installTriggerSource = json_decode($installTrigger['source'], true);
+assertDocumentValue(1, count($installTriggerSource['zabbix_export']['triggers']),
+	'Installation isolation must preserve the selected mixed-host trigger for dependency-aware preflight.');
 
 $missingDashboardGraph = $document;
 $missingDashboardGraph['zabbix_export']['graphs'] = [$document['zabbix_export']['graphs'][1]];
