@@ -95,21 +95,20 @@ assertBatchContract(strpos($prepareView, "body.append('manual_override', '1')") 
 	'Reviewed batch execution must send both explicit manual-override signals.');
 assertBatchContract(strpos($prepareView, 'const reviewed = new Map(selectedReviewedEntries()') !== false,
 	'Ready and explicitly selected reviewed rows must be merged into one ordered request-bounded execution queue.');
-assertBatchContract(strpos($prepareView, "new CCheckBox('ztum-reviewed-select-all', '1')") !== false
-		&& strpos($prepareView, "byId('ztum-reviewed-select-all').addEventListener('change'") !== false
-		&& strpos($prepareView, 'const updateReviewedSelectAll = () =>') !== false
-		&& strpos($prepareView, 'master.indeterminate = selected > 0 && selected < eligible.length;') !== false,
-	'The leading reviewed-selection column must provide select-all with checked/indeterminate synchronization.');
-assertBatchContract(strpos($prepareView, "->setId('ztum-reviewed-select-all');") !== false
-		&& strpos($prepareView, "->setId('ztum-reviewed-select-all')\n\t->setEnabled(false)") === false,
-	'Reviewed select-all must be clickable while preparation is still running.');
+assertBatchContract(strpos($prepareView, "new CButton('ztum-reviewed-select-all', _('Select all eligible'))") !== false
+		&& strpos($prepareView, "new CButton('ztum-reviewed-clear-all', _('Clear reviewed selection'))") !== false
+		&& strpos($prepareView, "byId('ztum-reviewed-select-all').addEventListener('click'") !== false
+		&& strpos($prepareView, "byId('ztum-reviewed-clear-all').addEventListener('click'") !== false,
+	'Large reviewed batches must provide explicit Select all eligible and Clear selection controls.');
 assertBatchContract(strpos($prepareView, 'let autoSelectReviewed = false;') !== false
 		&& strpos($prepareView, 'checkbox.checked = autoSelectReviewed;') !== false
-		&& strpos($prepareView, 'autoSelectReviewed = checked;') !== false,
-	'Select-all chosen during preparation must automatically include reviewed rows that become eligible later.');
-assertBatchContract(strpos($prepareView, 'master.disabled = executionStarted || retryInProgress;') !== false
-		&& strpos($prepareView, 'eligible.length === 0') === false,
-	'Select-all must not be disabled merely because no eligible reviewed row has completed preparation yet.');
+		&& strpos($prepareView, 'autoSelectReviewed = true;') !== false
+		&& strpos($prepareView, 'autoSelectReviewed = false;') !== false,
+	'Select-all chosen during preparation must automatically include reviewed rows that become eligible later and Clear must cancel sticky selection.');
+assertBatchContract(strpos($prepareView, 'selectAll.disabled = executionStarted || retryInProgress;') !== false,
+	'Select-all must stay available during preparation and disable only during retry/execution.');
+assertBatchContract(strpos($prepareView, 'Waiting for preparation to finish — {completed} of {total} completed.') !== false,
+	'Execution state must explain that updates wait for full preparation while selection can already be made.');
 assertBatchContract(strpos($prepareView, 'labels.review_batch_eligible') !== false
 		&& strpos($prepareView, 'labels.review_overwrite_eligible') !== false
 		&& strpos($prepareView, 'labels.review_individual_only') !== false,
