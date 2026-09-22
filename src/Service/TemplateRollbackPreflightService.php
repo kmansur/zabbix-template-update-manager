@@ -49,8 +49,8 @@ final class TemplateRollbackPreflightService {
 		};
 		$this->exporter = $exporter ?? static fn(string $templateId): array
 			=> (new TemplateExportService())->export($templateId);
-		$this->comparer = $comparer ?? static fn(string $source): array
-			=> (new TemplateImportCompareService())->compare($source);
+		$this->comparer = $comparer ?? static fn(string $source, string $format): array
+			=> (new TemplateImportCompareService())->compare($source, $format);
 	}
 
 	public function run(string $templateId, string $manifestFile): array {
@@ -84,11 +84,15 @@ final class TemplateRollbackPreflightService {
 		}
 
 		$source = $artifact['source'] ?? null;
+		$format = strtolower(trim((string) ($artifact['format'] ?? '')));
 		if (!is_string($source) || $source === '') {
 			throw new RuntimeException('The rollback artifact source is unavailable.');
 		}
+		if (!in_array($format, ['json', 'yaml'], true)) {
+			throw new RuntimeException('The rollback artifact format is unsupported.');
+		}
 
-		$diff = ($this->comparer)($source);
+		$diff = ($this->comparer)($source, $format);
 		if (!is_array($diff)) {
 			throw new RuntimeException('Rollback import comparison returned an invalid result.');
 		}
@@ -108,13 +112,14 @@ final class TemplateRollbackPreflightService {
 
 		$status = $summary['total'] === 0 ? 'already_restored' : 'ready';
 		$evidence = [
-			'schema_version' => 1,
+			'schema_version' => 2,
 			'templateid' => $templateId,
 			'uuid' => $currentUuid,
 			'current_vendor_version' => (string) ($template['vendor_version'] ?? ''),
 			'current_export_sha256' => $currentSha,
 			'current_export_bytes' => $currentBytes,
 			'target_manifest_file' => (string) ($artifact['manifest_file'] ?? ''),
+			'target_format' => $format,
 			'target_vendor_version' => (string) ($artifact['vendor_version'] ?? ''),
 			'target_sha256' => $targetSha,
 			'target_bytes' => $targetBytes,
