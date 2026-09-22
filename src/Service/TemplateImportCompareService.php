@@ -7,16 +7,27 @@ use RuntimeException;
 
 final class TemplateImportCompareService {
 
-	public function compare(string $source): array {
+	public function compare(string $source, string $format = 'json'): array {
 		if ($source === '') {
 			throw new RuntimeException('The comparison source is empty.');
 		}
 
-		return API::Configuration()->importcompare([
-			'format' => 'json',
+		$format = strtolower(trim($format));
+		if (!in_array($format, ['json', 'yaml'], true)) {
+			throw new RuntimeException('The comparison source format is not supported.');
+		}
+
+		$result = API::Configuration()->importcompare([
+			'format' => $format,
 			'source' => $source,
 			'rules' => self::rules()
 		]);
+
+		if (!is_array($result)) {
+			throw new RuntimeException('Zabbix configuration import comparison returned invalid data.');
+		}
+
+		return $result;
 	}
 
 	public static function rules(): array {

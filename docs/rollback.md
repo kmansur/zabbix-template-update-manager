@@ -30,7 +30,7 @@ It:
 1. revalidates the selected artifact from the persistent backup repository;
 2. exports the currently installed template with `configuration.export`;
 3. verifies current template identity against the artifact;
-4. runs `configuration.importcompare` using the stored YAML as the target;
+4. runs `configuration.importcompare` using the stored YAML as the target and explicitly sets `format=yaml`;
 5. displays the resulting additions, updates and removals;
 6. binds current-state and target evidence into a deterministic SHA-256 fingerprint.
 
@@ -48,7 +48,7 @@ The write action requires:
 - exact manifest filename;
 - rollback-preflight evidence fingerprint.
 
-The posted fingerprint is not trusted by itself. It is compared with a fresh server-side preflight immediately before any configuration import.
+The posted fingerprint is not trusted by itself. It is compared with a fresh server-side preflight immediately before any configuration import. The artifact format is included in that evidence so a format change cannot occur between review and write.
 
 ## Recovery backup before restore
 
@@ -108,7 +108,7 @@ After a successful import call, the module:
 1. reloads the installed template;
 2. verifies template ID and UUID;
 3. verifies the stored target vendor version;
-4. runs a fresh `configuration.importcompare` against the selected artifact;
+4. runs a fresh `configuration.importcompare` against the selected artifact using the artifact's validated format;
 5. requires zero remaining differences.
 
 A valid result is reported as `rolled_back`.
