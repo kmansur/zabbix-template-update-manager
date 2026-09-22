@@ -108,6 +108,43 @@ $result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $p
 assertReadiness('review_required', $result['status'], 'Medium technical risk should enter explicit manual-review path.');
 assertReadiness(['medium_technical_risk'], $result['manual_reasons'], 'Medium-risk reason must be explicit.');
 
+$riskKnownMedium = [
+	'coverage' => 'complete',
+	'level' => 'medium',
+	'standard_path_eligible' => true,
+	'risk_reasons' => ['bounded_preprocessing_discard_change']
+];
+$result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $preview, $riskKnownMedium);
+assertReadiness(
+	'candidate_for_backup',
+	$result['status'],
+	'A narrowly proven medium-impact change may enter the standard backup path.'
+);
+assertReadiness(
+	false,
+	$result['manual_confirmation_required'],
+	'Standard-path-eligible medium impact must not be forced into manual override.'
+);
+
+$result = UpdateReadinessEvaluator::evaluate(
+	$template,
+	$baseline,
+	$threeWay,
+	$preview,
+	$riskKnownMedium,
+	$verifiedBackup
+);
+assertReadiness(
+	'backup_verified',
+	$result['status'],
+	'Known-medium standard-path candidate with exact rollback evidence should advance to controlled preflight.'
+);
+assertReadiness(
+	'run_controlled_preflight',
+	$result['next_step'],
+	'Known-medium standard-path candidate must still pass fresh controlled preflight before any write.'
+);
+
 $result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWay, $preview, ['coverage' => 'complete', 'level' => 'none']);
 assertReadiness('candidate_for_backup', $result['status'], 'No effective technical risk with complete evidence may advance to standard backup creation.');
 

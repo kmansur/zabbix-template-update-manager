@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.17**
+Current version: **0.1.0-beta.18**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.17 keeps the request-bounded batch queue and fixes the response contract of its per-template endpoint. `ztum.templates.prepare_one` is now explicitly registered with Zabbix `layout.json` and no view, so the browser receives JSON instead of the default module HTML layout. One heavy candidate still runs per HTTP request, with the same CSRF, super-administrator and write-boundary protections.
+Beta.18 calibrates update risk using the real Zabbix 7.x field data gathered during batch validation. Technical impact is now separate from standard-path eligibility: known bounded preprocessing maintenance involving only `DISCARD_UNCHANGED` / `DISCARD_UNCHANGED_HEARTBEAT` remains visible as medium impact but can use the standard backup/preflight path when three-way evidence is complete, BASE matches LOCAL and no overwrite/conflict exists. Unknown or functional preprocessing changes remain high/manual.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.17` after the beta.17 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.18` after the beta.17 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -39,7 +39,7 @@ ZTUM currently provides:
 - native Zabbix checkbox/select-all selection of specific update candidates;
 - read-only selected-template review that rebuilds authoritative inventory/upstream/version state for the chosen subset;
 - bounded batch safety preparation for up to 25 explicitly selected templates, executed one candidate per HTTP request with visible progress;
-- automatic creation/refresh of rollback artifacts for standard low-risk candidates and explicitly reviewed manual-update candidates;
+- automatic creation/refresh of rollback artifacts for standard-path candidates (none/low plus narrowly recognized bounded-medium changes) and explicitly reviewed manual-update candidates;
 - batch classification into Ready, Manual review, Conflict and Blocked; reviewed override candidates never become unattended batch Ready;
 - controlled sequential update of Ready templates only;
 - stop-on-first-failure/evidence-change/ambiguous-state behavior with explicit not-attempted reporting;
@@ -68,7 +68,7 @@ Batch execution does not create a second write path. Each Ready template is exec
 
 Official identity is based on template UUID, never on vendor metadata alone. Version comparison, content comparison and update eligibility are separate stages.
 
-For an outdated official template, the standard controlled update path requires a proven historical baseline, complete three-way analysis, no conflict, no local-overwrite risk, `none`/`low` technical risk, and a persistent rollback artifact that exactly matches a fresh export of the installed template. If there is no unresolved identity or three-way conflict but known local-overwrite and/or medium/high technical risk exists, beta.12 retains the separate explicit reviewed path. That path binds the review reasons into the preflight evidence and requires an additional super-administrator acknowledgement before import.
+For an outdated official template, the standard controlled update path requires a proven historical baseline, complete three-way analysis, no conflict, no local-overwrite risk, and a persistent rollback artifact that exactly matches a fresh export of the installed template. `none`/`low` technical risk is standard-path eligible. Medium impact remains manual by default, except for narrowly recognized bounded changes explicitly marked `standard_path_eligible` by the risk analyzer; the current allowlist is limited to discard-only preprocessing maintenance. High risk and any local overwrite use the separate explicit reviewed path, while conflict/unresolved evidence remains blocked.
 
 Immediately before an update, ZTUM reruns the authoritative preflight, compares the explicit confirmation evidence with fresh server-side evidence, re-fetches the official template from the exact immutable upstream commit/path, verifies the raw YAML SHA-256 against the path-specific upstream index fingerprint, preserves the separate canonical template-content fingerprint in the evidence, and revalidates template identity. The selected source is then isolated with its required template/host groups plus top-level graphs and triggers that are exclusively owned by that template; unsafe cross-template dependencies are rejected.
 
@@ -112,8 +112,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.17
-git checkout -B release/0.1.0-beta.17 origin/release/0.1.0-beta.17
+git fetch origin release/0.1.0-beta.18
+git checkout -B release/0.1.0-beta.18 origin/release/0.1.0-beta.18
 cat VERSION
 git rev-parse HEAD
 ```
@@ -121,7 +121,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.17
+0.1.0-beta.18
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -137,7 +137,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.17**, enable the module and open:
+Confirm version **0.1.0-beta.18**, enable the module and open:
 
 ```text
 Data collection → Template updates

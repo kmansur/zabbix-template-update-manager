@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.17
+# Laboratory test plan — 0.1.0-beta.18
 
 ## Release state
 
@@ -11,17 +11,17 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.17`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.18`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.17 retains the validated individual update/rollback safety chain and moves heavy batch preparation into one bounded HTTP request per selected template. Field validation must confirm that the queue progresses through multiple candidates without a single long-lived request, that failed requests become Blocked, and that only a fully prepared set can expose Ready candidates for sequential execution.
+Beta.18 retains the validated individual update/rollback safety chain and request-bounded batch queue, and calibrates risk so narrowly known medium-impact upstream maintenance can remain standard-path eligible without weakening conflict/local-overwrite/high-risk gates. Field validation must confirm that the APC discard-only preprocessing regression can reach Ready while functional preprocessing and other high-impact changes remain manual or blocked.
 
 ## Safety assumptions
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications, complete historical/three-way analysis and `none`/`low` technical risk.
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.18 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
 
-Do not begin with a business-critical template or host. Medium/high-risk and local-overwrite candidates may use the explicit individual reviewed path after verified rollback evidence, but they must not enter the automatic batch execution set. Conflict and unresolved templates remain hard blocked.
+Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. High-risk and local-overwrite candidates use the explicit individual reviewed path after verified rollback evidence. Conflict and unresolved templates remain hard blocked.
 
 ## 1. Confirm frontend module and backup directory
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.17
-git checkout -B release/0.1.0-beta.17 origin/release/0.1.0-beta.17
+git fetch origin release/0.1.0-beta.18
+git checkout -B release/0.1.0-beta.18 origin/release/0.1.0-beta.18
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.17
+0.1.0-beta.18
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.17`, enable the module and open:
+Confirm `0.1.0-beta.18`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -132,8 +132,8 @@ Expected behavior:
 1. each selected template runs the full authoritative update analysis;
 2. historical baseline and BASE/LOCAL/UPSTREAM analysis are reused;
 3. conflict/local-overwrite/unresolved states remain blocked;
-4. medium/high risk and authoritative local-overwrite cases become Manual review and remain excluded from unattended batch execution;
-5. low/none-risk candidates that reached `candidate_for_backup` receive/refresh a persistent rollback artifact;
+4. high risk, local-overwrite and unrecognized medium-risk cases become Manual review; recognized bounded-medium cases may remain on the standard path;
+5. standard-path candidates (`none`/`low` plus recognized bounded-medium) that reached `candidate_for_backup` receive/refresh a persistent rollback artifact;
 6. analysis is rerun after backup creation;
 7. `backup_verified` candidates run fresh preflight;
 8. only a valid fresh preflight evidence SHA-256 can classify the template as `Ready`;
@@ -154,11 +154,26 @@ Blocked
 Before any write, inspect at least one item from each category that naturally occurs:
 
 - **Ready**: eligible for controlled sequential execution;
-- **Manual review**: medium/high technical review state;
+- **Manual review**: high or unrecognized-medium technical review state, or local-overwrite reviewed path;
 - **Conflict**: must never be executed; authoritative local-overwrite without conflict remains Manual review only;
 - **Blocked**: incomplete/unresolved/not-applicable evidence.
 
 If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
+
+### Beta.18 risk-calibration regression
+
+When available in the lab, include `APC UPS Symmetra RM by SNMP` at installed version `7.0-3` with upstream `7.0-4`. The official delta removes `DISCARD_UNCHANGED_HEARTBEAT 6h` from a status item.
+
+Expected analysis:
+
+```text
+technical impact: medium
+risk reason: bounded_preprocessing_discard_change
+standard path eligible: yes
+local overwrite/conflict/unresolved: 0
+```
+
+After verified rollback evidence and fresh preflight, this candidate may become `Ready`. A changed JavaScript/regex/transformation preprocessing step must still classify high/manual.
 
 ## 7. Controlled sequential batch update
 
@@ -260,7 +275,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.17 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.18 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -335,9 +350,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.17 laboratory validation
+## 16. Exit criteria for beta.18 laboratory validation
 
-A Zabbix generation passes beta.17 only after evidence demonstrates:
+A Zabbix generation passes beta.18 only after evidence demonstrates:
 
 ```text
 module discovery/enable

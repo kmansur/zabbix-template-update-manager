@@ -4,6 +4,26 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.18] - 2026-09-22
+
+### Fixed
+
+- Risk classification now separates visible technical impact from eligibility for the standard controlled path, reducing false `high_technical_risk`/manual-only outcomes without weakening conflict or local-overwrite gates.
+- Bounded preprocessing maintenance that only adds/removes/changes `DISCARD_UNCHANGED` or `DISCARD_UNCHANGED_HEARTBEAT` steps is classified as `medium` technical impact and may remain standard-path eligible when three-way evidence is complete and clean.
+- Functional preprocessing changes such as JavaScript, regex or other transformations remain `high` and manual-only.
+
+### Safety
+
+- Key/type/value-type/master-item/SNMP-OID changes, trigger expression/dependency changes, functional entity removals, local overwrites, conflicts and unresolved evidence remain outside the standard path.
+- Medium risk remains manual by default. Only an explicitly recognized bounded-medium change with `standard_path_eligible=true` may advance through the normal backup/preflight gates.
+- A known-medium candidate still requires a verified rollback artifact and a fresh preflight before it can become batch `Ready`.
+
+### Tests
+
+- Added a regression modeled on `APC UPS Symmetra RM by SNMP` 7.0-3 -> 7.0-4, where the official update removes only `DISCARD_UNCHANGED_HEARTBEAT 6h` from one status item.
+- Added regressions proving unchanged JavaScript preprocessing may coexist with the bounded delta, while changed JavaScript remains high/manual.
+- Added readiness coverage proving standard-path-eligible medium impact still passes through backup verification and controlled preflight rather than bypassing safety gates.
+
 ## [0.1.0-beta.17] - 2026-09-22
 
 ### Fixed
