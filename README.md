@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.23**
+Current version: **0.1.0-beta.24**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.23 keeps the beta.22 controlled multi-template installation flow and improves catalog selection UX: selection checkboxes are always visible, ineligible rows are shown disabled, and the select-all checkbox remains visible but is disabled when the bounded install limit prevents selecting the full result set safely.
+Beta.24 activates select-all for the `Not installed` catalog and moves multi-template installation execution to one HTTP request per Ready template. This preserves sequential stop-on-first-failure behavior while avoiding one long batch request that could hit reverse-proxy or Cloudflare timeouts.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.23` after the beta.22 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.24` after the beta.22 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -41,7 +41,7 @@ ZTUM currently provides:
 - official upstream source indexing by Zabbix release line;
 - native Zabbix checkbox/select-all selection of specific update candidates;
 - read-only selected-template review that rebuilds authoritative inventory/upstream/version state for the chosen subset;
-- bounded batch safety preparation for up to 25 explicitly selected templates, executed one candidate per HTTP request with visible progress;
+- bounded update-batch safety preparation for up to 25 explicitly selected update candidates, executed one candidate per HTTP request with visible progress;
 - automatic creation/refresh of rollback artifacts for standard-path candidates (none/low plus narrowly recognized bounded-medium changes) and explicitly reviewed manual-update candidates;
 - batch classification into Ready, Manual review, Conflict and Blocked; reviewed override candidates never become unattended batch Ready;
 - controlled sequential update of Ready templates only;
@@ -91,16 +91,16 @@ If an import has occurred but final validation cannot prove the expected state, 
 
 ## Installing multiple missing official templates
 
-In the `Not installed` status filter, Super Admins can select up to 25 official catalog entries and choose **Review selected installations**.
+In the `Not installed` status filter, Super Admins can use row checkboxes or the header select-all control and choose **Review selected installations**. Missing-template selection remains bounded to 500 catalog entries.
 
 The preparation page runs one bounded request per UUID and classifies every candidate:
 
 - `Ready`: the existing install preflight passed and produced bound SHA-256 evidence;
 - `Blocked`: dependency/collision/source/import-preview/evidence prerequisites did not pass.
 
-Only Ready candidates are submitted to **Install ready templates**. The execution is sequential, reruns the full controlled install preflight immediately before each write, and stops on the first non-success.
+Only Ready candidates are executed by **Install ready templates**. Execution is browser-driven and request-bounded: each Ready UUID gets its own CSRF-protected HTTP request, reruns the full controlled install preflight immediately before its write, completes post-install validation, and only then advances to the next template. Execution stops on the first non-success.
 
-Beta.22 deliberately does not recursively install dependencies. If a selected template requires another template that is still missing, it remains Blocked even if that dependency is also selected. Install the dependency first, then prepare the dependent template again.
+Beta.24 deliberately does not recursively install dependencies. If a selected template requires another template that is still missing, it remains Blocked even if that dependency is also selected. Install the dependency first, then prepare the dependent template again.
 
 No automatic uninstall is performed after any ambiguous/failed install. Successful candidates remain installed and validated; candidates after the first failure are reported as Not attempted.
 
@@ -121,7 +121,7 @@ Only a super administrator can confirm the write. The install action reruns the 
 
 After import, ZTUM resolves the new template by UUID and performs a fresh current-upstream validation. Because the template did not exist before the operation, there is no prior local rollback artifact. ZTUM therefore does not automatically uninstall a newly imported template if validation fails.
 
-Beta.22 supports controlled batch installation, but still does **not** recursively install missing dependencies. Install required dependencies first, then prepare dependent templates again.
+Beta.24 supports request-bounded controlled batch installation, but still does **not** recursively install missing dependencies. Install required dependencies first, then prepare dependent templates again.
 
 ## Persistent storage
 
@@ -149,8 +149,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.23
-git checkout -B release/0.1.0-beta.23 origin/release/0.1.0-beta.23
+git fetch origin release/0.1.0-beta.24
+git checkout -B release/0.1.0-beta.24 origin/release/0.1.0-beta.24
 cat VERSION
 git rev-parse HEAD
 ```
@@ -158,7 +158,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.23
+0.1.0-beta.24
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
