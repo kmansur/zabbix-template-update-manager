@@ -69,6 +69,14 @@ assertBatchContract(strpos($prepareView, 'Unavailable — no Ready templates.') 
 		&& strpos($prepareView, 'Available — {ready} Ready template(s).') !== false
 		&& strpos($prepareView, 'Unavailable — preparation stopped.') !== false,
 	'Batch execution availability must be explicit for Ready, zero-Ready and stopped plans.');
+assertBatchContract(strpos($prepareView, "setText('ztum-batch-exec-status', labels.execution_none);") !== false,
+	'Zero-Ready plans must synchronize the execution summary status instead of leaving Waiting for preparation.');
+assertBatchContract(strpos($prepareView, 'Retry failed preparation') !== false
+		&& strpos($prepareView, 'requestFailures = new Set()') !== false
+		&& strpos($prepareView, 'retryFailedPreparation = async () =>') !== false,
+	'Failed per-template preparation must expose an explicit operator-controlled retry path.');
+assertBatchContract(strpos($prepareView, "throw new Error('HTTP ' + response.status + ' after '") !== false,
+	'Preparation transport failures must include elapsed-request timing for field diagnostics.');
 
 assertBatchContract(strpos($update, "'templateids' => 'required|array_id'") !== false,
 	'Legacy batch execution must validate selected template IDs.');
