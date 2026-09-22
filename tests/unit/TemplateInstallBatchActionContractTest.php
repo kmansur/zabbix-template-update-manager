@@ -4,9 +4,7 @@ $root = dirname(__DIR__, 2);
 $prepare = (string) file_get_contents($root.'/actions/TemplateInstallBatchPrepare.php');
 $prepareOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchPrepareOne.php');
 $executeOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchExecuteOne.php');
-$legacyInstall = (string) file_get_contents($root.'/actions/TemplateInstallBatch.php');
 $prepareView = (string) file_get_contents($root.'/views/template.install.batch.prepare.php');
-$resultView = (string) file_get_contents($root.'/views/template.install.batch.php');
 $listView = (string) file_get_contents($root.'/views/template.list.php');
 $manifest = (string) file_get_contents($root.'/manifest.json');
 
@@ -17,7 +15,7 @@ function assertInstallBatchContract(bool $condition, string $message): void {
 	}
 }
 
-foreach ([$prepare, $prepareOne, $executeOne, $legacyInstall] as $controller) {
+foreach ([$prepare, $prepareOne, $executeOne] as $controller) {
 	assertInstallBatchContract(strpos($controller, 'disableCsrfValidation') === false,
 		'Batch installation actions must keep native CSRF validation enabled.');
 	assertInstallBatchContract(strpos($controller, 'USER_TYPE_SUPER_ADMIN') !== false,
@@ -68,9 +66,6 @@ assertInstallBatchContract(strpos($executeOne, 'TemplateControlledInstallService
 assertInstallBatchContract(strpos($executeOne, 'disableView()') !== false,
 	'Request-bounded execution must return raw JSON-layout data.');
 
-assertInstallBatchContract(strpos($resultView, 'No automatic uninstall is performed') !== false,
-	'Legacy batch result must continue to state that automatic uninstall is not performed.');
-
 assertInstallBatchContract(
 	strpos($listView, "'not_installed'") !== false
 		&& strpos($listView, "new CCheckBox('uuids['") !== false
@@ -79,7 +74,7 @@ assertInstallBatchContract(
 	'Not installed catalog mode must expose active multi-select/select-all installation review.'
 );
 
-$combined = $prepare.$prepareOne.$executeOne.$legacyInstall.$prepareView.$resultView;
+$combined = $prepare.$prepareOne.$executeOne.$prepareView;
 foreach ([
 	'API::Configuration()->import(',
 	'API::Template()->create(',
