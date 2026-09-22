@@ -112,6 +112,11 @@ $confirm = (new CCheckBox('confirm', '1'))
 	->setLabel(_('I reviewed the completed batch plan and explicitly accept the Manual review reasons for any reviewed templates I selected.'))
 	->setEnabled(false);
 
+$confirmLocalOverwrite = (new CCheckBox('confirm_local_overwrite', '1'))
+	->setId('ztum-batch-confirm-local-overwrite')
+	->setLabel(_('I explicitly accept overwriting local customizations for the selected templates.'))
+	->setEnabled(false);
+
 $submit = (new CButton('ztum-batch-update-submit', _('Update eligible templates')))
 	->setId('ztum-batch-update-submit')
 	->setEnabled(false);
@@ -129,10 +134,12 @@ $executionSummary = (new CTableInfo())
 $page
 	->addItem(new CTag('h4', true, _('Controlled sequential execution')))
 	->addItem(new CTag('p', true, _(
-		'After preparation completes, Ready templates can run normally. Manual review templates that contain only technical-risk reasons and have valid reviewed-preflight evidence can be explicitly selected in the Execution column. Local-customization overwrite, Conflict and Blocked rows still require individual handling. Each selected template runs in its own HTTP request, reruns fresh preflight immediately before import and is validated before the next template begins. Execution stops on the first failure and no automatic rollback is performed.'
+		'After preparation completes, Ready templates can run normally. Manual review templates with verified rollback and valid reviewed-preflight evidence can be explicitly selected from the Include column, including local-customization-overwrite cases. Local-overwrite selections require an additional explicit acknowledgement before execution. Conflict and Blocked rows remain non-executable. Each selected template runs in its own HTTP request, reruns fresh preflight immediately before import and is validated before the next template begins. Execution stops on the first failure and no automatic rollback is performed.'
 	)))
 	->addItem(new CTag('p', true, $executionState))
-	->addItem(new CDiv([$confirm, ' ', $submit]))
+	->addItem(new CDiv([$confirm]))
+	->addItem(new CDiv([$confirmLocalOverwrite]))
+	->addItem(new CDiv([$submit]))
 	->addItem($executionSummary);
 
 $prepareOneUrl = (new CUrl('zabbix.php'))
@@ -180,6 +187,7 @@ $jsLabels = json_encode([
 	'select_reviewed' => _('Include reviewed update'),
 	'select_all_reviewed' => _('Include all eligible reviewed updates'),
 	'review_batch_eligible' => _('Reviewed batch eligible'),
+	'review_overwrite_eligible' => _('Reviewed overwrite eligible'),
 	'review_details' => _('Review details'),
 	'review_individual_only' => _('Individual review required'),
 	'execution_running' => _('Running'),
@@ -259,7 +267,9 @@ $script = <<<'JS'
 		if (category === 'review') {
 			const note = document.createElement('span');
 			note.textContent = manual?.eligible === true
-				? labels.review_batch_eligible + ' · '
+				? ((manual?.requiresLocalOverwriteAck === true
+					? labels.review_overwrite_eligible
+					: labels.review_batch_eligible) + ' · ')
 				: labels.review_individual_only + ' · ';
 			element.appendChild(note);
 
@@ -302,6 +312,7 @@ $script = <<<'JS'
 		const evidence = normalizeEvidence(item.evidence_sha256 || '');
 		const manualEvidence = normalizeEvidence(item.manual_evidence_sha256 || '');
 		const manualEligible = item.batch_manual_eligible === true && isValidEvidence(manualEvidence);
+		const requiresLocalOverwriteAck = item.batch_manual_requires_local_overwrite_ack === true;
 
 		if (category === 'ready' && !isValidEvidence(evidence)) {
 			category = 'blocked';
@@ -316,7 +327,8 @@ $script = <<<'JS'
 		setText('ztum-reason-' + templateId, reason);
 		const manualState = {
 			eligible: manualEligible,
-			evidence: manualEvidence
+			evidence: manualEvidence,
+			requiresLocalOverwriteAck
 		};
 		setReviewedSelection(templateId, category, manualState);
 		setExecutionState(
@@ -337,7 +349,8 @@ $script = <<<'JS'
 		if (category === 'review' && manualEligible) {
 			reviewEvidence.set(templateId, {
 				evidence: manualEvidence,
-				reasons: Array.isArray(item.manual_reasons) ? item.manual_reasons : []
+				reasons: Array.isArray(item.manual_reasons) ? item.manual_reasons : [],
+				requiresLocalOverwriteAck
 			});
 		}
 		updateReviewedSelectAll();
@@ -382,7 +395,7 @@ $script = <<<'JS'
 		return payload.item;
 	};
 
-	const executeOne = async (templateId, evidence, manualOverride = false) => {
+	const executeOne = async (templateId, evidence, manualOverride = false, confirmLocalOverwrite = false) => {
 		const body = new FormData();
 		body.append(config.csrfName, config.executeCsrfToken);
 		body.append('templateid', templateId);
@@ -391,6 +404,9 @@ $script = <<<'JS'
 		if (manualOverride) {
 			body.append('manual_override', '1');
 			body.append('confirm_manual_override', '1');
+			if (confirmLocalOverwrite) {
+				body.append('confirm_local_overwrite', '1');
+			}
 		}
 
 		const response = await fetch(config.executeOneUrl, {
@@ -443,7 +459,8 @@ $script = <<<'JS'
 				entries.push({
 					templateId,
 					evidence: review.evidence,
-					manualOverride: true
+					manualOverride: true,
+					requiresLocalOverwriteAck: review.requiresLocalOverwriteAck === true
 				});
 			}
 		}
@@ -470,9 +487,12 @@ $script = <<<'JS'
 
 	const updateExecutionState = () => {
 		const confirm = byId('ztum-batch-confirm');
+		const confirmLocalOverwrite = byId('ztum-batch-confirm-local-overwrite');
 		const submit = byId('ztum-batch-update-submit');
 		const retry = byId('ztum-batch-retry-failed');
-		const selectedReviewed = selectedReviewedEntries().length;
+		const reviewedEntries = selectedReviewedEntries();
+		const selectedReviewed = reviewedEntries.length;
+		const selectedLocalOverwrite = reviewedEntries.filter((entry) => entry.requiresLocalOverwriteAck).length;
 		const executionCount = readyEvidence.size + selectedReviewed;
 		const canExecute = fullyPrepared && executionCount > 0 && !executionStarted && !retryInProgress;
 		const canRetry = fullyPrepared && requestFailures.size > 0 && !executionStarted && !retryInProgress;
@@ -511,20 +531,28 @@ $script = <<<'JS'
 		if (!canExecute && !executionStarted) {
 			confirm.checked = false;
 		}
-		submit.disabled = !(canExecute && confirm.checked);
+		confirmLocalOverwrite.disabled = !canExecute || selectedLocalOverwrite === 0;
+		if (selectedLocalOverwrite === 0 || !canExecute) {
+			confirmLocalOverwrite.checked = false;
+		}
+		const overwriteAccepted = selectedLocalOverwrite === 0 || confirmLocalOverwrite.checked;
+		submit.disabled = !(canExecute && confirm.checked && overwriteAccepted);
 		retry.disabled = !canRetry;
 		updateReviewedSelectAll();
 	};
 
 	const runExecution = async () => {
 		const entries = executionEntries();
+		const selectedLocalOverwrite = entries.filter((entry) => entry.requiresLocalOverwriteAck).length;
 		if (executionStarted || !fullyPrepared || entries.length === 0
-				|| !byId('ztum-batch-confirm').checked) {
+				|| !byId('ztum-batch-confirm').checked
+				|| (selectedLocalOverwrite > 0 && !byId('ztum-batch-confirm-local-overwrite').checked)) {
 			return;
 		}
 
 		executionStarted = true;
 		byId('ztum-batch-confirm').disabled = true;
+		byId('ztum-batch-confirm-local-overwrite').disabled = true;
 		byId('ztum-batch-update-submit').disabled = true;
 		for (const templateId of reviewEvidence.keys()) {
 			const checkbox = byId('ztum-review-select-' + templateId);
@@ -547,11 +575,16 @@ $script = <<<'JS'
 		setText('ztum-batch-exec-write', labels.no);
 
 		for (let index = 0; index < entries.length; index++) {
-			const {templateId, evidence, manualOverride} = entries[index];
+			const {templateId, evidence, manualOverride, requiresLocalOverwriteAck = false} = entries[index];
 			setText('ztum-execution-' + templateId, labels.executing);
 
 			try {
-				const result = await executeOne(templateId, evidence, manualOverride);
+				const result = await executeOne(
+					templateId,
+					evidence,
+					manualOverride,
+					requiresLocalOverwriteAck
+				);
 
 				if (result.write_performed) {
 					anyWrite = true;
@@ -663,6 +696,7 @@ $script = <<<'JS'
 	});
 
 	byId('ztum-batch-confirm').addEventListener('change', updateExecutionState);
+	byId('ztum-batch-confirm-local-overwrite').addEventListener('change', updateExecutionState);
 	byId('ztum-batch-update-submit').addEventListener('click', (event) => {
 		event.preventDefault();
 		runExecution();
