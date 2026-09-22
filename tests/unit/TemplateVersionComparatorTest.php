@@ -32,6 +32,13 @@ $result = TemplateVersionComparator::attach([
 		'vendor_version' => '1.0-1',
 		'upstream_status' => 'not_found',
 		'upstream' => null
+	],
+	[
+		'uuid' => str_repeat('c', 32),
+		'vendor_version' => '',
+		'installation_status' => 'not_installed',
+		'upstream_status' => 'official_catalog',
+		'upstream' => ['vendor_version' => '7.0-3']
 	]
 ]);
 
@@ -42,6 +49,8 @@ assertVersionValue('update_available', $result['templates'][3]['version_status']
 assertVersionValue('installed_version_missing', $result['templates'][4]['version_status'], 'Missing installed vendor version must fail closed.');
 assertVersionValue('version_uncomparable', $result['templates'][5]['version_status'], 'Unexpected version formats must not be guessed.');
 assertVersionValue('not_applicable', $result['templates'][6]['version_status'], 'Non-official templates must not receive version assumptions.');
+assertVersionValue('not_installed', $result['templates'][7]['version_status'], 'Upstream-only catalog templates must be explicitly not installed.');
+assertVersionValue('7.0-3', $result['templates'][7]['upstream_vendor_version'], 'Catalog entries must expose the available official version.');
 assertVersionValue('7.0-10', $result['templates'][1]['upstream_vendor_version'], 'The upstream vendor version must be exposed.');
 assertVersionValue([
 	'current' => 1,
@@ -50,7 +59,8 @@ assertVersionValue([
 	'installed_version_missing' => 1,
 	'upstream_version_missing' => 0,
 	'version_uncomparable' => 1,
-	'not_applicable' => 1
+	'not_applicable' => 1,
+	'not_installed' => 1
 ], $result['summary'], 'Version comparison summary is incorrect.');
 
 echo "TemplateVersionComparator tests passed.\n";

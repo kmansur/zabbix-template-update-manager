@@ -2,14 +2,14 @@
 
 ## Project
 
-Zabbix Template Update Manager is a native Zabbix frontend module for discovering, comparing and safely updating installed Zabbix templates.
+Zabbix Template Update Manager is a native Zabbix frontend module for discovering, installing, comparing and safely updating official Zabbix templates.
 
 Target Zabbix generations:
 
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.18`.
+Current test version: `0.1.0-beta.19`.
 
 ## Non-negotiable rules
 
@@ -30,6 +30,9 @@ Current test version: `0.1.0-beta.18`.
 15. Do not retry a failed or uncertain configuration import automatically.
 16. Rollback must remain an explicit super-administrator operation. Never trigger rollback automatically after update validation failure.
 17. Before restoring an older artifact, persist and verify a fresh recovery backup of the current installed state.
+18. Installation of an upstream-only template must remain a distinct flow from update. It must verify official identity, immutable source fingerprints, local UUID/technical-name absence, linked-template dependencies and a creation-only import preview before write.
+19. Do not recursively or batch-install missing templates in the current milestone. Missing dependencies block installation and must be installed explicitly first.
+20. A newly installed template has no prior local rollback artifact. Never auto-uninstall it after ambiguous or failed post-install validation; require operator inspection.
 
 ## Architecture
 
@@ -43,7 +46,7 @@ Current test version: `0.1.0-beta.18`.
 - `.github/workflows/` contains CI and upstream-index automation.
 - `VERSION` is the project/module test-release version and must match `manifest.json`.
 
-Keep controllers thin. Put comparison, repository, inventory, backup, preflight, update and rollback logic in `src/` services/classes rather than in views or controllers.
+Keep controllers thin. Put catalog, installation, comparison, repository, inventory, backup, preflight, update and rollback logic in `src/` services/classes rather than in views or controllers.
 
 For multi-template preparation, keep one heavy candidate preparation per HTTP request. Do not reintroduce a single synchronous request that analyzes/prepares the complete selected batch.
 

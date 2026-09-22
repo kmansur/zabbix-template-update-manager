@@ -8,6 +8,7 @@ use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateVersionComparator;
+use Modules\ZabbixTemplateUpdateManager\Service\UpstreamCatalogService;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamMatcher;
 use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
 use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
@@ -17,6 +18,7 @@ require_once dirname(__DIR__).'/src/Repository/TemplateRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateVersionComparator.php';
+require_once dirname(__DIR__).'/src/Service/UpstreamCatalogService.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamMatcher.php';
 require_once dirname(__DIR__).'/src/Support/ProjectVersion.php';
 require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
@@ -28,7 +30,15 @@ class TemplateList extends CController {
 	}
 
 	protected function checkInput(): bool {
-		return true;
+		$ret = $this->validateInput([
+			'page' => 'ge 1'
+		]);
+
+		if (!$ret) {
+			$this->setResponse(new \CControllerResponseFatal());
+		}
+
+		return $ret;
 	}
 
 	protected function checkPermissions(): bool {
@@ -46,11 +56,14 @@ class TemplateList extends CController {
 			'zabbix_version' => $zabbixVersion,
 			'zabbix_supported' => ZabbixVersion::isSupported(),
 			'can_compare' => $canAdminister,
+			'can_install' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
 			'show_diagnostics' => $canAdminister,
 			'templates' => [],
 			'summary' => TemplateInventoryService::emptySummary(),
 			'upstream_summary' => UpstreamMatcher::emptySummary(),
+			'catalog_summary' => UpstreamCatalogService::emptySummary(),
 			'version_summary' => TemplateVersionComparator::emptySummary(),
+			'paging' => null,
 			'upstream_source' => null,
 			'upstream_runtime' => null,
 			'upstream_diagnostics' => [
@@ -89,8 +102,10 @@ class TemplateList extends CController {
 		try {
 			$index = (new UpstreamIndexRepository())->load($data['zabbix_version']);
 			$matched = UpstreamMatcher::attach($data['templates'], $index);
-			$data['templates'] = $matched['templates'];
+			$catalog = UpstreamCatalogService::merge($matched['templates'], $index);
+			$data['templates'] = $catalog['templates'];
 			$data['upstream_summary'] = $matched['summary'];
+			$data['catalog_summary'] = $catalog['summary'];
 			$data['upstream_source'] = $index['source'] ?? null;
 			$data['upstream_runtime'] = $index['runtime'] ?? null;
 
@@ -119,6 +134,16 @@ class TemplateList extends CController {
 		$versionComparison = TemplateVersionComparator::attach($data['templates']);
 		$data['templates'] = $versionComparison['templates'];
 		$data['version_summary'] = $versionComparison['summary'];
+
+		order_result($data['templates'], 'name', ZBX_SORT_UP);
+		$pageNum = $this->getInput('page', 1);
+		CPagerHelper::savePage('ztum.template.catalog', $pageNum);
+		$data['paging'] = CPagerHelper::paginate(
+			$pageNum,
+			$data['templates'],
+			ZBX_SORT_UP,
+			(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
+		);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

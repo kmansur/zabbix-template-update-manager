@@ -11,7 +11,12 @@ final class TemplateVersionComparator {
 			$status = 'not_applicable';
 			$upstreamVersion = '';
 
-			if (($template['upstream_status'] ?? null) === 'official_match'
+			if (($template['installation_status'] ?? null) === 'not_installed'
+					&& is_array($template['upstream'] ?? null)) {
+				$upstreamVersion = self::stringValue($template['upstream']['vendor_version'] ?? '');
+				$status = 'not_installed';
+			}
+			elseif (($template['upstream_status'] ?? null) === 'official_match'
 					&& is_array($template['upstream'] ?? null)) {
 				$installedVersion = self::stringValue($template['vendor_version'] ?? '');
 				$upstreamVersion = self::stringValue($template['upstream']['vendor_version'] ?? '');
@@ -58,7 +63,8 @@ final class TemplateVersionComparator {
 			'installed_version_missing' => 0,
 			'upstream_version_missing' => 0,
 			'version_uncomparable' => 0,
-			'not_applicable' => 0
+			'not_applicable' => 0,
+			'not_installed' => 0
 		];
 	}
 

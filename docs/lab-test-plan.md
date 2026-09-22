@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.18
+# Laboratory test plan — 0.1.0-beta.19
 
 ## Release state
 
@@ -11,15 +11,15 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.18`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.19`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.18 retains the validated individual update/rollback safety chain and request-bounded batch queue, and calibrates risk so narrowly known medium-impact upstream maintenance can remain standard-path eligible without weakening conflict/local-overwrite/high-risk gates. Field validation must confirm that the APC discard-only preprocessing regression can reach Ready while functional preprocessing and other high-impact changes remain manual or blocked.
+Beta.19 retains the validated update/rollback/batch safety chain and adds the official upstream catalog plus individual controlled installation for templates that are not local. Field validation must prove catalog pagination, dependency/collision blocking, creation-only import preview, explicit installation write and fresh post-install validation.
 
 ## Safety assumptions
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.18 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.19 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. High-risk and local-overwrite candidates use the explicit individual reviewed path after verified rollback evidence. Conflict and unresolved templates remain hard blocked.
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.18
-git checkout -B release/0.1.0-beta.18 origin/release/0.1.0-beta.18
+git fetch origin release/0.1.0-beta.19
+git checkout -B release/0.1.0-beta.19 origin/release/0.1.0-beta.19
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.18
+0.1.0-beta.19
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.18`, enable the module and open:
+Confirm `0.1.0-beta.19`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -104,6 +104,31 @@ Updates available:        290
 The exact update count may change when the official upstream index moves, but repository-unavailable should remain zero in a healthy run and UUID matching should remain plausible.
 
 If upstream loading fails, capture the complete **Upstream diagnostics** table and stop before write-path tests.
+
+## 3A. Official catalog / missing-template installation
+
+Confirm the Templates table uses native Zabbix pagination and contains upstream-only entries with:
+
+```text
+Installed: —
+Status: Not installed
+Upstream identity: Official catalog
+Action: Review installation
+```
+
+For one non-critical official template that is absent locally and has no missing template-link dependencies:
+
+1. open **Review installation**;
+2. confirm official UUID/version/commit/path/raw SHA-256;
+3. confirm dependency list is complete;
+4. confirm import preview has `Added > 0`, `Updated = 0`, `Removed = 0`;
+5. confirm as Super Admin and install;
+6. verify result `Installed and validated`;
+7. return to catalog and confirm the row is now installed/current rather than `Not installed`.
+
+Also test at least one blocked dependency case if naturally available. Missing linked templates must be listed and the write must remain disabled.
+
+Do not test recursive dependency installation: beta.19 intentionally requires dependencies to be installed individually first.
 
 ## 4. Native checkbox/subset selection
 
@@ -160,7 +185,7 @@ Before any write, inspect at least one item from each category that naturally oc
 
 If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
 
-### Beta.18 risk-calibration regression
+### Beta.19 risk-calibration regression
 
 When available in the lab, include `APC UPS Symmetra RM by SNMP` at installed version `7.0-3` with upstream `7.0-4`. The official delta removes `DISCARD_UNCHANGED_HEARTBEAT 6h` from a status item.
 
@@ -275,7 +300,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.18 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.19 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -350,13 +375,16 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.18 laboratory validation
+## 16. Exit criteria for beta.19 laboratory validation
 
-A Zabbix generation passes beta.18 only after evidence demonstrates:
+A Zabbix generation passes beta.19 only after evidence demonstrates:
 
 ```text
 module discovery/enable
 inventory
+official catalog + native pagination
+upstream-only Not installed detection
+controlled individual installation + post-install validation
 upstream UUID/version matching
 native subset selection
 selected review
