@@ -47,9 +47,10 @@ assertCatalogControllerContract(
 
 assertCatalogControllerContract(
 	strpos($view, "new CCheckBox('all_templates')") !== false
-		&& strpos($view, '->setEnabled($selectAllEnabled)') !== false
-		&& strpos($view, 'installation batch limit is 25 templates') !== false,
-	'Catalog must always render the select-all checkbox and disable it when the bounded install limit prevents selecting the full result set.'
+		&& strpos($view, '->setEnabled(true)') !== false
+		&& strpos($view, "checkAll('") !== false
+		&& strpos($view, 'installation batch limit is 25 templates') === false,
+	'Catalog select-all must remain enabled for the request-bounded missing-template installation workflow.'
 );
 
 assertCatalogControllerContract(
