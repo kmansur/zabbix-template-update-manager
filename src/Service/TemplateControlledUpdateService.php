@@ -44,7 +44,12 @@ final class TemplateControlledUpdateService {
 			=> (new TemplatePostUpdateValidationService())->validate($templateId, $candidate);
 	}
 
-	public function execute(string $templateId, string $expectedEvidenceSha256, bool $manualOverride = false): array {
+	public function execute(
+		string $templateId,
+		string $expectedEvidenceSha256,
+		bool $manualOverride = false,
+		bool $localOverwriteConfirmed = true
+	): array {
 		$templateId = trim($templateId);
 		$expectedEvidenceSha256 = strtolower(trim($expectedEvidenceSha256));
 
@@ -74,6 +79,20 @@ final class TemplateControlledUpdateService {
 
 		if (!empty($preflight['write_enabled'])) {
 			throw new RuntimeException('Preflight must remain a non-write evidence gate.');
+		}
+
+		if ($manualOverride
+				&& in_array('local_customization_overwrite', (array) ($preflight['manual_reasons'] ?? []), true)
+				&& !$localOverwriteConfirmed) {
+			return [
+				'status' => 'blocked_manual_confirmation',
+				'write_performed' => false,
+				'reason' => 'local_overwrite_confirmation_required',
+				'preflight_status' => 'passed',
+				'preflight' => $preflight,
+				'candidate' => null,
+				'validation' => null
+			];
 		}
 
 		$freshEvidence = strtolower(trim((string) ($preflight['evidence_sha256'] ?? '')));
