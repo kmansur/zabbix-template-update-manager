@@ -10,14 +10,14 @@ require_once __DIR__.'/TemplateUpdateAnalysisService.php';
 require_once __DIR__.'/TemplateUpdatePreflightService.php';
 
 /**
- * Builds a bounded, authoritative batch plan from per-template safety gates.
+ * Builds an authoritative request-bounded batch plan from per-template safety gates.
  *
  * Optional preparation may create local rollback artifacts, but this service
  * never imports or changes Zabbix configuration.
  */
 final class TemplateBatchPlanService {
 
-	public const MAX_TEMPLATES = 25;
+	public const MAX_TEMPLATES = 500;
 
 	private $analysisRunner;
 	private $backupCreator;
