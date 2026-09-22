@@ -12,12 +12,16 @@ final class UpstreamCatalogService {
 	public static function merge(array $localTemplates, ?array $index): array {
 		$records = is_array($index['templates'] ?? null) ? $index['templates'] : [];
 		$localUuids = [];
+		$officialInstalled = 0;
 
 		foreach ($localTemplates as &$template) {
 			$template['installation_status'] = 'installed';
 			$uuid = self::normalizeUuid((string) ($template['uuid'] ?? ''));
 			if ($uuid !== '') {
 				$localUuids[$uuid] = true;
+				if (array_key_exists($uuid, $records)) {
+					$officialInstalled++;
+				}
 			}
 		}
 		unset($template);
@@ -36,7 +40,9 @@ final class UpstreamCatalogService {
 				'uuid' => $uuid,
 				'vendor_name' => trim((string) ($record['vendor_name'] ?? '')),
 				'vendor_version' => '',
-				'vendor_classification' => 'zabbix_vendor',
+				'vendor_classification' => strcasecmp(trim((string) ($record['vendor_name'] ?? '')), 'Zabbix') === 0
+					? 'zabbix_vendor'
+					: 'other_vendor',
 				'groups' => [],
 				'host_count' => 0,
 				'installation_status' => 'not_installed',
@@ -48,7 +54,8 @@ final class UpstreamCatalogService {
 		return [
 			'templates' => array_merge($localTemplates, $missing),
 			'summary' => [
-				'installed_visible' => count($localTemplates),
+				'local_visible' => count($localTemplates),
+				'official_installed' => $officialInstalled,
 				'official_catalog_total' => count($records),
 				'not_installed' => count($missing)
 			]
@@ -57,7 +64,8 @@ final class UpstreamCatalogService {
 
 	public static function emptySummary(): array {
 		return [
-			'installed_visible' => 0,
+			'local_visible' => 0,
+			'official_installed' => 0,
 			'official_catalog_total' => 0,
 			'not_installed' => 0
 		];
