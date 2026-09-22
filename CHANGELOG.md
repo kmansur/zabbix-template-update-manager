@@ -4,6 +4,40 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.36] - 2026-09-22
+
+### Fixed
+
+- Replaced the Zabbix-rendered header select-all checkbox, which remained visually/behaviorally unreliable in field testing, with explicit `Select all eligible` and `Clear reviewed selection` controls.
+- Per-row reviewed checkboxes remain in the first Include column.
+- The execution status now explicitly states that writes remain locked until the full selected preparation set completes, while reviewed selections may be made during preparation.
+- Installation preflight no longer blocks a template immediately on `cross_template_trigger_dependency` or `cross_template_graph_dependency` when those references can be represented as external template dependencies.
+
+### Changed
+
+- Select-all remains sticky during preparation: later reviewed-eligible rows inherit the selection until the operator clears or manually deselects.
+- Cross-template trigger/graph/dashboard host names discovered during installation isolation are surfaced as required template dependencies.
+- If those external templates are already installed, installation preflight may continue; if they are missing, the candidate now fails as `missing_template_dependencies` with actionable Required/Missing dependency names instead of a generic isolation block.
+- Strict isolation used by update/historical paths is unchanged and still fails closed on cross-template definitions.
+
+### Safety
+
+- Update execution still waits until every selected template finishes preparation, preventing concurrent preparation and configuration writes.
+- Local-overwrite reviewed updates still require the additional explicit overwrite acknowledgement.
+- Installation remains non-recursive: external dependencies must already be installed locally before the dependent template can become Ready.
+- Conflict, unresolved, request-failed and unknown reviewed states remain non-executable.
+
+### Field findings
+
+- A beta.35 update run at 24/26 completed showed valid reviewed row checkboxes but the header checkbox still appeared unusable, while execution was correctly waiting for the remaining preparation requests.
+- Vyatta Virtual Router by SNMP installation was blocked as `cross_template_trigger_dependency`; beta.36 converts that structural relationship into an explicit dependency when possible.
+
+### Tests
+
+- Updated batch action contracts for explicit select-all/clear controls and preparation-wait messaging.
+- Added dependency-service coverage for structural external dependencies.
+- Added installation-isolation regression coverage proving strict update isolation stays fail-closed while install-mode isolation preserves mixed-host graphs/triggers and reports external dependency names.
+
 ## [0.1.0-beta.35] - 2026-09-22
 
 ### Fixed
