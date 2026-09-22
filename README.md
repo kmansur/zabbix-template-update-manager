@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.30**
+Current version: **0.1.0-beta.31**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.30 keeps the request-bounded execution and preparation-retry model, and closes the Manual review usability gap: review-classified batch rows now offer a direct Review and update action into the existing individual comparison/reviewed-preflight flow. Zero-Ready plans containing Manual review candidates now explicitly explain that unattended batch execution is unavailable and how to continue safely.
+Beta.31 removes the former 25-template update-batch ceiling. Because preparation and Ready execution are already request-bounded one template at a time, a selected update set can now use the existing 500-template selection safety ceiling without creating one long-lived HTTP request. Stop, retry, evidence, Manual review and stop-on-first-failure protections remain unchanged.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.30` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.31` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -41,7 +41,7 @@ ZTUM currently provides:
 - official upstream source indexing by Zabbix release line;
 - native Zabbix checkbox/select-all selection of specific update candidates;
 - read-only selected-template review that rebuilds authoritative inventory/upstream/version state for the chosen subset;
-- bounded update-batch safety preparation for up to 25 explicitly selected update candidates, executed one candidate per HTTP request with visible progress;
+- request-bounded update-batch safety preparation for the full selected update set (up to the existing 500-template selection safety ceiling), executed one candidate per HTTP request with visible progress;
 - automatic creation/refresh of rollback artifacts for standard-path candidates (none/low plus narrowly recognized bounded-medium changes) and explicitly reviewed manual-update candidates;
 - batch classification into Ready, Manual review, Conflict and Blocked; reviewed override candidates never become unattended batch Ready;
 - controlled sequential update of Ready templates only, with one HTTP request per Ready template;
@@ -83,7 +83,7 @@ src/Service/TemplateConfigurationImportService.php
 
 Individual update, sequential batch update and rollback all reuse that service. CI rejects additional known Zabbix API write paths and direct database writes.
 
-Update-batch execution is deliberately bounded to 25 selected update candidates and stops immediately when one template does not return a successful validated update. Remaining templates are reported as **Not attempted**. Automatic rollback is never attempted because a failed post-write state may require operator inspection before choosing the correct recovery artifact.
+The former 25-template update-batch ceiling has been removed. Update selection retains the existing 500-template sanity ceiling, while preparation and Ready execution remain request-bounded one template at a time. Execution stops immediately when one template does not return a successful validated update; remaining templates are reported as **Not attempted**. Automatic rollback is never attempted because a failed post-write state may require operator inspection before choosing the correct recovery artifact.
 
 Rollback is never automatic. A super administrator must explicitly select a valid stored artifact, review a fresh `configuration.importcompare` preview and confirm the operation. The preview and post-rollback validation use the stored artifact format explicitly; current backup artifacts are private YAML exports. Before restoring the older artifact, ZTUM creates a fresh recovery backup of the current state and verifies that it exactly matches the current export participating in rollback preflight.
 
@@ -150,8 +150,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.30
-git checkout -B release/0.1.0-beta.30 origin/release/0.1.0-beta.30
+git fetch origin release/0.1.0-beta.31
+git checkout -B release/0.1.0-beta.31 origin/release/0.1.0-beta.31
 cat VERSION
 git rev-parse HEAD
 ```
@@ -159,7 +159,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.30
+0.1.0-beta.31
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -175,7 +175,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.30**, enable the module and open:
+Confirm version **0.1.0-beta.31**, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -183,7 +183,7 @@ Data collection → Template updates
 
 If the upstream index cannot be loaded, an administrator/super administrator sees an **Upstream diagnostics** table showing the requested index URL, cURL availability, `allow_url_fopen`, OpenSSL availability and a bounded failure detail. The module still fails closed and does not guess official identity when the repository cannot be validated.
 
-When upstream identity and version comparison succeed, checkboxes are shown only on official templates whose upstream vendor version is newer. **Review selected updates** sends only those selected template IDs to the bounded review action. A super administrator may then choose **Prepare selected updates**, which performs the full safety analysis and prepares rollback evidence. Only rows classified **Ready** can be submitted to **Update ready templates**.
+When upstream identity and version comparison succeed, checkboxes are shown only on official templates whose upstream vendor version is newer. **Review selected updates** sends only those selected template IDs to the review action. A super administrator may then choose **Prepare selected updates**, which performs the full safety analysis and prepares rollback evidence. Only rows classified **Ready** can be submitted to **Update ready templates**.
 
 For the exact beta test sequence, including update, batch stop behavior and rollback validation, follow [`docs/lab-test-plan.md`](docs/lab-test-plan.md).
 
@@ -195,7 +195,7 @@ installed templates
       v
 UUID official identity + vendor-version comparison
       |
-      +--> checkbox/select update candidates (max 25 per batch)
+      +--> checkbox/select update candidates (request-bounded; selection safety ceiling 500)
                     |
                     v
           selected-template review
