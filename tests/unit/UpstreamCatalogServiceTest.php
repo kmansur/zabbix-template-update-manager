@@ -54,7 +54,8 @@ assertCatalogValue('', $result['templates'][1]['templateid'], 'Upstream-only rec
 assertCatalogValue('official_catalog', $result['templates'][1]['upstream_status'], 'Upstream-only record must be identified as official catalog content.');
 assertCatalogValue('7.0-5', $result['templates'][1]['upstream']['vendor_version'], 'Missing record must retain authoritative upstream metadata.');
 assertCatalogValue([
-	'installed_visible' => 1,
+	'local_visible' => 1,
+	'official_installed' => 1,
 	'official_catalog_total' => 2,
 	'not_installed' => 1
 ], $result['summary'], 'Catalog summary is incorrect.');
