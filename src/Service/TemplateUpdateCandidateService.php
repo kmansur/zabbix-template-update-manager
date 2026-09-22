@@ -42,6 +42,13 @@ final class TemplateUpdateCandidateService {
 		$technicalName = trim((string) ($candidate['technical_name'] ?? ''));
 		$vendorName = trim((string) ($candidate['vendor_name'] ?? ''));
 		$vendorVersion = trim((string) ($candidate['vendor_version'] ?? ''));
+		$expectedExternalTemplateNames = is_array($candidate['external_template_names'] ?? null)
+			? array_values(array_unique(array_filter(array_map(
+				static fn($name): string => trim((string) $name),
+				$candidate['external_template_names']
+			), static fn(string $name): bool => $name !== '')))
+			: [];
+		sort($expectedExternalTemplateNames, SORT_NATURAL | SORT_FLAG_CASE);
 
 		if (!preg_match('/^[a-f0-9]{40}$/', $commit)
 				|| !self::isSafeTemplatePath($path)
@@ -84,8 +91,20 @@ final class TemplateUpdateCandidateService {
 				'technical_name' => $technicalName,
 				'vendor_name' => $vendorName,
 				'vendor_version' => $vendorVersion
-			]
+			],
+			true
 		);
+
+		$actualExternalTemplateNames = is_array($isolated['external_template_names'] ?? null)
+			? array_values(array_unique(array_filter(array_map(
+				static fn($externalName): string => trim((string) $externalName),
+				$isolated['external_template_names']
+			), static fn(string $externalName): bool => $externalName !== '')))
+			: [];
+		sort($actualExternalTemplateNames, SORT_NATURAL | SORT_FLAG_CASE);
+		if ($actualExternalTemplateNames !== $expectedExternalTemplateNames) {
+			throw new RuntimeException('The immutable update source cross-template dependency set changed after preflight.');
+		}
 
 		$source = (string) ($isolated['source'] ?? '');
 		if ($source === '') {
@@ -102,6 +121,7 @@ final class TemplateUpdateCandidateService {
 			'technical_name' => $technicalName,
 			'vendor_name' => $vendorName,
 			'vendor_version' => $vendorVersion,
+			'external_template_names' => $actualExternalTemplateNames,
 			'import_sha256' => hash('sha256', $source),
 			'format' => 'json',
 			'source' => $source
