@@ -4,6 +4,33 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.37] - 2026-09-22
+
+### Fixed
+
+- Controlled update analysis no longer fails immediately on official templates containing cross-template trigger/graph/dashboard references. Update comparison now uses dependency-aware isolation and lets Zabbix `configuration.importcompare` validate those references against the current local environment.
+- Historical baseline isolation can preserve the same external references, preventing false unresolved results caused only by strict source isolation.
+- Immutable controlled-update candidate reconstruction now preserves and verifies the exact external-template dependency set bound by preflight evidence.
+- Batch preparation now displays the actual sanitized comparison diagnostic instead of only `comparison_error`.
+- Reviewed selection controls now always show explicit counts, e.g. `Select all eligible (0)`, and an empty select-all is disabled once preparation is complete.
+
+### Safety
+
+- Dependency-aware update isolation does not auto-install or invent dependencies. If Zabbix importcompare cannot resolve an external reference, comparison still fails closed and the diagnostic is now visible.
+- The external dependency-name set is included in the update preflight evidence and must match again when the immutable candidate is rebuilt immediately before import.
+- Fresh preflight, rollback verification, reviewed acknowledgements, request-bounded execution and the single approved write boundary remain unchanged.
+
+### Field finding
+
+- Check Point Next Generation Firewall by SNMP, Cisco SD-WAN device by HTTP, Elasticsearch Cluster by HTTP and Generic Java JMX all reached `blocked_unresolved / comparison_error` in beta.36, leaving zero selectable reviewed rows. Beta.37 removes the strict-isolation false blocker where cross-template references are the cause and exposes the exact diagnostic for any remaining failure.
+
+### Tests
+
+- Added regression coverage for dependency-aware historical isolation.
+- Added controlled-update candidate coverage proving the preflight-bound external dependency set is preserved and mismatch fails closed.
+- Added batch-plan coverage for surfaced comparison diagnostics.
+- Updated reviewed-selection contracts for explicit eligible/selected counts.
+
 ## [0.1.0-beta.36] - 2026-09-22
 
 ### Fixed
