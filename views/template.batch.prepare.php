@@ -63,8 +63,13 @@ $page
 		'Each template is prepared in its own request. Preparation may create or refresh rollback evidence, but it never imports Zabbix configuration.'
 	)));
 
+$reviewSelectAll = (new CCheckBox('ztum-reviewed-select-all', '1'))
+	->setId('ztum-reviewed-select-all')
+	->setEnabled(false);
+
 $table = (new CTableInfo())
 	->setHeader([
+		new CDiv([$reviewSelectAll, ' ', _('Include')]),
 		_('Template'),
 		_('Installed'),
 		_('Available'),
@@ -83,6 +88,7 @@ foreach ($data['templateids'] as $templateId) {
 
 	$table->addRow(
 		(new CRow([
+			(new CSpan('—'))->setId('ztum-select-'.$templateId),
 			$name,
 			$installed !== '' ? $installed : '—',
 			(new CSpan('—'))->setId('ztum-available-'.$templateId),
@@ -173,6 +179,8 @@ $jsLabels = json_encode([
 	'retry_complete' => _('Failed preparation retry complete.'),
 	'execution_ready' => _('Ready for execution'),
 	'select_reviewed' => _('Include reviewed update'),
+	'select_all_reviewed' => _('Include all eligible reviewed updates'),
+	'review_batch_eligible' => _('Reviewed batch eligible'),
 	'review_details' => _('Review details'),
 	'review_individual_only' => _('Individual review required'),
 	'execution_running' => _('Running'),
