@@ -4,6 +4,28 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.34] - 2026-09-22
+
+### Fixed
+
+- The reviewed select-all checkbox is no longer disabled simply because no eligible reviewed row has completed preparation yet.
+- Select-all can now be checked while a long batch is still preparing; eligible reviewed rows discovered later are automatically selected.
+- Header checked/unchecked/indeterminate state remains synchronized with individual reviewed selections.
+
+### Safety
+
+- Sticky select-all applies only to rows that later satisfy the same reviewed-batch eligibility gates: verified rollback, passing reviewed preflight and technical-risk-only reasons.
+- `local_customization_overwrite`, Conflict, Blocked, unresolved and request-failed rows remain excluded even when select-all is enabled.
+- Global acknowledgement, fresh preflight, evidence binding and stop-on-first-failure are unchanged.
+
+### Field finding
+
+- A 50-template preparation run showed the beta.33 header checkbox disabled while preparation was still at 25/50 because all completed Manual review rows were individual-review-only at that point. Beta.34 makes the operator's select-all intent persistent across the remainder of preparation.
+
+### Tests
+
+- Added regression coverage that select-all is clickable before any eligible reviewed row exists and that later eligible rows inherit the selection automatically.
+
 ## [0.1.0-beta.33] - 2026-09-22
 
 ### Changed
