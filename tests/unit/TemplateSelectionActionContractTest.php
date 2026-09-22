@@ -10,7 +10,6 @@ $requiredControllerFragments = [
 	'USER_TYPE_ZABBIX_ADMIN',
 	'USER_TYPE_SUPER_ADMIN',
 	'MAX_SELECTED_TEMPLATES = 500',
-	'BATCH_PREPARE_LIMIT = 25',
 	'UpstreamIndexRepository',
 	'TemplateVersionComparator'
 ];
@@ -58,12 +57,18 @@ foreach ([
 	'ztum.templates.prepare_selected',
 	'Prepare selected updates',
 	'CCsrfTokenHelper::get',
-	'controlled batch preparation is limited'
+	'one template per HTTP request'
 ] as $fragment) {
 	if (strpos($reviewView, $fragment) === false) {
 		fwrite(STDERR, "Selected-template review batch-preparation contract missing: {$fragment}\n");
 		exit(1);
 	}
+}
+
+if (strpos($controller, 'BATCH_PREPARE_LIMIT') !== false
+		|| strpos($reviewView, 'controlled batch preparation is limited') !== false) {
+	fwrite(STDERR, "The obsolete 25-template update preparation ceiling must not remain.\n");
+	exit(1);
 }
 
 $forbidden = [
