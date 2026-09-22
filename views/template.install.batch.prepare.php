@@ -81,6 +81,9 @@ $submit = (new CButton('ztum-install-batch-submit', _('Install ready templates')
 	->setId('ztum-install-batch-submit')
 	->setEnabled(false);
 
+$noReadyMessage = (new CSpan(''))
+	->setId('ztum-install-no-ready-message');
+
 $executionSummary = (new CTableInfo())
 	->setHeader([_('Status'), _('Installed'), _('Failed'), _('Not attempted'), _('Any configuration write')])
 	->addRow([
@@ -97,6 +100,7 @@ $page
 		'Only Ready candidates are executed. Each template uses its own HTTP request, reruns the complete installation preflight immediately before import and is validated before the next template begins. Execution stops on the first failure and no automatic uninstall is performed.'
 	)))
 	->addItem(new CDiv([$confirm, ' ', $submit]))
+	->addItem(new CDiv($noReadyMessage))
 	->addItem($executionSummary);
 
 $prepareOneUrl = (new CUrl('zabbix.php'))
@@ -135,7 +139,9 @@ $jsLabels = json_encode([
 	'failed' => _('Failed'),
 	'not_attempted' => _('Not attempted'),
 	'yes' => _('Yes'),
-	'no' => _('No')
+	'no' => _('No'),
+	'execution_unavailable' => _('Unavailable — no Ready templates'),
+	'no_ready' => _('No templates are eligible for installation. {blocked} selected template(s) were blocked during safety analysis. Review the blocked reasons above or return to the catalog.')
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $script = <<<'JS'
@@ -184,7 +190,20 @@ $script = <<<'JS'
 		setText('ztum-install-category-' + uuid, labels[category]);
 		setText('ztum-install-required-' + uuid, listText(item.required_dependencies));
 		setText('ztum-install-missing-' + uuid, listText(item.missing_dependencies));
-		setText('ztum-install-reason-' + uuid, item.reason || '—');
+		const referenceIssues = Array.isArray(item.reference_issues)
+			? item.reference_issues
+				.map((issue) => {
+					const code = issue?.code || '';
+					const reference = issue?.reference || '';
+					return code !== '' ? code + (reference !== '' ? ': ' + reference : '') : '';
+				})
+				.filter((value) => value !== '')
+			: [];
+
+		setText(
+			'ztum-install-reason-' + uuid,
+			referenceIssues.length > 0 ? referenceIssues.join(' | ') : (item.reason || '—')
+		);
 		setText('ztum-install-execution-' + uuid, category === 'ready' ? labels.ready : labels.blocked);
 
 		if (category === 'ready' && /^[a-f0-9]{64}$/.test(item.evidence_sha256 || '')) {
@@ -264,6 +283,15 @@ $script = <<<'JS'
 		if (fullyPrepared && readyEvidence.size > 0 && !executionStarted) {
 			setText('ztum-install-exec-status', labels.execution_ready);
 			setText('ztum-install-exec-not-attempted', String(readyEvidence.size));
+			setText('ztum-install-no-ready-message', '');
+		}
+		else if (fullyPrepared && readyEvidence.size === 0 && !executionStarted) {
+			setText('ztum-install-exec-status', labels.execution_unavailable);
+			setText('ztum-install-exec-not-attempted', '0');
+			setText(
+				'ztum-install-no-ready-message',
+				labels.no_ready.replace('{blocked}', String(counts.blocked))
+			);
 		}
 	};
 
