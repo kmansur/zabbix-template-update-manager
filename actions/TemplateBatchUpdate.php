@@ -23,7 +23,7 @@ class TemplateBatchUpdate extends CController {
 
 		if ($ret) {
 			$count = count(array_unique(array_map('strval', $this->getInput('templateids', []))));
-			$ret = $count >= 1 && $count <= TemplateBatchPlanService::MAX_TEMPLATES;
+			$ret = $count === 1;
 		}
 
 		if (!$ret) {
