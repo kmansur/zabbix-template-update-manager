@@ -4,6 +4,39 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.19] - 2026-09-22
+
+### Added
+
+- Official upstream catalog entries that are absent locally now appear as `Not installed` instead of being invisible.
+- Added a separate `Review installation` workflow for upstream-only official templates.
+- Added fail-closed install preflight with immutable commit/path/raw-source/content/import fingerprints.
+- Added linked-template dependency discovery; missing dependencies block installation and are listed for the operator.
+- Added local UUID/technical-name collision checks.
+- Added creation-only `configuration.importcompare` gating: installation refuses previews that would update/remove existing configuration or contain unresolved identity.
+- Added explicit super-administrator controlled installation using the existing single `TemplateConfigurationImportService` write boundary.
+- Added post-install validation proving installed UUID/version/current-upstream equality and zero remaining differences.
+
+### Changed
+
+- Template inventory is now merged with the validated official upstream index to form an official catalog.
+- The expanded catalog uses native Zabbix `CPagerHelper` pagination and the configured Zabbix search/page limit.
+- Update and installation remain separate workflows; upstream-only templates are not batch-selected as updates.
+
+### Safety
+
+- Installation is individual in beta.19; recursive dependency installation and batch installation are intentionally not implemented.
+- No prior rollback artifact exists for a template that was absent before installation. Failed post-install validation never triggers automatic uninstall.
+- The write action reruns the complete installation preflight and rejects changed evidence immediately before `configuration.import`.
+- Cross-template isolation protections already used for official update sources remain active for installation.
+
+### Tests
+
+- Added upstream-catalog merge coverage.
+- Added nested linked-template dependency coverage.
+- Added creation-only install-preview gate coverage.
+- Added installation action/write-boundary contracts and not-installed version-state coverage.
+
 ## [0.1.0-beta.18] - 2026-09-22
 
 ### Fixed
