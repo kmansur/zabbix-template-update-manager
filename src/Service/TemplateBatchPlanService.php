@@ -32,8 +32,8 @@ final class TemplateBatchPlanService {
 			=> (new TemplateUpdateAnalysisService())->analyze($templateId);
 		$this->backupCreator = $backupCreator ?? static fn(array $template): array
 			=> (new TemplateBackupService())->create($template);
-		$this->preflightRunner = $preflightRunner ?? static fn(string $templateId): array
-			=> (new TemplateUpdatePreflightService())->run($templateId);
+		$this->preflightRunner = $preflightRunner ?? static fn(string $templateId, bool $manualOverride = false): array
+			=> (new TemplateUpdatePreflightService())->run($templateId, $manualOverride);
 	}
 
 	public function build(array $templateIds, bool $prepareBackups = false): array {
@@ -81,6 +81,10 @@ final class TemplateBatchPlanService {
 				$status = (string) ($readiness['status'] ?? 'blocked_unresolved');
 			}
 
+			$manualReasons = is_array($readiness['manual_reasons'] ?? null)
+				? array_values(array_map('strval', $readiness['manual_reasons']))
+				: [];
+
 			$item = [
 				'templateid' => $templateId,
 				'name' => (string) ($template['name'] ?? $templateId),
@@ -91,12 +95,15 @@ final class TemplateBatchPlanService {
 				'next_step' => (string) ($readiness['next_step'] ?? 'none'),
 				'category' => $this->classify($status),
 				'evidence_sha256' => '',
+				'manual_evidence_sha256' => '',
+				'manual_reasons' => $manualReasons,
+				'batch_manual_eligible' => false,
 				'reason' => $this->reason($analysis, $readiness),
 				'backup_prepared' => $prepareBackups && !empty($analysis['backup_verification'])
 			];
 
 			if ($status === 'backup_verified') {
-				$preflight = ($this->preflightRunner)($templateId);
+				$preflight = ($this->preflightRunner)($templateId, false);
 				if (is_array($preflight) && ($preflight['status'] ?? null) === 'passed') {
 					$evidence = strtolower(trim((string) ($preflight['evidence_sha256'] ?? '')));
 					if (preg_match('/^[a-f0-9]{64}$/', $evidence)) {
@@ -114,6 +121,21 @@ final class TemplateBatchPlanService {
 					$item['reason'] = is_array($preflight)
 						? (string) ($preflight['reason'] ?? 'preflight_not_passed')
 						: 'invalid_preflight_result';
+				}
+			}
+			elseif ($status === 'review_backup_verified'
+					&& $this->isBatchManualEligible($manualReasons)) {
+				$preflight = ($this->preflightRunner)($templateId, true);
+				$evidence = is_array($preflight)
+					? strtolower(trim((string) ($preflight['evidence_sha256'] ?? '')))
+					: '';
+
+				if (is_array($preflight)
+						&& ($preflight['status'] ?? null) === 'passed'
+						&& !empty($preflight['manual_override'])
+						&& preg_match('/^[a-f0-9]{64}$/', $evidence)) {
+					$item['batch_manual_eligible'] = true;
+					$item['manual_evidence_sha256'] = $evidence;
 				}
 			}
 
@@ -136,6 +158,9 @@ final class TemplateBatchPlanService {
 				'next_step' => 'inspect_error',
 				'category' => 'blocked',
 				'evidence_sha256' => '',
+				'manual_evidence_sha256' => '',
+				'manual_reasons' => [],
+				'batch_manual_eligible' => false,
 				'reason' => 'analysis_exception',
 				'backup_prepared' => false
 			];
@@ -158,6 +183,21 @@ final class TemplateBatchPlanService {
 		}
 
 		return $ids;
+	}
+
+	private function isBatchManualEligible(array $manualReasons): bool {
+		if ($manualReasons === []) {
+			return false;
+		}
+
+		$allowed = ['medium_technical_risk', 'high_technical_risk'];
+		foreach ($manualReasons as $reason) {
+			if (!in_array($reason, $allowed, true)) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	private function classify(string $status): string {
