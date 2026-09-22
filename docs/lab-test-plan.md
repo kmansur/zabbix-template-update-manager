@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.13
+# Laboratory test plan — 0.1.0-beta.14
 
 ## Release state
 
@@ -11,9 +11,9 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.13`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.14`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.12 retains the beta.11 immutable-source fingerprint contract and fixes dependency-preserving template isolation found during the Zabbix 7.x Acronis controlled-update field test. Current-upstream comparison, historical baseline and controlled import must preserve top-level graphs/triggers owned by the selected template while rejecting cross-template dependencies.
+Beta.14 retains the validated individual update/rollback safety chain and fixes the native selected-template review submit path found during the first real batch field test. Multi-template selection must now post through the native Zabbix `CActionButtonList` action mechanism before batch preparation.
 
 ## Safety assumptions
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.13
-git checkout -B release/0.1.0-beta.13 origin/release/0.1.0-beta.13
+git fetch origin release/0.1.0-beta.14
+git checkout -B release/0.1.0-beta.14 origin/release/0.1.0-beta.14
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.13
+0.1.0-beta.14
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.13`, enable the module and open:
+Confirm `0.1.0-beta.14`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -260,7 +260,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.13 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.14 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -335,9 +335,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.13 laboratory validation
+## 16. Exit criteria for beta.14 laboratory validation
 
-A Zabbix generation passes beta.13 only after evidence demonstrates:
+A Zabbix generation passes beta.14 only after evidence demonstrates:
 
 ```text
 module discovery/enable
