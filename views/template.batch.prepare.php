@@ -117,15 +117,15 @@ $page
 	)))
 	->addItem($form);
 
-$prepareSelectedUrl = (new CUrl('zabbix.php'))
-	->setArgument('action', 'ztum.templates.prepare_selected')
+$prepareOneUrl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'ztum.templates.prepare_one')
 	->getUrl();
 
 $jsConfig = json_encode([
 	'templateIds' => array_values(array_map('strval', $data['templateids'])),
-	'prepareSelectedUrl' => $prepareSelectedUrl,
+	'prepareOneUrl' => $prepareOneUrl,
 	'csrfName' => CSRF_TOKEN_NAME,
-	'csrfToken' => CCsrfTokenHelper::get('ztum.templates.prepare_selected')
+	'csrfToken' => CCsrfTokenHelper::get('ztum.templates.prepare_one')
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $jsLabels = json_encode([
@@ -219,10 +219,9 @@ $script = <<<'JS'
 	const prepareOne = async (templateId) => {
 		const body = new FormData();
 		body.append(config.csrfName, config.csrfToken);
-		body.append('async', '1');
 		body.append('templateid', templateId);
 
-		const response = await fetch(config.prepareSelectedUrl, {
+		const response = await fetch(config.prepareOneUrl, {
 			method: 'POST',
 			body,
 			credentials: 'same-origin',

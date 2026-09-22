@@ -59,6 +59,7 @@ $expectedActions = [
 	'ztum.templates' => ['class' => 'TemplateList', 'view' => 'template.list'],
 	'ztum.templates.review_selected' => ['class' => 'TemplateSelectionReview', 'view' => 'template.selection.review'],
 	'ztum.templates.prepare_selected' => ['class' => 'TemplateBatchPrepare', 'view' => 'template.batch.prepare'],
+	'ztum.templates.prepare_one' => ['class' => 'TemplateBatchPrepareOne', 'layout' => 'layout.json', 'view' => null],
 	'ztum.templates.batch_update' => ['class' => 'TemplateBatchUpdate', 'view' => 'template.batch.update'],
 	'ztum.template.compare' => ['class' => 'TemplateCompare', 'view' => 'template.compare'],
 	'ztum.template.backup' => ['class' => 'TemplateBackup'],
@@ -73,6 +74,12 @@ foreach ($expectedActions as $actionName => $expectedAction) {
 	$action = $manifest['actions'][$actionName] ?? null;
 	if (!is_array($action) || ($action['class'] ?? null) !== $expectedAction['class']) {
 		fwrite(STDERR, sprintf("Action %s is not configured as expected.\n", $actionName));
+		exit(1);
+	}
+
+	if (array_key_exists('layout', $expectedAction)
+			&& ($action['layout'] ?? null) !== $expectedAction['layout']) {
+		fwrite(STDERR, sprintf("Action %s layout is not configured as expected.\n", $actionName));
 		exit(1);
 	}
 
@@ -101,6 +108,7 @@ $requiredFiles = [
 	$root.'/views/template.selection.review.php',
 	$root.'/actions/TemplateBatchPrepare.php',
 	$root.'/views/template.batch.prepare.php',
+	$root.'/actions/TemplateBatchPrepareOne.php',
 	$root.'/actions/TemplateBatchUpdate.php',
 	$root.'/views/template.batch.update.php',
 	$root.'/actions/TemplateCompare.php',
