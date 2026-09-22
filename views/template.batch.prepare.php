@@ -381,11 +381,46 @@ $script = <<<'JS'
 		return payload.result;
 	};
 
+	const selectedReviewedEntries = () => {
+		const entries = [];
+		for (const [templateId, review] of reviewEvidence.entries()) {
+			const checkbox = byId('ztum-review-select-' + templateId);
+			if (checkbox !== null && checkbox.checked) {
+				entries.push({
+					templateId,
+					evidence: review.evidence,
+					manualOverride: true
+				});
+			}
+		}
+		return entries;
+	};
+
+	const executionEntries = () => {
+		const reviewed = new Map(selectedReviewedEntries().map((entry) => [entry.templateId, entry]));
+		const entries = [];
+		for (const templateId of config.templateIds) {
+			if (readyEvidence.has(templateId)) {
+				entries.push({
+					templateId,
+					evidence: readyEvidence.get(templateId),
+					manualOverride: false
+				});
+			}
+			else if (reviewed.has(templateId)) {
+				entries.push(reviewed.get(templateId));
+			}
+		}
+		return entries;
+	};
+
 	const updateExecutionState = () => {
 		const confirm = byId('ztum-batch-confirm');
 		const submit = byId('ztum-batch-update-submit');
 		const retry = byId('ztum-batch-retry-failed');
-		const canExecute = fullyPrepared && readyEvidence.size > 0 && !executionStarted && !retryInProgress;
+		const selectedReviewed = selectedReviewedEntries().length;
+		const executionCount = readyEvidence.size + selectedReviewed;
+		const canExecute = fullyPrepared && executionCount > 0 && !executionStarted && !retryInProgress;
 		const canRetry = fullyPrepared && requestFailures.size > 0 && !executionStarted && !retryInProgress;
 
 		if (!executionStarted) {
@@ -398,16 +433,17 @@ $script = <<<'JS'
 				setText('ztum-batch-execution-state', state);
 				setText('ztum-batch-exec-status', state);
 			}
-			else if (readyEvidence.size > 0) {
-				setText('ztum-batch-execution-state',
-					labels.execution_available.replace('{ready}', String(readyEvidence.size)));
+			else if (executionCount > 0) {
+				const state = labels.execution_available
+					.replace('{ready}', String(readyEvidence.size))
+					.replace('{review}', String(selectedReviewed));
+				setText('ztum-batch-execution-state', state);
 				setText('ztum-batch-exec-status', labels.execution_ready);
-				setText('ztum-batch-exec-not-attempted', String(readyEvidence.size));
+				setText('ztum-batch-exec-not-attempted', String(executionCount));
 			}
 			else if (counts.review > 0) {
-				const state = labels.execution_review_only.replace('{review}', String(counts.review));
-				setText('ztum-batch-execution-state', state);
-				setText('ztum-batch-exec-status', state);
+				setText('ztum-batch-execution-state', labels.execution_review_only);
+				setText('ztum-batch-exec-status', labels.execution_review_only);
 				setText('ztum-batch-exec-not-attempted', '0');
 			}
 			else {
@@ -426,7 +462,8 @@ $script = <<<'JS'
 	};
 
 	const runExecution = async () => {
-		if (executionStarted || !fullyPrepared || readyEvidence.size === 0
+		const entries = executionEntries();
+		if (executionStarted || !fullyPrepared || entries.length === 0
 				|| !byId('ztum-batch-confirm').checked) {
 			return;
 		}
@@ -434,8 +471,12 @@ $script = <<<'JS'
 		executionStarted = true;
 		byId('ztum-batch-confirm').disabled = true;
 		byId('ztum-batch-update-submit').disabled = true;
-
-		const entries = Array.from(readyEvidence.entries());
+		for (const templateId of reviewEvidence.keys()) {
+			const checkbox = byId('ztum-review-select-' + templateId);
+			if (checkbox !== null) {
+				checkbox.disabled = true;
+			}
+		}
 		let updated = 0;
 		let failed = 0;
 		let notAttempted = entries.length;
@@ -450,11 +491,11 @@ $script = <<<'JS'
 		setText('ztum-batch-exec-write', labels.no);
 
 		for (let index = 0; index < entries.length; index++) {
-			const [templateId, evidence] = entries[index];
+			const {templateId, evidence, manualOverride} = entries[index];
 			setText('ztum-execution-' + templateId, labels.executing);
 
 			try {
-				const result = await executeOne(templateId, evidence);
+				const result = await executeOne(templateId, evidence, manualOverride);
 
 				if (result.write_performed) {
 					anyWrite = true;
@@ -469,7 +510,7 @@ $script = <<<'JS'
 						labels.failed + (result.status ? ' (' + result.status + ')' : '') + detail);
 
 					for (let pending = index + 1; pending < entries.length; pending++) {
-						setText('ztum-execution-' + entries[pending][0], labels.not_attempted);
+						setText('ztum-execution-' + entries[pending].templateId, labels.not_attempted);
 					}
 
 					stopped = true;
@@ -492,7 +533,7 @@ $script = <<<'JS'
 					labels.request_failed + (error?.message ? ': ' + error.message : ''));
 
 				for (let pending = index + 1; pending < entries.length; pending++) {
-					setText('ztum-execution-' + entries[pending][0], labels.not_attempted);
+					setText('ztum-execution-' + entries[pending].templateId, labels.not_attempted);
 				}
 
 				stopped = true;
