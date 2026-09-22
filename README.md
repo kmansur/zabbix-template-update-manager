@@ -17,7 +17,7 @@ This version is intended for **laboratory testing**.
 
 Beta.13 fixes the rollback import-comparison format contract discovered during the first real rollback review after the successful Acronis controlled update. Stored rollback artifacts are YAML, and rollback review/post-validation now pass that exact format to `configuration.importcompare` instead of treating the bytes as JSON. Beta.13 retains the beta.12 dependency-preserving isolation and beta.11 source-fingerprint protections.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.13` after the beta.12 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.13` after the beta.13 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
