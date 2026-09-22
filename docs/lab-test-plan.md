@@ -105,7 +105,7 @@ The exact update count may change when the official upstream index moves, but re
 
 If upstream loading fails, capture the complete **Upstream diagnostics** table and stop before write-path tests.
 
-## 4. Official catalog / missing-template installation
+## 3A. Official catalog / missing-template installation
 
 Confirm the Templates table uses native Zabbix pagination and contains upstream-only entries with:
 
@@ -375,7 +375,7 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 17. Exit criteria for beta.19 laboratory validation
+## 16. Exit criteria for beta.19 laboratory validation
 
 A Zabbix generation passes beta.19 only after evidence demonstrates:
 
