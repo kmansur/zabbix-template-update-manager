@@ -77,6 +77,13 @@ assertBatchContract(strpos($prepareView, 'Retry failed preparation') !== false
 	'Failed per-template preparation must expose an explicit operator-controlled retry path.');
 assertBatchContract(strpos($prepareView, "throw new Error('HTTP ' + response.status + ' after '") !== false,
 	'Preparation transport failures must include elapsed-request timing for field diagnostics.');
+assertBatchContract(strpos($prepareView, "'compareUrl' => $compareUrl") !== false
+		&& strpos($prepareView, "link.href = config.compareUrl + '&templateid=' + encodeURIComponent(templateId);") !== false
+		&& strpos($prepareView, "link.textContent = labels.review_and_update;") !== false,
+	'Manual-review rows must provide a direct Review and update link to the individual comparison flow.');
+assertBatchContract(strpos($prepareView, 'Unavailable for unattended batch — {review} template(s) require manual review.') !== false
+		&& strpos($prepareView, 'else if (counts.review > 0)') !== false,
+	'Zero-Ready plans containing Manual review candidates must explain how to continue.');
 
 assertBatchContract(strpos($update, "'templateids' => 'required|array_id'") !== false,
 	'Legacy batch execution must validate selected template IDs.');
