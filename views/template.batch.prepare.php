@@ -64,7 +64,8 @@ $table = (new CTableInfo())
 		_('Linked hosts'),
 		_('Readiness'),
 		_('Batch class'),
-		_('Reason')
+		_('Reason'),
+		_('Execution')
 	]);
 
 foreach ($data['templateids'] as $templateId) {
@@ -81,7 +82,8 @@ foreach ($data['templateids'] as $templateId) {
 			$hostCount,
 			(new CSpan(_('Pending')))->setId('ztum-readiness-'.$templateId),
 			(new CSpan(_('Pending')))->setId('ztum-category-'.$templateId),
-			(new CSpan('—'))->setId('ztum-reason-'.$templateId)
+			(new CSpan('—'))->setId('ztum-reason-'.$templateId),
+			(new CSpan(_('Pending')))->setId('ztum-execution-'.$templateId)
 		]))->setId('ztum-row-'.$templateId)
 	);
 }
@@ -90,45 +92,52 @@ $page
 	->addItem(new CTag('h4', true, _('Prepared templates')))
 	->addItem($table);
 
-$updateAction = (new CUrl('zabbix.php'))
-	->setArgument('action', 'ztum.templates.batch_update')
-	->getUrl();
-
-$readyInputs = (new CDiv())->setId('ztum-batch-ready-inputs');
 $executionState = (new CSpan(_('Waiting for preparation.')))
 	->setId('ztum-batch-execution-state');
+
 $confirm = (new CCheckBox('confirm', '1'))
 	->setId('ztum-batch-confirm')
 	->setLabel(_('I reviewed the completed batch plan and want to update the Ready templates sequentially.'))
 	->setEnabled(false);
-$submit = (new CSubmitButton(_('Update ready templates')))
+
+$submit = (new CButton('ztum-batch-update-submit', _('Update ready templates')))
 	->setId('ztum-batch-update-submit')
 	->setEnabled(false);
 
-$form = (new CForm('post'))
-	->setId('ztum-batch-update-form')
-	->setAction($updateAction)
-	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.templates.batch_update')))->removeId())
-	->addItem($readyInputs)
-	->addItem([$confirm, $submit]);
+$executionSummary = (new CTableInfo())
+	->setHeader([_('Status'), _('Updated'), _('Failed'), _('Not attempted'), _('Any configuration write')])
+	->addRow([
+		(new CSpan(_('Waiting for preparation')))->setId('ztum-batch-exec-status'),
+		(new CSpan('0'))->setId('ztum-batch-exec-updated'),
+		(new CSpan('0'))->setId('ztum-batch-exec-failed'),
+		(new CSpan('0'))->setId('ztum-batch-exec-not-attempted'),
+		(new CSpan(_('No')))->setId('ztum-batch-exec-write')
+	]);
 
 $page
 	->addItem(new CTag('h4', true, _('Controlled sequential execution')))
 	->addItem(new CTag('p', true, _(
-		'After preparation completes, only Ready templates with valid bound preflight evidence can be submitted. Manual review, Conflict and Blocked rows never enter the execution set. Each submitted template reruns fresh preflight immediately before import and execution stops on the first failure.'
+		'After preparation completes, only Ready templates with valid bound preflight evidence can run. Each Ready template is executed in its own HTTP request, reruns fresh preflight immediately before import and is validated before the next template begins. Manual review, Conflict and Blocked rows never enter execution. Execution stops on the first failure and no automatic rollback is performed.'
 	)))
 	->addItem(new CTag('p', true, $executionState))
-	->addItem($form);
+	->addItem(new CDiv([$confirm, ' ', $submit]))
+	->addItem($executionSummary);
 
 $prepareOneUrl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'ztum.templates.prepare_one')
 	->getUrl();
 
+$executeOneUrl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'ztum.templates.batch_update_one')
+	->getUrl();
+
 $jsConfig = json_encode([
 	'templateIds' => array_values(array_map('strval', $data['templateids'])),
 	'prepareOneUrl' => $prepareOneUrl,
+	'executeOneUrl' => $executeOneUrl,
 	'csrfName' => CSRF_TOKEN_NAME,
-	'csrfToken' => CCsrfTokenHelper::get('ztum.templates.prepare_one')
+	'prepareCsrfToken' => CCsrfTokenHelper::get('ztum.templates.prepare_one'),
+	'executeCsrfToken' => CCsrfTokenHelper::get('ztum.templates.batch_update_one')
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $jsLabels = json_encode([
@@ -146,7 +155,17 @@ $jsLabels = json_encode([
 	'execution_waiting' => _('Waiting for preparation.'),
 	'execution_available' => _('Available — {ready} Ready template(s).'),
 	'execution_none' => _('Unavailable — no Ready templates.'),
-	'execution_stopped' => _('Unavailable — preparation stopped.')
+	'execution_stopped' => _('Unavailable — preparation stopped.'),
+	'execution_ready' => _('Ready for execution'),
+	'execution_running' => _('Running'),
+	'execution_completed' => _('Completed'),
+	'execution_failed' => _('Stopped on first failure'),
+	'executing' => _('Updating...'),
+	'updated' => _('Updated and validated'),
+	'failed' => _('Failed'),
+	'not_attempted' => _('Not attempted'),
+	'yes' => _('Yes'),
+	'no' => _('No')
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $script = <<<'JS'
@@ -158,6 +177,7 @@ $script = <<<'JS'
 	let completed = 0;
 	let stopRequested = false;
 	let fullyPrepared = false;
+	let executionStarted = false;
 
 	const byId = (id) => document.getElementById(id);
 	const setText = (id, value) => {
@@ -187,25 +207,6 @@ $script = <<<'JS'
 
 	const isValidEvidence = (value) => /^[a-f0-9]{64}$/.test(value);
 
-	const addReadyInput = (templateId, evidence) => {
-		const container = byId('ztum-batch-ready-inputs');
-		const index = readyEvidence.size;
-
-		const idInput = document.createElement('input');
-		idInput.type = 'hidden';
-		idInput.name = 'templateids[' + index + ']';
-		idInput.value = templateId;
-		container.appendChild(idInput);
-
-		const evidenceInput = document.createElement('input');
-		evidenceInput.type = 'hidden';
-		evidenceInput.name = 'evidence[' + templateId + ']';
-		evidenceInput.value = evidence;
-		container.appendChild(evidenceInput);
-
-		readyEvidence.set(templateId, evidence);
-	};
-
 	const applyItem = (templateId, item) => {
 		let category = ['ready', 'review', 'conflict', 'blocked'].includes(item.category)
 			? item.category
@@ -214,8 +215,6 @@ $script = <<<'JS'
 		let reason = item.reason || '—';
 		const evidence = normalizeEvidence(item.evidence_sha256 || '');
 
-		// Browser-side consistency guard: a row cannot be displayed/count as Ready
-		// unless it also carries the exact evidence shape required for execution.
 		if (category === 'ready' && !isValidEvidence(evidence)) {
 			category = 'blocked';
 			readinessStatus = 'blocked_invalid_evidence';
@@ -227,9 +226,11 @@ $script = <<<'JS'
 		setText('ztum-readiness-' + templateId, readinessStatus);
 		setText('ztum-category-' + templateId, labels[category] || labels.blocked);
 		setText('ztum-reason-' + templateId, reason);
+		setText('ztum-execution-' + templateId,
+			category === 'ready' ? labels.execution_ready : (labels[category] || labels.blocked));
 
 		if (category === 'ready') {
-			addReadyInput(templateId, evidence);
+			readyEvidence.set(templateId, evidence);
 		}
 	};
 
@@ -238,11 +239,12 @@ $script = <<<'JS'
 		setText('ztum-readiness-' + templateId, 'request_failed');
 		setText('ztum-category-' + templateId, labels.blocked);
 		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
+		setText('ztum-execution-' + templateId, labels.blocked);
 	};
 
 	const prepareOne = async (templateId) => {
 		const body = new FormData();
-		body.append(config.csrfName, config.csrfToken);
+		body.append(config.csrfName, config.prepareCsrfToken);
 		body.append('templateid', templateId);
 
 		const response = await fetch(config.prepareOneUrl, {
@@ -264,32 +266,154 @@ $script = <<<'JS'
 		return payload.item;
 	};
 
+	const executeOne = async (templateId, evidence) => {
+		const body = new FormData();
+		body.append(config.csrfName, config.executeCsrfToken);
+		body.append('templateid', templateId);
+		body.append('evidence_sha256', evidence);
+		body.append('confirm', '1');
+
+		const response = await fetch(config.executeOneUrl, {
+			method: 'POST',
+			body,
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'}
+		});
+
+		if (!response.ok) {
+			throw new Error('HTTP ' + response.status);
+		}
+
+		const payload = await response.json();
+		if (!payload || payload.ok !== true || !payload.result) {
+			throw new Error(payload?.error || labels.request_failed);
+		}
+
+		return payload.result;
+	};
+
 	const updateExecutionState = () => {
 		const confirm = byId('ztum-batch-confirm');
 		const submit = byId('ztum-batch-update-submit');
-		const canExecute = fullyPrepared && readyEvidence.size > 0;
+		const canExecute = fullyPrepared && readyEvidence.size > 0 && !executionStarted;
 
-		if (!fullyPrepared) {
-			setText('ztum-batch-execution-state',
-				stopRequested ? labels.execution_stopped : labels.execution_waiting);
-		}
-		else if (readyEvidence.size > 0) {
-			setText('ztum-batch-execution-state',
-				labels.execution_available.replace('{ready}', String(readyEvidence.size)));
-		}
-		else {
-			setText('ztum-batch-execution-state', labels.execution_none);
+		if (!executionStarted) {
+			if (!fullyPrepared) {
+				setText('ztum-batch-execution-state',
+					stopRequested ? labels.execution_stopped : labels.execution_waiting);
+			}
+			else if (readyEvidence.size > 0) {
+				setText('ztum-batch-execution-state',
+					labels.execution_available.replace('{ready}', String(readyEvidence.size)));
+				setText('ztum-batch-exec-status', labels.execution_ready);
+				setText('ztum-batch-exec-not-attempted', String(readyEvidence.size));
+			}
+			else {
+				setText('ztum-batch-execution-state', labels.execution_none);
+			}
 		}
 
 		confirm.disabled = !canExecute;
-		if (!canExecute) {
+		if (!canExecute && !executionStarted) {
 			confirm.checked = false;
 		}
 		submit.disabled = !(canExecute && confirm.checked);
 	};
 
-	const confirm = byId('ztum-batch-confirm');
-	confirm.addEventListener('change', updateExecutionState);
+	const runExecution = async () => {
+		if (executionStarted || !fullyPrepared || readyEvidence.size === 0
+				|| !byId('ztum-batch-confirm').checked) {
+			return;
+		}
+
+		executionStarted = true;
+		byId('ztum-batch-confirm').disabled = true;
+		byId('ztum-batch-update-submit').disabled = true;
+
+		const entries = Array.from(readyEvidence.entries());
+		let updated = 0;
+		let failed = 0;
+		let notAttempted = entries.length;
+		let anyWrite = false;
+		let stopped = false;
+
+		setText('ztum-batch-execution-state', labels.execution_running);
+		setText('ztum-batch-exec-status', labels.execution_running);
+		setText('ztum-batch-exec-updated', '0');
+		setText('ztum-batch-exec-failed', '0');
+		setText('ztum-batch-exec-not-attempted', String(notAttempted));
+		setText('ztum-batch-exec-write', labels.no);
+
+		for (let index = 0; index < entries.length; index++) {
+			const [templateId, evidence] = entries[index];
+			setText('ztum-execution-' + templateId, labels.executing);
+
+			try {
+				const result = await executeOne(templateId, evidence);
+
+				if (result.write_performed) {
+					anyWrite = true;
+					setText('ztum-batch-exec-write', labels.yes);
+				}
+
+				if (result.status !== 'updated') {
+					failed++;
+					notAttempted = entries.length - index - 1;
+					const detail = result.reason ? ': ' + result.reason : '';
+					setText('ztum-execution-' + templateId,
+						labels.failed + (result.status ? ' (' + result.status + ')' : '') + detail);
+
+					for (let pending = index + 1; pending < entries.length; pending++) {
+						setText('ztum-execution-' + entries[pending][0], labels.not_attempted);
+					}
+
+					stopped = true;
+					break;
+				}
+
+				updated++;
+				notAttempted = entries.length - index - 1;
+				const version = result.candidate?.vendor_version || '';
+				const validation = result.validation?.status || 'validated';
+				setText('ztum-execution-' + templateId,
+					labels.updated
+						+ (version !== '' ? ' (' + version + ')' : '')
+						+ (validation !== '' ? ' [' + validation + ']' : ''));
+			}
+			catch (error) {
+				failed++;
+				notAttempted = entries.length - index - 1;
+				setText('ztum-execution-' + templateId,
+					labels.request_failed + (error?.message ? ': ' + error.message : ''));
+
+				for (let pending = index + 1; pending < entries.length; pending++) {
+					setText('ztum-execution-' + entries[pending][0], labels.not_attempted);
+				}
+
+				stopped = true;
+				break;
+			}
+
+			setText('ztum-batch-exec-updated', String(updated));
+			setText('ztum-batch-exec-failed', String(failed));
+			setText('ztum-batch-exec-not-attempted', String(notAttempted));
+		}
+
+		setText('ztum-batch-exec-updated', String(updated));
+		setText('ztum-batch-exec-failed', String(failed));
+		setText('ztum-batch-exec-not-attempted', String(notAttempted));
+		setText('ztum-batch-exec-write', anyWrite ? labels.yes : labels.no);
+		setText('ztum-batch-exec-status',
+			stopped ? labels.execution_failed : labels.execution_completed);
+		setText('ztum-batch-execution-state',
+			stopped ? labels.execution_failed : labels.execution_completed);
+	};
+
+	byId('ztum-batch-confirm').addEventListener('change', updateExecutionState);
+	byId('ztum-batch-update-submit').addEventListener('click', (event) => {
+		event.preventDefault();
+		runExecution();
+	});
 
 	const stopButton = byId('ztum-batch-stop');
 	stopButton.addEventListener('click', () => {
@@ -311,10 +435,10 @@ $script = <<<'JS'
 			setText('ztum-readiness-' + templateId, labels.processing);
 			setText('ztum-category-' + templateId, labels.processing);
 			setText('ztum-reason-' + templateId, '—');
+			setText('ztum-execution-' + templateId, labels.pending);
 
 			try {
-				const item = await prepareOne(templateId);
-				applyItem(templateId, item);
+				applyItem(templateId, await prepareOne(templateId));
 			}
 			catch (error) {
 				applyRequestFailure(templateId, error);
@@ -326,14 +450,7 @@ $script = <<<'JS'
 
 		stopButton.disabled = true;
 		fullyPrepared = !stopRequested && completed === config.templateIds.length;
-
-		if (fullyPrepared) {
-			progress(completed, labels.complete);
-		}
-		else {
-			progress(completed, labels.stopped);
-		}
-
+		progress(completed, fullyPrepared ? labels.complete : labels.stopped);
 		updateExecutionState();
 	};
 
