@@ -5,14 +5,22 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
+use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateBatchPlanService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
+use RuntimeException;
 use Throwable;
 
+require_once dirname(__DIR__).'/src/Repository/TemplateRepository.php';
 require_once dirname(__DIR__).'/src/Service/TemplateBatchPlanService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
 
 /**
- * Creates/validates rollback artifacts and fresh preflight evidence for a
- * bounded selected set. This action never imports Zabbix configuration.
+ * Renders the batch-preparation queue shell.
+ *
+ * Heavy preparation is deliberately deferred to one request per template via
+ * TemplateBatchPrepareOne, avoiding a single long-lived HTTP request for the
+ * entire selection.
  */
 class TemplateBatchPrepare extends CController {
 
@@ -29,6 +37,7 @@ class TemplateBatchPrepare extends CController {
 		if (!$ret) {
 			$this->setResponse(new CControllerResponseFatal());
 		}
+
 		return $ret;
 	}
 
@@ -37,21 +46,42 @@ class TemplateBatchPrepare extends CController {
 	}
 
 	protected function doAction(): void {
+		$templateIds = array_values(array_unique(array_map(
+			'strval',
+			$this->getInput('templateids', [])
+		)));
+
 		$data = [
 			'title' => _('Prepare selected template updates'),
-			'plan' => null,
+			'templateids' => $templateIds,
+			'templates' => [],
 			'error' => null
 		];
 
 		try {
-			$data['plan'] = (new TemplateBatchPlanService())->build(
-				$this->getInput('templateids', []),
-				true
-			);
+			$records = [];
+			$repository = new TemplateRepository();
+
+			foreach ($templateIds as $templateId) {
+				$record = $repository->findById($templateId);
+				if ($record === null) {
+					throw new RuntimeException('One or more selected templates are no longer visible.');
+				}
+				$records[] = $record;
+			}
+
+			$inventory = TemplateInventoryService::fromRecords($records);
+			$data['templates'] = $inventory['templates'];
+
+			if (count($data['templates']) !== count($templateIds)) {
+				throw new RuntimeException('Unable to rebuild the selected batch shell.');
+			}
 		}
 		catch (Throwable $exception) {
-			error_log('[Zabbix Template Update Manager] Batch preparation failed: '.$exception->getMessage());
-			$data['error'] = _('Unable to prepare the selected templates. No Zabbix configuration import was attempted.');
+			error_log('[Zabbix Template Update Manager] Batch preparation shell failed: '.$exception->getMessage());
+			$data['error'] = _(
+				'Unable to rebuild the selected template set. No preparation or configuration import was attempted.'
+			);
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
