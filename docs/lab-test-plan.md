@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.29
+# Laboratory test plan — 0.1.0-beta.30
 
 ## Release state
 
@@ -11,15 +11,15 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.29`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.30`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.29 retains request-bounded update/installation execution and adds operator-controlled recovery for request-level preparation failures. Field validation must prove synchronized zero-Ready status, explicit retry of failed preparation rows, elapsed timeout diagnostics, per-template execution requests and unchanged fail-closed write semantics.
+Beta.30 retains request-bounded execution and preparation retry, and adds direct Manual review navigation from batch preparation. Field validation must prove that review-only plans clearly explain why unattended execution is unavailable and that Review and update reaches the existing individual comparison/reviewed-preflight path without weakening the safety gates.
 
 ## Safety assumptions
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.29 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.30 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. High-risk and local-overwrite candidates use the explicit individual reviewed path after verified rollback evidence. Conflict and unresolved templates remain hard blocked.
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.29
-git checkout -B release/0.1.0-beta.29 origin/release/0.1.0-beta.29
+git fetch origin release/0.1.0-beta.30
+git checkout -B release/0.1.0-beta.30 origin/release/0.1.0-beta.30
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.29
+0.1.0-beta.30
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.29`, enable the module and open:
+Confirm `0.1.0-beta.30`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -81,7 +81,7 @@ Data collection → Template updates
 
 ## 2A. Request-bounded update regression
 
-For the first beta.29 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.30 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -142,7 +142,7 @@ For one non-critical official template that is absent locally and has no missing
 
 Also test at least one blocked dependency case if naturally available. Missing linked templates must be listed and the write must remain disabled.
 
-Do not test recursive dependency installation: beta.29 intentionally requires dependencies to be installed individually first.
+Do not test recursive dependency installation: beta.30 intentionally requires dependencies to be installed individually first.
 
 ## 3B. Multi-template installation
 
@@ -166,7 +166,7 @@ Confirm **Install ready templates** when at least one candidate is Ready and ver
 - the batch reports Installed / Failed / Not attempted / Any configuration write;
 - returning to the catalog shows successful rows as installed/current.
 
-Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.29 does not recursively install selected dependencies.
+Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.30 does not recursively install selected dependencies.
 
 Stop-on-first-failure remains mandatory: if one controlled install returns a non-success, subsequent Ready UUIDs must be reported Not attempted.
 
@@ -238,6 +238,20 @@ Expected behavior:
 - if retry returns another 504 near the same elapsed time, capture that timing plus frontend/PHP logs and treat it as a repeatable per-template timeout rather than a cumulative batch timeout;
 - preparation retry must never call `configuration.import`.
 
+## 5B. Manual-review continuation regression
+
+Select one or more candidates that naturally classify as `Manual review` with verified rollback evidence. Current field examples include Aranet Cloud, Asterisk by HTTP and AWS by HTTP.
+
+Expected behavior:
+
+- every Manual review row shows `Review and update` in the Execution column;
+- the link opens the existing individual template comparison for that exact template ID;
+- a review-only plan with `Ready = 0` explains that unattended batch execution is unavailable and directs the operator to `Review and update`;
+- the comparison page retains the detailed BASE / LOCAL / UPSTREAM, risk and rollback evidence;
+- when readiness is `review_backup_verified`, the next action is `Run reviewed controlled preflight`;
+- the reviewed preflight must bind the manual-review reasons and still require the additional explicit Super Admin acknowledgement before `configuration.import`;
+- clicking `Review and update` itself performs no configuration write.
+
 ## 6. Batch classification sanity checks
 
 Before any write, inspect at least one item from each category that naturally occurs:
@@ -249,7 +263,7 @@ Before any write, inspect at least one item from each category that naturally oc
 
 If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
 
-### Beta.29 risk-calibration regression
+### Beta.30 risk-calibration regression
 
 When available in the lab, include `APC UPS Symmetra RM by SNMP` at installed version `7.0-3` with upstream `7.0-4`. The official delta removes `DISCARD_UNCHANGED_HEARTBEAT 6h` from a status item.
 
@@ -364,7 +378,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.29 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.30 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -439,9 +453,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.29 laboratory validation
+## 16. Exit criteria for beta.30 laboratory validation
 
-A Zabbix generation passes beta.29 only after evidence demonstrates:
+A Zabbix generation passes beta.30 only after evidence demonstrates:
 
 ```text
 module discovery/enable
