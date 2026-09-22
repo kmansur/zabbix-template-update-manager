@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.11
+# Laboratory test plan — 0.1.0-beta.12
 
 ## Release state
 
@@ -11,9 +11,9 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.11`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.12`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.11 retains bounded multi-template preparation, controlled sequential execution and the explicit reviewed-update path, and fixes the immutable upstream fingerprint contract found during the Zabbix 7.x controlled-update field test. The batch and individual paths must never bypass analysis, rollback, fresh preflight, separate raw-source/template-content fingerprint evidence, explicit confirmation or the single `configuration.import` boundary.
+Beta.12 retains the beta.11 immutable-source fingerprint contract and fixes dependency-preserving template isolation found during the Zabbix 7.x Acronis controlled-update field test. Current-upstream comparison, historical baseline and controlled import must preserve top-level graphs/triggers owned by the selected template while rejecting cross-template dependencies.
 
 ## Safety assumptions
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.11
-git checkout -B release/0.1.0-beta.11 origin/release/0.1.0-beta.11
+git fetch origin release/0.1.0-beta.12
+git checkout -B release/0.1.0-beta.12 origin/release/0.1.0-beta.12
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.11
+0.1.0-beta.12
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.11`, enable the module and open:
+Confirm `0.1.0-beta.12`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -115,7 +115,7 @@ Confirm:
 - select only 2–3 candidates for the first test;
 - **Review selected updates** shows only those explicitly selected templates.
 
-Beta.11 intentionally bounds one selected batch to **25 templates**. Larger batch submissions must fail closed rather than silently truncate.
+Beta.12 intentionally bounds one selected batch to **25 templates**. Larger batch submissions must fail closed rather than silently truncate.
 
 ## 5. Selected review → batch preparation
 
@@ -204,6 +204,10 @@ Automatic rollback must **not** occur.
 
 ## 9. Individual comparison and preflight regression
 
+For a template whose official source contains top-level graphs/triggers (the Acronis MSP template is the current regression case), confirm the comparison no longer reports those official objects as LOCAL-only solely because they live outside the nested template object.
+
+If a dashboard references a top-level graph, the controlled update must preserve that graph in the isolated candidate and must not produce `Cannot find graph ... used in dashboard ...`.
+
 For one selected template, also exercise the individual path:
 
 ```text
@@ -255,7 +259,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.11 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.12 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -330,9 +334,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.11 laboratory validation
+## 16. Exit criteria for beta.12 laboratory validation
 
-A Zabbix generation passes beta.11 only after evidence demonstrates:
+A Zabbix generation passes beta.12 only after evidence demonstrates:
 
 ```text
 module discovery/enable

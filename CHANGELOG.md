@@ -4,6 +4,25 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.12] - 2026-09-21
+
+### Fixed
+
+- Isolated upstream documents now preserve top-level `graphs` and `triggers` that belong exclusively to the selected template instead of dropping them outside the nested `templates` object.
+- Template dashboards that reference an official top-level graph now receive that graph in both current-upstream comparison and controlled import sources.
+- The Acronis Cyber Protect Cloud MSP update no longer misclassifies the official `Acronis CPC: Alerts overview` graph as a LOCAL-only customization merely because the graph is stored at export top level.
+- Controlled import no longer sends a dashboard that references a graph omitted by the isolation layer.
+
+### Safety
+
+- Top-level graphs or triggers that reference more than the selected template fail closed instead of silently importing cross-template dependencies.
+- Dashboard references to missing or foreign-template top-level graphs fail before `configuration.import`.
+- Historical baseline isolation uses the same dependency-preserving rules as current upstream isolation, keeping BASE / LOCAL / UPSTREAM analysis consistent.
+
+### Tests
+
+- Added regression coverage for top-level graph preservation, dashboard-to-graph dependencies, top-level triggers, historical baseline isolation and cross-template dependency rejection.
+
 ## [0.1.0-beta.11] - 2026-09-21
 
 ### Fixed

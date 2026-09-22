@@ -112,6 +112,22 @@ final class UpstreamTemplateDocumentService {
 
 		$minimalExport['templates'] = [$template];
 
+		$technicalName = trim((string) ($template['template'] ?? ''));
+		if ($technicalName === '') {
+			throw new RuntimeException('The selected upstream template has no technical name.');
+		}
+
+		$triggers = self::filterTopLevelTriggers($export['triggers'] ?? [], $technicalName);
+		if ($triggers !== []) {
+			$minimalExport['triggers'] = $triggers;
+		}
+
+		$graphs = self::filterTopLevelGraphs($export['graphs'] ?? [], $technicalName);
+		if ($graphs !== []) {
+			$minimalExport['graphs'] = $graphs;
+		}
+		self::assertDashboardGraphReferences($template, $graphs, $technicalName);
+
 		try {
 			$source = json_encode(
 				['zabbix_export' => $minimalExport],
@@ -127,8 +143,157 @@ final class UpstreamTemplateDocumentService {
 			'template' => $template,
 			'export_version' => (string) $export['version'],
 			'template_group_names' => $templateGroupNames,
-			'host_group_names' => $hostGroupNames
+			'host_group_names' => $hostGroupNames,
+			'top_level_trigger_count' => count($triggers),
+			'top_level_graph_count' => count($graphs)
 		];
+	}
+
+	private static function filterTopLevelGraphs($definitions, string $technicalName): array {
+		if (!is_array($definitions)) {
+			throw new RuntimeException('The upstream source contains invalid top-level graph definitions.');
+		}
+
+		$result = [];
+		foreach ($definitions as $graph) {
+			if (!is_array($graph)) {
+				continue;
+		}
+
+			$hosts = [];
+			foreach (($graph['graph_items'] ?? []) as $graphItem) {
+				if (!is_array($graphItem) || !is_array($graphItem['item'] ?? null)) {
+					continue;
+				}
+				$host = trim((string) ($graphItem['item']['host'] ?? ''));
+				if ($host !== '') {
+					$hosts[$host] = true;
+				}
+			}
+
+			if (!isset($hosts[$technicalName])) {
+				continue;
+			}
+			if (count($hosts) !== 1) {
+				throw new RuntimeException('The selected template has a cross-template top-level graph dependency that cannot be isolated safely.');
+			}
+
+			$result[] = $graph;
+		}
+
+		return $result;
+	}
+
+	private static function filterTopLevelTriggers($definitions, string $technicalName): array {
+		if (!is_array($definitions)) {
+			throw new RuntimeException('The upstream source contains invalid top-level trigger definitions.');
+		}
+
+		$result = [];
+		foreach ($definitions as $trigger) {
+			if (!is_array($trigger)) {
+				continue;
+			}
+
+			$hosts = self::triggerHostNames($trigger);
+			if (!isset($hosts[$technicalName])) {
+				continue;
+			}
+			if (count($hosts) !== 1) {
+				throw new RuntimeException('The selected template has a cross-template top-level trigger dependency that cannot be isolated safely.');
+			}
+
+			$result[] = $trigger;
+		}
+
+		return $result;
+	}
+
+	private static function triggerHostNames(array $trigger): array {
+		$expressions = [];
+		self::collectTriggerExpressions($trigger, $expressions);
+
+		$hosts = [];
+		foreach ($expressions as $expression) {
+			if (preg_match_all('~/([^/\r\n]+)/[^,\)\s]+~', $expression, $matches) !== false) {
+				foreach (($matches[1] ?? []) as $host) {
+					$host = trim((string) $host);
+					if ($host !== '') {
+						$hosts[$host] = true;
+					}
+				}
+			}
+		}
+
+		return $hosts;
+	}
+
+	private static function collectTriggerExpressions($value, array &$expressions, ?string $key = null): void {
+		if (is_string($value)) {
+			if ($key === 'expression' || $key === 'recovery_expression') {
+				$expressions[] = $value;
+			}
+			return;
+		}
+		if (!is_array($value)) {
+			return;
+		}
+
+		foreach ($value as $childKey => $childValue) {
+			self::collectTriggerExpressions(
+				$childValue,
+				$expressions,
+				is_string($childKey) ? $childKey : null
+			);
+		}
+	}
+
+	private static function assertDashboardGraphReferences(
+		array $template,
+		array $graphs,
+		string $technicalName
+	): void {
+		$available = [];
+		foreach ($graphs as $graph) {
+			if (!is_array($graph)) {
+				continue;
+			}
+			$name = trim((string) ($graph['name'] ?? ''));
+			if ($name !== '') {
+				$available[$name] = true;
+			}
+		}
+
+		foreach (($template['dashboards'] ?? []) as $dashboard) {
+			if (!is_array($dashboard)) {
+				continue;
+			}
+			foreach (($dashboard['pages'] ?? []) as $page) {
+				if (!is_array($page)) {
+					continue;
+				}
+				foreach (($page['widgets'] ?? []) as $widget) {
+					if (!is_array($widget)) {
+						continue;
+					}
+					foreach (($widget['fields'] ?? []) as $field) {
+						if (!is_array($field) || (string) ($field['type'] ?? '') !== 'GRAPH') {
+							continue;
+						}
+						$value = is_array($field['value'] ?? null) ? $field['value'] : [];
+						$host = trim((string) ($value['host'] ?? ''));
+						$name = trim((string) ($value['name'] ?? ''));
+
+						if ($host !== '' && $host !== $technicalName) {
+							throw new RuntimeException('The selected template dashboard references a graph from another template and cannot be isolated safely.');
+						}
+						if ($host === $technicalName && ($name === '' || !isset($available[$name]))) {
+							throw new RuntimeException('The selected template dashboard references a top-level graph that is missing from the isolated source.');
+						}
+					}
+				}
+			}
+		}
 	}
 
 	private static function templateGroupNames(array $template): array {

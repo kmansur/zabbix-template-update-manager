@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.11**
+Current version: **0.1.0-beta.12**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.11 fixes the controlled-update upstream fingerprint contract discovered during Zabbix 7.x field testing. Generated indexes now bind each YAML path to the SHA-256 of its exact raw bytes while retaining the canonical per-template content fingerprint separately. Fresh preflight binds both values and the write path re-fetches the immutable commit/path and verifies the raw source fingerprint before parsing or calling the single controlled import boundary. The explicit reviewed-update path introduced in beta.10 remains available with the same rollback and acknowledgement requirements.
+Beta.12 fixes dependency-preserving template isolation discovered during the Zabbix 7.x Acronis controlled-update test. Official top-level graphs and triggers that belong to the selected template are now preserved in comparison, historical-baseline and import documents. Cross-template dependencies fail closed. Beta.12 also retains the beta.11 separation between raw YAML fingerprints and canonical per-template content fingerprints.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.11` after the beta.11 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.12` after the beta.12 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -68,9 +68,9 @@ Batch execution does not create a second write path. Each Ready template is exec
 
 Official identity is based on template UUID, never on vendor metadata alone. Version comparison, content comparison and update eligibility are separate stages.
 
-For an outdated official template, the standard controlled update path requires a proven historical baseline, complete three-way analysis, no conflict, no local-overwrite risk, `none`/`low` technical risk, and a persistent rollback artifact that exactly matches a fresh export of the installed template. If there is no unresolved identity or three-way conflict but known local-overwrite and/or medium/high technical risk exists, beta.11 retains the separate explicit reviewed path. That path binds the review reasons into the preflight evidence and requires an additional super-administrator acknowledgement before import.
+For an outdated official template, the standard controlled update path requires a proven historical baseline, complete three-way analysis, no conflict, no local-overwrite risk, `none`/`low` technical risk, and a persistent rollback artifact that exactly matches a fresh export of the installed template. If there is no unresolved identity or three-way conflict but known local-overwrite and/or medium/high technical risk exists, beta.12 retains the separate explicit reviewed path. That path binds the review reasons into the preflight evidence and requires an additional super-administrator acknowledgement before import.
 
-Immediately before an update, ZTUM reruns the authoritative preflight, compares the explicit confirmation evidence with fresh server-side evidence, re-fetches the official template from the exact immutable upstream commit/path, verifies the raw YAML SHA-256 against the path-specific upstream index fingerprint, preserves the separate canonical template-content fingerprint in the evidence, and revalidates template identity.
+Immediately before an update, ZTUM reruns the authoritative preflight, compares the explicit confirmation evidence with fresh server-side evidence, re-fetches the official template from the exact immutable upstream commit/path, verifies the raw YAML SHA-256 against the path-specific upstream index fingerprint, preserves the separate canonical template-content fingerprint in the evidence, and revalidates template identity. The selected source is then isolated with its required template/host groups plus top-level graphs and triggers that are exclusively owned by that template; unsafe cross-template dependencies are rejected.
 
 The repository contains exactly one approved Zabbix configuration-write boundary:
 
@@ -112,8 +112,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.11
-git checkout -B release/0.1.0-beta.11 origin/release/0.1.0-beta.11
+git fetch origin release/0.1.0-beta.12
+git checkout -B release/0.1.0-beta.12 origin/release/0.1.0-beta.12
 cat VERSION
 git rev-parse HEAD
 ```
@@ -121,7 +121,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.11
+0.1.0-beta.12
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -137,7 +137,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.11**, enable the module and open:
+Confirm version **0.1.0-beta.12**, enable the module and open:
 
 ```text
 Data collection → Template updates

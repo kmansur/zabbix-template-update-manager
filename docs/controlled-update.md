@@ -24,7 +24,7 @@ A template reaches the controlled update path only after all of these gates succ
 
 The standard path still requires no local-overwrite condition and `none`/`low` technical risk.
 
-Beta.11 retains the separate **explicit reviewed path** introduced in beta.10 when all identities and baseline evidence are authoritative and no three-way conflict exists, but a known LOCAL-only difference would be overwritten/removed and/or technical risk is `medium`/`high`. The reviewed reasons are bound into the preflight evidence and require a second explicit super-administrator checkbox immediately before import. This path is never promoted to unattended batch `Ready`.
+Beta.12 retains the separate **explicit reviewed path** introduced in beta.10 when all identities and baseline evidence are authoritative and no three-way conflict exists, but a known LOCAL-only difference would be overwritten/removed and/or technical risk is `medium`/`high`. The reviewed reasons are bound into the preflight evidence and require a second explicit super-administrator checkbox immediately before import. This path is never promoted to unattended batch `Ready`.
 
 ## Permission and request boundary
 
@@ -88,9 +88,11 @@ After fresh preflight passes, the candidate is rebuilt server-side. No upstream 
 5. preserves the separate canonical per-template content fingerprint bound by preflight;
 6. parses the source with Zabbix's native YAML reader;
 7. validates UUID, visible/technical names, vendor name and vendor version;
-8. isolates only the selected template and required group definitions;
-9. emits the same minimal JSON import source used by the comparison pipeline;
-10. fingerprints the isolated import source for result/audit output.
+8. isolates only the selected template plus referenced template/host groups;
+9. preserves top-level graphs and triggers that reference only the selected template;
+10. rejects top-level or dashboard dependencies that cross into another template or cannot be resolved safely;
+11. emits the same dependency-complete minimal JSON import source used by the comparison pipeline;
+12. fingerprints the isolated import source for result/audit output.
 
 Any mismatch fails before the write boundary.
 
