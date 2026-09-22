@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.36**
+Current version: **0.1.0-beta.37**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.36 replaces the unreliable header select-all checkbox with explicit Select all eligible / Clear reviewed selection controls while keeping per-row reviewed checkboxes in the first column. It also makes installation isolation dependency-aware: cross-template trigger/graph/dashboard references are preserved as explicit template dependencies for install preflight instead of being blocked immediately as isolation errors.
+Beta.37 extends dependency-aware isolation to controlled updates and improves diagnostics. Official update sources with cross-template trigger/graph/dashboard references are preserved for importcompare instead of failing immediately at isolation, the external dependency set is bound into preflight evidence and revalidated before import, and batch preparation now surfaces the real comparison diagnostic instead of only `comparison_error`. Reviewed-selection controls also show explicit eligible/selected counts.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.36` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.37` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -150,8 +150,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.36
-git checkout -B release/0.1.0-beta.36 origin/release/0.1.0-beta.36
+git fetch origin release/0.1.0-beta.37
+git checkout -B release/0.1.0-beta.37 origin/release/0.1.0-beta.37
 cat VERSION
 git rev-parse HEAD
 ```
@@ -159,7 +159,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.36
+0.1.0-beta.37
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -175,7 +175,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.36**, enable the module and open:
+Confirm version **0.1.0-beta.37**, enable the module and open:
 
 ```text
 Data collection → Template updates
