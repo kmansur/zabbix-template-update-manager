@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.20`, enable the module and open:
+Confirm `0.1.0-beta.26`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -129,7 +129,7 @@ For one non-critical official template that is absent locally and has no missing
 
 Also test at least one blocked dependency case if naturally available. Missing linked templates must be listed and the write must remain disabled.
 
-Do not test recursive dependency installation: beta.20 intentionally requires dependencies to be installed individually first.
+Do not test recursive dependency installation: beta.26 intentionally requires dependencies to be installed individually first.
 
 ## 3B. Multi-template installation
 
@@ -327,7 +327,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.20 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.26 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -402,9 +402,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.20 laboratory validation
+## 16. Exit criteria for beta.26 laboratory validation
 
-A Zabbix generation passes beta.20 only after evidence demonstrates:
+A Zabbix generation passes beta.26 only after evidence demonstrates:
 
 ```text
 module discovery/enable
