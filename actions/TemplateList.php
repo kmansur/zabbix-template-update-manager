@@ -4,6 +4,9 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 
 use CController;
 use CControllerResponseData;
+use CControllerResponseFatal;
+use CPagerHelper;
+use CUrl;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
@@ -35,7 +38,7 @@ class TemplateList extends CController {
 		]);
 
 		if (!$ret) {
-			$this->setResponse(new \CControllerResponseFatal());
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
