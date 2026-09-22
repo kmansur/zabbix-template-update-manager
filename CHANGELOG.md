@@ -4,6 +4,13 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.38] - 2026-09-22
+
+### Changed
+
+- Renamed the Zabbix frontend module display name from `Zabbix Template Update Manager` to `Template Update Manager`.
+- Kept the existing module ID, namespace, action names, repository name and `ZTUM` acronym unchanged to avoid breaking installed-module identity or routes.
+
 ## [0.1.0-beta.37] - 2026-09-22
 
 ### Fixed
