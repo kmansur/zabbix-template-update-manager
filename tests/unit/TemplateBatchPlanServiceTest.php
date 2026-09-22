@@ -38,6 +38,9 @@ $analysisRunner = static function (string $templateId) use (&$backupCreated, &$a
 			'candidate_for_backup' => in_array($status, ['candidate_for_backup', 'review_required'], true),
 			'backup_verified' => in_array($status, ['backup_verified', 'review_backup_verified'], true),
 			'manual_confirmation_required' => in_array($status, ['review_required', 'review_backup_verified'], true),
+			'manual_reasons' => in_array($status, ['review_required', 'review_backup_verified'], true)
+				? ['medium_technical_risk']
+				: [],
 			'blockers' => $status === 'blocked_conflict' ? ['three_way_conflict'] : [],
 			'review_flags' => in_array($status, ['review_required', 'review_backup_verified'], true)
 				? ['medium_technical_risk']
@@ -56,9 +59,10 @@ $service = new TemplateBatchPlanService(
 		$backupCreated[(string) $template['templateid']] = true;
 		return ['status' => 'stored'];
 	},
-	static fn(string $templateId): array => [
+	static fn(string $templateId, bool $manualOverride = false): array => [
 		'status' => 'passed',
-		'evidence_sha256' => hash('sha256', 'evidence-'.$templateId)
+		'manual_override' => $manualOverride,
+		'evidence_sha256' => hash('sha256', ($manualOverride ? 'manual-' : 'evidence-').$templateId)
 	]
 );
 
@@ -75,9 +79,50 @@ assertBatchPlan('review', $plan['items'][1]['category'], 'Reviewed manual-update
 assertBatchPlan('conflict', $plan['items'][2]['category'], 'Conflict template must classify as conflict.');
 assertBatchPlan('blocked', $plan['items'][3]['category'], 'Unresolved template must classify as blocked.');
 assertBatchPlan(hash('sha256', 'evidence-101'), $plan['items'][0]['evidence_sha256'], 'Ready template must retain fresh preflight evidence.');
-assertBatchPlan('', $plan['items'][1]['evidence_sha256'], 'Manual-review template must never carry batch execution evidence.');
+assertBatchPlan('', $plan['items'][1]['evidence_sha256'], 'Manual-review template must never carry unattended Ready evidence.');
+assertBatchPlan(true, $plan['items'][1]['batch_manual_eligible'],
+	'Technical-risk-only reviewed template with verified manual preflight may be explicitly selected for reviewed batch override.');
+assertBatchPlan(hash('sha256', 'manual-102'), $plan['items'][1]['manual_evidence_sha256'],
+	'Reviewed batch override must retain manual-mode preflight evidence separately from Ready evidence.');
+assertBatchPlan(['medium_technical_risk'], $plan['items'][1]['manual_reasons'],
+	'Reviewed batch override must expose the exact manual reasons.');
 assertBatchPlan('', $plan['items'][2]['evidence_sha256'], 'Conflict template must never carry batch execution evidence.');
 assertBatchPlan('', $plan['items'][3]['evidence_sha256'], 'Blocked template must never carry batch execution evidence.');
+
+$localOverwriteService = new TemplateBatchPlanService(
+	static fn(string $templateId): array => [
+		'template' => [
+			'templateid' => $templateId,
+			'name' => 'Template '.$templateId,
+			'vendor_version' => '7.0-1',
+			'upstream_vendor_version' => '7.0-2',
+			'host_count' => 0
+		],
+		'update_readiness' => [
+			'status' => 'review_backup_verified',
+			'next_step' => 'run_manual_preflight',
+			'candidate_for_backup' => false,
+			'backup_verified' => true,
+			'manual_confirmation_required' => true,
+			'manual_reasons' => ['local_customization_overwrite', 'high_technical_risk'],
+			'blockers' => [],
+			'review_flags' => ['local_customization_overwrite', 'high_technical_risk']
+		],
+		'backup_verification' => ['status' => 'current_match'],
+		'comparison_error' => null
+	],
+	null,
+	static fn(string $templateId, bool $manualOverride = false): array => [
+		'status' => 'passed',
+		'manual_override' => $manualOverride,
+		'evidence_sha256' => hash('sha256', 'local-overwrite-'.$templateId)
+	]
+);
+$localPlan = $localOverwriteService->build(['105'], false);
+assertBatchPlan(false, $localPlan['items'][0]['batch_manual_eligible'],
+	'Local-customization overwrite must remain individual-review only and must not get a batch override checkbox.');
+assertBatchPlan('', $localPlan['items'][0]['manual_evidence_sha256'],
+	'Local-overwrite review must not expose reviewed batch execution evidence.');
 
 $largeIds = array_map('strval', range(1001, 1026));
 $largeService = new TemplateBatchPlanService(
