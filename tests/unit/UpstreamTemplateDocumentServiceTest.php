@@ -1,5 +1,6 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateIsolationSafetyException;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamTemplateDocumentService;
 
 require_once dirname(__DIR__, 2).'/src/Service/UpstreamTemplateDocumentService.php';
@@ -17,6 +18,23 @@ function assertDocumentThrows(callable $callback, string $message): void {
 	}
 	catch (RuntimeException $exception) {
 		return;
+	}
+
+	fwrite(STDERR, $message."\n");
+	exit(1);
+}
+
+function assertIsolationReason(callable $callback, string $expectedReason, string $message): void {
+	try {
+		$callback();
+	}
+	catch (TemplateIsolationSafetyException $exception) {
+		if ($exception->getReasonCode() === $expectedReason) {
+			return;
+		}
+
+		fwrite(STDERR, $message."\nExpected reason: ".$expectedReason."\nActual reason: ".$exception->getReasonCode()."\n");
+		exit(1);
 	}
 
 	fwrite(STDERR, $message."\n");
@@ -169,24 +187,27 @@ $mixedGraph = $document;
 $mixedGraph['zabbix_export']['graphs'][0]['graph_items'][] = [
 	'item' => ['host' => 'Other', 'key' => 'other.metric']
 ];
-assertDocumentThrows(
+assertIsolationReason(
 	fn() => UpstreamTemplateDocumentService::buildImportSource($mixedGraph, $uuid, $expected),
-	'Cross-template graph dependencies must fail closed instead of importing another template implicitly.'
+	'cross_template_graph_dependency',
+	'Cross-template graph dependencies must fail closed with an explicit reason.'
 );
 
 $mixedTrigger = $document;
 $mixedTrigger['zabbix_export']['triggers'][0]['expression'] =
 	'last(/Target by agent/target.metric)>0 and last(/Other/other.metric)>0';
-assertDocumentThrows(
+assertIsolationReason(
 	fn() => UpstreamTemplateDocumentService::buildImportSource($mixedTrigger, $uuid, $expected),
-	'Cross-template trigger dependencies must fail closed instead of importing another template implicitly.'
+	'cross_template_trigger_dependency',
+	'Cross-template trigger dependencies must fail closed with an explicit reason.'
 );
 
 $missingDashboardGraph = $document;
 $missingDashboardGraph['zabbix_export']['graphs'] = [$document['zabbix_export']['graphs'][1]];
-assertDocumentThrows(
+assertIsolationReason(
 	fn() => UpstreamTemplateDocumentService::buildImportSource($missingDashboardGraph, $uuid, $expected),
-	'A dashboard reference to a missing top-level graph must fail closed before import.'
+	'missing_dashboard_graph_dependency',
+	'A missing dashboard graph dependency must fail closed with an explicit reason.'
 );
 
 echo "UpstreamTemplateDocumentService tests passed.\n";
