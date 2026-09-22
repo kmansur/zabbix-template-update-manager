@@ -4,6 +4,34 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.32] - 2026-09-22
+
+### Added
+
+- Eligible Manual review rows now expose an explicit per-row `Include reviewed update` checkbox directly in batch preparation.
+- Technical-risk-only reviewed candidates receive a separate reviewed-preflight SHA-256 evidence fingerprint during preparation; this evidence is never confused with normal Ready evidence.
+- Ready candidates and explicitly selected reviewed candidates are merged into one ordered, request-bounded execution queue.
+
+### Changed
+
+- The main confirmation now explicitly acknowledges Manual review reasons for any reviewed rows selected by the operator.
+- The batch execution button is now `Update eligible templates` because the queue can contain normal Ready rows plus explicitly selected reviewed overrides.
+- Review-only plans no longer force individual navigation for ordinary technical-risk-only cases; `Review details` remains available for inspection.
+
+### Safety
+
+- Manual review is not auto-approved. Each reviewed row must be explicitly selected, and the batch confirmation must also be checked.
+- Reviewed execution sends both `manual_override=1` and `confirm_manual_override=1`, then reruns fresh manual-mode preflight immediately before import and verifies the bound evidence fingerprint.
+- Only `medium_technical_risk` and `high_technical_risk` reasons are eligible for batch reviewed override.
+- Any `local_customization_overwrite`, Conflict, unresolved state or non-approved manual reason remains individual-review only.
+- The single approved `configuration.import` boundary and stop-on-first-failure semantics are unchanged.
+
+### Tests
+
+- Added service coverage for reviewed evidence generation and separate manual evidence storage.
+- Added negative coverage proving local-customization overwrite cannot receive a reviewed batch checkbox/evidence.
+- Added UI/action contracts for per-row reviewed selection, dual acknowledgement and the combined ordered execution queue.
+
 ## [0.1.0-beta.31] - 2026-09-22
 
 ### Changed
