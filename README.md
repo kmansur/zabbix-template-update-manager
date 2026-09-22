@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.22**
+Current version: **0.1.0-beta.23**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.22 adds controlled multi-template installation from the `Not installed` catalog filter. Candidates are prepared one request at a time, only preflight-passed candidates become Ready, and Ready templates are installed sequentially with fresh evidence checks and stop-on-first-failure behavior.
+Beta.23 keeps the beta.22 controlled multi-template installation flow and improves catalog selection UX: selection checkboxes are always visible, ineligible rows are shown disabled, and the select-all checkbox remains visible but is disabled when the bounded install limit prevents selecting the full result set safely.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.22` after the beta.22 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.23` after the beta.22 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -149,8 +149,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.22
-git checkout -B release/0.1.0-beta.22 origin/release/0.1.0-beta.22
+git fetch origin release/0.1.0-beta.23
+git checkout -B release/0.1.0-beta.23 origin/release/0.1.0-beta.23
 cat VERSION
 git rev-parse HEAD
 ```
@@ -158,7 +158,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.22
+0.1.0-beta.23
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
