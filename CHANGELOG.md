@@ -4,6 +4,25 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.31] - 2026-09-22
+
+### Changed
+
+- Removed the former 25-template ceiling for controlled update preparation.
+- Selected update preparation can now use the full existing selected-template safety ceiling of 500 candidates.
+- The selected-review page no longer blocks Super Admin batch preparation merely because more than 25 templates were selected.
+
+### Safety
+
+- This does not restore a long-running multi-template request. Preparation still runs one template per HTTP request and Ready execution still runs one template per HTTP request.
+- The existing 500-template selection ceiling remains as an anti-abuse/sanity boundary.
+- Stop-after-current-template, request-failure retry, Manual review separation, bound SHA-256 evidence, fresh preflight, stop-on-first-failure and the single approved configuration-write boundary remain unchanged.
+
+### Tests
+
+- Added regression coverage proving a 26-template update plan is accepted and represented completely, preventing reintroduction of the old 25-template ceiling.
+- Updated selected-review contracts to reject the obsolete `BATCH_PREPARE_LIMIT` and its limit-warning UI.
+
 ## [0.1.0-beta.30] - 2026-09-22
 
 ### Fixed
