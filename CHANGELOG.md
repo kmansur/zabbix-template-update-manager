@@ -4,6 +4,32 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.26] - 2026-09-22
+
+### Added
+
+- Read-only structural reference audit in controlled template-install preflight.
+- Static checks for value-map references, dependent-item master keys, dashboard ITEM references, trigger-expression hosts and graph-item hosts.
+- Structural audit counts are bound into installation preflight evidence and shown in individual installation review.
+- Bounded structural-reference issue details are propagated into batch preparation.
+
+### Changed
+
+- A completed batch plan with zero Ready candidates now explicitly reports `Unavailable — no Ready templates` instead of leaving the execution area at `Waiting for preparation`.
+- Zero-Ready plans explain that all selected candidates were blocked and direct the operator to the reasons above or back to the catalog.
+- Proven unresolved structural references fail closed as `blocked_references` before `configuration.importcompare` / `configuration.import`.
+
+### Safety
+
+- The reference audit is read-only and only blocks relationships that can be proven unresolved from the isolated template plus already-validated linked-template names.
+- Existing dependency, isolation, creation-only preview, evidence, CSRF, Super Admin and single-write-boundary protections remain unchanged.
+
+### Tests
+
+- Added structural-reference audit coverage for master items, value maps, dashboards, trigger hosts and graph hosts.
+- Added contracts for zero-Ready batch UX and structural-reference preflight gating.
+- Added batch-plan coverage for reference-audit blockers.
+
 ## [0.1.0-beta.25] - 2026-09-22
 
 ### Fixed
