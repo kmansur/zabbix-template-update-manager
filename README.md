@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.18**
+Current version: **0.1.0-beta.19**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.18 calibrates update risk using the real Zabbix 7.x field data gathered during batch validation. Technical impact is now separate from standard-path eligibility: known bounded preprocessing maintenance involving only `DISCARD_UNCHANGED` / `DISCARD_UNCHANGED_HEARTBEAT` remains visible as medium impact but can use the standard backup/preflight path when three-way evidence is complete, BASE matches LOCAL and no overwrite/conflict exists. Unknown or functional preprocessing changes remain high/manual.
+Beta.19 adds an official template catalog and controlled installation for official templates that are present upstream but absent locally. Missing templates appear as `Not installed`; installation uses immutable source identity, dependency/collision checks, creation-only `configuration.importcompare`, explicit super-administrator confirmation, the existing single configuration-import boundary and fresh post-install validation. The expanded catalog also uses native Zabbix pagination.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.18` after the beta.17 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.19` after the beta.17 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -33,6 +33,9 @@ The module detects the frontend `ZABBIX_VERSION` at runtime and fails closed for
 ZTUM currently provides:
 
 - installed-template inventory through the native Zabbix API;
+- merged official upstream catalog showing upstream-only templates as `Not installed`;
+- native Zabbix pagination for the expanded catalog;
+- individual controlled installation of missing official templates after dependency/collision/import-preview review;
 - official-template identification by UUID;
 - installed/upstream vendor-version comparison;
 - official upstream source indexing by Zabbix release line;
@@ -86,6 +89,25 @@ Rollback is never automatic. A super administrator must explicitly select a vali
 
 If an import has occurred but final validation cannot prove the expected state, the module reports that a write occurred and does not retry automatically.
 
+## Installing an official template that is not local
+
+Upstream-only catalog entries use a separate installation workflow. They are never treated as updates and never enter the update batch.
+
+Installation review verifies:
+
+- the official UUID exists in the validated index;
+- the immutable commit/path/raw-source fingerprint matches the index;
+- the isolated template identity matches the catalog record;
+- no local template already owns the UUID or technical name;
+- every linked template dependency is already installed;
+- `configuration.importcompare` is creation-only (no update/remove/unresolved operation against existing configuration).
+
+Only a super administrator can confirm the write. The install action reruns the entire preflight and rejects stale evidence before using the same `TemplateConfigurationImportService` that powers update and rollback.
+
+After import, ZTUM resolves the new template by UUID and performs a fresh current-upstream validation. Because the template did not exist before the operation, there is no prior local rollback artifact. ZTUM therefore does not automatically uninstall a newly imported template if validation fails.
+
+Beta.19 intentionally does **not** recursively install missing dependencies or batch-install catalog entries. Install required dependencies individually first.
+
 ## Persistent storage
 
 Rollback artifacts are stored by default under:
@@ -112,8 +134,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.18
-git checkout -B release/0.1.0-beta.18 origin/release/0.1.0-beta.18
+git fetch origin release/0.1.0-beta.19
+git checkout -B release/0.1.0-beta.19 origin/release/0.1.0-beta.19
 cat VERSION
 git rev-parse HEAD
 ```
@@ -121,7 +143,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.18
+0.1.0-beta.19
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -137,7 +159,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.18**, enable the module and open:
+Confirm version **0.1.0-beta.19**, enable the module and open:
 
 ```text
 Data collection → Template updates
