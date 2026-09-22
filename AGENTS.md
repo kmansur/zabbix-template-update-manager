@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.17`.
+Current test version: `0.1.0-beta.18`.
 
 ## Non-negotiable rules
 
@@ -46,6 +46,8 @@ Current test version: `0.1.0-beta.17`.
 Keep controllers thin. Put comparison, repository, inventory, backup, preflight, update and rollback logic in `src/` services/classes rather than in views or controllers.
 
 For multi-template preparation, keep one heavy candidate preparation per HTTP request. Do not reintroduce a single synchronous request that analyzes/prepares the complete selected batch.
+
+Risk severity and standard-path eligibility are separate concepts. Never make all medium-risk changes automatic. Any medium automatic-path exception must be an explicit allowlisted change class with regression tests; unknown medium stays manual and unknown/high functional changes fail closed.
 
 ## Zabbix compatibility
 
@@ -152,7 +154,7 @@ The controlled update flow must include all of the following:
 4. complete three-way analysis with no unresolved identities;
 5. no confirmed conflict;
 6. no known local-customization overwrite risk;
-7. initial automatic update eligibility limited to `none`/`low` technical risk;
+7. standard update eligibility limited to `none`/`low` technical risk plus explicitly recognized bounded-medium changes marked `standard_path_eligible`; medium remains manual by default and high/conflict/unresolved/local-overwrite must never become automatic;
 8. persistent rollback backup created;
 9. newest rollback backup revalidated against a fresh installed-template export (`backup_verified`);
 10. fresh server-side preflight;
