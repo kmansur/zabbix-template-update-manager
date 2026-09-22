@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.11`.
+Current test version: `0.1.0-beta.12`.
 
 ## Non-negotiable rules
 
@@ -159,8 +159,9 @@ The controlled update flow must include all of the following:
 13. complete preflight rerun immediately before import;
 14. posted evidence fingerprint must exactly match freshly recomputed evidence;
 15. exact immutable upstream source re-fetched and raw-source SHA-256 revalidated against the path-specific index fingerprint;
-16. candidate identity revalidated and isolated to one template;
-17. `configuration.import` executed only through `TemplateConfigurationImportService`;
+16. candidate identity revalidated and isolated to one template with its required group definitions and any top-level graphs/triggers owned exclusively by that template;
+17. cross-template top-level dependencies rejected rather than implicitly importing another template;
+18. `configuration.import` executed only through `TemplateConfigurationImportService`;
 18. fresh post-import analysis proving the template is current and content matches current upstream with zero remaining comparison differences.
 
 If evidence changes between confirmation and write, the update must be refused with no configuration write.
