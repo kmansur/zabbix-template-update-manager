@@ -44,13 +44,20 @@ $stopButton = (new CButton('ztum-batch-stop', _('Stop after current template')))
 	->setId('ztum-batch-stop')
 	->addClass(ZBX_STYLE_BTN_ALT);
 
+$retryFailedButton = (new CButton('ztum-batch-retry-failed', _('Retry failed preparation')))
+	->setId('ztum-batch-retry-failed')
+	->setEnabled(false)
+	->addClass(ZBX_STYLE_BTN_ALT);
+
 $page
 	->addItem(new CTag('h4', true, _('Batch preparation')))
 	->addItem($summaryTable)
 	->addItem(new CDiv([
 		$progressText,
 		' ',
-		$stopButton
+		$stopButton,
+		' ',
+		$retryFailedButton
 	]))
 	->addItem(new CTag('p', true, _(
 		'Each template is prepared in its own request. Preparation may create or refresh rollback evidence, but it never imports Zabbix configuration.'
@@ -156,6 +163,8 @@ $jsLabels = json_encode([
 	'execution_available' => _('Available — {ready} Ready template(s).'),
 	'execution_none' => _('Unavailable — no Ready templates.'),
 	'execution_stopped' => _('Unavailable — preparation stopped.'),
+	'retrying_failed' => _('Retrying failed preparation...'),
+	'retry_complete' => _('Failed preparation retry complete.'),
 	'execution_ready' => _('Ready for execution'),
 	'execution_running' => _('Running'),
 	'execution_completed' => _('Completed'),
@@ -174,10 +183,12 @@ $script = <<<'JS'
 	const labels = __LABELS__;
 	const counts = {ready: 0, review: 0, conflict: 0, blocked: 0};
 	const readyEvidence = new Map();
+	const requestFailures = new Set();
 	let completed = 0;
 	let stopRequested = false;
 	let fullyPrepared = false;
 	let executionStarted = false;
+	let retryInProgress = false;
 
 	const byId = (id) => document.getElementById(id);
 	const setText = (id, value) => {
@@ -229,6 +240,7 @@ $script = <<<'JS'
 		setText('ztum-execution-' + templateId,
 			category === 'ready' ? labels.execution_ready : (labels[category] || labels.blocked));
 
+		requestFailures.delete(templateId);
 		if (category === 'ready') {
 			readyEvidence.set(templateId, evidence);
 		}
@@ -236,6 +248,8 @@ $script = <<<'JS'
 
 	const applyRequestFailure = (templateId, error) => {
 		counts.blocked++;
+		requestFailures.add(templateId);
+		readyEvidence.delete(templateId);
 		setText('ztum-readiness-' + templateId, 'request_failed');
 		setText('ztum-category-' + templateId, labels.blocked);
 		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
@@ -246,6 +260,7 @@ $script = <<<'JS'
 		const body = new FormData();
 		body.append(config.csrfName, config.prepareCsrfToken);
 		body.append('templateid', templateId);
+		const startedAt = performance.now();
 
 		const response = await fetch(config.prepareOneUrl, {
 			method: 'POST',
@@ -255,7 +270,8 @@ $script = <<<'JS'
 		});
 
 		if (!response.ok) {
-			throw new Error('HTTP ' + response.status);
+			const elapsedSeconds = ((performance.now() - startedAt) / 1000).toFixed(1);
+			throw new Error('HTTP ' + response.status + ' after ' + elapsedSeconds + 's');
 		}
 
 		const payload = await response.json();
@@ -295,12 +311,19 @@ $script = <<<'JS'
 	const updateExecutionState = () => {
 		const confirm = byId('ztum-batch-confirm');
 		const submit = byId('ztum-batch-update-submit');
-		const canExecute = fullyPrepared && readyEvidence.size > 0 && !executionStarted;
+		const retry = byId('ztum-batch-retry-failed');
+		const canExecute = fullyPrepared && readyEvidence.size > 0 && !executionStarted && !retryInProgress;
+		const canRetry = fullyPrepared && requestFailures.size > 0 && !executionStarted && !retryInProgress;
 
 		if (!executionStarted) {
-			if (!fullyPrepared) {
-				setText('ztum-batch-execution-state',
-					stopRequested ? labels.execution_stopped : labels.execution_waiting);
+			if (retryInProgress) {
+				setText('ztum-batch-execution-state', labels.retrying_failed);
+				setText('ztum-batch-exec-status', labels.retrying_failed);
+			}
+			else if (!fullyPrepared) {
+				const state = stopRequested ? labels.execution_stopped : labels.execution_waiting;
+				setText('ztum-batch-execution-state', state);
+				setText('ztum-batch-exec-status', state);
 			}
 			else if (readyEvidence.size > 0) {
 				setText('ztum-batch-execution-state',
@@ -310,6 +333,8 @@ $script = <<<'JS'
 			}
 			else {
 				setText('ztum-batch-execution-state', labels.execution_none);
+				setText('ztum-batch-exec-status', labels.execution_none);
+				setText('ztum-batch-exec-not-attempted', '0');
 			}
 		}
 
@@ -318,6 +343,7 @@ $script = <<<'JS'
 			confirm.checked = false;
 		}
 		submit.disabled = !(canExecute && confirm.checked);
+		retry.disabled = !canRetry;
 	};
 
 	const runExecution = async () => {
@@ -409,10 +435,51 @@ $script = <<<'JS'
 			stopped ? labels.execution_failed : labels.execution_completed);
 	};
 
+	const retryFailedPreparation = async () => {
+		if (retryInProgress || executionStarted || !fullyPrepared || requestFailures.size === 0) {
+			return;
+		}
+
+		retryInProgress = true;
+		updateExecutionState();
+
+		const failedIds = Array.from(requestFailures);
+		for (const templateId of failedIds) {
+			if (!requestFailures.has(templateId)) {
+				continue;
+			}
+
+			requestFailures.delete(templateId);
+			counts.blocked = Math.max(0, counts.blocked - 1);
+			setText('ztum-readiness-' + templateId, labels.processing);
+			setText('ztum-category-' + templateId, labels.processing);
+			setText('ztum-reason-' + templateId, '—');
+			setText('ztum-execution-' + templateId, labels.pending);
+			updateSummary();
+
+			try {
+				applyItem(templateId, await prepareOne(templateId));
+			}
+			catch (error) {
+				applyRequestFailure(templateId, error);
+			}
+
+			updateSummary();
+		}
+
+		retryInProgress = false;
+		progress(completed, labels.retry_complete);
+		updateExecutionState();
+	};
+
 	byId('ztum-batch-confirm').addEventListener('change', updateExecutionState);
 	byId('ztum-batch-update-submit').addEventListener('click', (event) => {
 		event.preventDefault();
 		runExecution();
+	});
+	byId('ztum-batch-retry-failed').addEventListener('click', (event) => {
+		event.preventDefault();
+		retryFailedPreparation();
 	});
 
 	const stopButton = byId('ztum-batch-stop');
