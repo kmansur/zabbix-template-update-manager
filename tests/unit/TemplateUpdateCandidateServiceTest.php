@@ -67,6 +67,38 @@ assertUpdateCandidate(true, $sourceSha !== $contentSha, 'Regression fixture must
 assertUpdateCandidate(true, is_string($result['source']) && $result['source'] !== '', 'Candidate must produce an isolated import source.');
 assertUpdateCandidate(hash('sha256', $result['source']), $result['import_sha256'], 'Candidate must fingerprint isolated import source.');
 
+$crossDocument = $document;
+$crossDocument['zabbix_export']['triggers'] = [[
+	'uuid' => str_repeat('a', 32),
+	'name' => 'Cross template trigger',
+	'expression' => 'last(/Linux by Zabbix agent/linux.metric)>0 and last(/External base/base.metric)>0'
+]];
+$crossPreflight = $preflight;
+$crossPreflight['candidate']['external_template_names'] = ['External base'];
+$crossService = new TemplateUpdateCandidateService(
+	static fn(string $requestedCommit, string $requestedPath): array => [
+		'content' => $raw,
+		'commit' => $requestedCommit,
+		'path' => $requestedPath
+	],
+	static fn(string $source): array => $crossDocument
+);
+$crossResult = $crossService->build($crossPreflight);
+assertUpdateCandidate(['External base'], $crossResult['external_template_names'],
+	'Controlled update candidate must preserve the cross-template dependency set bound by preflight.');
+
+$changedDependencies = $crossPreflight;
+$changedDependencies['candidate']['external_template_names'] = ['Different base'];
+$threw = false;
+try {
+	$crossService->build($changedDependencies);
+}
+catch (RuntimeException $exception) {
+	$threw = true;
+}
+assertUpdateCandidate(true, $threw,
+	'Controlled update candidate must fail closed when cross-template dependencies differ from preflight evidence.');
+
 $badPreflight = $preflight;
 $badPreflight['candidate']['commit'] = 'release/7.0';
 $threw = false;
