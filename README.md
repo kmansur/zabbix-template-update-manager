@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.13**
+Current version: **0.1.0-beta.14**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.13 fixes the rollback import-comparison format contract discovered during the first real rollback review after the successful Acronis controlled update. Stored rollback artifacts are YAML, and rollback review/post-validation now pass that exact format to `configuration.importcompare` instead of treating the bytes as JSON. Beta.13 retains the beta.12 dependency-preserving isolation and beta.11 source-fingerprint protections.
+Beta.14 fixes the selected-template batch-entry control discovered during the first real multi-template field test. `Review selected updates` now uses the native `CActionButtonList` submit path, so the selected IDs and `ztum.templates.review_selected` action are posted through standard Zabbix form handling. Beta.14 retains the beta.13 rollback-format fix, beta.12 dependency-preserving isolation and beta.11 source-fingerprint protections.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.13` after the beta.13 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.14` after the beta.13 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -112,8 +112,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.13
-git checkout -B release/0.1.0-beta.13 origin/release/0.1.0-beta.13
+git fetch origin release/0.1.0-beta.14
+git checkout -B release/0.1.0-beta.14 origin/release/0.1.0-beta.14
 cat VERSION
 git rev-parse HEAD
 ```
@@ -121,7 +121,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.13
+0.1.0-beta.14
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -137,7 +137,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.13**, enable the module and open:
+Confirm version **0.1.0-beta.14**, enable the module and open:
 
 ```text
 Data collection → Template updates
