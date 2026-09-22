@@ -44,6 +44,16 @@ foreach ($requiredViewFragments as $fragment) {
 	}
 }
 
+if (strpos($listView, "'ztum.templates.review_selected' => [\n\t\t\t\t'name' => _('Review selected updates')") === false) {
+	fwrite(STDERR, "Review selected updates must use CActionButtonList native submit mode.\n");
+	exit(1);
+}
+
+if (strpos($listView, "'content' => (new CSimpleButton(_('Review selected updates')))") !== false) {
+	fwrite(STDERR, "Review selected updates must not use an unbound CSimpleButton content override.\n");
+	exit(1);
+}
+
 foreach ([
 	'ztum.templates.prepare_selected',
 	'Prepare selected updates',

@@ -163,9 +163,10 @@ if ($selectionForm !== null) {
 		$templateTable,
 		new CActionButtonList('action', 'templateids', [
 			'ztum.templates.review_selected' => [
-				'content' => (new CSimpleButton(_('Review selected updates')))
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass('js-no-chkbxrange')
+				'name' => _('Review selected updates'),
+				'attributes' => [
+					'class' => ZBX_STYLE_BTN_ALT.' js-no-chkbxrange'
+				]
 			]
 		], 'ztum_selected_templates')
 	]);
