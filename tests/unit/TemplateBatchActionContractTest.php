@@ -111,8 +111,15 @@ assertBatchContract(strpos($prepareView, 'master.disabled = executionStarted || 
 		&& strpos($prepareView, 'eligible.length === 0') === false,
 	'Select-all must not be disabled merely because no eligible reviewed row has completed preparation yet.');
 assertBatchContract(strpos($prepareView, 'labels.review_batch_eligible') !== false
+		&& strpos($prepareView, 'labels.review_overwrite_eligible') !== false
 		&& strpos($prepareView, 'labels.review_individual_only') !== false,
-	'Execution state must distinguish reviewed-batch-eligible rows from individual-review-only rows.');
+	'Execution state must distinguish technical reviewed, local-overwrite reviewed and individual-review-only rows.');
+assertBatchContract(strpos($prepareView, "new CCheckBox('confirm_local_overwrite', '1')") !== false
+		&& strpos($prepareView, "setId('ztum-batch-confirm-local-overwrite')") !== false
+		&& strpos($prepareView, 'selectedLocalOverwrite > 0') !== false,
+	'Local-overwrite reviewed selection must require a second explicit batch acknowledgement.');
+assertBatchContract(strpos($prepareView, "body.append('confirm_local_overwrite', '1')") !== false,
+	'Local-overwrite reviewed execution must transmit the additional acknowledgement only for those rows.');
 
 assertBatchContract(strpos($update, "'templateids' => 'required|array_id'") !== false,
 	'Legacy batch execution must validate selected template IDs.');
@@ -123,8 +130,9 @@ assertBatchContract(strpos($updateOne, "'templateid' => 'required|id'") !== fals
 assertBatchContract(strpos($updateOne, "'evidence_sha256' => 'required|string'") !== false
 		&& strpos($updateOne, "'confirm' => 'required|in 1'") !== false
 		&& strpos($updateOne, "'manual_override' => 'in 1'") !== false
-		&& strpos($updateOne, "'confirm_manual_override' => 'in 1'") !== false,
-	'Request-bounded execution must require bound evidence and explicit confirmation, including a second acknowledgement for reviewed overrides.');
+		&& strpos($updateOne, "'confirm_manual_override' => 'in 1'") !== false
+		&& strpos($updateOne, "'confirm_local_overwrite' => 'in 1'") !== false,
+	'Request-bounded execution must require bound evidence and explicit confirmations, including local-overwrite acknowledgement when applicable.');
 assertBatchContract(strpos($updateOne, 'TemplateControlledUpdateService') !== false,
 	'Request-bounded execution must reuse TemplateControlledUpdateService.');
 assertBatchContract(strpos($manifest, '"ztum.templates.batch_update_one"') !== false
