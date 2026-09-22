@@ -21,10 +21,15 @@ final class TemplateIsolationSafetyException extends RuntimeException {
 
 final class UpstreamTemplateDocumentService {
 
-	public static function buildImportSource(array $document, string $expectedUuid, array $expectedRecord): array {
+	public static function buildImportSource(
+		array $document,
+		string $expectedUuid,
+		array $expectedRecord,
+		bool $allowExternalTemplateReferences = false
+	): array {
 		[$export, $template, $normalizedUuid] = self::locateTemplate($document, $expectedUuid);
 		self::assertIdentity($template, $expectedRecord, $normalizedUuid);
-		return self::buildMinimalSource($export, $template);
+		return self::buildMinimalSource($export, $template, $allowExternalTemplateReferences);
 	}
 
 	public static function buildHistoricalImportSource(
@@ -101,7 +106,11 @@ final class UpstreamTemplateDocumentService {
 		}
 	}
 
-	private static function buildMinimalSource(array $export, array $template): array {
+	private static function buildMinimalSource(
+		array $export,
+		array $template,
+		bool $allowExternalTemplateReferences = false
+	): array {
 		$minimalExport = [
 			'version' => $export['version']
 		];
@@ -131,16 +140,33 @@ final class UpstreamTemplateDocumentService {
 			throw new RuntimeException('The selected upstream template has no technical name.');
 		}
 
-		$triggers = self::filterTopLevelTriggers($export['triggers'] ?? [], $technicalName);
+		$externalTemplateNames = [];
+		$triggers = self::filterTopLevelTriggers(
+			$export['triggers'] ?? [],
+			$technicalName,
+			$allowExternalTemplateReferences,
+			$externalTemplateNames
+		);
 		if ($triggers !== []) {
 			$minimalExport['triggers'] = $triggers;
 		}
 
-		$graphs = self::filterTopLevelGraphs($export['graphs'] ?? [], $technicalName);
+		$graphs = self::filterTopLevelGraphs(
+			$export['graphs'] ?? [],
+			$technicalName,
+			$allowExternalTemplateReferences,
+			$externalTemplateNames
+		);
 		if ($graphs !== []) {
 			$minimalExport['graphs'] = $graphs;
 		}
-		self::assertDashboardGraphReferences($template, $graphs, $technicalName);
+		self::assertDashboardGraphReferences(
+			$template,
+			$graphs,
+			$technicalName,
+			$allowExternalTemplateReferences,
+			$externalTemplateNames
+		);
 
 		try {
 			$source = json_encode(
@@ -152,6 +178,9 @@ final class UpstreamTemplateDocumentService {
 			throw new RuntimeException('Unable to encode the isolated upstream template source.', 0, $exception);
 		}
 
+		$externalTemplateNames = array_keys($externalTemplateNames);
+		sort($externalTemplateNames, SORT_NATURAL | SORT_FLAG_CASE);
+
 		return [
 			'source' => $source,
 			'template' => $template,
@@ -159,11 +188,17 @@ final class UpstreamTemplateDocumentService {
 			'template_group_names' => $templateGroupNames,
 			'host_group_names' => $hostGroupNames,
 			'top_level_trigger_count' => count($triggers),
-			'top_level_graph_count' => count($graphs)
+			'top_level_graph_count' => count($graphs),
+			'external_template_names' => $externalTemplateNames
 		];
 	}
 
-	private static function filterTopLevelGraphs($definitions, string $technicalName): array {
+	private static function filterTopLevelGraphs(
+		$definitions,
+		string $technicalName,
+		bool $allowExternalTemplateReferences = false,
+		array &$externalTemplateNames = []
+	): array {
 		if (!is_array($definitions)) {
 			throw new RuntimeException('The upstream source contains invalid top-level graph definitions.');
 		}
@@ -189,10 +224,17 @@ final class UpstreamTemplateDocumentService {
 				continue;
 			}
 			if (count($hosts) !== 1) {
-				throw new TemplateIsolationSafetyException(
-					'cross_template_graph_dependency',
-					'The selected template has a cross-template top-level graph dependency that cannot be isolated safely.'
-				);
+				if (!$allowExternalTemplateReferences) {
+					throw new TemplateIsolationSafetyException(
+						'cross_template_graph_dependency',
+						'The selected template has a cross-template top-level graph dependency that cannot be isolated safely.'
+					);
+				}
+				foreach (array_keys($hosts) as $host) {
+					if ($host !== $technicalName) {
+						$externalTemplateNames[$host] = true;
+					}
+				}
 			}
 
 			$result[] = $graph;
@@ -201,7 +243,12 @@ final class UpstreamTemplateDocumentService {
 		return $result;
 	}
 
-	private static function filterTopLevelTriggers($definitions, string $technicalName): array {
+	private static function filterTopLevelTriggers(
+		$definitions,
+		string $technicalName,
+		bool $allowExternalTemplateReferences = false,
+		array &$externalTemplateNames = []
+	): array {
 		if (!is_array($definitions)) {
 			throw new RuntimeException('The upstream source contains invalid top-level trigger definitions.');
 		}
@@ -217,10 +264,17 @@ final class UpstreamTemplateDocumentService {
 				continue;
 			}
 			if (count($hosts) !== 1) {
-				throw new TemplateIsolationSafetyException(
-					'cross_template_trigger_dependency',
-					'The selected template has a cross-template top-level trigger dependency that cannot be isolated safely.'
-				);
+				if (!$allowExternalTemplateReferences) {
+					throw new TemplateIsolationSafetyException(
+						'cross_template_trigger_dependency',
+						'The selected template has a cross-template top-level trigger dependency that cannot be isolated safely.'
+					);
+				}
+				foreach (array_keys($hosts) as $host) {
+					if ($host !== $technicalName) {
+						$externalTemplateNames[$host] = true;
+					}
+				}
 			}
 
 			$result[] = $trigger;
@@ -271,7 +325,9 @@ final class UpstreamTemplateDocumentService {
 	private static function assertDashboardGraphReferences(
 		array $template,
 		array $graphs,
-		string $technicalName
+		string $technicalName,
+		bool $allowExternalTemplateReferences = false,
+		array &$externalTemplateNames = []
 	): void {
 		$available = [];
 		foreach ($graphs as $graph) {
@@ -305,10 +361,14 @@ final class UpstreamTemplateDocumentService {
 						$name = trim((string) ($value['name'] ?? ''));
 
 						if ($host !== '' && $host !== $technicalName) {
-							throw new TemplateIsolationSafetyException(
-								'cross_template_dashboard_dependency',
-								'The selected template dashboard references a graph from another template and cannot be isolated safely.'
-							);
+							if (!$allowExternalTemplateReferences) {
+								throw new TemplateIsolationSafetyException(
+									'cross_template_dashboard_dependency',
+									'The selected template dashboard references a graph from another template and cannot be isolated safely.'
+								);
+							}
+							$externalTemplateNames[$host] = true;
+							continue;
 						}
 						if ($host === $technicalName && ($name === '' || !isset($available[$name]))) {
 							throw new TemplateIsolationSafetyException(
