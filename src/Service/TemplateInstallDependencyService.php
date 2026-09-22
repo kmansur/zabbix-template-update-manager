@@ -10,9 +10,19 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
  */
 final class TemplateInstallDependencyService {
 
-	public static function analyze(array $template, array $localRecords): array {
+	public static function analyze(
+		array $template,
+		array $localRecords,
+		array $additionalRequiredNames = []
+	): array {
 		$required = [];
 		self::collectTemplateLinks($template, $required);
+		foreach ($additionalRequiredNames as $name) {
+			$name = trim((string) $name);
+			if ($name !== '') {
+				$required[$name] = true;
+			}
+		}
 
 		$selfNames = [];
 		foreach (['template', 'name'] as $field) {
