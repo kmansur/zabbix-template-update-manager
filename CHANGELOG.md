@@ -4,6 +4,19 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.23] - 2026-09-22
+
+### Changed
+
+- The catalog selection column now always renders a checkbox instead of leaving ineligible rows visually blank.
+- Ineligible rows render a disabled checkbox with a reason tooltip.
+- The select-all checkbox is always visible in the table header.
+- For `Not installed`, select-all is disabled when the filtered result exceeds the bounded batch-install limit of 25 templates; individual eligible checkboxes remain available.
+
+### Tests
+
+- Extended catalog UI contracts to require visible disabled row checkboxes and a persistent select-all control with bounded-limit disabling.
+
 ## [0.1.0-beta.22] - 2026-09-22
 
 ### Added

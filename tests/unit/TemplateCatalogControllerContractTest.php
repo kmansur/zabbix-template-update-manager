@@ -45,4 +45,18 @@ assertCatalogControllerContract(
 	'Catalog pager must provide reversible All/Pages display mode.'
 );
 
+assertCatalogControllerContract(
+	strpos($view, "new CCheckBox('all_templates')") !== false
+		&& strpos($view, '->setEnabled($selectAllEnabled)') !== false
+		&& strpos($view, 'installation batch limit is 25 templates') !== false,
+	'Catalog must always render the select-all checkbox and disable it when the bounded install limit prevents selecting the full result set.'
+);
+
+assertCatalogControllerContract(
+	strpos($view, "new CCheckBox('ztum_disabled[") !== false
+		&& strpos($view, "This template is not eligible for the current bulk action.") !== false,
+	'Rows that are not eligible for the active bulk action must render a disabled checkbox instead of an empty cell.'
+);
+
+
 echo "Template catalog controller/filter contracts passed.\n";
