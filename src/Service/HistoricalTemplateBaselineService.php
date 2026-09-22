@@ -54,7 +54,8 @@ final class HistoricalTemplateBaselineService {
 		string $targetVendorVersion,
 		string $expectedVendorName = 'Zabbix',
 		int $maxCommits = 75,
-		?callable $candidateEvaluator = null
+		?callable $candidateEvaluator = null,
+		bool $allowExternalTemplateReferences = false
 	): array {
 		$targetVendorVersion = trim($targetVendorVersion);
 		if ($targetVendorVersion === '') {
@@ -125,7 +126,8 @@ final class HistoricalTemplateBaselineService {
 				$document,
 				$uuid,
 				$targetVendorVersion,
-				$expectedVendorName
+				$expectedVendorName,
+				$allowExternalTemplateReferences
 			);
 			$sourceHash = hash('sha256', $isolated['source']);
 
