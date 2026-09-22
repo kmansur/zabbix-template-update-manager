@@ -138,10 +138,15 @@ $executeOneUrl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'ztum.templates.batch_update_one')
 	->getUrl();
 
+$compareUrl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'ztum.template.compare')
+	->getUrl();
+
 $jsConfig = json_encode([
 	'templateIds' => array_values(array_map('strval', $data['templateids'])),
 	'prepareOneUrl' => $prepareOneUrl,
 	'executeOneUrl' => $executeOneUrl,
+	'compareUrl' => $compareUrl,
 	'csrfName' => CSRF_TOKEN_NAME,
 	'prepareCsrfToken' => CCsrfTokenHelper::get('ztum.templates.prepare_one'),
 	'executeCsrfToken' => CCsrfTokenHelper::get('ztum.templates.batch_update_one')
@@ -162,10 +167,12 @@ $jsLabels = json_encode([
 	'execution_waiting' => _('Waiting for preparation.'),
 	'execution_available' => _('Available — {ready} Ready template(s).'),
 	'execution_none' => _('Unavailable — no Ready templates.'),
+	'execution_review_only' => _('Unavailable for unattended batch — {review} template(s) require manual review. Use Review and update in the Execution column.'),
 	'execution_stopped' => _('Unavailable — preparation stopped.'),
 	'retrying_failed' => _('Retrying failed preparation...'),
 	'retry_complete' => _('Failed preparation retry complete.'),
 	'execution_ready' => _('Ready for execution'),
+	'review_and_update' => _('Review and update'),
 	'execution_running' => _('Running'),
 	'execution_completed' => _('Completed'),
 	'execution_failed' => _('Stopped on first failure'),
@@ -196,6 +203,24 @@ $script = <<<'JS'
 		if (element !== null) {
 			element.textContent = value;
 		}
+	};
+
+	const setExecutionState = (templateId, category, text = null) => {
+		const element = byId('ztum-execution-' + templateId);
+		if (element === null) {
+			return;
+		}
+
+		element.replaceChildren();
+		if (category === 'review') {
+			const link = document.createElement('a');
+			link.href = config.compareUrl + '&templateid=' + encodeURIComponent(templateId);
+			link.textContent = labels.review_and_update;
+			element.appendChild(link);
+			return;
+		}
+
+		element.textContent = text ?? (labels[category] || labels.blocked);
 	};
 
 	const updateSummary = () => {
@@ -237,8 +262,11 @@ $script = <<<'JS'
 		setText('ztum-readiness-' + templateId, readinessStatus);
 		setText('ztum-category-' + templateId, labels[category] || labels.blocked);
 		setText('ztum-reason-' + templateId, reason);
-		setText('ztum-execution-' + templateId,
-			category === 'ready' ? labels.execution_ready : (labels[category] || labels.blocked));
+		setExecutionState(
+			templateId,
+			category,
+			category === 'ready' ? labels.execution_ready : (labels[category] || labels.blocked)
+		);
 
 		requestFailures.delete(templateId);
 		if (category === 'ready') {
@@ -253,7 +281,7 @@ $script = <<<'JS'
 		setText('ztum-readiness-' + templateId, 'request_failed');
 		setText('ztum-category-' + templateId, labels.blocked);
 		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
-		setText('ztum-execution-' + templateId, labels.blocked);
+		setExecutionState(templateId, 'blocked', labels.blocked);
 	};
 
 	const prepareOne = async (templateId) => {
@@ -330,6 +358,12 @@ $script = <<<'JS'
 					labels.execution_available.replace('{ready}', String(readyEvidence.size)));
 				setText('ztum-batch-exec-status', labels.execution_ready);
 				setText('ztum-batch-exec-not-attempted', String(readyEvidence.size));
+			}
+			else if (counts.review > 0) {
+				const state = labels.execution_review_only.replace('{review}', String(counts.review));
+				setText('ztum-batch-execution-state', state);
+				setText('ztum-batch-exec-status', state);
+				setText('ztum-batch-exec-not-attempted', '0');
 			}
 			else {
 				setText('ztum-batch-execution-state', labels.execution_none);
