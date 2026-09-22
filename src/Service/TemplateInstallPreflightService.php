@@ -78,7 +78,12 @@ final class TemplateInstallPreflightService {
 		$document = $reader->read($sourceFile['content']);
 
 		try {
-			$isolated = UpstreamTemplateDocumentService::buildImportSource($document, $uuid, $record);
+			$isolated = UpstreamTemplateDocumentService::buildImportSource(
+				$document,
+				$uuid,
+				$record,
+				true
+			);
 		}
 		catch (TemplateIsolationSafetyException $exception) {
 			return self::blocked('blocked_isolation', $exception->getReasonCode(), [
@@ -87,7 +92,13 @@ final class TemplateInstallPreflightService {
 			]);
 		}
 
-		$dependencies = TemplateInstallDependencyService::analyze($isolated['template'], $localRecords);
+		$dependencies = TemplateInstallDependencyService::analyze(
+			$isolated['template'],
+			$localRecords,
+			is_array($isolated['external_template_names'] ?? null)
+				? $isolated['external_template_names']
+				: []
+		);
 		$candidate['import_sha256'] = hash('sha256', $isolated['source']);
 
 		if (!$dependencies['complete']) {
@@ -135,6 +146,9 @@ final class TemplateInstallPreflightService {
 			'content_sha256' => (string) ($candidate['content_sha256'] ?? ''),
 			'import_sha256' => (string) ($candidate['import_sha256'] ?? ''),
 			'dependencies' => $dependencies['required'],
+			'external_template_names' => is_array($isolated['external_template_names'] ?? null)
+				? array_values(array_map('strval', $isolated['external_template_names']))
+				: [],
 			'reference_audit' => [
 				'counts' => $referenceAudit['counts']
 			],
