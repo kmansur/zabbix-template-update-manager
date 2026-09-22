@@ -63,8 +63,8 @@ assertBatchContract(strpos($prepareView, "category === 'ready' && !isValidEviden
 assertBatchContract(strpos($prepareView, 'fullyPrepared && readyEvidence.size > 0') !== false,
 	'Completed mixed plans must enable execution whenever at least one evidence-backed Ready candidate exists.');
 assertBatchContract(strpos($prepareView, "if (category === 'ready') {") !== false
-		&& strpos($prepareView, 'addReadyInput(templateId, evidence);') !== false,
-	'Only Ready candidates may enter the hidden execution set.');
+		&& strpos($prepareView, 'readyEvidence.set(templateId, evidence);') !== false,
+	'Only Ready candidates may enter the request-bounded execution set.');
 assertBatchContract(strpos($prepareView, 'Unavailable — no Ready templates.') !== false
 		&& strpos($prepareView, 'Available — {ready} Ready template(s).') !== false
 		&& strpos($prepareView, 'Unavailable — preparation stopped.') !== false,
