@@ -1,9 +1,9 @@
 {
-    "manifest_version": 2.0,
+    "manifest_version": 2,
     "id": "kmansur_zabbix_template_update_manager",
     "name": "Zabbix Template Update Manager",
     "namespace": "ZabbixTemplateUpdateManager",
-    "version": "0.1.0-beta.26",
+    "version": "0.1.0-beta.27",
     "author": "Karim Mansur",
     "description": "Discover, install, compare and safely manage official Zabbix templates.",
     "actions": {

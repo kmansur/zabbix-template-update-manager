@@ -49,6 +49,18 @@ assertBatchContract(strpos($prepareView, 'Stop after current template') !== fals
 	'Batch preparation queue must be cancellable between templates.');
 assertBatchContract(strpos($prepareView, "CCsrfTokenHelper::get('ztum.templates.batch_update')") !== false,
 	'Batch execution form must carry its action-specific CSRF token.');
+assertBatchContract(strpos($prepareView, "category === 'ready' && !isValidEvidence(evidence)") !== false
+		&& strpos($prepareView, "reason = 'invalid_preflight_evidence'") !== false,
+	'Browser batch state must fail closed when a server-reported Ready row lacks valid SHA-256 evidence.');
+assertBatchContract(strpos($prepareView, 'fullyPrepared && readyEvidence.size > 0') !== false,
+	'Completed mixed plans must enable execution whenever at least one evidence-backed Ready candidate exists.');
+assertBatchContract(strpos($prepareView, "if (category === 'ready') {") !== false
+		&& strpos($prepareView, 'addReadyInput(templateId, evidence);') !== false,
+	'Only Ready candidates may enter the hidden execution set.');
+assertBatchContract(strpos($prepareView, 'Unavailable — no Ready templates.') !== false
+		&& strpos($prepareView, 'Available — {ready} Ready template(s).') !== false
+		&& strpos($prepareView, 'Unavailable — preparation stopped.') !== false,
+	'Batch execution availability must be explicit for Ready, zero-Ready and stopped plans.');
 
 assertBatchContract(strpos($update, "'templateids' => 'required|array_id'") !== false,
 	'Batch execution must validate selected template IDs.');

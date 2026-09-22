@@ -75,5 +75,8 @@ assertBatchPlan('review', $plan['items'][1]['category'], 'Reviewed manual-update
 assertBatchPlan('conflict', $plan['items'][2]['category'], 'Conflict template must classify as conflict.');
 assertBatchPlan('blocked', $plan['items'][3]['category'], 'Unresolved template must classify as blocked.');
 assertBatchPlan(hash('sha256', 'evidence-101'), $plan['items'][0]['evidence_sha256'], 'Ready template must retain fresh preflight evidence.');
+assertBatchPlan('', $plan['items'][1]['evidence_sha256'], 'Manual-review template must never carry batch execution evidence.');
+assertBatchPlan('', $plan['items'][2]['evidence_sha256'], 'Conflict template must never carry batch execution evidence.');
+assertBatchPlan('', $plan['items'][3]['evidence_sha256'], 'Blocked template must never carry batch execution evidence.');
 
 echo "TemplateBatchPlanService tests passed.\n";

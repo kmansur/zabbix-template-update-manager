@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.26
+# Laboratory test plan — 0.1.0-beta.27
 
 ## Release state
 
@@ -11,15 +11,15 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.26`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.27`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.26 retains the validated update/rollback/request-bounded installation safety chain, adds structural reference auditing to install preflight and clarifies zero-Ready batch plans. Field validation must prove catalog selection, dependency/isolation/reference blocking, creation-only import preview, request-bounded installation and fresh post-install validation.
+Beta.27 retains the validated update/rollback/request-bounded installation safety chain, adds structural reference auditing to install preflight and clarifies zero-Ready batch plans. Field validation must prove catalog selection, dependency/isolation/reference blocking, creation-only import preview, request-bounded installation and fresh post-install validation.
 
 ## Safety assumptions
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.26 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.27 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. High-risk and local-overwrite candidates use the explicit individual reviewed path after verified rollback evidence. Conflict and unresolved templates remain hard blocked.
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.26
-git checkout -B release/0.1.0-beta.26 origin/release/0.1.0-beta.26
+git fetch origin release/0.1.0-beta.27
+git checkout -B release/0.1.0-beta.27 origin/release/0.1.0-beta.27
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.26
+0.1.0-beta.27
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.26`, enable the module and open:
+Confirm `0.1.0-beta.27`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -129,7 +129,7 @@ For one non-critical official template that is absent locally and has no missing
 
 Also test at least one blocked dependency case if naturally available. Missing linked templates must be listed and the write must remain disabled.
 
-Do not test recursive dependency installation: beta.26 intentionally requires dependencies to be installed individually first.
+Do not test recursive dependency installation: beta.27 intentionally requires dependencies to be installed individually first.
 
 ## 3B. Multi-template installation
 
@@ -153,7 +153,7 @@ Confirm **Install ready templates** when at least one candidate is Ready and ver
 - the batch reports Installed / Failed / Not attempted / Any configuration write;
 - returning to the catalog shows successful rows as installed/current.
 
-Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.26 does not recursively install selected dependencies.
+Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.27 does not recursively install selected dependencies.
 
 Stop-on-first-failure remains mandatory: if one controlled install returns a non-success, subsequent Ready UUIDs must be reported Not attempted.
 
@@ -201,6 +201,15 @@ Conflict
 Blocked
 ```
 
+For a mixed plan, deliberately keep at least one `Ready` and one `Manual review`/Conflict/Blocked candidate when naturally available. After preparation completes, confirm that:
+
+- the execution state shows `Available — N Ready template(s).`;
+- the confirmation checkbox becomes enabled whenever `N > 0`, regardless of non-Ready rows in the same plan;
+- only Ready rows contribute hidden template/evidence inputs;
+- a Ready row without a valid 64-hex SHA-256 evidence value is converted to Blocked and cannot be submitted;
+- if `Ready = 0`, the execution state shows `Unavailable — no Ready templates.`;
+- stopping preparation keeps execution unavailable even if an earlier row had become Ready.
+
 ## 6. Batch classification sanity checks
 
 Before any write, inspect at least one item from each category that naturally occurs:
@@ -212,7 +221,7 @@ Before any write, inspect at least one item from each category that naturally oc
 
 If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
 
-### Beta.26 risk-calibration regression
+### Beta.27 risk-calibration regression
 
 When available in the lab, include `APC UPS Symmetra RM by SNMP` at installed version `7.0-3` with upstream `7.0-4`. The official delta removes `DISCARD_UNCHANGED_HEARTBEAT 6h` from a status item.
 
@@ -327,7 +336,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.26 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.27 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -402,9 +411,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.26 laboratory validation
+## 16. Exit criteria for beta.27 laboratory validation
 
-A Zabbix generation passes beta.26 only after evidence demonstrates:
+A Zabbix generation passes beta.27 only after evidence demonstrates:
 
 ```text
 module discovery/enable

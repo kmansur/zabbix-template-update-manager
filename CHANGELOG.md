@@ -4,6 +4,31 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.27] - 2026-09-22
+
+### Fixed
+
+- Update-batch preparation now derives executable Ready state from candidates that actually carry a valid bound SHA-256 preflight evidence value, preventing a visual Ready / disabled-confirmation divergence.
+- A server-reported Ready row without valid evidence is reclassified client-side as Blocked with `invalid_preflight_evidence` and is never submitted.
+- Mixed batch plans can enable confirmation when at least one evidence-backed Ready candidate exists; Manual review, Conflict and Blocked rows remain outside the execution set.
+
+### Changed
+
+- The controlled sequential execution section now reports an explicit state: waiting for preparation, available with the exact Ready count, unavailable with zero Ready candidates, or unavailable because preparation was stopped.
+- The execution explanation now states that only Ready candidates with valid bound preflight evidence are submitted.
+
+### Safety
+
+- The server-side `TemplateBatchPlanService` evidence gate remains authoritative; the browser now mirrors the same fail-closed invariant instead of maintaining a looser visual Ready state.
+- Manual-review candidates may still receive rollback evidence during preparation, but they never receive batch execution evidence and cannot enter unattended sequential execution.
+- Conflict, unresolved, stale-evidence and stop-on-first-failure protections remain unchanged.
+
+### Tests
+
+- Added browser contract coverage for evidence-gated Ready classification, mixed-plan enablement and explicit execution-state UX.
+- Extended batch-plan tests to prove Manual review, Conflict and Blocked rows never carry execution evidence.
+- Existing batch-update tests continue to cover ordered execution, invalid evidence and stop-on-first-failure with Not attempted reporting.
+
 ## [0.1.0-beta.26] - 2026-09-22
 
 ### Added
