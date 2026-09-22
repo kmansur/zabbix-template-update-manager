@@ -56,6 +56,18 @@ assertInstallBatchContract(strpos($prepareView, 'Stop after current template') !
 	'Batch install preparation must be cancellable between candidates.');
 assertInstallBatchContract(strpos($prepareView, 'Install ready templates') !== false,
 	'Batch install execution must require an explicit Ready-only action.');
+
+assertInstallBatchContract(
+	strpos($prepareView, 'No templates are eligible for installation.') !== false
+		&& strpos($prepareView, 'Unavailable — no Ready templates') !== false
+		&& strpos($prepareView, "readyEvidence.size === 0") !== false,
+	'Zero-Ready batch plans must explain why confirmation/execution remains unavailable.'
+);
+
+assertInstallBatchContract(
+	strpos($prepareView, 'reference_issues') !== false,
+	'Batch preparation must display bounded structural-reference issues when present.'
+);
 assertInstallBatchContract(strpos($prepareView, 'stops on the first failure') !== false,
 	'Request-bounded execution must preserve stop-on-first-failure behavior.');
 
