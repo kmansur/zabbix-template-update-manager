@@ -42,10 +42,6 @@
             "layout": "layout.json",
             "view": null
         },
-        "ztum.templates.install_batch": {
-            "class": "TemplateInstallBatch",
-            "view": "template.install.batch"
-        },
         "ztum.template.install.review": {
             "class": "TemplateInstallReview",
             "view": "template.install.review"
