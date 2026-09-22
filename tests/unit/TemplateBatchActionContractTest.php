@@ -78,11 +78,11 @@ assertBatchContract(strpos($prepareView, 'Retry failed preparation') !== false
 	'Failed per-template preparation must expose an explicit operator-controlled retry path.');
 assertBatchContract(strpos($prepareView, "throw new Error('HTTP ' + response.status + ' after '") !== false,
 	'Preparation transport failures must include elapsed-request timing for field diagnostics.');
-assertBatchContract(strpos($prepareView, "'compareUrl' => $compareUrl") !== false
+assertBatchContract(strpos($prepareView, "'compareUrl' => \$compareUrl") !== false
 		&& strpos($prepareView, "link.href = config.compareUrl + '&templateid=' + encodeURIComponent(templateId);") !== false
 		&& strpos($prepareView, "link.textContent = labels.review_details;") !== false,
 	'Manual-review rows must retain a direct Review details link to the individual comparison flow.');
-assertBatchContract(strpos($prepareView, "new CSpan('—'))->setId('ztum-select-'.$templateId)") !== false
+assertBatchContract(strpos($prepareView, "new CSpan('—'))->setId('ztum-select-'.\$templateId)") !== false
 		&& strpos($prepareView, "checkbox.id = 'ztum-review-select-' + templateId;") !== false
 		&& strpos($prepareView, 'setReviewedSelection(templateId, category, manualState);') !== false
 		&& strpos($prepareView, 'reviewEvidence.set(templateId') !== false,
