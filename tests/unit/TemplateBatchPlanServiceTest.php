@@ -79,4 +79,32 @@ assertBatchPlan('', $plan['items'][1]['evidence_sha256'], 'Manual-review templat
 assertBatchPlan('', $plan['items'][2]['evidence_sha256'], 'Conflict template must never carry batch execution evidence.');
 assertBatchPlan('', $plan['items'][3]['evidence_sha256'], 'Blocked template must never carry batch execution evidence.');
 
+$largeIds = array_map('strval', range(1001, 1026));
+$largeService = new TemplateBatchPlanService(
+	static fn(string $templateId): array => [
+		'template' => [
+			'templateid' => $templateId,
+			'name' => 'Template '.$templateId,
+			'vendor_version' => '7.0-1',
+			'upstream_vendor_version' => '7.0-2',
+			'host_count' => 0
+		],
+		'update_readiness' => [
+			'status' => 'blocked_unresolved',
+			'next_step' => 'none',
+			'candidate_for_backup' => false,
+			'backup_verified' => false,
+			'manual_confirmation_required' => false,
+			'blockers' => ['test_blocker'],
+			'review_flags' => []
+		],
+		'comparison_error' => null
+	]
+);
+$largePlan = $largeService->build($largeIds, false);
+assertBatchPlan(26, $largePlan['summary']['selected'],
+	'The former 25-template update batch ceiling must not reject a 26-template request-bounded plan.');
+assertBatchPlan(26, $largePlan['summary']['blocked'],
+	'All 26 regression candidates must be represented instead of being silently truncated.');
+
 echo "TemplateBatchPlanService tests passed.\n";
