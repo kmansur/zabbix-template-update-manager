@@ -4,6 +4,38 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.35] - 2026-09-22
+
+### Fixed
+
+- Manual review rows whose reason includes `local_customization_overwrite` no longer make the reviewed select-all appear broken by exposing no selectable rows.
+- Verified local-overwrite Manual review candidates can now be explicitly included in the request-bounded reviewed batch.
+
+### Added
+
+- Separate `batch_manual_requires_local_overwrite_ack` evidence flag produced during preparation.
+- Additional explicit acknowledgement: `I explicitly accept overwriting local customizations for the selected templates.`
+- Server-side enforcement in `TemplateControlledUpdateService`: a local-overwrite reviewed batch request without that acknowledgement is blocked before `configuration.import`.
+- Execution state distinguishes ordinary `Reviewed batch eligible` from `Reviewed overwrite eligible`.
+
+### Safety
+
+- Local-overwrite rows still remain Manual review; they are never promoted to unattended Ready.
+- They require verified rollback evidence, successful manual-mode preflight, bound SHA-256 evidence, explicit row/select-all selection, the normal reviewed acknowledgement and the additional local-overwrite acknowledgement.
+- Unknown manual reasons, Conflict, Blocked, unresolved and request-failed rows remain non-executable.
+- Fresh preflight, evidence revalidation, request-bounded execution, stop-on-first-failure and the single approved write boundary remain unchanged.
+
+### Field finding
+
+- A completed 34-template Zabbix 7.x preparation contained 7 Manual review and 27 Blocked rows, with the visible Manual review set dominated by `local_customization_overwrite, high_technical_risk`. Because beta.34 intentionally excluded local-overwrite rows, the header select-all had no eligible rows to act on and appeared broken to the operator.
+
+### Tests
+
+- Updated batch-plan coverage to prove local-overwrite reviewed candidates receive manual evidence plus a mandatory overwrite-ack flag.
+- Added negative coverage for unknown manual reasons.
+- Added controlled-update coverage proving a missing local-overwrite acknowledgement blocks before import.
+- Added batch action/UI contracts for the second acknowledgement and transport of `confirm_local_overwrite`.
+
 ## [0.1.0-beta.34] - 2026-09-22
 
 ### Fixed
