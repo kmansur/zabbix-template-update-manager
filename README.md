@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.25**
+Current version: **0.1.0-beta.26**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.25 keeps request-bounded multi-template installation and improves diagnostics: native Zabbix import errors are preserved in the batch UI, and cross-template isolation hazards are reported as explicit blocked states with the official template identity.
+Beta.26 keeps request-bounded multi-template installation, adds a read-only structural reference audit to installation preflight, and makes zero-Ready batch plans explicit instead of leaving disabled controls unexplained.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.25` after the beta.22 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.26` after the beta.26 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -83,7 +83,7 @@ src/Service/TemplateConfigurationImportService.php
 
 Individual update, sequential batch update and rollback all reuse that service. CI rejects additional known Zabbix API write paths and direct database writes.
 
-Batch execution is deliberately bounded to 25 selected templates and stops immediately when one template does not return a successful validated update. Remaining templates are reported as **Not attempted**. Automatic rollback is never attempted because a failed post-write state may require operator inspection before choosing the correct recovery artifact.
+Update-batch execution is deliberately bounded to 25 selected update candidates and stops immediately when one template does not return a successful validated update. Remaining templates are reported as **Not attempted**. Automatic rollback is never attempted because a failed post-write state may require operator inspection before choosing the correct recovery artifact.
 
 Rollback is never automatic. A super administrator must explicitly select a valid stored artifact, review a fresh `configuration.importcompare` preview and confirm the operation. The preview and post-rollback validation use the stored artifact format explicitly; current backup artifacts are private YAML exports. Before restoring the older artifact, ZTUM creates a fresh recovery backup of the current state and verifies that it exactly matches the current export participating in rollback preflight.
 
@@ -100,7 +100,7 @@ The preparation page runs one bounded request per UUID and classifies every cand
 
 Only Ready candidates are executed by **Install ready templates**. Execution is browser-driven and request-bounded: each Ready UUID gets its own CSRF-protected HTTP request, reruns the full controlled install preflight immediately before its write, completes post-install validation, and only then advances to the next template. Execution stops on the first non-success.
 
-Beta.24 deliberately does not recursively install dependencies. If a selected template requires another template that is still missing, it remains Blocked even if that dependency is also selected. Install the dependency first, then prepare the dependent template again.
+Beta.26 deliberately does not recursively install dependencies. If a selected template requires another template that is still missing, it remains Blocked even if that dependency is also selected. Install the dependency first, then prepare the dependent template again.
 
 No automatic uninstall is performed after any ambiguous/failed install. Successful candidates remain installed and validated; candidates after the first failure are reported as Not attempted.
 
@@ -115,13 +115,14 @@ Installation review verifies:
 - the isolated template identity matches the catalog record;
 - no local template already owns the UUID or technical name;
 - every linked template dependency is already installed;
+- a read-only structural audit can resolve all statically verifiable value-map, master-item, dashboard-item, trigger-host and graph-host references;
 - `configuration.importcompare` is creation-only (no update/remove/unresolved operation against existing configuration).
 
 Only a super administrator can confirm the write. The install action reruns the entire preflight and rejects stale evidence before using the same `TemplateConfigurationImportService` that powers update and rollback.
 
 After import, ZTUM resolves the new template by UUID and performs a fresh current-upstream validation. Because the template did not exist before the operation, there is no prior local rollback artifact. ZTUM therefore does not automatically uninstall a newly imported template if validation fails.
 
-Beta.24 supports request-bounded controlled batch installation, but still does **not** recursively install missing dependencies. Install required dependencies first, then prepare dependent templates again.
+Beta.26 supports request-bounded controlled batch installation, but still does **not** recursively install missing dependencies. Install required dependencies first, then prepare dependent templates again.
 
 ## Persistent storage
 
@@ -149,8 +150,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.25
-git checkout -B release/0.1.0-beta.25 origin/release/0.1.0-beta.25
+git fetch origin release/0.1.0-beta.26
+git checkout -B release/0.1.0-beta.26 origin/release/0.1.0-beta.26
 cat VERSION
 git rev-parse HEAD
 ```
@@ -158,7 +159,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.24
+0.1.0-beta.26
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -174,7 +175,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.20**, enable the module and open:
+Confirm version **0.1.0-beta.26**, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -277,6 +278,7 @@ official upstream catalog
                  |
                  +--> UUID/name collision? -> BLOCK
                  +--> missing linked templates? -> BLOCK
+                 +--> unresolved structural references? -> BLOCK
                  +--> importcompare updates/removes existing config? -> BLOCK
                  |
                  v
