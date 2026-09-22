@@ -67,17 +67,27 @@ final class TemplateInstallPreflightService {
 			throw new RuntimeException('The immutable upstream source is missing a validated raw fingerprint.');
 		}
 
-		$reader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
-		$document = $reader->read($sourceFile['content']);
-		$isolated = UpstreamTemplateDocumentService::buildImportSource($document, $uuid, $record);
-
-		$dependencies = TemplateInstallDependencyService::analyze($isolated['template'], $localRecords);
 		$candidate = self::candidateIdentity($record, $index['source'] ?? []) + [
 			'path' => (string) ($sourceFile['path'] ?? ''),
 			'source_sha256' => (string) ($sourceFile['source_sha256'] ?? ''),
-			'content_sha256' => (string) ($sourceFile['content_sha256'] ?? ''),
-			'import_sha256' => hash('sha256', $isolated['source'])
+			'content_sha256' => (string) ($sourceFile['content_sha256'] ?? '')
 		];
+
+		$reader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
+		$document = $reader->read($sourceFile['content']);
+
+		try {
+			$isolated = UpstreamTemplateDocumentService::buildImportSource($document, $uuid, $record);
+		}
+		catch (TemplateIsolationSafetyException $exception) {
+			return self::blocked('blocked_isolation', $exception->getReasonCode(), [
+				'candidate' => $candidate,
+				'isolation_detail' => $exception->getMessage()
+			]);
+		}
+
+		$dependencies = TemplateInstallDependencyService::analyze($isolated['template'], $localRecords);
+		$candidate['import_sha256'] = hash('sha256', $isolated['source']);
 
 		if (!$dependencies['complete']) {
 			return self::blocked('blocked_dependencies', 'missing_template_dependencies', [
