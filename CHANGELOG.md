@@ -4,6 +4,28 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.16] - 2026-09-22
+
+### Fixed
+
+- Per-template batch preparation now reuses the already registered `ztum.templates.prepare_selected` action in explicit `async=1` mode instead of relying on a second module action.
+- The browser queue now receives raw `main_block` JSON from the existing action, avoiding the HTML `<!DOCTYPE ...>` response that caused `Unexpected token '<' ... is not valid JSON` during beta.15 field testing.
+
+### Changed
+
+- Removed the redundant `ztum.templates.prepare_one` manifest action and controller.
+- Queue requests reuse the existing preparation action's CSRF token and post one validated `templateid` at a time.
+
+### Safety
+
+- Heavy preparation remains one candidate per HTTP request.
+- The normal preparation page and asynchronous single-candidate mode share one super-administrator-only controller with native CSRF validation enabled.
+- No configuration-write path changed.
+
+### Tests
+
+- Updated manifest/action contracts to require the existing-route async branch, raw JSON response, single-template planning and absence of the redundant route.
+
 ## [0.1.0-beta.15] - 2026-09-22
 
 ### Fixed
