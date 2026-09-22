@@ -19,6 +19,11 @@
             "class": "TemplateBatchPrepare",
             "view": "template.batch.prepare"
         },
+        "ztum.templates.prepare_one": {
+            "class": "TemplateBatchPrepareOne",
+            "layout": "layout.json",
+            "view": null
+        },
         "ztum.templates.batch_update": {
             "class": "TemplateBatchUpdate",
             "view": "template.batch.update"
