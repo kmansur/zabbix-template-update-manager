@@ -162,7 +162,7 @@ The controlled update flow must include all of the following:
 16. candidate identity revalidated and isolated to one template with its required group definitions and any top-level graphs/triggers owned exclusively by that template;
 17. cross-template top-level dependencies rejected rather than implicitly importing another template;
 18. `configuration.import` executed only through `TemplateConfigurationImportService`;
-18. fresh post-import analysis proving the template is current and content matches current upstream with zero remaining comparison differences.
+19. fresh post-import analysis proving the template is current and content matches current upstream with zero remaining comparison differences.
 
 If evidence changes between confirmation and write, the update must be refused with no configuration write.
 
