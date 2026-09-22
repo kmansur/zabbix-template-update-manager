@@ -22,6 +22,26 @@ $versionLabels = [
 	'not_applicable' => _('Not applicable')
 ];
 
+$catalogUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates');
+
+$filter = (new CFilter())
+	->setResetUrl($catalogUrl)
+	->addVar('action', 'ztum.templates')
+	->setProfile($data['filter_profile'])
+	->setActiveTab($data['filter_active_tab'])
+	->addFilterTab(_('Filter'), [
+		(new CFormList())->addRow(
+			_('Status'),
+			(new CRadioButtonList('filter_status', (string) $data['filter']['status']))
+				->addValue(_('All'), 'all')
+				->addValue(_('Current'), 'current')
+				->addValue(_('Not applicable'), 'not_applicable')
+				->addValue(_('Update available'), 'update_available')
+				->addValue(_('Not installed'), 'not_installed')
+				->setModern(true)
+		)
+	]);
+
 $localSummary = (new CTableInfo())
 	->setHeader([
 		_('Installed templates'),
@@ -229,6 +249,11 @@ if ($data['upstream_error'] !== null) {
 }
 
 $page
+	->addItem($filter)
+	->addItem(new CTag('p', true, sprintf(
+		_('Showing %1$s template(s) for the selected status filter.'),
+		$data['filtered_count']
+	)))
 	->addItem(new CTag('p', true, _(
 		'Update selection applies only to installed official templates with a newer version. Upstream-only templates use the separate Review installation workflow; installation is individual and fail-closed.'
 	)))
