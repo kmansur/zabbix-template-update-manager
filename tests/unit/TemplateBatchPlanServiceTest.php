@@ -119,10 +119,47 @@ $localOverwriteService = new TemplateBatchPlanService(
 	]
 );
 $localPlan = $localOverwriteService->build(['105'], false);
-assertBatchPlan(false, $localPlan['items'][0]['batch_manual_eligible'],
-	'Local-customization overwrite must remain individual-review only and must not get a batch override checkbox.');
-assertBatchPlan('', $localPlan['items'][0]['manual_evidence_sha256'],
-	'Local-overwrite review must not expose reviewed batch execution evidence.');
+assertBatchPlan(true, $localPlan['items'][0]['batch_manual_eligible'],
+	'Local-customization overwrite may enter reviewed batch only after explicit local-overwrite acknowledgement.');
+assertBatchPlan(true, $localPlan['items'][0]['batch_manual_requires_local_overwrite_ack'],
+	'Local-overwrite reviewed batch candidate must require the additional overwrite acknowledgement.');
+assertBatchPlan(hash('sha256', 'local-overwrite-105'), $localPlan['items'][0]['manual_evidence_sha256'],
+	'Local-overwrite reviewed batch candidate must retain manual preflight evidence.');
+
+$unknownManualService = new TemplateBatchPlanService(
+	static fn(string $templateId): array => [
+		'template' => [
+			'templateid' => $templateId,
+			'name' => 'Template '.$templateId,
+			'vendor_version' => '7.0-1',
+			'upstream_vendor_version' => '7.0-2',
+			'host_count' => 0
+		],
+		'update_readiness' => [
+			'status' => 'review_backup_verified',
+			'next_step' => 'run_manual_preflight',
+			'candidate_for_backup' => false,
+			'backup_verified' => true,
+			'manual_confirmation_required' => true,
+			'manual_reasons' => ['unrecognized_manual_reason'],
+			'blockers' => [],
+			'review_flags' => ['unrecognized_manual_reason']
+		],
+		'backup_verification' => ['status' => 'current_match'],
+		'comparison_error' => null
+	],
+	null,
+	static fn(string $templateId, bool $manualOverride = false): array => [
+		'status' => 'passed',
+		'manual_override' => $manualOverride,
+		'evidence_sha256' => hash('sha256', 'unknown-'.$templateId)
+	]
+);
+$unknownPlan = $unknownManualService->build(['106'], false);
+assertBatchPlan(false, $unknownPlan['items'][0]['batch_manual_eligible'],
+	'Unrecognized manual-review reasons must remain individual-review only.');
+assertBatchPlan('', $unknownPlan['items'][0]['manual_evidence_sha256'],
+	'Unrecognized manual-review reasons must not receive batch execution evidence.');
 
 $largeIds = array_map('strval', range(1001, 1026));
 $largeService = new TemplateBatchPlanService(
