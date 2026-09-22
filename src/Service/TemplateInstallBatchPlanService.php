@@ -13,7 +13,7 @@ require_once __DIR__.'/TemplateInstallPreflightService.php';
  */
 final class TemplateInstallBatchPlanService {
 
-	public const MAX_TEMPLATES = 25;
+	public const MAX_TEMPLATES = 500;
 
 	private $preflightRunner;
 

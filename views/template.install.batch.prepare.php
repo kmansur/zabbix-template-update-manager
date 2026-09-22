@@ -49,7 +49,8 @@ $table = (new CTableInfo())
 		_('Batch class'),
 		_('Required dependencies'),
 		_('Missing dependencies'),
-		_('Reason')
+		_('Reason'),
+		_('Execution')
 	]);
 
 foreach ($data['uuids'] as $uuid) {
@@ -61,7 +62,8 @@ foreach ($data['uuids'] as $uuid) {
 			(new CSpan(_('Pending')))->setId('ztum-install-category-'.$uuid),
 			(new CSpan('—'))->setId('ztum-install-required-'.$uuid),
 			(new CSpan('—'))->setId('ztum-install-missing-'.$uuid),
-			(new CSpan('—'))->setId('ztum-install-reason-'.$uuid)
+			(new CSpan('—'))->setId('ztum-install-reason-'.$uuid),
+			(new CSpan(_('Pending')))->setId('ztum-install-execution-'.$uuid)
 		]))->setId('ztum-install-row-'.$uuid)
 	);
 }
@@ -70,45 +72,48 @@ $page
 	->addItem(new CTag('h4', true, _('Prepared installation candidates')))
 	->addItem($table);
 
-$installAction = (new CUrl('zabbix.php'))
-	->setArgument('action', 'ztum.templates.install_batch')
-	->getUrl();
-
-$readyInputs = (new CDiv())->setId('ztum-install-batch-ready-inputs');
 $confirm = (new CCheckBox('confirm', '1'))
 	->setId('ztum-install-batch-confirm')
 	->setLabel(_('I reviewed the completed installation plan and want to install the Ready templates sequentially.'))
 	->setEnabled(false);
-$submit = (new CSubmitButton(_('Install ready templates')))
+
+$submit = (new CButton('ztum-install-batch-submit', _('Install ready templates')))
 	->setId('ztum-install-batch-submit')
 	->setEnabled(false);
 
-$form = (new CForm('post'))
-	->setId('ztum-install-batch-form')
-	->setAction($installAction)
-	->addItem((new CVar(
-		CSRF_TOKEN_NAME,
-		CCsrfTokenHelper::get('ztum.templates.install_batch')
-	))->removeId())
-	->addItem($readyInputs)
-	->addItem([$confirm, $submit]);
+$executionSummary = (new CTableInfo())
+	->setHeader([_('Status'), _('Installed'), _('Failed'), _('Not attempted'), _('Any configuration write')])
+	->addRow([
+		(new CSpan(_('Waiting for preparation')))->setId('ztum-install-exec-status'),
+		(new CSpan('0'))->setId('ztum-install-exec-installed'),
+		(new CSpan('0'))->setId('ztum-install-exec-failed'),
+		(new CSpan('0'))->setId('ztum-install-exec-not-attempted'),
+		(new CSpan(_('No')))->setId('ztum-install-exec-write')
+	]);
 
 $page
 	->addItem(new CTag('h4', true, _('Controlled sequential installation')))
 	->addItem(new CTag('p', true, _(
-		'Only Ready candidates are submitted. Each candidate reruns the complete installation preflight immediately before import. Execution stops on the first failure and no automatic uninstall is performed.'
+		'Only Ready candidates are executed. Each template uses its own HTTP request, reruns the complete installation preflight immediately before import and is validated before the next template begins. Execution stops on the first failure and no automatic uninstall is performed.'
 	)))
-	->addItem($form);
+	->addItem(new CDiv([$confirm, ' ', $submit]))
+	->addItem($executionSummary);
 
 $prepareOneUrl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'ztum.templates.install_prepare_one')
 	->getUrl();
 
+$executeOneUrl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'ztum.templates.install_execute_one')
+	->getUrl();
+
 $jsConfig = json_encode([
 	'uuids' => array_values(array_map('strval', $data['uuids'])),
 	'prepareOneUrl' => $prepareOneUrl,
+	'executeOneUrl' => $executeOneUrl,
 	'csrfName' => CSRF_TOKEN_NAME,
-	'csrfToken' => CCsrfTokenHelper::get('ztum.templates.install_prepare_one')
+	'prepareCsrfToken' => CCsrfTokenHelper::get('ztum.templates.install_prepare_one'),
+	'executeCsrfToken' => CCsrfTokenHelper::get('ztum.templates.install_execute_one')
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $jsLabels = json_encode([
@@ -120,7 +125,17 @@ $jsLabels = json_encode([
 	'complete' => _('Preparation complete.'),
 	'stopped' => _('Preparation stopped. Reload or return to the catalog to prepare the full set.'),
 	'stopping' => _('Stop requested; the current template will finish first.'),
-	'progress' => _('Preparing {current} of {total} installations...')
+	'progress' => _('Preparing {current} of {total} installations...'),
+	'execution_ready' => _('Ready for execution'),
+	'execution_running' => _('Running'),
+	'execution_completed' => _('Completed'),
+	'execution_stopped' => _('Stopped on first failure'),
+	'executing' => _('Installing...'),
+	'installed' => _('Installed and validated'),
+	'failed' => _('Failed'),
+	'not_attempted' => _('Not attempted'),
+	'yes' => _('Yes'),
+	'no' => _('No')
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $script = <<<'JS'
@@ -132,6 +147,7 @@ $script = <<<'JS'
 	let completed = 0;
 	let stopRequested = false;
 	let fullyPrepared = false;
+	let executionStarted = false;
 
 	const byId = (id) => document.getElementById(id);
 	const setText = (id, value) => {
@@ -156,25 +172,6 @@ $script = <<<'JS'
 		);
 	};
 
-	const addReadyInput = (uuid, evidence) => {
-		const container = byId('ztum-install-batch-ready-inputs');
-		const index = readyEvidence.size;
-
-		const uuidInput = document.createElement('input');
-		uuidInput.type = 'hidden';
-		uuidInput.name = 'uuids[' + index + ']';
-		uuidInput.value = uuid;
-		container.appendChild(uuidInput);
-
-		const evidenceInput = document.createElement('input');
-		evidenceInput.type = 'hidden';
-		evidenceInput.name = 'evidence[' + uuid + ']';
-		evidenceInput.value = evidence;
-		container.appendChild(evidenceInput);
-
-		readyEvidence.set(uuid, evidence);
-	};
-
 	const listText = (value) => Array.isArray(value) && value.length > 0 ? value.join(', ') : '—';
 
 	const applyItem = (uuid, item) => {
@@ -188,9 +185,10 @@ $script = <<<'JS'
 		setText('ztum-install-required-' + uuid, listText(item.required_dependencies));
 		setText('ztum-install-missing-' + uuid, listText(item.missing_dependencies));
 		setText('ztum-install-reason-' + uuid, item.reason || '—');
+		setText('ztum-install-execution-' + uuid, category === 'ready' ? labels.ready : labels.blocked);
 
 		if (category === 'ready' && /^[a-f0-9]{64}$/.test(item.evidence_sha256 || '')) {
-			addReadyInput(uuid, item.evidence_sha256);
+			readyEvidence.set(uuid, item.evidence_sha256);
 		}
 	};
 
@@ -199,11 +197,12 @@ $script = <<<'JS'
 		setText('ztum-install-preflight-' + uuid, 'request_failed');
 		setText('ztum-install-category-' + uuid, labels.blocked);
 		setText('ztum-install-reason-' + uuid, error?.message || labels.request_failed);
+		setText('ztum-install-execution-' + uuid, labels.blocked);
 	};
 
 	const prepareOne = async (uuid) => {
 		const body = new FormData();
-		body.append(config.csrfName, config.csrfToken);
+		body.append(config.csrfName, config.prepareCsrfToken);
 		body.append('uuid', uuid);
 
 		const response = await fetch(config.prepareOneUrl, {
@@ -225,19 +224,138 @@ $script = <<<'JS'
 		return payload.item;
 	};
 
+	const executeOne = async (uuid, evidence) => {
+		const body = new FormData();
+		body.append(config.csrfName, config.executeCsrfToken);
+		body.append('uuid', uuid);
+		body.append('evidence_sha256', evidence);
+		body.append('confirm', '1');
+
+		const response = await fetch(config.executeOneUrl, {
+			method: 'POST',
+			body,
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'}
+		});
+
+		if (!response.ok) {
+			throw new Error('HTTP ' + response.status);
+		}
+
+		const payload = await response.json();
+		if (!payload || payload.ok !== true || !payload.result) {
+			throw new Error(payload?.error || labels.request_failed);
+		}
+
+		return payload.result;
+	};
+
 	const updateExecutionState = () => {
 		const confirm = byId('ztum-install-batch-confirm');
 		const submit = byId('ztum-install-batch-submit');
-		const canExecute = fullyPrepared && readyEvidence.size > 0;
+		const canExecute = fullyPrepared && readyEvidence.size > 0 && !executionStarted;
 
 		confirm.disabled = !canExecute;
-		if (!canExecute) {
+		if (!canExecute && !executionStarted) {
 			confirm.checked = false;
 		}
 		submit.disabled = !(canExecute && confirm.checked);
+
+		if (fullyPrepared && readyEvidence.size > 0 && !executionStarted) {
+			setText('ztum-install-exec-status', labels.execution_ready);
+			setText('ztum-install-exec-not-attempted', String(readyEvidence.size));
+		}
+	};
+
+	const runExecution = async () => {
+		if (executionStarted || !fullyPrepared || readyEvidence.size === 0
+				|| !byId('ztum-install-batch-confirm').checked) {
+			return;
+		}
+
+		executionStarted = true;
+		byId('ztum-install-batch-confirm').disabled = true;
+		byId('ztum-install-batch-submit').disabled = true;
+
+		const entries = Array.from(readyEvidence.entries());
+		let installed = 0;
+		let failed = 0;
+		let notAttempted = entries.length;
+		let anyWrite = false;
+		let stopped = false;
+
+		setText('ztum-install-exec-status', labels.execution_running);
+		setText('ztum-install-exec-installed', '0');
+		setText('ztum-install-exec-failed', '0');
+		setText('ztum-install-exec-not-attempted', String(notAttempted));
+		setText('ztum-install-exec-write', labels.no);
+
+		for (let index = 0; index < entries.length; index++) {
+			const [uuid, evidence] = entries[index];
+			setText('ztum-install-execution-' + uuid, labels.executing);
+
+			try {
+				const result = await executeOne(uuid, evidence);
+
+				if (result.write_performed) {
+					anyWrite = true;
+					setText('ztum-install-exec-write', labels.yes);
+				}
+
+				if (result.status !== 'installed') {
+					failed++;
+					notAttempted = entries.length - index - 1;
+					setText(
+						'ztum-install-execution-' + uuid,
+						labels.failed + (result.status ? ' (' + result.status + ')' : '')
+					);
+
+					for (let pending = index + 1; pending < entries.length; pending++) {
+						setText('ztum-install-execution-' + entries[pending][0], labels.not_attempted);
+					}
+
+					stopped = true;
+					break;
+				}
+
+				installed++;
+				notAttempted = entries.length - index - 1;
+				const validation = result.validation?.status || 'validated';
+				setText('ztum-install-execution-' + uuid, labels.installed + ' (' + validation + ')');
+			}
+			catch (error) {
+				failed++;
+				notAttempted = entries.length - index - 1;
+				setText('ztum-install-execution-' + uuid, labels.request_failed);
+
+				for (let pending = index + 1; pending < entries.length; pending++) {
+					setText('ztum-install-execution-' + entries[pending][0], labels.not_attempted);
+				}
+
+				stopped = true;
+				break;
+			}
+
+			setText('ztum-install-exec-installed', String(installed));
+			setText('ztum-install-exec-failed', String(failed));
+			setText('ztum-install-exec-not-attempted', String(notAttempted));
+		}
+
+		setText('ztum-install-exec-installed', String(installed));
+		setText('ztum-install-exec-failed', String(failed));
+		setText('ztum-install-exec-not-attempted', String(notAttempted));
+		setText('ztum-install-exec-write', anyWrite ? labels.yes : labels.no);
+		setText(
+			'ztum-install-exec-status',
+			stopped ? labels.execution_stopped : labels.execution_completed
+		);
 	};
 
 	byId('ztum-install-batch-confirm').addEventListener('change', updateExecutionState);
+	byId('ztum-install-batch-submit').addEventListener('click', (event) => {
+		event.preventDefault();
+		runExecution();
+	});
 
 	const stopButton = byId('ztum-install-batch-stop');
 	stopButton.addEventListener('click', () => {

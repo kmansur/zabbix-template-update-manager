@@ -4,6 +4,31 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.24] - 2026-09-22
+
+### Fixed
+
+- The `Not installed` header select-all checkbox is active again and can select the full current missing-template set.
+
+### Changed
+
+- Missing-template batch selection ceiling increased from 25 to 500, which covers the complete current official Zabbix catalog while remaining bounded.
+- Controlled multi-template installation execution is now request-bounded: each Ready template is imported and validated in its own HTTP request.
+- Removed the legacy single-request batch-install execution route to avoid large batches recreating proxy/Cloudflare timeout risk.
+- The preparation page now keeps execution results inline, including Installed / Failed / Not attempted / Any configuration write and per-template execution state.
+
+### Safety
+
+- Every request-bounded write still goes through `TemplateControlledInstallService`, which reruns fresh install preflight/evidence immediately before the single approved `configuration.import` boundary.
+- Sequential order and stop-on-first-failure semantics are preserved across browser-driven requests.
+- No automatic uninstall is performed after a failed or ambiguous installation request.
+
+### Tests
+
+- Updated catalog contract to require active select-all.
+- Added route/action contracts requiring request-bounded execution with native CSRF and Super Admin authorization.
+- Removed tests and manifest expectations for the legacy long-running batch-install endpoint.
+
 ## [0.1.0-beta.23] - 2026-09-22
 
 ### Changed

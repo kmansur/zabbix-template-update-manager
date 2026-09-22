@@ -3,9 +3,8 @@
 $root = dirname(__DIR__, 2);
 $prepare = (string) file_get_contents($root.'/actions/TemplateInstallBatchPrepare.php');
 $prepareOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchPrepareOne.php');
-$install = (string) file_get_contents($root.'/actions/TemplateInstallBatch.php');
+$executeOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchExecuteOne.php');
 $prepareView = (string) file_get_contents($root.'/views/template.install.batch.prepare.php');
-$resultView = (string) file_get_contents($root.'/views/template.install.batch.php');
 $listView = (string) file_get_contents($root.'/views/template.list.php');
 $manifest = (string) file_get_contents($root.'/manifest.json');
 
@@ -16,7 +15,7 @@ function assertInstallBatchContract(bool $condition, string $message): void {
 	}
 }
 
-foreach ([$prepare, $prepareOne, $install] as $controller) {
+foreach ([$prepare, $prepareOne, $executeOne] as $controller) {
 	assertInstallBatchContract(strpos($controller, 'disableCsrfValidation') === false,
 		'Batch installation actions must keep native CSRF validation enabled.');
 	assertInstallBatchContract(strpos($controller, 'USER_TYPE_SUPER_ADMIN') !== false,
@@ -34,8 +33,9 @@ assertInstallBatchContract(strpos($prepareOne, 'disableView()') !== false,
 
 assertInstallBatchContract(
 	strpos($manifest, '"ztum.templates.install_prepare_one"') !== false
-		&& strpos($manifest, '"layout": "layout.json"') !== false,
-	'Per-template install preparation route must use layout.json.'
+		&& strpos($manifest, '"ztum.templates.install_execute_one"') !== false
+		&& substr_count($manifest, '"layout": "layout.json"') >= 2,
+	'Per-template preparation and execution routes must use layout.json.'
 );
 
 assertInstallBatchContract(
@@ -44,28 +44,37 @@ assertInstallBatchContract(
 		&& strpos($prepareView, 'for (let index = 0; index < config.uuids.length; index++)') !== false,
 	'Batch install preparation must use one bounded HTTP request per UUID.'
 );
+
+assertInstallBatchContract(
+	strpos($prepareView, "CCsrfTokenHelper::get('ztum.templates.install_execute_one')") !== false
+		&& strpos($prepareView, 'fetch(config.executeOneUrl') !== false
+		&& strpos($prepareView, 'for (let index = 0; index < entries.length; index++)') !== false,
+	'Batch install execution must use one bounded HTTP request per Ready UUID.'
+);
+
 assertInstallBatchContract(strpos($prepareView, 'Stop after current template') !== false,
 	'Batch install preparation must be cancellable between candidates.');
-assertInstallBatchContract(strpos($prepareView, "CCsrfTokenHelper::get('ztum.templates.install_batch')") !== false,
-	'Batch install execution must carry its action-specific CSRF token.');
 assertInstallBatchContract(strpos($prepareView, 'Install ready templates') !== false,
-	'Batch install execution must require an explicit Ready-only submit.');
+	'Batch install execution must require an explicit Ready-only action.');
+assertInstallBatchContract(strpos($prepareView, 'stops on the first failure') !== false,
+	'Request-bounded execution must preserve stop-on-first-failure behavior.');
 
-assertInstallBatchContract(strpos($install, "'confirm' => 'required|in 1'") !== false,
-	'Batch install execution must require explicit confirmation.');
-assertInstallBatchContract(strpos($install, 'TemplateInstallBatchService') !== false,
-	'Batch install action must delegate to the sequential service.');
-assertInstallBatchContract(strpos($resultView, 'No automatic uninstall is performed') !== false,
-	'Batch install result must explicitly state that automatic uninstall is not performed.');
+assertInstallBatchContract(strpos($executeOne, "'confirm' => 'required|in 1'") !== false,
+	'Each request-bounded installation write must require explicit confirmation.');
+assertInstallBatchContract(strpos($executeOne, 'TemplateControlledInstallService') !== false,
+	'Each request-bounded execution must reuse the authoritative controlled install service.');
+assertInstallBatchContract(strpos($executeOne, 'disableView()') !== false,
+	'Request-bounded execution must return raw JSON-layout data.');
 
 assertInstallBatchContract(
 	strpos($listView, "'not_installed'") !== false
 		&& strpos($listView, "new CCheckBox('uuids['") !== false
-		&& strpos($listView, 'Review selected installations') !== false,
-	'Not installed catalog mode must expose multi-select installation review.'
+		&& strpos($listView, 'Review selected installations') !== false
+		&& strpos($listView, '->setEnabled(true)') !== false,
+	'Not installed catalog mode must expose active multi-select/select-all installation review.'
 );
 
-$combined = $prepare.$prepareOne.$install.$prepareView.$resultView;
+$combined = $prepare.$prepareOne.$executeOne.$prepareView;
 foreach ([
 	'API::Configuration()->import(',
 	'API::Template()->create(',
