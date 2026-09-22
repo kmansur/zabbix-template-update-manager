@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.31**
+Current version: **0.1.0-beta.32**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.31 removes the former 25-template update-batch ceiling. Because preparation and Ready execution are already request-bounded one template at a time, a selected update set can now use the existing 500-template selection safety ceiling without creating one long-lived HTTP request. Stop, retry, evidence, Manual review and stop-on-first-failure protections remain unchanged.
+Beta.32 reduces Manual review friction without making high-risk changes unattended. Technical-risk-only Manual review rows with verified rollback and a passing reviewed preflight now expose an explicit per-row Include reviewed update checkbox. Selected reviewed overrides are merged with Ready candidates into the same request-bounded sequential queue. Local-customization overwrite, Conflict and unresolved cases remain individual-review only.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.31` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.32` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -43,7 +43,7 @@ ZTUM currently provides:
 - read-only selected-template review that rebuilds authoritative inventory/upstream/version state for the chosen subset;
 - request-bounded update-batch safety preparation for the full selected update set (up to the existing 500-template selection safety ceiling), executed one candidate per HTTP request with visible progress;
 - automatic creation/refresh of rollback artifacts for standard-path candidates (none/low plus narrowly recognized bounded-medium changes) and explicitly reviewed manual-update candidates;
-- batch classification into Ready, Manual review, Conflict and Blocked; reviewed override candidates never become unattended batch Ready;
+- batch classification into Ready, Manual review, Conflict and Blocked; technical-risk-only Manual review candidates may be explicitly selected for reviewed batch override, but never become unattended Ready;
 - controlled sequential update of Ready templates only, with one HTTP request per Ready template;
 - stop-on-first-failure/evidence-change/ambiguous-state behavior with explicit not-attempted reporting;
 - current-upstream comparison through `configuration.importcompare`;
@@ -71,7 +71,7 @@ Batch execution does not create a second write path. Each Ready template is exec
 
 Official identity is based on template UUID, never on vendor metadata alone. Version comparison, content comparison and update eligibility are separate stages.
 
-For an outdated official template, the standard controlled update path requires a proven historical baseline, complete three-way analysis, no conflict, no local-overwrite risk, and a persistent rollback artifact that exactly matches a fresh export of the installed template. `none`/`low` technical risk is standard-path eligible. Medium impact remains manual by default, except for narrowly recognized bounded changes explicitly marked `standard_path_eligible` by the risk analyzer; the current allowlist is limited to discard-only preprocessing maintenance. High risk and any local overwrite use the separate explicit reviewed path, while conflict/unresolved evidence remains blocked.
+For an outdated official template, the standard controlled update path requires a proven historical baseline, complete three-way analysis, no conflict, no local-overwrite risk, and a persistent rollback artifact that exactly matches a fresh export of the installed template. `none`/`low` technical risk is standard-path eligible. Medium impact remains manual by default, except for narrowly recognized bounded changes explicitly marked `standard_path_eligible` by the risk analyzer; the current allowlist is limited to discard-only preprocessing maintenance. High technical risk remains Manual review, but beta.32 can accept an explicit per-row reviewed batch override only when rollback is verified, reviewed preflight passes and the reasons are technical-risk-only. Any local-customization overwrite still requires the separate individual reviewed path, while conflict/unresolved evidence remains blocked.
 
 Immediately before an update, ZTUM reruns the authoritative preflight, compares the explicit confirmation evidence with fresh server-side evidence, re-fetches the official template from the exact immutable upstream commit/path, verifies the raw YAML SHA-256 against the path-specific upstream index fingerprint, preserves the separate canonical template-content fingerprint in the evidence, and revalidates template identity. The selected source is then isolated with its required template/host groups plus top-level graphs and triggers that are exclusively owned by that template; unsafe cross-template dependencies are rejected.
 
@@ -150,8 +150,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.31
-git checkout -B release/0.1.0-beta.31 origin/release/0.1.0-beta.31
+git fetch origin release/0.1.0-beta.32
+git checkout -B release/0.1.0-beta.32 origin/release/0.1.0-beta.32
 cat VERSION
 git rev-parse HEAD
 ```
@@ -159,7 +159,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.31
+0.1.0-beta.32
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -175,7 +175,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.31**, enable the module and open:
+Confirm version **0.1.0-beta.32**, enable the module and open:
 
 ```text
 Data collection → Template updates
