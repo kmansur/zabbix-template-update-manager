@@ -6,6 +6,7 @@ $install = (string) file_get_contents($root.'/actions/TemplateInstall.php');
 $preflight = (string) file_get_contents($root.'/src/Service/TemplateInstallPreflightService.php');
 $controlled = (string) file_get_contents($root.'/src/Service/TemplateControlledInstallService.php');
 $post = (string) file_get_contents($root.'/src/Service/TemplatePostInstallValidationService.php');
+$listController = (string) file_get_contents($root.'/actions/TemplateList.php');
 $list = (string) file_get_contents($root.'/views/template.list.php');
 $reviewView = (string) file_get_contents($root.'/views/template.install.review.php');
 $resultView = (string) file_get_contents($root.'/views/template.install.php');
@@ -56,8 +57,10 @@ assertInstallContract(strpos($post, 'TemplatePostUpdateValidationService') !== f
 
 assertInstallContract(strpos($list, 'Review installation') !== false,
 	'Catalog must expose a distinct installation-review action.');
-assertInstallContract(strpos($list, 'setPageNavigation') !== false,
-	'Expanded official catalog must use native Zabbix pagination.');
+assertInstallContract(strpos($listController, 'CPagerHelper::paginate') !== false
+		&& strpos($listController, "CPagerHelper::savePage('ztum.template.catalog'") !== false
+		&& strpos($list, 'setPageNavigation') !== false,
+	'Expanded official catalog must use native Zabbix pagination end to end.');
 assertInstallContract(strpos($reviewView, 'there is no prior local rollback artifact') !== false,
 	'Installation review must disclose the absence of a prior rollback artifact.');
 assertInstallContract(strpos($resultView, 'does not automatically uninstall') !== false,
