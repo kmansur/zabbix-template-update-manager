@@ -65,9 +65,11 @@ class TemplateInstallBatchExecuteOne extends CController {
 				$exception->getMessage()
 			));
 
-			$output['error'] = _(
-				'Unable to complete this controlled installation request. Inspect the local template state before retrying.'
-			);
+			$output['error'] = $exception->getMessage() !== ''
+				? $exception->getMessage()
+				: _(
+					'Unable to complete this controlled installation request. Inspect the local template state before retrying.'
+				);
 		}
 
 		$this->setResponse(

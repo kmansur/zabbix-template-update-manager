@@ -5,6 +5,20 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
 use JsonException;
 use RuntimeException;
 
+final class TemplateIsolationSafetyException extends RuntimeException {
+
+	private string $reasonCode;
+
+	public function __construct(string $reasonCode, string $message) {
+		parent::__construct($message);
+		$this->reasonCode = $reasonCode;
+	}
+
+	public function getReasonCode(): string {
+		return $this->reasonCode;
+	}
+}
+
 final class UpstreamTemplateDocumentService {
 
 	public static function buildImportSource(array $document, string $expectedUuid, array $expectedRecord): array {
@@ -175,7 +189,10 @@ final class UpstreamTemplateDocumentService {
 				continue;
 			}
 			if (count($hosts) !== 1) {
-				throw new RuntimeException('The selected template has a cross-template top-level graph dependency that cannot be isolated safely.');
+				throw new TemplateIsolationSafetyException(
+					'cross_template_graph_dependency',
+					'The selected template has a cross-template top-level graph dependency that cannot be isolated safely.'
+				);
 			}
 
 			$result[] = $graph;
@@ -200,7 +217,10 @@ final class UpstreamTemplateDocumentService {
 				continue;
 			}
 			if (count($hosts) !== 1) {
-				throw new RuntimeException('The selected template has a cross-template top-level trigger dependency that cannot be isolated safely.');
+				throw new TemplateIsolationSafetyException(
+					'cross_template_trigger_dependency',
+					'The selected template has a cross-template top-level trigger dependency that cannot be isolated safely.'
+				);
 			}
 
 			$result[] = $trigger;
@@ -285,10 +305,16 @@ final class UpstreamTemplateDocumentService {
 						$name = trim((string) ($value['name'] ?? ''));
 
 						if ($host !== '' && $host !== $technicalName) {
-							throw new RuntimeException('The selected template dashboard references a graph from another template and cannot be isolated safely.');
+							throw new TemplateIsolationSafetyException(
+								'cross_template_dashboard_dependency',
+								'The selected template dashboard references a graph from another template and cannot be isolated safely.'
+							);
 						}
 						if ($host === $technicalName && ($name === '' || !isset($available[$name]))) {
-							throw new RuntimeException('The selected template dashboard references a top-level graph that is missing from the isolated source.');
+							throw new TemplateIsolationSafetyException(
+								'missing_dashboard_graph_dependency',
+								'The selected template dashboard references a top-level graph that is missing from the isolated source.'
+							);
 						}
 					}
 				}

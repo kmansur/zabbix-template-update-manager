@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.24**
+Current version: **0.1.0-beta.25**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.24 activates select-all for the `Not installed` catalog and moves multi-template installation execution to one HTTP request per Ready template. This preserves sequential stop-on-first-failure behavior while avoiding one long batch request that could hit reverse-proxy or Cloudflare timeouts.
+Beta.25 keeps request-bounded multi-template installation and improves diagnostics: native Zabbix import errors are preserved in the batch UI, and cross-template isolation hazards are reported as explicit blocked states with the official template identity.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.24` after the beta.22 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.25` after the beta.22 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -149,8 +149,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.24
-git checkout -B release/0.1.0-beta.24 origin/release/0.1.0-beta.24
+git fetch origin release/0.1.0-beta.25
+git checkout -B release/0.1.0-beta.25 origin/release/0.1.0-beta.25
 cat VERSION
 git rev-parse HEAD
 ```

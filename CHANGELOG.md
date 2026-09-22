@@ -4,6 +4,30 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.25] - 2026-09-22
+
+### Fixed
+
+- Preserve native Zabbix frontend API error messages when `configuration.import` returns `false` instead of replacing the real cause with a generic import failure.
+- Request-bounded batch-install rows now display the underlying controlled import failure detail inline for Super Admins.
+- Known cross-template isolation hazards are classified as explicit blocked states rather than generic `analysis_exception` rows.
+
+### Changed
+
+- Cross-template top-level trigger, graph and dashboard dependencies now carry stable reason codes.
+- Isolation-blocked batch rows retain the official candidate name/version, improving operator review.
+
+### Field findings
+
+- Beta.24 full-catalog test: 37 selected, 32 Ready, 5 Blocked; 30 installed and validated before the first execution failure; 1 failed and 1 remained Not attempted.
+- `Jira Data Center by JMX` and `Vyatta Virtual Router by SNMP` were confirmed as deterministic cross-template top-level trigger isolation blocks.
+- `VeloCloud SD-WAN Edge by HTTP` reached the write boundary but the frontend API returned failure; beta.25 now surfaces the native Zabbix reason required to diagnose it.
+
+### Tests
+
+- Added explicit isolation reason-code assertions.
+- Added contracts requiring native `CMessageHelper` import diagnostics and inline request-bounded failure detail.
+
 ## [0.1.0-beta.24] - 2026-09-22
 
 ### Fixed
