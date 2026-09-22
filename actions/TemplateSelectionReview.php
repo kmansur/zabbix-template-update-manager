@@ -22,12 +22,12 @@ require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
 
 /**
  * Rebuilds inventory/upstream/version state for an explicitly selected review
- * set. Review may be broad; controlled batch preparation remains bounded to 25.
+ * set. Preparation is request-bounded per template, so the former 25-template
+ * operational ceiling is unnecessary.
  */
 class TemplateSelectionReview extends CController {
 
 	private const MAX_SELECTED_TEMPLATES = 500;
-	private const BATCH_PREPARE_LIMIT = 25;
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput([
@@ -61,10 +61,8 @@ class TemplateSelectionReview extends CController {
 			'title' => _('Selected template updates'),
 			'zabbix_version' => ZabbixVersion::current(),
 			'selected_count' => $selectedCount,
-			'batch_prepare_limit' => self::BATCH_PREPARE_LIMIT,
 			'templates' => [],
-			'can_prepare' => $this->getUserType() === USER_TYPE_SUPER_ADMIN
-				&& $selectedCount <= self::BATCH_PREPARE_LIMIT,
+			'can_prepare' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
 			'error' => null
 		];
 
