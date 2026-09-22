@@ -4,6 +4,22 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.21] - 2026-09-22
+
+### Added
+
+- Native Zabbix status filter for the template catalog with `All`, `Current`, `Not applicable`, `Update available` and `Not installed` choices.
+- `All` control in the catalog pager to show every matching row, with a `Pages` control to return to normal pagination.
+
+### Changed
+
+- Catalog status selection is persisted with Zabbix `CProfile` and applied before pagination.
+- Filter UI uses native `CFilter` + modern `CRadioButtonList` controls.
+
+### Tests
+
+- Extended catalog controller/view contracts to cover native filter controls, persisted status choices and reversible All/Pages pager mode.
+
 ## [0.1.0-beta.20] - 2026-09-22
 
 ### Fixed

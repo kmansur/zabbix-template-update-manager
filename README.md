@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.20**
+Current version: **0.1.0-beta.21**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.20 keeps the beta.19 official catalog and controlled installation workflow and fixes the catalog HTTP 500 caused by unresolved native Zabbix pagination classes inside the namespaced controller.
+Beta.21 adds native Zabbix catalog status filtering and an All/Pages pager toggle while retaining the beta.20 catalog and controlled installation workflow.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.20` after the beta.19 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.21` after the beta.19 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -134,8 +134,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.20
-git checkout -B release/0.1.0-beta.20 origin/release/0.1.0-beta.20
+git fetch origin release/0.1.0-beta.21
+git checkout -B release/0.1.0-beta.21 origin/release/0.1.0-beta.21
 cat VERSION
 git rev-parse HEAD
 ```

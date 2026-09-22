@@ -5,7 +5,11 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
+use CDiv;
+use CLink;
 use CPagerHelper;
+use CProfile;
+use CTag;
 use CUrl;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
@@ -34,7 +38,11 @@ class TemplateList extends CController {
 
 	protected function checkInput(): bool {
 		$ret = $this->validateInput([
-			'page' => 'ge 1'
+			'page' => 'ge 1',
+			'filter_set' => 'in 1',
+			'filter_rst' => 'in 1',
+			'filter_status' => 'in all,current,not_applicable,update_available,not_installed',
+			'show_all' => 'in 1'
 		]);
 
 		if (!$ret) {
@@ -52,6 +60,23 @@ class TemplateList extends CController {
 		$canAdminister = in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true);
 		$zabbixVersion = ZabbixVersion::current();
 
+		if ($this->hasInput('filter_set')) {
+			CProfile::update(
+				'web.ztum.templates.filter.status',
+				$this->getInput('filter_status', 'all'),
+				PROFILE_TYPE_STR
+			);
+		}
+		elseif ($this->hasInput('filter_rst')) {
+			CProfile::delete('web.ztum.templates.filter.status');
+		}
+
+		$filterStatus = (string) CProfile::get('web.ztum.templates.filter.status', 'all');
+		$allowedStatuses = ['all', 'current', 'not_applicable', 'update_available', 'not_installed'];
+		if (!in_array($filterStatus, $allowedStatuses, true)) {
+			$filterStatus = 'all';
+		}
+
 		$data = [
 			'title' => _('Zabbix Template Update Manager'),
 			'version' => ProjectVersion::current(),
@@ -67,6 +92,13 @@ class TemplateList extends CController {
 			'catalog_summary' => UpstreamCatalogService::emptySummary(),
 			'version_summary' => TemplateVersionComparator::emptySummary(),
 			'paging' => null,
+			'filter' => [
+				'status' => $filterStatus
+			],
+			'filter_profile' => 'web.ztum.templates.filter',
+			'filter_active_tab' => CProfile::get('web.ztum.templates.filter.active', 1),
+			'show_all' => $this->hasInput('show_all'),
+			'filtered_count' => 0,
 			'upstream_source' => null,
 			'upstream_runtime' => null,
 			'upstream_diagnostics' => [
@@ -138,15 +170,64 @@ class TemplateList extends CController {
 		$data['templates'] = $versionComparison['templates'];
 		$data['version_summary'] = $versionComparison['summary'];
 
+		if ($filterStatus !== 'all') {
+			$data['templates'] = array_values(array_filter(
+				$data['templates'],
+				static fn(array $template): bool =>
+					(string) ($template['version_status'] ?? 'not_applicable') === $filterStatus
+			));
+		}
+
 		order_result($data['templates'], 'name', ZBX_SORT_UP);
-		$pageNum = $this->getInput('page', 1);
-		CPagerHelper::savePage('ztum.template.catalog', $pageNum);
-		$data['paging'] = CPagerHelper::paginate(
-			$pageNum,
-			$data['templates'],
-			ZBX_SORT_UP,
-			(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
-		);
+		$data['filtered_count'] = count($data['templates']);
+
+		$listUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates');
+
+		if ($data['show_all']) {
+			$pagesUrl = clone $listUrl;
+			$pagesUrl->removeArgument('show_all');
+
+			$data['paging'] = (new CDiv())
+				->addClass(ZBX_STYLE_TABLE_PAGING)
+				->addItem(
+					(new CTag('nav', true))
+						->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+						->setAttribute('role', 'navigation')
+						->setAttribute('aria-label', _x('Pager', 'page navigation'))
+						->addItem(
+							(new CLink(_('Pages'), $pagesUrl->getUrl()))
+								->setAttribute('aria-label', _('Return to paginated view'))
+						)
+						->addItem(
+							(new CDiv())
+								->addClass(ZBX_STYLE_TABLE_STATS)
+								->addItem(_s('Displaying all %1$s found', $data['filtered_count']))
+						)
+				);
+		}
+		else {
+			$pageNum = $this->getInput('page', 1);
+			CPagerHelper::savePage('ztum.template.catalog', $pageNum);
+			$data['paging'] = CPagerHelper::paginate(
+				$pageNum,
+				$data['templates'],
+				ZBX_SORT_UP,
+				$listUrl
+			);
+
+			$allUrl = clone $listUrl;
+			$allUrl->setArgument('show_all', '1');
+
+			$data['paging']->addItem(
+				(new CTag('nav', true,
+					(new CLink(_('All'), $allUrl->getUrl()))
+						->setAttribute('aria-label', _('Show all matching templates'))
+				))
+					->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+					->setAttribute('role', 'navigation')
+					->setAttribute('aria-label', _('Catalog display mode'))
+			);
+		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
