@@ -618,6 +618,7 @@ $script = <<<'JS'
 			setText('ztum-readiness-' + templateId, labels.processing);
 			setText('ztum-category-' + templateId, labels.processing);
 			setText('ztum-reason-' + templateId, '—');
+			setText('ztum-select-' + templateId, '—');
 			setText('ztum-execution-' + templateId, labels.pending);
 			updateSummary();
 
@@ -678,6 +679,7 @@ $script = <<<'JS'
 			setText('ztum-readiness-' + templateId, labels.processing);
 			setText('ztum-category-' + templateId, labels.processing);
 			setText('ztum-reason-' + templateId, '—');
+			setText('ztum-select-' + templateId, '—');
 			setText('ztum-execution-' + templateId, labels.pending);
 
 			try {
