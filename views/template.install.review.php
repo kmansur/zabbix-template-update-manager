@@ -1,0 +1,152 @@
+<?php
+
+$statusLabels = [
+	'passed' => _('Passed — eligible for controlled installation'),
+	'blocked_version' => _('Blocked — unsupported Zabbix version'),
+	'blocked_candidate' => _('Blocked — official candidate unavailable'),
+	'blocked_already_installed' => _('Blocked — template is already installed'),
+	'blocked_collision' => _('Blocked — local technical-name collision'),
+	'blocked_dependencies' => _('Blocked — required template dependencies are missing'),
+	'blocked_preview' => _('Blocked — import preview is not creation-only')
+];
+
+$reasonLabels = [
+	'unsupported_zabbix_version' => _('Unsupported or undetected Zabbix version'),
+	'official_template_not_found' => _('The selected UUID is not present in the validated official catalog'),
+	'upstream_version_missing' => _('The official candidate has no vendor version'),
+	'template_already_installed' => _('A local template with this official UUID already exists'),
+	'technical_name_collision' => _('A different local template already uses the same technical name'),
+	'missing_template_dependencies' => _('One or more linked templates must be installed first'),
+	'install_would_modify_existing_configuration' => _('The import preview would update or remove existing configuration'),
+	'install_preview_contains_no_creations' => _('The import preview did not contain any creation')
+];
+
+$page = (new CHtmlPage())
+	->setTitle($data['title'])
+	->addItem(new CLink(
+		_('Back to template catalog'),
+		(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
+	));
+
+if ($data['preflight_error'] !== null) {
+	$page->addItem(new CTag('p', true, $data['preflight_error']))->show();
+	return;
+}
+
+$preflight = is_array($data['preflight']) ? $data['preflight'] : [];
+$status = (string) ($preflight['status'] ?? 'blocked_candidate');
+$reason = (string) ($preflight['reason'] ?? '');
+$candidate = is_array($preflight['candidate'] ?? null) ? $preflight['candidate'] : [];
+$dependencies = is_array($preflight['dependencies'] ?? null) ? $preflight['dependencies'] : [];
+$summary = is_array($preflight['comparison_summary'] ?? null) ? $preflight['comparison_summary'] : [];
+$evidence = (string) ($preflight['evidence_sha256'] ?? '');
+
+$page
+	->addItem(new CTag('h4', true, _('Installation safety check')))
+	->addItem(
+		(new CTableInfo())
+			->setHeader([_('State'), _('Reason'), _('Configuration write enabled')])
+			->addRow([
+				$statusLabels[$status] ?? $status,
+				$reason !== '' ? ($reasonLabels[$reason] ?? $reason) : '—',
+				!empty($preflight['write_enabled']) ? _('Yes') : _('No')
+			])
+	);
+
+if ($candidate !== []) {
+	$page
+		->addItem(new CTag('h4', true, _('Official candidate')))
+		->addItem(
+			(new CTableInfo())
+				->setHeader([
+					_('Template'),
+					_('Version'),
+					_('UUID'),
+					_('Upstream commit'),
+					_('Source path'),
+					_('Raw source SHA-256')
+				])
+				->addRow([
+					(string) ($candidate['name'] ?? '—'),
+					(string) ($candidate['vendor_version'] ?? '—'),
+					(string) ($candidate['uuid'] ?? $data['uuid']),
+					isset($candidate['commit']) ? substr((string) $candidate['commit'], 0, 16) : '—',
+					(string) ($candidate['path'] ?? '—'),
+					isset($candidate['source_sha256'])
+						? substr((string) $candidate['source_sha256'], 0, 20)
+						: '—'
+				])
+		);
+}
+
+$required = is_array($dependencies['required'] ?? null) ? $dependencies['required'] : [];
+$missing = is_array($dependencies['missing'] ?? null) ? $dependencies['missing'] : [];
+$page
+	->addItem(new CTag('h4', true, _('Template dependencies')))
+	->addItem(
+		(new CTableInfo())
+			->setHeader([_('Required linked templates'), _('Missing')])
+			->addRow([
+				$required !== [] ? implode(', ', array_map('strval', $required)) : _('None'),
+				$missing !== [] ? implode(', ', array_map('strval', $missing)) : _('None')
+			])
+	);
+
+if ($summary !== []) {
+	$page
+		->addItem(new CTag('h4', true, _('Installation import preview')))
+		->addItem(
+			(new CTableInfo())
+				->setHeader([_('Added'), _('Updated'), _('Removed'), _('Total changes')])
+				->addRow([
+					(int) ($summary['added'] ?? 0),
+					(int) ($summary['updated'] ?? 0),
+					(int) ($summary['removed'] ?? 0),
+					(int) ($summary['total'] ?? 0)
+				])
+		);
+}
+
+if ($evidence !== '') {
+	$page
+		->addItem(new CTag('h4', true, _('Preflight evidence fingerprint')))
+		->addItem(new CTag('p', true, $evidence));
+}
+
+if ($status === 'passed' && !empty($data['can_install']) && $evidence !== '') {
+	$installAction = (new CUrl('zabbix.php'))
+		->setArgument('action', 'ztum.template.install')
+		->getUrl();
+
+	$form = (new CForm('post'))
+		->setId('ztum-template-install-form')
+		->setAction($installAction)
+		->addItem([
+			(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.install')))->removeId(),
+			(new CVar('uuid', $data['uuid']))->removeId(),
+			(new CVar('evidence_sha256', $evidence))->removeId(),
+			(new CCheckBox('confirm', '1'))->setLabel(_(
+				'I reviewed the official candidate, dependencies and creation-only import preview and want to install this template.'
+			)),
+			new CSubmitButton(_('Install official template'))
+		]);
+
+	$page
+		->addItem(new CTag('h4', true, _('Controlled installation')))
+		->addItem(new CTag('p', true, _(
+			'This operation creates Zabbix configuration and is restricted to super administrators. Because the template is not currently installed, there is no prior local rollback artifact. If post-install validation fails, ZTUM will not automatically uninstall the imported configuration.'
+		)))
+		->addItem($form);
+}
+elseif ($status === 'passed') {
+	$page->addItem(new CTag('p', true, _(
+		'A Zabbix super administrator is required to install the official template.'
+	)));
+}
+else {
+	$page->addItem(new CTag('p', true, _(
+		'Installation remains blocked. Resolve the reported prerequisite and reopen this review.'
+	)));
+}
+
+$page->show();
