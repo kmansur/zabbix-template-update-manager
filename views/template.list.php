@@ -91,22 +91,18 @@ if ($canRenderSelectionForm) {
 		->setName('ztum_template_list');
 
 	$selectionNamespace = $installSelectionMode ? 'uuids' : 'templateids';
-	$selectAllEnabled = !$installSelectionMode || $data['filtered_count'] <= 25;
 
 	$selectAllCheckbox = (new CCheckBox('all_templates'))
-		->setEnabled($selectAllEnabled);
-
-	if ($selectAllEnabled) {
-		$selectAllCheckbox->onClick(
+		->setEnabled(true)
+		->onClick(
 			"checkAll('".$selectionForm->getName()."', 'all_templates', '".$selectionNamespace."');"
-		);
-	}
-	else {
-		$selectAllCheckbox->setAttribute(
+		)
+		->setAttribute(
 			'title',
-			_('Select all is disabled because the installation batch limit is 25 templates.')
+			$installSelectionMode
+				? _('Select all visible Not installed templates.')
+				: _('Select all visible update candidates.')
 		);
-	}
 
 	$selectAllHeader = (new CColHeader($selectAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
 }
@@ -311,7 +307,7 @@ $page
 	)))
 	->addItem(new CTag('p', true, _(
 		$installSelectionMode
-			? 'Select up to 25 Not installed official templates to review them for controlled sequential installation. Missing dependencies and unsafe previews remain blocked.'
+			? 'Select the Not installed official templates to review them for controlled sequential installation. Preparation and execution are request-bounded per template; missing dependencies and unsafe previews remain blocked.'
 			: 'Update selection applies only to installed official templates with a newer version. Use the Not installed filter to select multiple official templates for controlled installation.'
 	)))
 	->addItem(new CTag('h4', true, _('Templates')));
