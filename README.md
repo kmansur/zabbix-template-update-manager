@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.32**
+Current version: **0.1.0-beta.33**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.32 reduces Manual review friction without making high-risk changes unattended. Technical-risk-only Manual review rows with verified rollback and a passing reviewed preflight now expose an explicit per-row Include reviewed update checkbox. Selected reviewed overrides are merged with Ready candidates into the same request-bounded sequential queue. Local-customization overwrite, Conflict and unresolved cases remain individual-review only.
+Beta.33 refines reviewed batch selection: the explicit reviewed-update checkbox moves to the first column of each eligible row, and the table header adds a select-all control for all eligible reviewed overrides. Local-customization overwrite, Conflict and unresolved cases stay unselectable and continue to require individual handling.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.32` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.33` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -43,7 +43,7 @@ ZTUM currently provides:
 - read-only selected-template review that rebuilds authoritative inventory/upstream/version state for the chosen subset;
 - request-bounded update-batch safety preparation for the full selected update set (up to the existing 500-template selection safety ceiling), executed one candidate per HTTP request with visible progress;
 - automatic creation/refresh of rollback artifacts for standard-path candidates (none/low plus narrowly recognized bounded-medium changes) and explicitly reviewed manual-update candidates;
-- batch classification into Ready, Manual review, Conflict and Blocked; technical-risk-only Manual review candidates may be explicitly selected for reviewed batch override, but never become unattended Ready;
+- batch classification into Ready, Manual review, Conflict and Blocked; technical-risk-only Manual review candidates may be explicitly selected from a leading checkbox column, including select-all for eligible reviewed overrides, but never become unattended Ready;
 - controlled sequential update of Ready templates only, with one HTTP request per Ready template;
 - stop-on-first-failure/evidence-change/ambiguous-state behavior with explicit not-attempted reporting;
 - current-upstream comparison through `configuration.importcompare`;
@@ -150,8 +150,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.32
-git checkout -B release/0.1.0-beta.32 origin/release/0.1.0-beta.32
+git fetch origin release/0.1.0-beta.33
+git checkout -B release/0.1.0-beta.33 origin/release/0.1.0-beta.33
 cat VERSION
 git rev-parse HEAD
 ```
@@ -159,7 +159,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.32
+0.1.0-beta.33
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -175,7 +175,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.32**, enable the module and open:
+Confirm version **0.1.0-beta.33**, enable the module and open:
 
 ```text
 Data collection → Template updates
