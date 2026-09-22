@@ -132,7 +132,7 @@ Do not test recursive dependency installation: beta.20 intentionally requires de
 
 ## 3B. Multi-template installation
 
-From the `Not installed` filter, select 2–3 non-critical official templates with no missing linked-template dependencies and choose **Review selected installations**.
+From the `Not installed` filter, first verify the header checkbox selects all visible missing templates. For the write test, select 2–3 non-critical official templates with no missing linked-template dependencies and choose **Review selected installations**.
 
 Expected preparation:
 
@@ -145,12 +145,12 @@ Blocked: remainder
 
 Only Ready rows may be submitted. Confirm **Install ready templates** and verify:
 
-- execution is sequential;
+- execution is sequential and each Ready template uses its own HTTP request;
 - every successful row returns a local Template ID and `validated` post-install state;
 - the batch reports Installed / Failed / Not attempted / Any configuration write;
 - returning to the catalog shows successful rows as installed/current.
 
-Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.23 does not recursively install selected dependencies.
+Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.24 does not recursively install selected dependencies.
 
 Stop-on-first-failure remains mandatory: if one controlled install returns a non-success, subsequent Ready UUIDs must be reported Not attempted.
 
