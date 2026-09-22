@@ -69,7 +69,10 @@ $catalogSummary = (new CTableInfo())
 
 $installSelectionMode = $data['can_install'] && ($data['filter']['status'] ?? 'all') === 'not_installed';
 $selectionForm = null;
-$selectAllHeader = '';
+$selectAllCheckbox = (new CCheckBox('all_templates'))
+	->setEnabled(false)
+	->setAttribute('title', _('Select all is unavailable for the current view.'));
+$selectAllHeader = (new CColHeader($selectAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
 
 $canRenderSelectionForm = $data['can_compare']
 	&& (($data['filter']['status'] ?? 'all') !== 'not_installed' || $data['can_install']);
@@ -88,18 +91,24 @@ if ($canRenderSelectionForm) {
 		->setName('ztum_template_list');
 
 	$selectionNamespace = $installSelectionMode ? 'uuids' : 'templateids';
+	$selectAllEnabled = !$installSelectionMode || $data['filtered_count'] <= 25;
 
-	if (!$installSelectionMode || $data['filtered_count'] <= 25) {
-		$selectAllHeader = (new CColHeader(
-			(new CCheckBox('all_templates'))
-				->onClick(
-					"checkAll('".$selectionForm->getName()."', 'all_templates', '".$selectionNamespace."');"
-				)
-		))->addClass(ZBX_STYLE_CELL_WIDTH);
+	$selectAllCheckbox = (new CCheckBox('all_templates'))
+		->setEnabled($selectAllEnabled);
+
+	if ($selectAllEnabled) {
+		$selectAllCheckbox->onClick(
+			"checkAll('".$selectionForm->getName()."', 'all_templates', '".$selectionNamespace."');"
+		);
 	}
 	else {
-		$selectAllHeader = (new CColHeader(''))->addClass(ZBX_STYLE_CELL_WIDTH);
+		$selectAllCheckbox->setAttribute(
+			'title',
+			_('Select all is disabled because the installation batch limit is 25 templates.')
+		);
 	}
+
+	$selectAllHeader = (new CColHeader($selectAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
 }
 
 $templateTable = (new CTableInfo())
@@ -169,7 +178,10 @@ foreach ($data['templates'] as $template) {
 		$selectionCell = new CCheckBox('templateids['.$template['templateid'].']', $template['templateid']);
 	}
 	else {
-		$selectionCell = '';
+		$disabledKey = (string) ($template['uuid'] ?? $template['templateid'] ?? md5($templateName));
+		$selectionCell = (new CCheckBox('ztum_disabled['.$disabledKey.']', '1'))
+			->setEnabled(false)
+			->setAttribute('title', _('This template is not eligible for the current bulk action.'));
 	}
 
 	$actionCell = '—';
