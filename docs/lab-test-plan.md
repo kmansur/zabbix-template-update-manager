@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.30
+# Laboratory test plan — 0.1.0-beta.31
 
 ## Release state
 
@@ -11,15 +11,15 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.30`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.31`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.30 retains request-bounded execution and preparation retry, and adds direct Manual review navigation from batch preparation. Field validation must prove that review-only plans clearly explain why unattended execution is unavailable and that Review and update reaches the existing individual comparison/reviewed-preflight path without weakening the safety gates.
+Beta.31 retains request-bounded execution, preparation retry and Manual review navigation, and removes the former 25-template update preparation ceiling. Field validation must prove that selections larger than 25 are prepared sequentially without truncation or a cumulative HTTP request, while all existing safety gates remain intact.
 
 ## Safety assumptions
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.30 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.31 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. High-risk and local-overwrite candidates use the explicit individual reviewed path after verified rollback evidence. Conflict and unresolved templates remain hard blocked.
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.30
-git checkout -B release/0.1.0-beta.30 origin/release/0.1.0-beta.30
+git fetch origin release/0.1.0-beta.31
+git checkout -B release/0.1.0-beta.31 origin/release/0.1.0-beta.31
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.30
+0.1.0-beta.31
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.30`, enable the module and open:
+Confirm `0.1.0-beta.31`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -81,7 +81,7 @@ Data collection → Template updates
 
 ## 2A. Request-bounded update regression
 
-For the first beta.30 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.31 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -142,7 +142,7 @@ For one non-critical official template that is absent locally and has no missing
 
 Also test at least one blocked dependency case if naturally available. Missing linked templates must be listed and the write must remain disabled.
 
-Do not test recursive dependency installation: beta.30 intentionally requires dependencies to be installed individually first.
+Do not test recursive dependency installation: beta.31 intentionally requires dependencies to be installed individually first.
 
 ## 3B. Multi-template installation
 
@@ -166,7 +166,7 @@ Confirm **Install ready templates** when at least one candidate is Ready and ver
 - the batch reports Installed / Failed / Not attempted / Any configuration write;
 - returning to the catalog shows successful rows as installed/current.
 
-Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.30 does not recursively install selected dependencies.
+Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.31 does not recursively install selected dependencies.
 
 Stop-on-first-failure remains mandatory: if one controlled install returns a non-success, subsequent Ready UUIDs must be reported Not attempted.
 
@@ -180,7 +180,22 @@ Confirm:
 - select only 2–3 candidates for the first test;
 - **Review selected updates** shows only those explicitly selected templates.
 
-Beta.12 intentionally bounds one selected batch to **25 templates**. Larger batch submissions must fail closed rather than silently truncate.
+The former 25-template update-batch ceiling is removed in beta.31. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach review and preparation intact, and preparation must still run one template per HTTP request without silent truncation.
+
+## 4A. Large selected-update regression
+
+Select at least 26 eligible official update candidates in the lab.
+
+Expected behavior:
+
+- **Review selected updates** accepts the complete selection;
+- the review page shows all selected candidates without truncation;
+- a Super Admin can choose **Prepare selected updates**;
+- preparation runs sequentially, one template per HTTP request;
+- progress reaches the full selected count;
+- Stop after current template remains available while preparation is running;
+- there is no reappearance of the old 25-template rejection;
+- the 500-template selected-update sanity ceiling remains fail-closed.
 
 ## 5. Selected review → batch preparation
 
@@ -263,7 +278,7 @@ Before any write, inspect at least one item from each category that naturally oc
 
 If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
 
-### Beta.30 risk-calibration regression
+### Beta.31 risk-calibration regression
 
 When available in the lab, include `APC UPS Symmetra RM by SNMP` at installed version `7.0-3` with upstream `7.0-4`. The official delta removes `DISCARD_UNCHANGED_HEARTBEAT 6h` from a status item.
 
@@ -378,7 +393,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.30 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.31 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -389,7 +404,7 @@ Confirm:
 - leaving batch confirmation unchecked is rejected;
 - direct POST without the valid action-specific CSRF token is rejected by native Zabbix handling;
 - tampering a reviewed evidence fingerprint prevents that template from being written;
-- submitting more than 25 template IDs fails closed;
+- submitting more than the 500-template selected-update sanity ceiling fails closed;
 - conflict/manual-review/blocked items are absent from the hidden Ready execution set;
 - a preflight built from a legacy index without a raw source fingerprint remains blocked until the refreshed index is available.
 
@@ -453,9 +468,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.30 laboratory validation
+## 16. Exit criteria for beta.31 laboratory validation
 
-A Zabbix generation passes beta.30 only after evidence demonstrates:
+A Zabbix generation passes beta.31 only after evidence demonstrates:
 
 ```text
 module discovery/enable
