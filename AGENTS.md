@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.25`.
+Current test version: `0.1.0-beta.26`.
 
 ## Non-negotiable rules
 
@@ -31,11 +31,11 @@ Current test version: `0.1.0-beta.25`.
 16. Rollback must remain an explicit super-administrator operation. Never trigger rollback automatically after update validation failure.
 17. Before restoring an older artifact, persist and verify a fresh recovery backup of the current installed state.
 18. Installation of an upstream-only template must remain a distinct flow from update. It must verify official identity, immutable source fingerprints, local UUID/technical-name absence, linked-template dependencies and a creation-only import preview before write.
-19. Do not recursively or batch-install missing templates in the current milestone. Missing dependencies block installation and must be installed explicitly first.
+19. Batch installation of missing official templates is allowed only through the request-bounded controlled flow. Do not recursively install missing dependencies; dependency-blocked candidates require a later preparation after prerequisites are actually installed.
 20. A newly installed template has no prior local rollback artifact. Never auto-uninstall it after ambiguous or failed post-install validation; require operator inspection.
 21. Multi-template installation must prepare one UUID per HTTP request and only execute candidates with passed install preflight plus bound evidence.
 22. Batch installation must execute one Ready UUID per HTTP request, reuse TemplateControlledInstallService per candidate and stop on the first non-success. Never bypass the existing single configuration-import boundary.
-23. Do not auto-resolve selected missing dependencies in beta.22; dependency-blocked candidates require a later preparation after dependencies are actually installed.
+23. Installation preflight must run the structural reference audit before import comparison. Proven unresolved internal references must fail closed and be bound into preflight evidence; do not use the audit to relax Zabbix's own import validation.
 
 ## Architecture
 
