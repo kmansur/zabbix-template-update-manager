@@ -115,7 +115,7 @@ Confirm:
 - select only 2–3 candidates for the first test;
 - **Review selected updates** shows only those explicitly selected templates.
 
-Beta.11 intentionally bounds one selected batch to **25 templates**. Larger batch submissions must fail closed rather than silently truncate.
+Beta.12 intentionally bounds one selected batch to **25 templates**. Larger batch submissions must fail closed rather than silently truncate.
 
 ## 5. Selected review → batch preparation
 
