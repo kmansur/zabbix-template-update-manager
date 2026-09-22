@@ -4,6 +4,34 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.29] - 2026-09-22
+
+### Fixed
+
+- Completed update-preparation plans with `Ready = 0` now synchronize the execution summary status to `Unavailable — no Ready templates` instead of leaving the lower status table at `Waiting for preparation`.
+- Per-template preparation transport failures no longer require restarting the entire selected batch just to retry the failed row.
+
+### Added
+
+- Explicit `Retry failed preparation` control, enabled only after preparation completes and only when one or more request-level preparation failures exist.
+- Request-failure tracking that safely removes the old Blocked count before retrying and reclassifies the row from the fresh result.
+- Elapsed request timing in HTTP preparation errors, e.g. `HTTP 504 after 100.1s`, to distinguish repeatable proxy deadlines from short transient failures.
+
+### Safety
+
+- Retry remains preparation-only: it may refresh rollback evidence but never imports Zabbix configuration.
+- Retry is manual, sequential and limited to rows that failed at the HTTP/request layer; Manual review, Conflict and normal Blocked analysis states are not retried automatically.
+- Controlled update execution, fresh preflight, evidence binding, stop-on-first-failure and the single approved configuration-write boundary are unchanged.
+
+### Field finding
+
+- Zabbix 7.x beta.28 field test updated and validated 9 Ready APC templates sequentially with 0 failures and no cumulative Cloudflare 504.
+- A later VMware preparation set produced 4 Manual review candidates plus one isolated `HTTP 504` preparation failure, motivating explicit retry/timing diagnostics and the zero-Ready status correction.
+
+### Tests
+
+- Added contract coverage for synchronized zero-Ready execution status, explicit preparation retry state and elapsed HTTP-failure timing.
+
 ## [0.1.0-beta.28] - 2026-09-22
 
 ### Fixed
