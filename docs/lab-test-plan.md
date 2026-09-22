@@ -150,7 +150,7 @@ Only Ready rows may be submitted. Confirm **Install ready templates** and verify
 - the batch reports Installed / Failed / Not attempted / Any configuration write;
 - returning to the catalog shows successful rows as installed/current.
 
-Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.24 does not recursively install selected dependencies.
+Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.25 does not recursively install selected dependencies.
 
 Stop-on-first-failure remains mandatory: if one controlled install returns a non-success, subsequent Ready UUIDs must be reported Not attempted.
 
