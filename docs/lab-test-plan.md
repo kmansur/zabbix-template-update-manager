@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.19
+# Laboratory test plan — 0.1.0-beta.20
 
 ## Release state
 
@@ -11,15 +11,15 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.19`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.20`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.19 retains the validated update/rollback/batch safety chain and adds the official upstream catalog plus individual controlled installation for templates that are not local. Field validation must prove catalog pagination, dependency/collision blocking, creation-only import preview, explicit installation write and fresh post-install validation.
+Beta.20 retains the validated update/rollback/batch safety chain and adds the official upstream catalog plus individual controlled installation for templates that are not local. Field validation must prove catalog pagination, dependency/collision blocking, creation-only import preview, explicit installation write and fresh post-install validation.
 
 ## Safety assumptions
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.19 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.20 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. High-risk and local-overwrite candidates use the explicit individual reviewed path after verified rollback evidence. Conflict and unresolved templates remain hard blocked.
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.19
-git checkout -B release/0.1.0-beta.19 origin/release/0.1.0-beta.19
+git fetch origin release/0.1.0-beta.20
+git checkout -B release/0.1.0-beta.20 origin/release/0.1.0-beta.20
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.19
+0.1.0-beta.20
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.19`, enable the module and open:
+Confirm `0.1.0-beta.20`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -128,7 +128,7 @@ For one non-critical official template that is absent locally and has no missing
 
 Also test at least one blocked dependency case if naturally available. Missing linked templates must be listed and the write must remain disabled.
 
-Do not test recursive dependency installation: beta.19 intentionally requires dependencies to be installed individually first.
+Do not test recursive dependency installation: beta.20 intentionally requires dependencies to be installed individually first.
 
 ## 4. Native checkbox/subset selection
 
@@ -185,7 +185,7 @@ Before any write, inspect at least one item from each category that naturally oc
 
 If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
 
-### Beta.19 risk-calibration regression
+### Beta.20 risk-calibration regression
 
 When available in the lab, include `APC UPS Symmetra RM by SNMP` at installed version `7.0-3` with upstream `7.0-4`. The official delta removes `DISCARD_UNCHANGED_HEARTBEAT 6h` from a status item.
 
@@ -300,7 +300,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.19 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.20 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -375,9 +375,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.19 laboratory validation
+## 16. Exit criteria for beta.20 laboratory validation
 
-A Zabbix generation passes beta.19 only after evidence demonstrates:
+A Zabbix generation passes beta.20 only after evidence demonstrates:
 
 ```text
 module discovery/enable
