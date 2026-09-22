@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.16
+# Laboratory test plan — 0.1.0-beta.17
 
 ## Release state
 
@@ -11,9 +11,9 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.16`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.17`. A formal Git tag/GitHub release remains a later publication step.
 
-Beta.16 retains the validated individual update/rollback safety chain and moves heavy batch preparation into one bounded HTTP request per selected template. Field validation must confirm that the queue progresses through multiple candidates without a single long-lived request, that failed requests become Blocked, and that only a fully prepared set can expose Ready candidates for sequential execution.
+Beta.17 retains the validated individual update/rollback safety chain and moves heavy batch preparation into one bounded HTTP request per selected template. Field validation must confirm that the queue progresses through multiple candidates without a single long-lived request, that failed requests become Blocked, and that only a fully prepared set can expose Ready candidates for sequential execution.
 
 ## Safety assumptions
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.16
-git checkout -B release/0.1.0-beta.16 origin/release/0.1.0-beta.16
+git fetch origin release/0.1.0-beta.17
+git checkout -B release/0.1.0-beta.17 origin/release/0.1.0-beta.17
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.16
+0.1.0-beta.17
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.16`, enable the module and open:
+Confirm `0.1.0-beta.17`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -260,7 +260,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.16 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.17 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -335,9 +335,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.16 laboratory validation
+## 16. Exit criteria for beta.17 laboratory validation
 
-A Zabbix generation passes beta.16 only after evidence demonstrates:
+A Zabbix generation passes beta.17 only after evidence demonstrates:
 
 ```text
 module discovery/enable
