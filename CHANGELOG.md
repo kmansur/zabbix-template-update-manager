@@ -4,6 +4,17 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.20] - 2026-09-22
+
+### Fixed
+
+- Fixed an HTTP 500 on the expanded template catalog introduced in beta.19.
+- `TemplateList` now explicitly imports the native global Zabbix `CPagerHelper` and `CUrl` classes before using catalog pagination inside the module namespace.
+
+### Tests
+
+- Added a controller namespace contract that requires the native pager/URL imports and preserves the `CPagerHelper` pagination wiring.
+
 ## [0.1.0-beta.19] - 2026-09-22
 
 ### Added
