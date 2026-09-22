@@ -149,6 +149,7 @@ final class TemplateUpdatePreflightService {
 			'upstream_name' => $candidate['name'],
 			'upstream_technical_name' => $candidate['technical_name'],
 			'upstream_vendor_name' => $candidate['vendor_name'],
+			'external_template_names' => $candidate['external_template_names'],
 			'rollback_sha256' => $rollback['sha256'],
 			'current_export_sha256' => $rollback['current_export_sha256'],
 			'direct_host_count' => $result['direct_host_count'],
@@ -196,6 +197,14 @@ final class TemplateUpdatePreflightService {
 			break;
 		}
 
+		$externalTemplateNames = is_array($analysis['external_template_names'] ?? null)
+			? array_values(array_unique(array_filter(array_map(
+				static fn($name): string => trim((string) $name),
+				$analysis['external_template_names']
+			), static fn(string $name): bool => $name !== '')))
+			: [];
+		sort($externalTemplateNames, SORT_NATURAL | SORT_FLAG_CASE);
+
 		if (!preg_match('/^[a-f0-9]{40}$/', $commit)
 				|| !self::isSafeTemplatePath($path)
 				|| !preg_match('/^[a-f0-9]{32}$/', $uuid)
@@ -211,6 +220,7 @@ final class TemplateUpdatePreflightService {
 		return [
 			'commit' => $commit,
 			'path' => $path,
+			'external_template_names' => $externalTemplateNames,
 			'source_sha256' => $sourceSha256,
 			'content_sha256' => $contentSha256,
 			'uuid' => $uuid,
