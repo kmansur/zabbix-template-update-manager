@@ -4,6 +4,31 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.33] - 2026-09-22
+
+### Changed
+
+- Moved the reviewed-override checkbox from the Execution column to a dedicated leading Include column so large batches are easier to scan and select.
+- Added a header select-all checkbox that selects/deselects every currently eligible reviewed override in one action.
+- The select-all control tracks checked/unchecked/indeterminate state as individual reviewed rows are changed.
+- The Execution column now focuses on outcome/workflow state: `Reviewed batch eligible`, `Individual review required`, `Updated and validated`, `Blocked`, and `Review details`.
+
+### Safety
+
+- Select-all applies only to reviewed rows that already have verified rollback evidence, approved technical-risk-only reasons and valid reviewed-preflight evidence.
+- Rows containing `local_customization_overwrite` remain unselectable for batch override and still show `Individual review required`.
+- Conflict, Blocked, unresolved and request-failed rows remain unselectable.
+- Global confirmation, fresh reviewed preflight, bound SHA-256 evidence and stop-on-first-failure remain unchanged.
+
+### Field finding
+
+- A 50-template Zabbix 7.x preparation run produced 1 Ready, 35 Manual review and 14 Blocked candidates. Technical-risk-only reviewed rows updated successfully through the reviewed batch path, while several templates with local customization correctly remained individual-review-only.
+- Multiple AWS templates also exposed isolated per-template HTTP 504 preparation failures near 30 seconds; those remain handled by the existing request-failure retry/diagnostic path.
+
+### Tests
+
+- Added contract coverage for the leading reviewed-selection column, select-all behavior and indeterminate-state synchronization.
+
 ## [0.1.0-beta.32] - 2026-09-22
 
 ### Added
