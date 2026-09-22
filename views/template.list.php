@@ -39,10 +39,10 @@ $localSummary = (new CTableInfo())
 	]);
 
 $catalogSummary = (new CTableInfo())
-	->setHeader([_('Official catalog'), _('Installed/visible'), _('Not installed'), _('Updates available')])
+	->setHeader([_('Official catalog'), _('Official installed'), _('Not installed'), _('Updates available')])
 	->addRow([
 		$data['catalog_summary']['official_catalog_total'],
-		$data['catalog_summary']['installed_visible'],
+		$data['catalog_summary']['official_installed'],
 		$data['catalog_summary']['not_installed'],
 		$data['version_summary']['update_available']
 	]);
