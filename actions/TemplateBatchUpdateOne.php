@@ -23,12 +23,18 @@ class TemplateBatchUpdateOne extends CController {
 		$ret = $this->validateInput([
 			'templateid' => 'required|id',
 			'evidence_sha256' => 'required|string',
-			'confirm' => 'required|in 1'
+			'confirm' => 'required|in 1',
+			'manual_override' => 'in 1',
+			'confirm_manual_override' => 'in 1'
 		]);
 
 		if ($ret) {
 			$evidence = strtolower(trim((string) $this->getInput('evidence_sha256')));
 			$ret = preg_match('/^[a-f0-9]{64}$/', $evidence) === 1;
+		}
+
+		if ($ret && (string) $this->getInput('manual_override', '') === '1') {
+			$ret = (string) $this->getInput('confirm_manual_override', '') === '1';
 		}
 
 		if (!$ret) {
@@ -56,7 +62,8 @@ class TemplateBatchUpdateOne extends CController {
 		$output = ['ok' => false, 'result' => null, 'error' => null];
 
 		try {
-			$result = (new TemplateControlledUpdateService())->execute($templateId, $evidence);
+			$manualOverride = (string) $this->getInput('manual_override', '') === '1';
+			$result = (new TemplateControlledUpdateService())->execute($templateId, $evidence, $manualOverride);
 			$output['ok'] = true;
 			$output['result'] = $result;
 		}
