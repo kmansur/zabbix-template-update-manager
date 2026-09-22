@@ -25,7 +25,8 @@ class TemplateBatchUpdateOne extends CController {
 			'evidence_sha256' => 'required|string',
 			'confirm' => 'required|in 1',
 			'manual_override' => 'in 1',
-			'confirm_manual_override' => 'in 1'
+			'confirm_manual_override' => 'in 1',
+			'confirm_local_overwrite' => 'in 1'
 		]);
 
 		if ($ret) {
@@ -63,7 +64,13 @@ class TemplateBatchUpdateOne extends CController {
 
 		try {
 			$manualOverride = (string) $this->getInput('manual_override', '') === '1';
-			$result = (new TemplateControlledUpdateService())->execute($templateId, $evidence, $manualOverride);
+			$localOverwriteConfirmed = (string) $this->getInput('confirm_local_overwrite', '') === '1';
+			$result = (new TemplateControlledUpdateService())->execute(
+				$templateId,
+				$evidence,
+				$manualOverride,
+				$localOverwriteConfirmed
+			);
 			$output['ok'] = true;
 			$output['result'] = $result;
 		}
