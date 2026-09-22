@@ -94,8 +94,12 @@ final class TemplateUpdateAnalysisService {
 			$isolated = UpstreamTemplateDocumentService::buildImportSource(
 				$document,
 				$template['uuid'],
-				$template['upstream']
+				$template['upstream'],
+				true
 			);
+			$data['external_template_names'] = is_array($isolated['external_template_names'] ?? null)
+				? array_values(array_map('strval', $isolated['external_template_names']))
+				: [];
 
 			$compareService = new TemplateImportCompareService();
 			$currentDiff = $compareService->compare($isolated['source']);
@@ -231,7 +235,10 @@ final class TemplateUpdateAnalysisService {
 					$currentCommit,
 					$template['uuid'],
 					$template['vendor_version'],
-					$vendorName
+					$vendorName,
+					75,
+					null,
+					true
 				);
 
 				if (($baseline['status'] ?? null) === 'found') {
@@ -290,6 +297,7 @@ final class TemplateUpdateAnalysisService {
 			'template' => null,
 			'upstream_source' => null,
 			'source_path' => '',
+			'external_template_names' => [],
 			'comparison_summary' => ImportCompareSummary::summarize([]),
 			'content_status' => 'not_available',
 			'comparison_error' => null,
