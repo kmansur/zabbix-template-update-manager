@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.34**
+Current version: **0.1.0-beta.35**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.34 fixes reviewed select-all during long preparation runs. The header checkbox is now usable from the start of preparation and behaves as a sticky 'include all eligible' request: any technical-risk-only reviewed row that becomes eligible later is selected automatically. Local-customization overwrite, Conflict, Blocked and request-failed rows remain unselectable.
+Beta.35 makes local-customization Manual review rows explicitly batch-selectable instead of leaving the reviewed select-all with nothing to select. A local-overwrite row still requires verified rollback evidence, a passing reviewed preflight, its per-row selection, the normal reviewed-batch acknowledgement and an additional explicit acknowledgement that local customizations may be overwritten. Conflict, Blocked, unresolved and request-failed rows remain unselectable.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.34` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.35` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -71,7 +71,7 @@ Batch execution does not create a second write path. Each Ready template is exec
 
 Official identity is based on template UUID, never on vendor metadata alone. Version comparison, content comparison and update eligibility are separate stages.
 
-For an outdated official template, the standard controlled update path requires a proven historical baseline, complete three-way analysis, no conflict, no local-overwrite risk, and a persistent rollback artifact that exactly matches a fresh export of the installed template. `none`/`low` technical risk is standard-path eligible. Medium impact remains manual by default, except for narrowly recognized bounded changes explicitly marked `standard_path_eligible` by the risk analyzer; the current allowlist is limited to discard-only preprocessing maintenance. High technical risk remains Manual review, but beta.32 can accept an explicit per-row reviewed batch override only when rollback is verified, reviewed preflight passes and the reasons are technical-risk-only. Any local-customization overwrite still requires the separate individual reviewed path, while conflict/unresolved evidence remains blocked.
+For an outdated official template, the standard unattended path still requires a proven historical baseline, complete three-way analysis, no conflict, no local-overwrite risk, and a persistent rollback artifact that exactly matches a fresh export of the installed template. `none`/`low` technical risk is standard-path eligible. Medium impact remains manual by default, except for narrowly recognized bounded changes explicitly marked `standard_path_eligible` by the risk analyzer. Manual-review candidates can enter the reviewed batch only after verified rollback evidence and a passing manual-mode preflight. A `local_customization_overwrite` reason additionally requires a second explicit acknowledgement before the write; conflict/unresolved evidence remains blocked.
 
 Immediately before an update, ZTUM reruns the authoritative preflight, compares the explicit confirmation evidence with fresh server-side evidence, re-fetches the official template from the exact immutable upstream commit/path, verifies the raw YAML SHA-256 against the path-specific upstream index fingerprint, preserves the separate canonical template-content fingerprint in the evidence, and revalidates template identity. The selected source is then isolated with its required template/host groups plus top-level graphs and triggers that are exclusively owned by that template; unsafe cross-template dependencies are rejected.
 
@@ -150,8 +150,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.34
-git checkout -B release/0.1.0-beta.34 origin/release/0.1.0-beta.34
+git fetch origin release/0.1.0-beta.35
+git checkout -B release/0.1.0-beta.35 origin/release/0.1.0-beta.35
 cat VERSION
 git rev-parse HEAD
 ```
@@ -159,7 +159,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.34
+0.1.0-beta.35
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -175,7 +175,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.34**, enable the module and open:
+Confirm version **0.1.0-beta.35**, enable the module and open:
 
 ```text
 Data collection → Template updates
