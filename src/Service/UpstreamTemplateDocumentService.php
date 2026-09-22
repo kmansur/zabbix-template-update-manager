@@ -36,7 +36,8 @@ final class UpstreamTemplateDocumentService {
 		array $document,
 		string $expectedUuid,
 		string $expectedVendorVersion,
-		string $expectedVendorName = 'Zabbix'
+		string $expectedVendorName = 'Zabbix',
+		bool $allowExternalTemplateReferences = false
 	): array {
 		[$export, $template] = self::locateTemplate($document, $expectedUuid);
 		$metadata = self::metadataFromTemplate($template);
@@ -48,7 +49,7 @@ final class UpstreamTemplateDocumentService {
 			throw new RuntimeException('The historical template vendor does not match the requested baseline.');
 		}
 
-		return self::buildMinimalSource($export, $template);
+		return self::buildMinimalSource($export, $template, $allowExternalTemplateReferences);
 	}
 
 	public static function templateMetadata(array $document, string $expectedUuid): array {
