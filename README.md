@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.14**
+Current version: **0.1.0-beta.15**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.14 fixes the selected-template batch-entry control discovered during the first real multi-template field test. `Review selected updates` now uses the native `CActionButtonList` submit path, so the selected IDs and `ztum.templates.review_selected` action are posted through standard Zabbix form handling. Beta.14 retains the beta.13 rollback-format fix, beta.12 dependency-preserving isolation and beta.11 source-fingerprint protections.
+Beta.15 replaces long synchronous batch preparation with a request-bounded browser-driven queue. The selected set is rendered immediately, then each template is prepared in its own super-administrator/CSRF-protected request and the UI aggregates Ready / Manual review / Conflict / Blocked results with progress. This avoids the Cloudflare/Nginx 499/504 behavior observed when multiple full analyses were executed inside one HTTP request. Beta.15 retains all individual update/rollback safety protections from earlier betas.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.14` after the beta.13 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.15` after the beta.15 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -38,7 +38,7 @@ ZTUM currently provides:
 - official upstream source indexing by Zabbix release line;
 - native Zabbix checkbox/select-all selection of specific update candidates;
 - read-only selected-template review that rebuilds authoritative inventory/upstream/version state for the chosen subset;
-- bounded batch safety preparation for up to 25 explicitly selected templates;
+- bounded batch safety preparation for up to 25 explicitly selected templates, executed one candidate per HTTP request with visible progress;
 - automatic creation/refresh of rollback artifacts for standard low-risk candidates and explicitly reviewed manual-update candidates;
 - batch classification into Ready, Manual review, Conflict and Blocked; reviewed override candidates never become unattended batch Ready;
 - controlled sequential update of Ready templates only;
@@ -112,8 +112,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.14
-git checkout -B release/0.1.0-beta.14 origin/release/0.1.0-beta.14
+git fetch origin release/0.1.0-beta.15
+git checkout -B release/0.1.0-beta.15 origin/release/0.1.0-beta.15
 cat VERSION
 git rev-parse HEAD
 ```
@@ -121,7 +121,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.14
+0.1.0-beta.15
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -137,7 +137,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.14**, enable the module and open:
+Confirm version **0.1.0-beta.15**, enable the module and open:
 
 ```text
 Data collection → Template updates
