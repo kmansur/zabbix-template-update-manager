@@ -100,6 +100,16 @@ assertBatchContract(strpos($prepareView, "new CCheckBox('ztum-reviewed-select-al
 		&& strpos($prepareView, 'const updateReviewedSelectAll = () =>') !== false
 		&& strpos($prepareView, 'master.indeterminate = selected > 0 && selected < eligible.length;') !== false,
 	'The leading reviewed-selection column must provide select-all with checked/indeterminate synchronization.');
+assertBatchContract(strpos($prepareView, "->setId('ztum-reviewed-select-all');") !== false
+		&& strpos($prepareView, "->setId('ztum-reviewed-select-all')\n\t->setEnabled(false)") === false,
+	'Reviewed select-all must be clickable while preparation is still running.');
+assertBatchContract(strpos($prepareView, 'let autoSelectReviewed = false;') !== false
+		&& strpos($prepareView, 'checkbox.checked = autoSelectReviewed;') !== false
+		&& strpos($prepareView, 'autoSelectReviewed = checked;') !== false,
+	'Select-all chosen during preparation must automatically include reviewed rows that become eligible later.');
+assertBatchContract(strpos($prepareView, 'master.disabled = executionStarted || retryInProgress;') !== false
+		&& strpos($prepareView, 'eligible.length === 0') === false,
+	'Select-all must not be disabled merely because no eligible reviewed row has completed preparation yet.');
 assertBatchContract(strpos($prepareView, 'labels.review_batch_eligible') !== false
 		&& strpos($prepareView, 'labels.review_individual_only') !== false,
 	'Execution state must distinguish reviewed-batch-eligible rows from individual-review-only rows.');
