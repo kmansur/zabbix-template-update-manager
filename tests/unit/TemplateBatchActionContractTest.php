@@ -82,10 +82,11 @@ assertBatchContract(strpos($prepareView, "'compareUrl' => $compareUrl") !== fals
 		&& strpos($prepareView, "link.href = config.compareUrl + '&templateid=' + encodeURIComponent(templateId);") !== false
 		&& strpos($prepareView, "link.textContent = labels.review_details;") !== false,
 	'Manual-review rows must retain a direct Review details link to the individual comparison flow.');
-assertBatchContract(strpos($prepareView, "checkbox.id = 'ztum-review-select-' + templateId;") !== false
-		&& strpos($prepareView, 'labels.select_reviewed') !== false
+assertBatchContract(strpos($prepareView, "new CSpan('—'))->setId('ztum-select-'.$templateId)") !== false
+		&& strpos($prepareView, "checkbox.id = 'ztum-review-select-' + templateId;") !== false
+		&& strpos($prepareView, 'setReviewedSelection(templateId, category, manualState);') !== false
 		&& strpos($prepareView, 'reviewEvidence.set(templateId') !== false,
-	'Eligible technical-risk Manual review rows must expose an explicit per-row reviewed-update checkbox.');
+	'Eligible technical-risk Manual review rows must expose an explicit reviewed-update checkbox in the leading selection column.');
 assertBatchContract(strpos($prepareView, 'No unattended Ready templates. Select eligible Manual review rows below') !== false
 		&& strpos($prepareView, 'else if (counts.review > 0)') !== false,
 	'Review-only plans must explain how to continue with explicit reviewed selection.');
@@ -94,6 +95,14 @@ assertBatchContract(strpos($prepareView, "body.append('manual_override', '1')") 
 	'Reviewed batch execution must send both explicit manual-override signals.');
 assertBatchContract(strpos($prepareView, 'const reviewed = new Map(selectedReviewedEntries()') !== false,
 	'Ready and explicitly selected reviewed rows must be merged into one ordered request-bounded execution queue.');
+assertBatchContract(strpos($prepareView, "new CCheckBox('ztum-reviewed-select-all', '1')") !== false
+		&& strpos($prepareView, "byId('ztum-reviewed-select-all').addEventListener('change'") !== false
+		&& strpos($prepareView, 'const updateReviewedSelectAll = () =>') !== false
+		&& strpos($prepareView, 'master.indeterminate = selected > 0 && selected < eligible.length;') !== false,
+	'The leading reviewed-selection column must provide select-all with checked/indeterminate synchronization.');
+assertBatchContract(strpos($prepareView, 'labels.review_batch_eligible') !== false
+		&& strpos($prepareView, 'labels.review_individual_only') !== false,
+	'Execution state must distinguish reviewed-batch-eligible rows from individual-review-only rows.');
 
 assertBatchContract(strpos($update, "'templateids' => 'required|array_id'") !== false,
 	'Legacy batch execution must validate selected template IDs.');
