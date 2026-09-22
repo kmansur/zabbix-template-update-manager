@@ -4,6 +4,29 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.17] - 2026-09-22
+
+### Fixed
+
+- Per-template batch preparation now uses a dedicated module action explicitly registered with `layout.json` and `view: null`.
+- This fixes the field failure where `disableView()` still inherited the default module `layout.htmlpage`, causing the browser to receive `<!DOCTYPE ...>` around `main_block` instead of JSON.
+
+### Changed
+
+- Restored `ztum.templates.prepare_one` as the bounded one-template preparation endpoint, now with the correct JSON layout contract.
+- `ztum.templates.prepare_selected` remains HTML-only and renders the queue shell.
+
+### Safety
+
+- Both preparation actions remain super-administrator-only with native CSRF validation.
+- Heavy preparation remains one candidate per request.
+- No Zabbix configuration-write boundary changed.
+
+### Tests
+
+- Manifest validation now asserts the JSON layout and null view for `ztum.templates.prepare_one`.
+- Batch action contracts require the dedicated JSON route and continue enforcing the single-write boundary.
+
 ## [0.1.0-beta.16] - 2026-09-22
 
 ### Fixed
