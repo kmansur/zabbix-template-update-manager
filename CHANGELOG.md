@@ -4,6 +4,32 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.30] - 2026-09-22
+
+### Fixed
+
+- Batch preparation no longer leaves Manual review candidates in a dead-end-looking state. Each Manual review row now exposes a direct `Review and update` link to the existing individual comparison flow.
+- Zero-Ready plans that contain Manual review candidates now explain that unattended batch execution is unavailable and direct the operator to the per-row reviewed path instead of only stating that no Ready templates exist.
+
+### Changed
+
+- The Execution column now acts as a workflow continuation point: Ready rows remain executable through the request-bounded batch path, Manual review rows navigate to detailed comparison/reviewed preflight, and Conflict/Blocked rows remain non-executable.
+- The reviewed path itself is unchanged: authoritative comparison, verified rollback evidence, fresh reviewed preflight and a second explicit Super Admin acknowledgement remain mandatory before import.
+
+### Safety
+
+- High technical risk is still not promoted to unattended Ready. Beta.30 improves navigation only and does not relax the risk classifier or readiness gate.
+- Manual review links target the existing read-only comparison controller; no configuration write occurs from the batch page.
+- The single approved `configuration.import` boundary remains unchanged.
+
+### Field finding
+
+- Zabbix 7.x beta.29 field validation showed Aranet Cloud, Asterisk by HTTP and AWS by HTTP correctly reaching `review_backup_verified` with `high_technical_risk`, but the batch page gave no obvious continuation action. Beta.30 makes that required manual path explicit.
+
+### Tests
+
+- Added batch-view contract coverage for the direct Manual review comparison link and the review-only zero-Ready guidance.
+
 ## [0.1.0-beta.29] - 2026-09-22
 
 ### Fixed
