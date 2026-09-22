@@ -71,7 +71,10 @@ $installSelectionMode = $data['can_install'] && ($data['filter']['status'] ?? 'a
 $selectionForm = null;
 $selectAllHeader = '';
 
-if ($data['can_compare']) {
+$canRenderSelectionForm = $data['can_compare']
+	&& (($data['filter']['status'] ?? 'all') !== 'not_installed' || $data['can_install']);
+
+if ($canRenderSelectionForm) {
 	$selectionForm = (new CForm())
 		->addItem((new CVar(
 			CSRF_TOKEN_NAME,
@@ -85,12 +88,18 @@ if ($data['can_compare']) {
 		->setName('ztum_template_list');
 
 	$selectionNamespace = $installSelectionMode ? 'uuids' : 'templateids';
-	$selectAllHeader = (new CColHeader(
-		(new CCheckBox('all_templates'))
-			->onClick(
-				"checkAll('".$selectionForm->getName()."', 'all_templates', '".$selectionNamespace."');"
-			)
-	))->addClass(ZBX_STYLE_CELL_WIDTH);
+
+	if (!$installSelectionMode || $data['filtered_count'] <= 25) {
+		$selectAllHeader = (new CColHeader(
+			(new CCheckBox('all_templates'))
+				->onClick(
+					"checkAll('".$selectionForm->getName()."', 'all_templates', '".$selectionNamespace."');"
+				)
+		))->addClass(ZBX_STYLE_CELL_WIDTH);
+	}
+	else {
+		$selectAllHeader = (new CColHeader(''))->addClass(ZBX_STYLE_CELL_WIDTH);
+	}
 }
 
 $templateTable = (new CTableInfo())
