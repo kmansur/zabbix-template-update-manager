@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.14`.
+Current test version: `0.1.0-beta.15`.
 
 ## Non-negotiable rules
 
@@ -44,6 +44,8 @@ Current test version: `0.1.0-beta.14`.
 - `VERSION` is the project/module test-release version and must match `manifest.json`.
 
 Keep controllers thin. Put comparison, repository, inventory, backup, preflight, update and rollback logic in `src/` services/classes rather than in views or controllers.
+
+For multi-template preparation, keep one heavy candidate preparation per HTTP request. Do not reintroduce a single synchronous request that analyzes/prepares the complete selected batch.
 
 ## Zabbix compatibility
 
