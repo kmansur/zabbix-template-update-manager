@@ -2,7 +2,6 @@
 
 $root = dirname(__DIR__, 2);
 $prepare = (string) file_get_contents($root.'/actions/TemplateBatchPrepare.php');
-$prepareOne = (string) file_get_contents($root.'/actions/TemplateBatchPrepareOne.php');
 $update = (string) file_get_contents($root.'/actions/TemplateBatchUpdate.php');
 $prepareView = (string) file_get_contents($root.'/views/template.batch.prepare.php');
 $updateView = (string) file_get_contents($root.'/views/template.batch.update.php');
@@ -15,38 +14,44 @@ function assertBatchContract(bool $condition, string $message): void {
 	}
 }
 
-foreach ([$prepare, $prepareOne, $update] as $controller) {
+foreach ([$prepare, $update] as $controller) {
 	assertBatchContract(strpos($controller, 'disableCsrfValidation') === false,
 		'Batch actions must keep native CSRF validation enabled.');
 	assertBatchContract(strpos($controller, 'USER_TYPE_SUPER_ADMIN') !== false,
 		'Batch preparation and execution must be super-admin-only.');
 }
 
-foreach ([$prepare, $update] as $controller) {
-	assertBatchContract(strpos($controller, "'templateids' => 'required|array_id'") !== false,
-		'Batch selection/execution actions must validate selected template IDs.');
-}
+assertBatchContract(strpos($prepare, "'templateids' => 'array_id'") !== false,
+	'Batch preparation shell must validate the selected template ID array.');
+assertBatchContract(strpos($prepare, "'templateid' => 'id'") !== false
+		&& strpos($prepare, "'async' => 'in 1'") !== false,
+	'Per-template preparation mode must validate one template ID and explicit async mode.');
+assertBatchContract(strpos($prepare, 'build([$templateId], true)') !== false,
+	'Per-template asynchronous preparation must delegate exactly one candidate to TemplateBatchPlanService.');
+assertBatchContract(strpos($prepare, 'if ((int) $this->getInput(\'async\', 0) === 1)') !== false,
+	'The existing preparation action must explicitly branch between shell and one-template JSON modes.');
+assertBatchContract(strpos($prepare, 'disableView()') !== false,
+	'Per-template asynchronous preparation must return raw main_block JSON without a normal HTML view.');
+assertBatchContract(strpos($prepare, 'TemplateBatchPlanService())->build($templateIds') === false,
+	'Batch shell rendering must never synchronously prepare the complete selected set.');
 
-assertBatchContract(strpos($prepareOne, "'templateid' => 'required|id'") !== false,
-	'Per-template batch preparation must validate exactly one template ID.');
-assertBatchContract(strpos($prepare, '->build(') === false,
-	'Batch shell rendering must not synchronously prepare the full selected set.');
-assertBatchContract(strpos($prepareOne, 'TemplateBatchPlanService') !== false
-		&& strpos($prepareOne, 'build([$templateId], true)') !== false,
-	'Per-template preparation must delegate exactly one candidate to TemplateBatchPlanService.');
+assertBatchContract(strpos($update, "'templateids' => 'required|array_id'") !== false,
+	'Batch execution must validate selected template IDs.');
 assertBatchContract(strpos($update, 'TemplateBatchUpdateService') !== false,
 	'Batch update action must delegate to TemplateBatchUpdateService.');
 assertBatchContract(strpos($update, "'confirm' => 'required|in 1'") !== false,
 	'Batch update must require explicit confirmation.');
 
-assertBatchContract(strpos($manifest, '"ztum.templates.prepare_one"') !== false,
-	'Manifest must register the per-template preparation action.');
-assertBatchContract(strpos($prepareView, "CCsrfTokenHelper::get('ztum.templates.prepare_one')") !== false,
-	'Per-template preparation requests must carry their action-specific CSRF token.');
+assertBatchContract(strpos($manifest, '"ztum.templates.prepare_one"') === false,
+	'Batch queue must not depend on a second module route for per-template preparation.');
+assertBatchContract(strpos($prepareView, "CCsrfTokenHelper::get('ztum.templates.prepare_selected')") !== false,
+	'Per-template queue requests must reuse the registered preparation action CSRF token.');
+assertBatchContract(strpos($prepareView, "body.append('async', '1')") !== false,
+	'Queue requests must explicitly select one-template asynchronous mode.');
+assertBatchContract(strpos($prepareView, 'fetch(config.prepareSelectedUrl') !== false,
+	'Batch preparation view must drive one bounded HTTP request per template through the existing action.');
 assertBatchContract(strpos($prepareView, "CCsrfTokenHelper::get('ztum.templates.batch_update')") !== false,
 	'Batch execution form must carry the native action-specific CSRF token.');
-assertBatchContract(strpos($prepareView, 'fetch(config.prepareOneUrl') !== false,
-	'Batch preparation view must drive one bounded HTTP request per template.');
 assertBatchContract(strpos($prepareView, 'for (let index = 0; index < config.templateIds.length; index++)') !== false,
 	'Batch preparation queue must be sequential and bounded.');
 assertBatchContract(strpos($prepareView, 'Stop after current template') !== false,
@@ -59,7 +64,7 @@ assertBatchContract(strpos($prepareView, 'execution stops on the first failure')
 assertBatchContract(strpos($updateView, 'No automatic rollback is performed') !== false,
 	'Batch result view must explicitly state that rollback is not automatic.');
 
-$combined = $prepare.$prepareOne.$update.$prepareView.$updateView;
+$combined = $prepare.$update.$prepareView.$updateView;
 foreach ([
 	'API::Configuration()->import(',
 	'API::Template()->update(',
