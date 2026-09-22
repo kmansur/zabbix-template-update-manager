@@ -4,6 +4,30 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.15] - 2026-09-22
+
+### Fixed
+
+- Batch preparation no longer performs the complete selected set inside one long-lived HTTP request, avoiding proxy/client 499/504 failures observed behind Cloudflare.
+
+### Changed
+
+- `ztum.templates.prepare_selected` now renders a lightweight preparation queue shell only.
+- Added super-administrator-only `ztum.templates.prepare_one`, which prepares exactly one template and returns authoritative classification data as JSON.
+- The browser drives preparation sequentially one template per request and aggregates Ready / Manual review / Conflict / Blocked results.
+- Preparation progress is visible and can be stopped between templates.
+- Batch execution remains disabled until the complete selected set has finished preparation; only Ready items contribute fresh evidence to the update form.
+
+### Safety
+
+- Per-template preparation may create/refresh rollback evidence but never imports Zabbix configuration.
+- Batch execution still reruns fresh per-template preflight immediately before each write and preserves stop-on-first-failure semantics.
+- A failed/timeout preparation request is classified Blocked without losing results already completed for other candidates.
+
+### Tests
+
+- Added contract coverage requiring bounded per-template preparation, native CSRF protection, sequential queue behavior, cancellation between templates and unchanged single-write-boundary guarantees.
+
 ## [0.1.0-beta.14] - 2026-09-22
 
 ### Fixed

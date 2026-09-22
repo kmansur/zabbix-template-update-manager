@@ -14,28 +14,46 @@ $page = (new CHtmlPage())
 		(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
 	));
 
-if ($data['error'] !== null || !is_array($data['plan'])) {
-	$page->addItem(new CTag('p', true, $data['error'] ?? _('Batch preparation returned no plan.')))->show();
+if ($data['error'] !== null || $data['templateids'] === [] || $data['templates'] === []) {
+	$page->addItem(new CTag('p', true, $data['error'] ?? _('Batch preparation returned no selected templates.')))->show();
 	return;
 }
 
-$plan = $data['plan'];
-$summary = is_array($plan['summary'] ?? null) ? $plan['summary'] : [];
+$templateById = [];
+foreach ($data['templates'] as $template) {
+	$templateById[(string) $template['templateid']] = $template;
+}
+
+$selectedCount = count($data['templateids']);
+
 $summaryTable = (new CTableInfo())
-	->setHeader([_('Selected'), _('Ready'), _('Manual review'), _('Conflict'), _('Blocked')])
+	->setHeader([_('Selected'), _('Completed'), _('Ready'), _('Manual review'), _('Conflict'), _('Blocked')])
 	->addRow([
-		(int) ($summary['selected'] ?? 0),
-		(int) ($summary['ready'] ?? 0),
-		(int) ($summary['review'] ?? 0),
-		(int) ($summary['conflict'] ?? 0),
-		(int) ($summary['blocked'] ?? 0)
+		$selectedCount,
+		(new CSpan('0'))->setId('ztum-summary-completed'),
+		(new CSpan('0'))->setId('ztum-summary-ready'),
+		(new CSpan('0'))->setId('ztum-summary-review'),
+		(new CSpan('0'))->setId('ztum-summary-conflict'),
+		(new CSpan('0'))->setId('ztum-summary-blocked')
 	]);
 
+$progressText = (new CSpan(sprintf(_('Preparing %1$d of %2$d templates...'), 0, $selectedCount)))
+	->setId('ztum-batch-progress-text');
+
+$stopButton = (new CButton('ztum-batch-stop', _('Stop after current template')))
+	->setId('ztum-batch-stop')
+	->addClass(ZBX_STYLE_BTN_ALT);
+
 $page
-	->addItem(new CTag('h4', true, _('Batch preparation summary')))
+	->addItem(new CTag('h4', true, _('Batch preparation')))
 	->addItem($summaryTable)
+	->addItem(new CDiv([
+		$progressText,
+		' ',
+		$stopButton
+	]))
 	->addItem(new CTag('p', true, _(
-		'Preparation may create persistent rollback artifacts, but it does not import Zabbix configuration. Only templates with a freshly passed per-template preflight become Ready.'
+		'Each template is prepared in its own request. Preparation may create or refresh rollback evidence, but it never imports Zabbix configuration.'
 	)));
 
 $table = (new CTableInfo())
@@ -49,60 +67,250 @@ $table = (new CTableInfo())
 		_('Reason')
 	]);
 
-$readyIds = [];
-$evidence = [];
-foreach ($plan['items'] as $item) {
-	$category = (string) ($item['category'] ?? 'blocked');
-	if ($category === 'ready') {
-		$templateId = (string) $item['templateid'];
-		$readyIds[] = $templateId;
-		$evidence[$templateId] = (string) ($item['evidence_sha256'] ?? '');
-	}
+foreach ($data['templateids'] as $templateId) {
+	$template = $templateById[(string) $templateId] ?? [];
+	$name = (string) ($template['name'] ?? $templateId);
+	$installed = (string) ($template['vendor_version'] ?? '');
+	$hostCount = (int) ($template['host_count'] ?? 0);
 
-	$table->addRow([
-		(string) ($item['name'] ?? $item['templateid']),
-		(string) ($item['installed_version'] ?? '') !== '' ? (string) $item['installed_version'] : '—',
-		(string) ($item['available_version'] ?? '') !== '' ? (string) $item['available_version'] : '—',
-		(int) ($item['host_count'] ?? 0),
-		(string) ($item['readiness_status'] ?? '—'),
-		$categoryLabels[$category] ?? _('Blocked'),
-		(string) ($item['reason'] ?? '') !== '' ? (string) $item['reason'] : '—'
-	]);
+	$table->addRow(
+		(new CRow([
+			$name,
+			$installed !== '' ? $installed : '—',
+			(new CSpan('—'))->setId('ztum-available-'.$templateId),
+			$hostCount,
+			(new CSpan(_('Pending')))->setId('ztum-readiness-'.$templateId),
+			(new CSpan(_('Pending')))->setId('ztum-category-'.$templateId),
+			(new CSpan('—'))->setId('ztum-reason-'.$templateId)
+		]))->setId('ztum-row-'.$templateId)
+	);
 }
 
-$page->addItem(new CTag('h4', true, _('Prepared templates')))->addItem($table);
+$page
+	->addItem(new CTag('h4', true, _('Prepared templates')))
+	->addItem($table);
 
-if ($readyIds !== []) {
-	$action = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates.batch_update')->getUrl();
-	$form = (new CForm('post'))
-		->setId('ztum-batch-update-form')
-		->setAction($action)
-		->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.templates.batch_update')))->removeId());
+$updateAction = (new CUrl('zabbix.php'))
+	->setArgument('action', 'ztum.templates.batch_update')
+	->getUrl();
 
-	foreach ($readyIds as $index => $templateId) {
-		$form->addItem((new CVar('templateids['.$index.']', $templateId))->removeId());
-		$form->addItem((new CVar('evidence['.$templateId.']', $evidence[$templateId]))->removeId());
-	}
+$readyInputs = (new CDiv())->setId('ztum-batch-ready-inputs');
+$confirm = (new CCheckBox('confirm', '1'))
+	->setId('ztum-batch-confirm')
+	->setLabel(_('I reviewed the completed batch plan and want to update the Ready templates sequentially.'))
+	->setEnabled(false);
+$submit = (new CSubmitButton(_('Update ready templates')))
+	->setId('ztum-batch-update-submit')
+	->setEnabled(false);
 
-	$form->addItem([
-		(new CCheckBox('confirm', '1'))->setLabel(sprintf(
-			_('I reviewed the batch plan and want to update the %1$d Ready template(s) sequentially.'),
-			count($readyIds)
-		)),
-		new CSubmitButton(_('Update ready templates'))
-	]);
+$form = (new CForm('post'))
+	->setId('ztum-batch-update-form')
+	->setAction($updateAction)
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.templates.batch_update')))->removeId())
+	->addItem($readyInputs)
+	->addItem([$confirm, $submit]);
 
-	$page
-		->addItem(new CTag('h4', true, _('Controlled sequential execution')))
-		->addItem(new CTag('p', true, _(
-			'Each template reruns the complete preflight immediately before its own import. Execution stops on the first failure, evidence change, ambiguous state or validation problem. Templates after that point are not attempted.'
-		)))
-		->addItem($form);
-}
-else {
-	$page->addItem(new CTag('p', true, _(
-		'No selected template is currently eligible for controlled batch execution. Resolve manual-review, conflict or blocked states individually.'
-	)));
-}
+$page
+	->addItem(new CTag('h4', true, _('Controlled sequential execution')))
+	->addItem(new CTag('p', true, _(
+		'After preparation completes, only Ready templates can be submitted. Each template reruns fresh preflight immediately before import and execution stops on the first failure.'
+	)))
+	->addItem($form);
 
-$page->show();
+$prepareOneUrl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'ztum.templates.prepare_one')
+	->getUrl();
+
+$jsConfig = json_encode([
+	'templateIds' => array_values(array_map('strval', $data['templateids'])),
+	'prepareOneUrl' => $prepareOneUrl,
+	'csrfName' => CSRF_TOKEN_NAME,
+	'csrfToken' => CCsrfTokenHelper::get('ztum.templates.prepare_one')
+], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
+
+$jsLabels = json_encode([
+	'ready' => _('Ready'),
+	'review' => _('Manual review'),
+	'conflict' => _('Conflict / local overwrite'),
+	'blocked' => _('Blocked'),
+	'pending' => _('Pending'),
+	'processing' => _('Processing...'),
+	'request_failed' => _('Request failed'),
+	'complete' => _('Preparation complete.'),
+	'stopped' => _('Preparation stopped. Reload or return to the selection review to prepare the full set.'),
+	'stopping' => _('Stop requested; the current template will finish first.'),
+	'progress' => _('Preparing {current} of {total} templates...')
+], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
+
+$script = <<<'JS'
+(() => {
+	const config = __CONFIG__;
+	const labels = __LABELS__;
+	const counts = {ready: 0, review: 0, conflict: 0, blocked: 0};
+	const readyEvidence = new Map();
+	let completed = 0;
+	let stopRequested = false;
+	let fullyPrepared = false;
+
+	const byId = (id) => document.getElementById(id);
+	const setText = (id, value) => {
+		const element = byId(id);
+		if (element !== null) {
+			element.textContent = value;
+		}
+	};
+
+	const updateSummary = () => {
+		setText('ztum-summary-completed', String(completed));
+		for (const category of ['ready', 'review', 'conflict', 'blocked']) {
+			setText('ztum-summary-' + category, String(counts[category]));
+		}
+	};
+
+	const progress = (current, text = null) => {
+		const message = text ?? labels.progress
+			.replace('{current}', String(current))
+			.replace('{total}', String(config.templateIds.length));
+		setText('ztum-batch-progress-text', message);
+	};
+
+	const addReadyInput = (templateId, evidence) => {
+		const container = byId('ztum-batch-ready-inputs');
+		const index = readyEvidence.size;
+
+		const idInput = document.createElement('input');
+		idInput.type = 'hidden';
+		idInput.name = 'templateids[' + index + ']';
+		idInput.value = templateId;
+		container.appendChild(idInput);
+
+		const evidenceInput = document.createElement('input');
+		evidenceInput.type = 'hidden';
+		evidenceInput.name = 'evidence[' + templateId + ']';
+		evidenceInput.value = evidence;
+		container.appendChild(evidenceInput);
+
+		readyEvidence.set(templateId, evidence);
+	};
+
+	const applyItem = (templateId, item) => {
+		const category = ['ready', 'review', 'conflict', 'blocked'].includes(item.category)
+			? item.category
+			: 'blocked';
+
+		counts[category]++;
+		setText('ztum-available-' + templateId, item.available_version || '—');
+		setText('ztum-readiness-' + templateId, item.readiness_status || '—');
+		setText('ztum-category-' + templateId, labels[category] || labels.blocked);
+		setText('ztum-reason-' + templateId, item.reason || '—');
+
+		if (category === 'ready' && /^[a-f0-9]{64}$/.test(item.evidence_sha256 || '')) {
+			addReadyInput(templateId, item.evidence_sha256);
+		}
+	};
+
+	const applyRequestFailure = (templateId, error) => {
+		counts.blocked++;
+		setText('ztum-readiness-' + templateId, 'request_failed');
+		setText('ztum-category-' + templateId, labels.blocked);
+		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
+	};
+
+	const prepareOne = async (templateId) => {
+		const body = new FormData();
+		body.append(config.csrfName, config.csrfToken);
+		body.append('templateid', templateId);
+
+		const response = await fetch(config.prepareOneUrl, {
+			method: 'POST',
+			body,
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'}
+		});
+
+		if (!response.ok) {
+			throw new Error('HTTP ' + response.status);
+		}
+
+		const payload = await response.json();
+		if (!payload || payload.ok !== true || !payload.item) {
+			throw new Error(payload?.error || labels.request_failed);
+		}
+
+		return payload.item;
+	};
+
+	const updateExecutionState = () => {
+		const confirm = byId('ztum-batch-confirm');
+		const submit = byId('ztum-batch-update-submit');
+		const canExecute = fullyPrepared && readyEvidence.size > 0;
+
+		confirm.disabled = !canExecute;
+		if (!canExecute) {
+			confirm.checked = false;
+		}
+		submit.disabled = !(canExecute && confirm.checked);
+	};
+
+	const confirm = byId('ztum-batch-confirm');
+	confirm.addEventListener('change', updateExecutionState);
+
+	const stopButton = byId('ztum-batch-stop');
+	stopButton.addEventListener('click', () => {
+		stopRequested = true;
+		stopButton.disabled = true;
+		progress(completed, labels.stopping);
+	});
+
+	const run = async () => {
+		updateSummary();
+
+		for (let index = 0; index < config.templateIds.length; index++) {
+			if (stopRequested) {
+				break;
+			}
+
+			const templateId = config.templateIds[index];
+			progress(index + 1);
+			setText('ztum-readiness-' + templateId, labels.processing);
+			setText('ztum-category-' + templateId, labels.processing);
+			setText('ztum-reason-' + templateId, '—');
+
+			try {
+				const item = await prepareOne(templateId);
+				applyItem(templateId, item);
+			}
+			catch (error) {
+				applyRequestFailure(templateId, error);
+			}
+
+			completed++;
+			updateSummary();
+		}
+
+		stopButton.disabled = true;
+		fullyPrepared = !stopRequested && completed === config.templateIds.length;
+
+		if (fullyPrepared) {
+			progress(completed, labels.complete);
+		}
+		else {
+			progress(completed, labels.stopped);
+		}
+
+		updateExecutionState();
+	};
+
+	run();
+})();
+JS;
+
+$script = str_replace(
+	['__CONFIG__', '__LABELS__'],
+	[$jsConfig, $jsLabels],
+	$script
+);
+
+$page
+	->addItem(new CScriptTag($script))
+	->show();
