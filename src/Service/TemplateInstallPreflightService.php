@@ -16,6 +16,7 @@ require_once dirname(__DIR__).'/Support/ZabbixVersion.php';
 require_once __DIR__.'/ImportCompareSummary.php';
 require_once __DIR__.'/TemplateImportCompareService.php';
 require_once __DIR__.'/TemplateInstallDependencyService.php';
+require_once __DIR__.'/TemplateInstallReferenceAuditService.php';
 require_once __DIR__.'/TemplateInstallPreviewGate.php';
 require_once __DIR__.'/UpdatePreviewAnalyzer.php';
 require_once __DIR__.'/UpstreamTemplateDocumentService.php';
@@ -96,6 +97,19 @@ final class TemplateInstallPreflightService {
 			]);
 		}
 
+		$referenceAudit = TemplateInstallReferenceAuditService::analyze(
+			$isolated['template'],
+			$dependencies['required']
+		);
+
+		if (!$referenceAudit['safe']) {
+			return self::blocked('blocked_references', 'unresolved_internal_references', [
+				'candidate' => $candidate,
+				'dependencies' => $dependencies,
+				'reference_audit' => $referenceAudit
+			]);
+		}
+
 		$diff = (new TemplateImportCompareService())->compare($isolated['source'], 'json');
 		$summary = ImportCompareSummary::summarize($diff);
 		$preview = UpdatePreviewAnalyzer::analyze($diff, 200);
@@ -121,6 +135,9 @@ final class TemplateInstallPreflightService {
 			'content_sha256' => (string) ($candidate['content_sha256'] ?? ''),
 			'import_sha256' => (string) ($candidate['import_sha256'] ?? ''),
 			'dependencies' => $dependencies['required'],
+			'reference_audit' => [
+				'counts' => $referenceAudit['counts']
+			],
 			'comparison_summary' => [
 				'added' => (int) ($summary['added'] ?? 0),
 				'updated' => (int) ($summary['updated'] ?? 0),
@@ -135,6 +152,7 @@ final class TemplateInstallPreflightService {
 			'write_enabled' => true,
 			'candidate' => $candidate,
 			'dependencies' => $dependencies,
+			'reference_audit' => $referenceAudit,
 			'comparison_summary' => $summary,
 			'preview' => $preview,
 			'evidence_sha256' => self::evidenceSha256($evidence),
