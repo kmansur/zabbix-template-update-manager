@@ -452,12 +452,10 @@ $script = <<<'JS'
 			.filter((checkbox) => checkbox !== null && !checkbox.disabled);
 		const selected = eligible.filter((checkbox) => checkbox.checked).length;
 
-		selectAll.disabled = executionStarted || retryInProgress;
+		selectAll.disabled = executionStarted || retryInProgress || (fullyPrepared && eligible.length === 0);
 		clearAll.disabled = executionStarted || retryInProgress || (selected === 0 && !autoSelectReviewed);
-		selectAll.textContent = labels.select_all_reviewed
-			+ (eligible.length > 0 ? ' (' + eligible.length + ')' : '');
-		clearAll.textContent = labels.clear_all_reviewed
-			+ (selected > 0 ? ' (' + selected + ')' : '');
+		selectAll.textContent = labels.select_all_reviewed + ' (' + eligible.length + ')';
+		clearAll.textContent = labels.clear_all_reviewed + ' (' + selected + ')';
 	};
 
 	const selectedReviewedEntries = () => {
