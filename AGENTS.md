@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.12`.
+Current test version: `0.1.0-beta.13`.
 
 ## Non-negotiable rules
 
@@ -178,16 +178,17 @@ The rollback flow must include:
 
 1. explicit selection of a valid stored artifact from the bounded backup view;
 2. read-only rollback preflight using current `configuration.export` plus `configuration.importcompare` against the selected artifact;
-3. exact template ID/UUID identity match;
-4. deterministic rollback evidence fingerprint;
-5. explicit super-administrator confirmation through HTTP POST with native CSRF validation;
-6. fresh rollback preflight immediately before preparing the write;
-7. revalidation/loading of the exact selected artifact and its SHA-256/byte count;
-8. fresh persistent recovery backup of the current state before restoring the older artifact;
-9. exact equality between recovery-backup SHA/bytes and the current export participating in the final preflight;
-10. `configuration.import` executed only through `TemplateConfigurationImportService`;
-11. post-rollback validation of template ID, UUID, target vendor version and zero remaining import-comparison differences;
-12. retention of both the rollback target and recovery backup.
+3. rollback comparison must use the validated artifact format (`yaml` for current backup artifacts), never assume JSON;
+4. exact template ID/UUID identity match;
+5. deterministic rollback evidence fingerprint including target format;
+6. explicit super-administrator confirmation through HTTP POST with native CSRF validation;
+7. fresh rollback preflight immediately before preparing the write;
+8. revalidation/loading of the exact selected artifact and its SHA-256/byte count;
+9. fresh persistent recovery backup of the current state before restoring the older artifact;
+10. exact equality between recovery-backup SHA/bytes and the current export participating in the final preflight;
+11. `configuration.import` executed only through `TemplateConfigurationImportService`;
+12. post-rollback validation of template ID, UUID, target vendor version and zero remaining import-comparison differences;
+13. retention of both the rollback target and recovery backup.
 
 Rollback must never silently fall back from an invalid selected artifact to another artifact. It must never be triggered automatically after update failure and must never retry an ambiguous import automatically.
 

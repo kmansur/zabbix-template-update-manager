@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.12**
+Current version: **0.1.0-beta.13**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.12 fixes dependency-preserving template isolation discovered during the Zabbix 7.x Acronis controlled-update test. Official top-level graphs and triggers that belong to the selected template are now preserved in comparison, historical-baseline and import documents. Cross-template dependencies fail closed. Beta.12 also retains the beta.11 separation between raw YAML fingerprints and canonical per-template content fingerprints.
+Beta.13 fixes the rollback import-comparison format contract discovered during the first real rollback review after the successful Acronis controlled update. Stored rollback artifacts are YAML, and rollback review/post-validation now pass that exact format to `configuration.importcompare` instead of treating the bytes as JSON. Beta.13 retains the beta.12 dependency-preserving isolation and beta.11 source-fingerprint protections.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.12` after the beta.12 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.13` after the beta.12 changes are merged and validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -82,7 +82,7 @@ Individual update, sequential batch update and rollback all reuse that service. 
 
 Batch execution is deliberately bounded to 25 selected templates and stops immediately when one template does not return a successful validated update. Remaining templates are reported as **Not attempted**. Automatic rollback is never attempted because a failed post-write state may require operator inspection before choosing the correct recovery artifact.
 
-Rollback is never automatic. A super administrator must explicitly select a valid stored artifact, review a fresh `configuration.importcompare` preview and confirm the operation. Before restoring the older artifact, ZTUM creates a fresh recovery backup of the current state and verifies that it exactly matches the current export participating in rollback preflight.
+Rollback is never automatic. A super administrator must explicitly select a valid stored artifact, review a fresh `configuration.importcompare` preview and confirm the operation. The preview and post-rollback validation use the stored artifact format explicitly; current backup artifacts are private YAML exports. Before restoring the older artifact, ZTUM creates a fresh recovery backup of the current state and verifies that it exactly matches the current export participating in rollback preflight.
 
 If an import has occurred but final validation cannot prove the expected state, the module reports that a write occurred and does not retry automatically.
 
@@ -112,8 +112,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.12
-git checkout -B release/0.1.0-beta.12 origin/release/0.1.0-beta.12
+git fetch origin release/0.1.0-beta.13
+git checkout -B release/0.1.0-beta.13 origin/release/0.1.0-beta.13
 cat VERSION
 git rev-parse HEAD
 ```
@@ -121,7 +121,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.12
+0.1.0-beta.13
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -137,7 +137,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.12**, enable the module and open:
+Confirm version **0.1.0-beta.13**, enable the module and open:
 
 ```text
 Data collection → Template updates

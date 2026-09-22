@@ -4,6 +4,24 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.13] - 2026-09-22
+
+### Fixed
+
+- Rollback review now passes the stored artifact format to `configuration.importcompare` instead of always treating rollback YAML as JSON.
+- Post-rollback validation now uses the same artifact format, preventing a successful YAML restore from failing its final comparison with `Cannot read JSON: Syntax error`.
+- Rollback preflight evidence now binds the target format and the final rollback target revalidation verifies that the format has not changed.
+
+### Safety
+
+- Unsupported rollback comparison formats fail closed before a Zabbix API comparison call.
+- The stored format participates in rollback TOCTOU evidence and target matching; no configuration-write boundary was added or changed.
+
+### Tests
+
+- Added regression coverage proving stored YAML backup bytes reach `configuration.importcompare` with `format=yaml` during review and post-rollback validation.
+- Added format-preservation assertions across rollback preflight and rollback result descriptors.
+
 ## [0.1.0-beta.12] - 2026-09-21
 
 ### Fixed
