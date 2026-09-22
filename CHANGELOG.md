@@ -4,6 +4,29 @@ All notable changes to Zabbix Template Update Manager will be documented in this
 
 ## [Unreleased]
 
+## [0.1.0-beta.28] - 2026-09-22
+
+### Fixed
+
+- Multi-template update execution no longer keeps the whole Ready set inside one synchronous frontend request. Each Ready template now executes in its own request, preventing cumulative batch runtime from triggering reverse-proxy/Cloudflare 504 timeouts.
+- A request failure stops client-side sequencing immediately and marks every later Ready template as Not attempted instead of continuing into an ambiguous state.
+- The legacy synchronous `ztum.templates.batch_update` endpoint now fails fast for selections larger than one template.
+
+### Changed
+
+- Controlled update execution now mirrors the existing request-bounded installation architecture: browser-side sequential orchestration, per-template CSRF-protected JSON execution, visible per-row execution state and aggregate Updated/Failed/Not attempted/write counters.
+- The execution page stays in place while the queue runs; successful templates report version/validation inline.
+
+### Safety
+
+- Every per-template request still delegates to `TemplateControlledUpdateService`, which reruns fresh authoritative preflight, verifies bound evidence, reconstructs the immutable candidate and uses the single approved configuration-import boundary.
+- Execution still stops on the first non-success. No automatic rollback or blind retry was added.
+- A transport timeout for one individual template remains an ambiguous state and must be inspected before retrying; request-bounding removes only cumulative multi-template timeout exposure.
+
+### Tests
+
+- Added action-contract coverage for the request-bounded update route, per-template evidence/confirmation, sequential browser queue, stop-on-first-failure behavior and legacy multi-template fail-fast protection.
+
 ## [0.1.0-beta.27] - 2026-09-22
 
 ### Fixed
