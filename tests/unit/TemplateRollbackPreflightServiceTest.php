@@ -51,16 +51,22 @@ $diff = [
 	]
 ];
 
+$observedFormat = null;
 $service = new TemplateRollbackPreflightService(
 	static fn(string $templateId, string $manifestFile): array => $artifact,
 	static fn(string $templateId): array => $template,
 	static fn(string $templateId): array => $currentExport,
-	static fn(string $source): array => $diff
+	static function (string $source, string $format) use ($diff, &$observedFormat): array {
+		$observedFormat = $format;
+		return $diff;
+	}
 );
 $result = $service->run('12345', $manifest);
 assertRollbackPreflight('ready', $result['status'], 'A valid differing artifact should be ready for explicit rollback confirmation.');
 assertRollbackPreflight(false, $result['write_enabled'], 'Rollback preflight must never write configuration.');
 assertRollbackPreflight(1, $result['comparison_summary']['total'], 'Rollback preflight must summarize import differences.');
+assertRollbackPreflight('yaml', $observedFormat, 'Rollback preflight must compare stored backup bytes using their YAML format.');
+assertRollbackPreflight('yaml', $result['target']['format'], 'Rollback target evidence must retain the artifact format.');
 assertRollbackPreflight(true, is_string($result['evidence_sha256']) && strlen($result['evidence_sha256']) === 64, 'Rollback preflight must emit evidence fingerprint.');
 $resultAgain = $service->run('12345', $manifest);
 assertRollbackPreflight($result['evidence_sha256'], $resultAgain['evidence_sha256'], 'Unchanged rollback evidence must be deterministic.');
@@ -69,7 +75,7 @@ $already = new TemplateRollbackPreflightService(
 	static fn(string $templateId, string $manifestFile): array => $artifact,
 	static fn(string $templateId): array => $template,
 	static fn(string $templateId): array => $currentExport,
-	static fn(string $source): array => []
+	static fn(string $source, string $format): array => []
 );
 $result = $already->run('12345', $manifest);
 assertRollbackPreflight('already_restored', $result['status'], 'No import differences should suppress rollback.');
@@ -80,7 +86,7 @@ $blocked = new TemplateRollbackPreflightService(
 	static fn(string $templateId, string $manifestFile): array => $artifact,
 	static fn(string $templateId): array => $wrongTemplate,
 	static fn(string $templateId): array => $currentExport,
-	static fn(string $source): array => $diff
+	static fn(string $source, string $format): array => $diff
 );
 $result = $blocked->run('12345', $manifest);
 assertRollbackPreflight('blocked_identity', $result['status'], 'Rollback must fail closed when UUID identity differs.');

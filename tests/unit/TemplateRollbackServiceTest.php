@@ -27,6 +27,7 @@ $targetDescriptor = [
 	'templateid' => '12345',
 	'uuid' => $uuid,
 	'vendor_version' => '7.0-3',
+	'format' => 'yaml',
 	'created_at' => '2026-09-15T03:00:00+00:00',
 	'bytes' => 6,
 	'sha256' => $targetSha,
@@ -75,6 +76,7 @@ assertRollbackService('rolled_back', $result['status'], 'Matching fresh evidence
 assertRollbackService(true, $result['write_performed'], 'Successful rollback must report configuration write.');
 assertRollbackService(true, $imported, 'Rollback importer must run after recovery backup and second preflight.');
 assertRollbackService($currentSha, $result['recovery_backup']['sha256'], 'Rollback result must retain recovery backup fingerprint.');
+assertRollbackService('yaml', $result['target']['format'], 'Rollback result must retain the selected artifact format evidence.');
 
 $imported = false;
 $result = $service->execute('12345', $manifest, hash('sha256', 'stale'));

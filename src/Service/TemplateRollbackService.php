@@ -179,7 +179,7 @@ final class TemplateRollbackService {
 
 	private function assertTargetMatchesPreflight(array $artifact, array $preflight): void {
 		$target = is_array($preflight['target'] ?? null) ? $preflight['target'] : [];
-		foreach (['templateid', 'uuid', 'vendor_version', 'manifest_file', 'source_file', 'sha256'] as $field) {
+		foreach (['templateid', 'uuid', 'vendor_version', 'format', 'manifest_file', 'source_file', 'sha256'] as $field) {
 			if ((string) ($artifact[$field] ?? '') !== (string) ($target[$field] ?? '')) {
 				throw new RuntimeException('The rollback target changed after the final preflight.');
 			}
@@ -205,6 +205,7 @@ final class TemplateRollbackService {
 		return [
 			'created_at' => (string) ($artifact['created_at'] ?? ''),
 			'vendor_version' => (string) ($artifact['vendor_version'] ?? ''),
+			'format' => strtolower(trim((string) ($artifact['format'] ?? ''))),
 			'bytes' => (int) ($artifact['bytes'] ?? 0),
 			'sha256' => (string) ($artifact['sha256'] ?? ''),
 			'manifest_file' => (string) ($artifact['manifest_file'] ?? ''),

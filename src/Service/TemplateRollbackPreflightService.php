@@ -162,6 +162,7 @@ final class TemplateRollbackPreflightService {
 			'name' => (string) ($artifact['name'] ?? ''),
 			'technical_name' => (string) ($artifact['technical_name'] ?? ''),
 			'vendor_version' => (string) ($artifact['vendor_version'] ?? ''),
+			'format' => strtolower(trim((string) ($artifact['format'] ?? ''))),
 			'created_at' => (string) ($artifact['created_at'] ?? ''),
 			'bytes' => (int) ($artifact['bytes'] ?? 0),
 			'sha256' => (string) ($artifact['sha256'] ?? ''),

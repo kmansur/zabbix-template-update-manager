@@ -17,11 +17,17 @@ final class TemplateImportCompareService {
 			throw new RuntimeException('The comparison source format is not supported.');
 		}
 
-		return API::Configuration()->importcompare([
+		$result = API::Configuration()->importcompare([
 			'format' => $format,
 			'source' => $source,
 			'rules' => self::rules()
 		]);
+
+		if (!is_array($result)) {
+			throw new RuntimeException('Zabbix configuration import comparison returned invalid data.');
+		}
+
+		return $result;
 	}
 
 	public static function rules(): array {

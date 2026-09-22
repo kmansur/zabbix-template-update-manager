@@ -33,8 +33,8 @@ final class TemplatePostRollbackValidationService {
 			}
 			return $template;
 		};
-		$this->comparer = $comparer ?? static fn(string $source): array
-			=> (new TemplateImportCompareService())->compare($source);
+		$this->comparer = $comparer ?? static fn(string $source, string $format): array
+			=> (new TemplateImportCompareService())->compare($source, $format);
 	}
 
 	public function validate(string $templateId, array $artifact): array {
@@ -45,9 +45,13 @@ final class TemplatePostRollbackValidationService {
 
 		$expectedUuid = self::normalizeUuid((string) ($artifact['uuid'] ?? ''));
 		$expectedVersion = (string) ($artifact['vendor_version'] ?? '');
+		$format = strtolower(trim((string) ($artifact['format'] ?? '')));
 		$source = $artifact['source'] ?? null;
 		if (!preg_match('/^[a-f0-9]{32}$/', $expectedUuid) || !is_string($source) || $source === '') {
 			throw new RuntimeException('The rollback target identity/source is invalid.');
+		}
+		if (!in_array($format, ['json', 'yaml'], true)) {
+			throw new RuntimeException('The rollback target format is unsupported.');
 		}
 
 		$template = ($this->templateLoader)($templateId);
@@ -55,7 +59,7 @@ final class TemplatePostRollbackValidationService {
 			throw new RuntimeException('Post-rollback template loader returned invalid data.');
 		}
 
-		$diff = ($this->comparer)($source);
+		$diff = ($this->comparer)($source, $format);
 		if (!is_array($diff)) {
 			throw new RuntimeException('Post-rollback import comparison returned invalid data.');
 		}
