@@ -47,8 +47,8 @@ foreach ($views as $file) {
 }
 
 foreach ([
-	$root.'/views/template.batch.prepare.php',
-	$root.'/views/template.install.batch.prepare.php'
+	$root.'/views/ztum.template.batch.prepare.php',
+	$root.'/views/ztum.template.install.batch.prepare.php'
 ] as $batchView) {
 	$content = (string) file_get_contents($batchView);
 	if (strpos($content, 'setOnDocumentReady()') === false) {
@@ -56,7 +56,7 @@ foreach ([
 	}
 }
 
-$updateBatch = (string) file_get_contents($root.'/views/template.batch.prepare.php');
+$updateBatch = (string) file_get_contents($root.'/views/ztum.template.batch.prepare.php');
 if (strpos($updateBatch, "new CCheckBox('review_select['.\$templateId.']', '1')") === false) {
 	$fail('Reviewed update selection must be rendered with native CCheckBox controls.');
 }
