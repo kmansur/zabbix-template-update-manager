@@ -255,7 +255,7 @@ foreach ($data['templates'] as $template) {
 		$isInstalled ? (int) $template['host_count'] : '—',
 		$actionCell,
 		$backupCell,
-		$template['uuid'] !== '' ? $template['uuid'] : '—'
+		$template['uuid'] !== '' ? FrontendUi::fingerprint($template['uuid'], 12) : '—'
 	]);
 }
 
