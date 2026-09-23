@@ -11,8 +11,14 @@ final class HistoricalTemplateBaselineService {
 	private $historyLoader;
 	private $sourceLoader;
 	private $documentReader;
+	private $previousPathResolver;
 
-	public function __construct(?callable $historyLoader = null, ?callable $sourceLoader = null, ?callable $documentReader = null) {
+	public function __construct(
+		?callable $historyLoader = null,
+		?callable $sourceLoader = null,
+		?callable $documentReader = null,
+		?callable $previousPathResolver = null
+	) {
 		if ($historyLoader === null) {
 			$historyRepository = new UpstreamTemplateHistoryRepository();
 			$historyLoader = static fn(string $path, string $until, int $limit): array
@@ -32,9 +38,16 @@ final class HistoricalTemplateBaselineService {
 			};
 		}
 
+		if ($previousPathResolver === null) {
+			$historyRepository = $historyRepository ?? new UpstreamTemplateHistoryRepository();
+			$previousPathResolver = static fn(string $commit, string $path): ?string
+				=> $historyRepository->previousPathAtCommit($commit, $path);
+		}
+
 		$this->historyLoader = $historyLoader;
 		$this->sourceLoader = $sourceLoader;
 		$this->documentReader = $documentReader;
+		$this->previousPathResolver = $previousPathResolver;
 	}
 
 	/**
@@ -85,6 +98,8 @@ final class HistoricalTemplateBaselineService {
 		$seenTargetVersion = false;
 		$versionBoundaryReached = false;
 		$candidatesByHash = [];
+		$historicalPath = $path;
+		$previousCommit = null;
 
 		// The canonical Bitbucket commit endpoint returns newest -> oldest for the path.
 		// Once the requested version block has been entered and an older version is
@@ -96,17 +111,12 @@ final class HistoricalTemplateBaselineService {
 			}
 
 			$examined++;
-			$source = ($this->sourceLoader)($id, $path);
-			if (!is_array($source) || !is_string($source['content'] ?? null)) {
-				throw new RuntimeException('The historical source loader returned an invalid result.');
-			}
-
-			$document = ($this->documentReader)($source['content']);
-			if (!is_array($document)) {
-				throw new RuntimeException('The historical template parser returned an invalid document.');
-			}
-
-			$metadata = UpstreamTemplateDocumentService::templateMetadata($document, $uuid);
+			$loaded = $this->loadRevision($id, $historicalPath, $previousCommit, $uuid);
+			$source = $loaded['source'];
+			$document = $loaded['document'];
+			$metadata = $loaded['metadata'];
+			$historicalPath = $loaded['path'];
+			$previousCommit = $id;
 			if ($metadata['vendor_version'] !== $targetVendorVersion) {
 				if ($seenTargetVersion) {
 					$versionBoundaryReached = true;
@@ -228,6 +238,77 @@ final class HistoricalTemplateBaselineService {
 			'closest_commit' => $closest['commit'] ?? '',
 			'closest_changes' => $closest['semantic_distance'] ?? null,
 			'source' => null
+		];
+	}
+
+	private function loadRevision(
+		string $commit,
+		string $path,
+		?string $previousCommit,
+		string $uuid
+	): array {
+		try {
+			return $this->loadRevisionAtPath($commit, $path, $uuid);
+		}
+		catch (\Throwable $firstException) {
+			if ($previousCommit !== null) {
+				try {
+					$previousPath = ($this->previousPathResolver)($previousCommit, $path);
+				}
+				catch (\Throwable $resolverException) {
+					throw new RuntimeException(sprintf(
+						'Unable to resolve historical path before commit %s while reading %s: %s',
+						$previousCommit,
+						$path,
+						$resolverException->getMessage()
+					), 0, $resolverException);
+				}
+
+				if (is_string($previousPath)
+						&& $previousPath !== ''
+						&& $previousPath !== $path) {
+					try {
+						return $this->loadRevisionAtPath($commit, $previousPath, $uuid);
+					}
+					catch (\Throwable $retryException) {
+						throw new RuntimeException(sprintf(
+							'Unable to read historical template revision %s using current path %s or rename-aware path %s: %s',
+							$commit,
+							$path,
+							$previousPath,
+							$retryException->getMessage()
+						), 0, $retryException);
+					}
+				}
+			}
+
+			throw new RuntimeException(sprintf(
+				'Unable to read historical template revision %s at path %s: %s',
+				$commit,
+				$path,
+				$firstException->getMessage()
+			), 0, $firstException);
+		}
+	}
+
+	private function loadRevisionAtPath(string $commit, string $path, string $uuid): array {
+		$source = ($this->sourceLoader)($commit, $path);
+		if (!is_array($source) || !is_string($source['content'] ?? null)) {
+			throw new RuntimeException('The historical source loader returned an invalid result.');
+		}
+
+		$document = ($this->documentReader)($source['content']);
+		if (!is_array($document)) {
+			throw new RuntimeException('The historical template parser returned an invalid document.');
+		}
+
+		$metadata = UpstreamTemplateDocumentService::templateMetadata($document, $uuid);
+
+		return [
+			'source' => $source,
+			'document' => $document,
+			'metadata' => $metadata,
+			'path' => $path
 		];
 	}
 
