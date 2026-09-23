@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $versionLabels = [
 	'current' => _('Current'),
 	'update_available' => _('Update available'),
@@ -8,6 +12,24 @@ $versionLabels = [
 	'upstream_version_missing' => _('Upstream version missing'),
 	'version_uncomparable' => _('Version format cannot be compared'),
 	'not_applicable' => _('Not applicable')
+];
+
+$versionTones = [
+	'current' => FrontendUi::SUCCESS,
+	'update_available' => FrontendUi::WARNING,
+	'installed_newer' => FrontendUi::INFO,
+	'installed_version_missing' => FrontendUi::DANGER,
+	'upstream_version_missing' => FrontendUi::DANGER,
+	'version_uncomparable' => FrontendUi::WARNING,
+	'not_applicable' => FrontendUi::MUTED
+];
+
+$upstreamTones = [
+	'official_match' => FrontendUi::SUCCESS,
+	'not_found' => FrontendUi::MUTED,
+	'no_uuid' => FrontendUi::WARNING,
+	'invalid_uuid' => FrontendUi::DANGER,
+	'repository_unavailable' => FrontendUi::DANGER
 ];
 
 $upstreamLabels = [
@@ -68,8 +90,14 @@ foreach ($data['templates'] as $template) {
 		$template['name'],
 		$template['vendor_version'] !== '' ? $template['vendor_version'] : '—',
 		($template['upstream_vendor_version'] ?? '') !== '' ? $template['upstream_vendor_version'] : '—',
-		$versionLabels[$template['version_status'] ?? 'not_applicable'] ?? _('Unknown'),
-		$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
+		FrontendUi::status(
+			$versionLabels[$template['version_status'] ?? 'not_applicable'] ?? _('Unknown'),
+			$versionTones[$template['version_status'] ?? 'not_applicable'] ?? FrontendUi::MUTED
+		),
+		FrontendUi::status(
+			$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
+			$upstreamTones[$template['upstream_status'] ?? 'repository_unavailable'] ?? FrontendUi::MUTED
+		),
 		(int) $template['host_count'],
 		$eligible ? new CLink(_('Review update'), $compareUrl) : _('No longer eligible')
 	]);
