@@ -1,4 +1,4 @@
-# Project status and engineering audit — 0.1.0-beta.52
+# Project status and engineering audit — 0.1.0-beta.53
 
 Date: 2026-09-23
 
@@ -15,17 +15,19 @@ The estimate deliberately separates implementation from automation and field val
 | Discovery/catalog/upstream identity | 10% | 97% | Official catalog/index identity, immutable initial-release baselines and verified offline source mode implemented |
 | Comparison/risk/readiness | 20% | 97% | Historical/initial-release BASE, three-way, risk, readiness, persistent Never update policy and dependency-aware comparison implemented |
 | Update/install/rollback write paths | 20% | 97% | Controlled writes, evidence, post-write validation, reviewed overrides and serialization implemented |
-| Native Zabbix UI/UX | 10% | 97% | Native presentation/copy pass plus Never update policy controls/filter complete; cross-version light/dark field validation remains |
+| Native Zabbix UI/UX | 10% | 97% | Native presentation/copy pass, Never update controls and Zabbix 7.x/8.x pager compatibility implemented; cross-version light/dark field validation remains |
 | Automated validation/CI | 10% | 98% | CI/UI/security/workflow/offline/runtime/coverage gates implemented; browser E2E and independent security review remain |
 | Runtime resilience | 10% | 94% | Request-bounded flows, immutable history caching, rename-aware paths, initial-release BASE, offline mode and operation lock implemented |
-| Field validation | 10% | 70% | End-to-end Zabbix 7.x update field evidence is strong; Zabbix 8.x and cross-theme/community matrix remain incomplete |
+| Field validation | 10% | 65% | End-to-end Zabbix 7.x evidence is strong; Zabbix 8.x field testing exposed and beta.53 fixes a catalog pager compatibility blocker, but the full 8.x/cross-theme matrix still needs retesting |
 | Release engineering | 10% | 82% | Quick install, release workflow/assets/checksums/policy implemented; license decision and first community-test prerelease remain |
 
 Weighted result: **92%**.
 
-## Major improvements through beta.52
+## Major improvements through beta.53
 
 The external review's principal technical/process findings were converted into implementation work:
+
+- cross-version frontend compatibility: beta.53 adds runtime resolution for the pager constants renamed between Zabbix 7.x and 8.x after a real Zabbix 8 HTTP 500 field finding;
 
 - persistent update protection: per-template **Never update** policy with UUID-based private storage, catalog filter, explicit reversal and fail-closed enforcement at preparation/preflight/import gates;
 
