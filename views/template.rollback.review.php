@@ -12,7 +12,11 @@ $backUrl = (new CUrl('zabbix.php'))
 
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
-	->addItem(new CLink(_('Back to rollback backup history'), $backUrl));
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(new CLink(_('Back to rollback backup history'), $backUrl))
+		))->setAttribute('aria-label', _('Content controls'))
+	);
 
 if ($data['preflight_error'] !== null) {
 	$page
