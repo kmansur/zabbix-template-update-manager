@@ -22,8 +22,11 @@ Default persistent root:
 /var/lib/zabbix-template-update-manager
 ├── backups/
 ├── offline/
-└── locks/
+├── locks/
+└── update-policy.json   # created on first Never update policy change
 ```
+
+`update-policy.json` is created as mode `0600` by the PHP-FPM/web runtime account and stores the global UUID-based **Never update** policy. Back up this file with the rest of the ZTUM runtime state if policy continuity matters across server rebuilds.
 
 All directories are created as mode `0700` and owned by the resolved runtime account. The script refuses symbolic-link targets and does not edit PHP-FPM configuration.
 

@@ -1,4 +1,4 @@
-# Project status and engineering audit — 0.1.0-beta.51
+# Project status and engineering audit — 0.1.0-beta.52
 
 Date: 2026-09-23
 
@@ -13,9 +13,9 @@ The estimate deliberately separates implementation from automation and field val
 | Area | Weight | Estimated completion | Notes |
 |---|---:|---:|---|
 | Discovery/catalog/upstream identity | 10% | 97% | Official catalog/index identity, immutable initial-release baselines and verified offline source mode implemented |
-| Comparison/risk/readiness | 20% | 96% | Historical/initial-release BASE, three-way, risk, readiness and dependency-aware comparison implemented |
+| Comparison/risk/readiness | 20% | 97% | Historical/initial-release BASE, three-way, risk, readiness, persistent Never update policy and dependency-aware comparison implemented |
 | Update/install/rollback write paths | 20% | 97% | Controlled writes, evidence, post-write validation, reviewed overrides and serialization implemented |
-| Native Zabbix UI/UX | 10% | 96% | Full native presentation/copy pass complete; cross-version light/dark field validation remains |
+| Native Zabbix UI/UX | 10% | 97% | Native presentation/copy pass plus Never update policy controls/filter complete; cross-version light/dark field validation remains |
 | Automated validation/CI | 10% | 98% | CI/UI/security/workflow/offline/runtime/coverage gates implemented; browser E2E and independent security review remain |
 | Runtime resilience | 10% | 94% | Request-bounded flows, immutable history caching, rename-aware paths, initial-release BASE, offline mode and operation lock implemented |
 | Field validation | 10% | 70% | End-to-end Zabbix 7.x update field evidence is strong; Zabbix 8.x and cross-theme/community matrix remain incomplete |

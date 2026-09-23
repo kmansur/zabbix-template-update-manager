@@ -13,6 +13,7 @@ use CTag;
 use CUrl;
 use CWebUser;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\TemplateUpdatePolicyRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateVersionComparator;
@@ -23,6 +24,7 @@ use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Repository/TemplateRepository.php';
+require_once dirname(__DIR__).'/src/Repository/TemplateUpdatePolicyRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateVersionComparator.php';
@@ -42,7 +44,7 @@ class TemplateList extends CController {
 			'page' => 'ge 1',
 			'filter_set' => 'in 1',
 			'filter_rst' => 'in 1',
-			'filter_status' => 'in all,current,not_applicable,update_available,not_installed',
+			'filter_status' => 'in all,current,not_applicable,update_available,not_installed,never_update',
 			'show_all' => 'in 1'
 		]);
 
@@ -73,7 +75,7 @@ class TemplateList extends CController {
 		}
 
 		$filterStatus = (string) CProfile::get('web.ztum.templates.filter.status', 'all');
-		$allowedStatuses = ['all', 'current', 'not_applicable', 'update_available', 'not_installed'];
+		$allowedStatuses = ['all', 'current', 'not_applicable', 'update_available', 'not_installed', 'never_update'];
 		if (!in_array($filterStatus, $allowedStatuses, true)) {
 			$filterStatus = 'all';
 		}
@@ -87,12 +89,14 @@ class TemplateList extends CController {
 			'can_compare' => $canAdminister,
 			'can_prepare_updates' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
 			'can_install' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
+			'can_manage_policy' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
 			'show_diagnostics' => $canAdminister,
 			'templates' => [],
 			'summary' => TemplateInventoryService::emptySummary(),
 			'upstream_summary' => UpstreamMatcher::emptySummary(),
 			'catalog_summary' => UpstreamCatalogService::emptySummary(),
 			'version_summary' => TemplateVersionComparator::emptySummary(),
+			'policy_summary' => ['never_update' => 0],
 			'paging' => null,
 			'filter' => [
 				'status' => $filterStatus
@@ -110,7 +114,8 @@ class TemplateList extends CController {
 			],
 			'inventory_error' => null,
 			'upstream_error' => null,
-			'upstream_warning' => null
+			'upstream_warning' => null,
+			'policy_error' => null
 		];
 
 		if (!$data['zabbix_supported']) {
@@ -172,11 +177,57 @@ class TemplateList extends CController {
 		$data['templates'] = $versionComparison['templates'];
 		$data['version_summary'] = $versionComparison['summary'];
 
-		if ($filterStatus !== 'all') {
+		try {
+			$data['templates'] = (new TemplateUpdatePolicyRepository())->annotate($data['templates']);
+			$neverUpdate = 0;
+			$actionableUpdates = 0;
+
+			foreach ($data['templates'] as $template) {
+				$isInstalled = (string) ($template['installation_status'] ?? 'installed') === 'installed';
+
+				if ($isInstalled && !empty($template['never_update'])) {
+					$neverUpdate++;
+				}
+				elseif ($isInstalled && ($template['version_status'] ?? null) === 'update_available') {
+					$actionableUpdates++;
+				}
+			}
+
+			$data['policy_summary']['never_update'] = $neverUpdate;
+			$data['version_summary']['update_available'] = $actionableUpdates;
+		}
+		catch (Throwable $exception) {
+			error_log(sprintf(
+				'[Zabbix Template Update Manager] Update-policy inventory lookup failed: %s',
+				$exception->getMessage()
+			));
+			$data['policy_error'] = _(
+				'Unable to read the template update policy. Update execution is disabled until the policy store is available.'
+			);
+			$data['can_prepare_updates'] = false;
+			$data['can_manage_policy'] = false;
+
+			foreach ($data['templates'] as &$template) {
+				$template['update_policy'] = 'unavailable';
+				$template['never_update'] = false;
+			}
+			unset($template);
+		}
+
+		if ($filterStatus === 'never_update') {
+			$data['templates'] = array_values(array_filter(
+				$data['templates'],
+				static fn(array $template): bool =>
+					(string) ($template['installation_status'] ?? 'installed') === 'installed'
+					&& !empty($template['never_update'])
+			));
+		}
+		elseif ($filterStatus !== 'all') {
 			$data['templates'] = array_values(array_filter(
 				$data['templates'],
 				static fn(array $template): bool =>
 					(string) ($template['version_status'] ?? 'not_applicable') === $filterStatus
+					&& ($filterStatus !== 'update_available' || empty($template['never_update']))
 			));
 		}
 

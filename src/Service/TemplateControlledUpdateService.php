@@ -2,9 +2,11 @@
 
 namespace Modules\ZabbixTemplateUpdateManager\Service;
 
+use Modules\ZabbixTemplateUpdateManager\Repository\TemplateUpdatePolicyRepository;
 use RuntimeException;
 use Throwable;
 
+require_once dirname(__DIR__).'/Repository/TemplateUpdatePolicyRepository.php';
 require_once __DIR__.'/TemplateConfigurationImportService.php';
 require_once __DIR__.'/TemplatePostUpdateValidationService.php';
 require_once __DIR__.'/TemplateUpdateCandidateService.php';
@@ -23,12 +25,14 @@ final class TemplateControlledUpdateService {
 	private $candidateBuilder;
 	private $importer;
 	private $validator;
+	private $policyChecker;
 
 	public function __construct(
 		?callable $preflightRunner = null,
 		?callable $candidateBuilder = null,
 		?callable $importer = null,
-		?callable $validator = null
+		?callable $validator = null,
+		?callable $policyChecker = null
 	) {
 		$this->preflightRunner = $preflightRunner ?? static fn(string $templateId, bool $manualOverride = false): array
 			=> (new TemplateUpdatePreflightService())->run($templateId, $manualOverride);
@@ -42,6 +46,8 @@ final class TemplateControlledUpdateService {
 		};
 		$this->validator = $validator ?? static fn(string $templateId, array $candidate): array
 			=> (new TemplatePostUpdateValidationService())->validate($templateId, $candidate);
+		$this->policyChecker = $policyChecker ?? static fn(string $templateId, string $uuid): bool
+			=> (new TemplateUpdatePolicyRepository())->isNeverUpdate($templateId, $uuid);
 	}
 
 	public function execute(
@@ -102,6 +108,34 @@ final class TemplateControlledUpdateService {
 				'status' => 'blocked_evidence_changed',
 				'write_performed' => false,
 				'reason' => 'preflight_evidence_changed',
+				'preflight_status' => 'passed',
+				'preflight' => $preflight,
+				'candidate' => null,
+				'validation' => null
+			];
+		}
+
+		$preflightTemplate = is_array($preflight['template'] ?? null) ? $preflight['template'] : [];
+		$preflightUuid = (string) ($preflightTemplate['uuid'] ?? '');
+
+		try {
+			if (($this->policyChecker)($templateId, $preflightUuid)) {
+				return [
+					'status' => 'blocked_update_policy',
+					'write_performed' => false,
+					'reason' => 'update_policy_never',
+					'preflight_status' => 'passed',
+					'preflight' => $preflight,
+					'candidate' => null,
+					'validation' => null
+				];
+			}
+		}
+		catch (Throwable $exception) {
+			return [
+				'status' => 'blocked_update_policy',
+				'write_performed' => false,
+				'reason' => 'update_policy_unavailable',
 				'preflight_status' => 'passed',
 				'preflight' => $preflight,
 				'candidate' => null,

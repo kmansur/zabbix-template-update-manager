@@ -6,6 +6,7 @@ use CImportReaderFactory;
 use Modules\ZabbixTemplateUpdateManager\Repository\HistoricalBaselineCacheRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateBackupRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\TemplateUpdatePolicyRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateHistoryRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateSourceRepository;
@@ -16,6 +17,7 @@ use Throwable;
 require_once dirname(__DIR__).'/Repository/HistoricalBaselineCacheRepository.php';
 require_once dirname(__DIR__).'/Repository/TemplateBackupRepository.php';
 require_once dirname(__DIR__).'/Repository/TemplateRepository.php';
+require_once dirname(__DIR__).'/Repository/TemplateUpdatePolicyRepository.php';
 require_once dirname(__DIR__).'/Repository/UpstreamIndexRepository.php';
 require_once dirname(__DIR__).'/Repository/UpstreamTemplateHistoryRepository.php';
 require_once dirname(__DIR__).'/Repository/UpstreamTemplateSourceRepository.php';
@@ -76,6 +78,22 @@ final class TemplateUpdateAnalysisService {
 			$matched = UpstreamMatcher::attach([$template], $index);
 			$versioned = TemplateVersionComparator::attach($matched['templates']);
 			$template = $versioned['templates'][0];
+
+			try {
+				$policyTemplates = (new TemplateUpdatePolicyRepository())->annotate([$template]);
+				$template = $policyTemplates[0] ?? $template;
+				$data['update_policy'] = (string) ($template['update_policy'] ?? 'managed');
+			}
+			catch (Throwable $exception) {
+				$this->logFailure('Update policy lookup', $templateId, $exception);
+				$template['update_policy'] = 'unavailable';
+				$template['never_update'] = false;
+				$data['update_policy'] = 'unavailable';
+				$data['policy_error'] = _(
+					'Unable to read the template update policy. Update execution remains blocked until the policy store is available.'
+				);
+			}
+
 			$data['template'] = $template;
 			$data['upstream_source'] = $index['source'] ?? null;
 
@@ -152,12 +170,16 @@ final class TemplateUpdateAnalysisService {
 				}
 			}
 
-			$data['update_readiness'] = UpdateReadinessEvaluator::evaluate(
-				$template,
-				$data['historical_baseline'],
-				$data['three_way_analysis'],
-				$data['update_preview'],
-				$data['update_risk']
+			$data['update_readiness'] = $this->applyUpdatePolicyGate(
+				UpdateReadinessEvaluator::evaluate(
+					$template,
+					$data['historical_baseline'],
+					$data['three_way_analysis'],
+					$data['update_preview'],
+					$data['update_risk']
+				),
+				(string) ($data['update_policy'] ?? 'managed'),
+				$data['policy_error']
 			);
 
 			if (!empty($data['update_readiness']['candidate_for_backup'])) {
@@ -201,13 +223,17 @@ final class TemplateUpdateAnalysisService {
 				new TemplateBackupRepository()
 			))->verifyCurrent($template);
 
-			$analysis['update_readiness'] = UpdateReadinessEvaluator::evaluate(
-				$template,
-				is_array($analysis['historical_baseline'] ?? null) ? $analysis['historical_baseline'] : null,
-				is_array($analysis['three_way_analysis'] ?? null) ? $analysis['three_way_analysis'] : null,
-				is_array($analysis['update_preview'] ?? null) ? $analysis['update_preview'] : null,
-				is_array($analysis['update_risk'] ?? null) ? $analysis['update_risk'] : null,
-				$analysis['backup_verification']
+			$analysis['update_readiness'] = $this->applyUpdatePolicyGate(
+				UpdateReadinessEvaluator::evaluate(
+					$template,
+					is_array($analysis['historical_baseline'] ?? null) ? $analysis['historical_baseline'] : null,
+					is_array($analysis['three_way_analysis'] ?? null) ? $analysis['three_way_analysis'] : null,
+					is_array($analysis['update_preview'] ?? null) ? $analysis['update_preview'] : null,
+					is_array($analysis['update_risk'] ?? null) ? $analysis['update_risk'] : null,
+					$analysis['backup_verification']
+				),
+				(string) ($analysis['update_policy'] ?? 'managed'),
+				$analysis['policy_error'] ?? null
 			);
 			$analysis['backup_verification_error'] = null;
 		}
@@ -219,6 +245,30 @@ final class TemplateUpdateAnalysisService {
 		}
 
 		return $analysis;
+	}
+
+	private function applyUpdatePolicyGate(array $readiness, string $policy, ?string $policyError): array {
+		if ($policy === TemplateUpdatePolicyRepository::POLICY_MANAGED && $policyError === null) {
+			return $readiness;
+		}
+
+		$readiness['status'] = 'blocked_update_policy';
+		$readiness['next_step'] = $policy === TemplateUpdatePolicyRepository::POLICY_NEVER_UPDATE
+			? 'allow_updates'
+			: 'resolve_update_policy';
+		$readiness['candidate_for_backup'] = false;
+		$readiness['backup_verified'] = false;
+		$readiness['manual_confirmation_required'] = false;
+		$readiness['manual_reasons'] = [];
+		$readiness['write_enabled'] = false;
+		$readiness['review_flags'] = [];
+		$readiness['blockers'] = [
+			$policy === TemplateUpdatePolicyRepository::POLICY_NEVER_UPDATE
+				? 'update_policy_never'
+				: 'update_policy_unavailable'
+		];
+
+		return $readiness;
 	}
 
 	private function resolveHistoricalAnalysis(
@@ -411,6 +461,8 @@ final class TemplateUpdateAnalysisService {
 			'update_preview' => null,
 			'update_risk' => null,
 			'update_risk_error' => null,
+			'update_policy' => 'managed',
+			'policy_error' => null,
 			'update_readiness' => null,
 			'backup_verification' => null,
 			'backup_verification_error' => null

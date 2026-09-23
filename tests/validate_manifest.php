@@ -58,6 +58,7 @@ foreach ($expected as $key => $value) {
 $expectedActions = [
 	'ztum.templates' => ['class' => 'TemplateList', 'view' => 'ztum.template.list'],
 	'ztum.templates.prepare_selected' => ['class' => 'TemplateBatchPrepare', 'view' => 'ztum.template.batch.prepare'],
+	'ztum.templates.update_policy' => ['class' => 'TemplateUpdatePolicy'],
 	'ztum.templates.prepare_one' => ['class' => 'TemplateBatchPrepareOne', 'layout' => 'layout.json', 'view' => null],
 	'ztum.templates.batch_update_one' => ['class' => 'TemplateBatchUpdateOne', 'layout' => 'layout.json', 'view' => null],
 	'ztum.templates.batch_update' => ['class' => 'TemplateBatchUpdate', 'view' => 'ztum.template.batch.update'],
@@ -110,6 +111,8 @@ $requiredFiles = [
 	$root.'/actions/TemplateList.php',
 	$root.'/views/ztum.template.list.php',
 	$root.'/actions/TemplateBatchPrepare.php',
+	$root.'/actions/TemplateUpdatePolicy.php',
+	$root.'/src/Repository/TemplateUpdatePolicyRepository.php',
 	$root.'/views/ztum.template.batch.prepare.php',
 	$root.'/actions/TemplateBatchPrepareOne.php',
 	$root.'/actions/TemplateBatchUpdateOne.php',

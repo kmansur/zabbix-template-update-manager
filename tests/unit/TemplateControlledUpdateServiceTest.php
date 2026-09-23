@@ -66,6 +66,21 @@ assertControlledUpdate($evidence, $result['preflight_evidence_sha256'], 'Result 
 assertControlledUpdate($sourceSha, $result['candidate']['source_sha256'], 'Result must retain verified raw upstream source evidence.');
 assertControlledUpdate($contentSha, $result['candidate']['content_sha256'], 'Result must retain canonical template content evidence.');
 
+$policyImportAttempted = false;
+$policyBlockedService = new TemplateControlledUpdateService(
+	static fn(string $templateId): array => $preflight,
+	static fn(array $freshPreflight): array => $builtCandidate,
+	static function (array $candidateToImport) use (&$policyImportAttempted): void {
+		$policyImportAttempted = true;
+	},
+	static fn(string $templateId, array $candidateToValidate): array => ['valid' => true],
+	static fn(string $templateId, string $uuid): bool => true
+);
+$result = $policyBlockedService->execute('12345', $evidence);
+assertControlledUpdate('blocked_update_policy', $result['status'], 'Never update policy must be rechecked immediately before import.');
+assertControlledUpdate(false, $result['write_performed'], 'Never update recheck must block before configuration write.');
+assertControlledUpdate(false, $policyImportAttempted, 'Never update recheck must prevent importer execution.');
+
 $imported = false;
 $result = $service->execute('12345', hash('sha256', 'stale-page'));
 assertControlledUpdate('blocked_evidence_changed', $result['status'], 'Stale confirmation evidence must fail closed.');

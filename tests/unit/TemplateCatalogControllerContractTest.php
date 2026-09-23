@@ -24,7 +24,7 @@ assertCatalogControllerContract(
 	'TemplateList must keep native Zabbix pagination wired through CPagerHelper.'
 );
 
-foreach (['all', 'current', 'not_applicable', 'update_available', 'not_installed'] as $status) {
+foreach (['all', 'current', 'not_applicable', 'update_available', 'not_installed', 'never_update'] as $status) {
 	assertCatalogControllerContract(
 		strpos($controller, $status) !== false && strpos($view, "'".$status."'") !== false,
 		'Catalog status filter is missing option '.$status.'.'
@@ -76,7 +76,7 @@ assertCatalogControllerContract(
 );
 
 assertCatalogControllerContract(
-	strpos($view, "if ((int) \$data['filtered_count'] > 0)") !== false
+	strpos($view, "if ((int) \$data['filtered_count'] > 0 && \$selectionGuidance !== '')") !== false
 		&& strpos($view, "FrontendUi::section(_('Templates'))") !== false
 		&& strpos($view, 'FrontendUi::status($selectionGuidance, FrontendUi::MUTED)') !== false,
 	'Selection guidance must be concise, visually secondary and hidden when the filtered catalog is empty.'

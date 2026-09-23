@@ -33,18 +33,22 @@ foreach ([
 }
 
 assertSelectionContract(
-	strpos($listView, "'ztum.templates.prepare_selected' => [\n\t\t\t\t'name' => _('Prepare selected updates')") !== false,
+	strpos($listView, "'ztum.templates.prepare_selected'") !== false
+		&& strpos($listView, "'name' => _('Prepare selected updates')") !== false
+		&& strpos($listView, "new CActionButtonList(") !== false,
 	'Prepare selected updates must use CActionButtonList native submit mode.'
 );
 
 assertSelectionContract(
-	strpos($listView, "CCsrfTokenHelper::get(\n\t\t\t\t\$installSelectionMode\n\t\t\t\t\t? 'ztum.templates.install_prepare_selected'\n\t\t\t\t\t: 'ztum.templates.prepare_selected'") !== false,
-	'Direct bulk update submission must bind the prepare-selected CSRF token.'
+	strpos($listView, "CCsrfTokenHelper::get('ztum.templates.prepare_selected')") !== false
+		&& strpos($listView, "CCsrfTokenHelper::get('ztum.templates.install_prepare_selected')") !== false,
+	'Bulk update and installation submissions must bind their action-specific CSRF tokens.'
 );
 
 assertSelectionContract(
-	strpos($listView, "&& !empty(\$data['can_prepare_updates'])") !== false,
-	'Bulk update checkboxes must not be actionable for users who cannot prepare updates.'
+	strpos($listView, "\$updatePrepareMode = !empty(\$data['can_prepare_updates'])") !== false
+		&& strpos($listView, "\$updateSelectionEligible = \$updatePrepareMode") !== false,
+	'Bulk update preparation must remain gated by the Super Admin update capability.'
 );
 
 assertSelectionContract(

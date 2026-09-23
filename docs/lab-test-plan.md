@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.51
+# Laboratory test plan — 0.1.0-beta.52
 
 ## Release state
 
@@ -68,7 +68,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.51`, enable the module and open:
+Confirm `0.1.0-beta.52`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -577,6 +577,23 @@ Expected behavior:
 - tampering one consumed bundle file causes SHA-256 verification failure and no network fallback;
 - removing a required index/source/history artifact blocks the operation rather than using public endpoints;
 - controlled update/install safety gates remain unchanged.
+
+## 13B. Never update policy regression
+
+Use one installed official template that currently has an update available and one installed official template that is already current.
+
+Expected behavior:
+
+- a Super Admin can select one or more installed official templates and choose **Never update**;
+- the catalog displays **Never update** in the **Update policy** column;
+- the **Never update** status filter shows the protected installed templates;
+- protected templates are excluded from the actionable **Updates available** count and cannot enter update preparation;
+- opening an individual comparison remains read-only and clearly shows that the update path is blocked by policy;
+- fresh update preflight returns the explicit blocker `update_policy_never`;
+- controlled update rechecks the policy immediately before import and performs no configuration write while protection is active;
+- selecting protected templates under the **Never update** filter and choosing **Allow updates** removes the block;
+- after **Allow updates**, a template with a newer official version becomes eligible for the normal preparation/preflight path again;
+- corrupt or unreadable existing policy storage fails closed and does not enable a configuration write.
 
 ## 13C. Runtime setup helper regression
 
