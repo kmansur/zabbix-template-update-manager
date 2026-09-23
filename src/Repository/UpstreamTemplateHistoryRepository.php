@@ -18,6 +18,7 @@ final class UpstreamTemplateHistoryRepository {
 	private const PAGE_SIZE = 25;
 	private const MAX_COMMITS = 75;
 	private const MAX_RESPONSE_BYTES = 2097152;
+	private const CHANGES_LIMIT = 1000;
 
 	public function __construct(?OfflineBundleRepository $offlineBundle = null) {
 		$this->offlineBundle = $offlineBundle ?? new OfflineBundleRepository();
@@ -81,6 +82,107 @@ final class UpstreamTemplateHistoryRepository {
 			'truncated' => !$isLastPage,
 			'limit' => $maxCommits
 		];
+	}
+
+	/**
+	 * Resolves the path used immediately before a rename/move commit.
+	 *
+	 * The commit history endpoint can follow renames, but raw historical source
+	 * retrieval still needs the path that existed at the requested revision.
+	 * This lookup is used lazily only after the current tracked path fails.
+	 */
+	public function previousPathAtCommit(string $commit, string $currentPath): ?string {
+		if (!UpstreamIndexRepository::isValidTemplatePath($currentPath)) {
+			throw new RuntimeException('The upstream historical rename path is invalid.');
+		}
+
+		$commit = strtolower(trim($commit));
+		if (!preg_match('/^[a-f0-9]{40}$/', $commit)) {
+			throw new RuntimeException('The upstream historical rename commit is invalid.');
+		}
+
+		if ($this->offlineBundle->isOfflineOnly()) {
+			return null;
+		}
+
+		return self::decodePreviousPath(
+			$this->fetchUrl(self::buildChangesUrl($commit)),
+			$currentPath
+		);
+	}
+
+	public static function buildChangesUrl(string $commit): string {
+		$commit = strtolower(trim($commit));
+		if (!preg_match('/^[a-f0-9]{40}$/', $commit)) {
+			throw new RuntimeException('The upstream historical rename commit is invalid.');
+		}
+
+		return self::BASE_URL.'/'.rawurlencode($commit).'/changes?'.http_build_query([
+			'limit' => self::CHANGES_LIMIT
+		], '', '&', PHP_QUERY_RFC3986);
+	}
+
+	public static function decodePreviousPath(string $json, string $currentPath): ?string {
+		if (!UpstreamIndexRepository::isValidTemplatePath($currentPath)) {
+			throw new RuntimeException('The upstream historical rename path is invalid.');
+		}
+		if ($json === '' || strlen($json) > self::MAX_RESPONSE_BYTES) {
+			throw new RuntimeException('The upstream historical changes response is empty or exceeds the size limit.');
+		}
+
+		try {
+			$data = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+		}
+		catch (JsonException $exception) {
+			throw new RuntimeException('The upstream historical changes response is not valid JSON.', 0, $exception);
+		}
+
+		if (!is_array($data) || !is_array($data['values'] ?? null)) {
+			throw new RuntimeException('The upstream historical changes response has an invalid structure.');
+		}
+
+		foreach ($data['values'] as $record) {
+			if (!is_array($record)) {
+				continue;
+			}
+
+			$path = self::changePath($record['path'] ?? null);
+			$srcPath = self::changePath($record['srcPath'] ?? null);
+			if ($path === $currentPath
+					&& $srcPath !== null
+					&& $srcPath !== $currentPath
+					&& UpstreamIndexRepository::isValidTemplatePath($srcPath)) {
+				return $srcPath;
+			}
+		}
+
+		return null;
+	}
+
+	private static function changePath($path): ?string {
+		if (!is_array($path)) {
+			return null;
+		}
+
+		$components = $path['components'] ?? null;
+		if (is_array($components) && $components !== []) {
+			$segments = [];
+			foreach ($components as $component) {
+				if (!is_string($component) || $component === '' || $component === '.' || $component === '..') {
+					return null;
+				}
+				$segments[] = $component;
+			}
+			return implode('/', $segments);
+		}
+
+		$parent = trim((string) ($path['parent'] ?? ''), '/');
+		$name = trim((string) ($path['name'] ?? ''), '/');
+		if ($name === '') {
+			return null;
+		}
+
+		return $parent !== '' ? $parent.'/'.$name : $name;
 	}
 
 	public static function buildUrl(string $path, string $until, int $start = 0, int $limit = self::PAGE_SIZE): string {
