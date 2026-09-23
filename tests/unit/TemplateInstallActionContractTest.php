@@ -85,5 +85,12 @@ assertInstallContract(strpos($reviewView, 'there is no prior local rollback arti
 	'Installation review must disclose the absence of a prior rollback artifact.');
 assertInstallContract(strpos($resultView, 'does not automatically uninstall') !== false,
 	'Install result must disclose that failed validation does not trigger automatic uninstall.');
+assertInstallContract(
+	strpos($resultView, "'import_failed'") !== false
+		&& strpos($resultView, 'Import attempted') !== false
+		&& strpos($resultView, 'Confirmed configuration write') !== false
+		&& strpos($resultView, 'Read-only post-failure inspection') !== false,
+	'Individual install result must distinguish import attempt, confirmed write and post-failure target inspection.'
+);
 
 echo "Template install action contract tests passed.\n";
