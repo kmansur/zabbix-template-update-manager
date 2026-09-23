@@ -17,7 +17,11 @@ require_once __DIR__.'/TemplateImportCompareService.php';
  */
 final class TemplateConfigurationImportService {
 
-	public function import(string $source, string $format = 'json'): void {
+	public function import(
+		string $source,
+		string $format = 'json',
+		string $ruleProfile = TemplateImportCompareService::PROFILE_UPDATE
+	): void {
 		if ($source === '') {
 			throw new RuntimeException('The controlled template import source is empty.');
 		}
@@ -30,7 +34,7 @@ final class TemplateConfigurationImportService {
 		$result = API::Configuration()->import([
 			'format' => $format,
 			'source' => $source,
-			'rules' => TemplateImportCompareService::rules()
+			'rules' => TemplateImportCompareService::rules($ruleProfile)
 		]);
 
 		if ($result !== true) {
