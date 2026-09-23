@@ -35,7 +35,7 @@ class TemplateInstallReview extends CController {
 	protected function doAction(): void {
 		$uuid = strtolower(str_replace('-', '', trim((string) $this->getInput('uuid'))));
 		$data = [
-			'title' => _('Review template installation'),
+			'title' => _('Template installation review'),
 			'uuid' => $uuid,
 			'preflight' => null,
 			'preflight_error' => null,
