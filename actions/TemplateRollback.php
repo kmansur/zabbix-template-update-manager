@@ -8,7 +8,8 @@ use CControllerResponseFatal;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateRollbackService;\nuse Modules\\ZabbixTemplateUpdateManager\\Service\\TemplateOperationLockService;
 use Throwable;
 
-require_once dirname(__DIR__).'/src/Service/TemplateRollbackService.php';\nrequire_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateRollbackService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 
 /**
  * Performs one explicitly confirmed template rollback.
