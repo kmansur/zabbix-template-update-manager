@@ -139,6 +139,15 @@ $audit = TemplateInstallReferenceAuditService::analyze($linkedTrigger, ['Linked 
 assertReferenceAudit(false, in_array('unresolved_trigger_host', issueCodes($audit), true),
 	'Installed linked-template trigger host must be accepted.');
 
+$divisionExpression = $base;
+$divisionExpression['triggers'][0]['expression'] =
+	'min(/Test template by HTTP/test.master,5m)/last(/Test template by HTTP/test.dependent)>1';
+$audit = TemplateInstallReferenceAuditService::analyze($divisionExpression, []);
+assertReferenceAudit(true, $audit['safe'],
+	'Arithmetic division before last() must not create a false unresolved trigger host.');
+assertReferenceAudit(false, in_array('unresolved_trigger_host', issueCodes($audit), true),
+	'The structural audit must never report last( as a template dependency.');
+
 $badGraphHost = $base;
 $badGraphHost['discovery_rules'][0]['graph_prototypes'][0]['graph_items'][0]['item']['host'] = 'Other template';
 $audit = TemplateInstallReferenceAuditService::analyze($badGraphHost, []);
