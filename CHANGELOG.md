@@ -4,6 +4,29 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.44] - 2026-09-23
+
+### Fixed
+
+- Post-install validation is now aligned with the create-only installation contract introduced in beta.42.
+- A successful missing-template installation no longer fails validation solely because an already existing shared `template_group` or `host_group` differs from the official source. The create-only write profile intentionally does not update those pre-existing shared objects.
+- Template-owned differences remain authoritative: items, discovery rules, triggers, graphs, dashboards, HTTP tests, value maps, template identity/version and any other non-shared-group difference still fail closed.
+- Batch installation now surfaces the actual post-install validation reasons and remaining/raw difference counts instead of only `post_install_validation_failed`.
+- Individual installation results now show effective differences, raw differences and the count of intentionally ignored shared-group differences.
+
+### Safety
+
+- Standard update validation is unchanged and still requires an exact zero-difference current-upstream result.
+- The post-install exception is narrow and explicit: only `host_groups` and `template_groups` may be excluded, and only when all remaining template-owned content validates exactly.
+- Raw comparison status/counts remain available in the validation result for diagnostics.
+- No retry, automatic uninstall, additional configuration-write path or direct database write was introduced.
+
+### Tests
+
+- Added regression coverage for a create-only installation whose only remaining comparison changes are shared groups.
+- Added a negative regression proving any non-group difference still fails post-install validation.
+- Added UI/action contract coverage for detailed post-install validation diagnostics.
+
 ## [0.1.0-beta.43] - 2026-09-23
 
 ### Fixed
