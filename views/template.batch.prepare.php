@@ -182,7 +182,14 @@ $jsConfig = json_encode([
 	'compareUrl' => $compareUrl,
 	'csrfName' => CSRF_TOKEN_NAME,
 	'prepareCsrfToken' => CCsrfTokenHelper::get('ztum.templates.prepare_one'),
-	'executeCsrfToken' => CCsrfTokenHelper::get('ztum.templates.batch_update_one')
+	'executeCsrfToken' => CCsrfTokenHelper::get('ztum.templates.batch_update_one'),
+	'statusClasses' => [
+		'success' => ZBX_STYLE_GREEN,
+		'warning' => ZBX_STYLE_ORANGE,
+		'danger' => ZBX_STYLE_RED,
+		'info' => ZBX_STYLE_BLUE,
+		'muted' => ZBX_STYLE_GREY
+	]
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $jsLabels = json_encode([
@@ -244,6 +251,24 @@ $script = <<<'JS'
 		const element = byId(id);
 		if (element !== null) {
 			element.textContent = value;
+		}
+	};
+
+	const setStateText = (id, value, tone = 'muted') => {
+		const element = byId(id);
+		if (element === null) {
+			return;
+		}
+
+		element.textContent = value;
+		for (const className of Object.values(config.statusClasses || {})) {
+			if (className) {
+				element.classList.remove(className);
+			}
+		}
+		const className = config.statusClasses?.[tone] || '';
+		if (className) {
+			element.classList.add(className);
 		}
 	};
 
@@ -333,8 +358,15 @@ $script = <<<'JS'
 
 		counts[category]++;
 		setText('ztum-available-' + templateId, item.available_version || '—');
-		setText('ztum-readiness-' + templateId, readinessStatus);
-		setText('ztum-category-' + templateId, labels[category] || labels.blocked);
+		const categoryTone = category === 'ready'
+			? 'success'
+			: (category === 'review' ? 'warning' : 'danger');
+		const readinessTone = readinessStatus.includes('blocked') || readinessStatus === 'request_failed'
+			? 'danger'
+			: (readinessStatus.includes('review') ? 'warning'
+				: (readinessStatus.includes('verified') || readinessStatus.includes('passed') ? 'success' : 'muted'));
+		setStateText('ztum-readiness-' + templateId, readinessStatus, readinessTone);
+		setStateText('ztum-category-' + templateId, labels[category] || labels.blocked, categoryTone);
 		setText('ztum-reason-' + templateId, reason);
 		const manualState = {
 			eligible: manualEligible,
@@ -372,8 +404,8 @@ $script = <<<'JS'
 		requestFailures.add(templateId);
 		readyEvidence.delete(templateId);
 		reviewEvidence.delete(templateId);
-		setText('ztum-readiness-' + templateId, 'request_failed');
-		setText('ztum-category-' + templateId, labels.blocked);
+		setStateText('ztum-readiness-' + templateId, 'request_failed', 'danger');
+		setStateText('ztum-category-' + templateId, labels.blocked, 'danger');
 		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
 		setReviewedSelection(templateId, 'blocked');
 		setExecutionState(templateId, 'blocked', labels.blocked);
@@ -505,8 +537,8 @@ $script = <<<'JS'
 
 		if (!executionStarted) {
 			if (retryInProgress) {
-				setText('ztum-batch-execution-state', labels.retrying_failed);
-				setText('ztum-batch-exec-status', labels.retrying_failed);
+				setStateText('ztum-batch-execution-state', labels.retrying_failed, 'info');
+				setStateText('ztum-batch-exec-status', labels.retrying_failed, 'info');
 			}
 			else if (!fullyPrepared) {
 				const state = stopRequested
@@ -514,25 +546,33 @@ $script = <<<'JS'
 					: labels.execution_waiting_progress
 						.replace('{completed}', String(completed))
 						.replace('{total}', String(config.templateIds.length));
-				setText('ztum-batch-execution-state', state);
-				setText('ztum-batch-exec-status', state);
+				setStateText(
+					'ztum-batch-execution-state',
+					state,
+					stopRequested ? 'danger' : 'muted'
+				);
+				setStateText(
+					'ztum-batch-exec-status',
+					state,
+					stopRequested ? 'danger' : 'muted'
+				);
 			}
 			else if (executionCount > 0) {
 				const state = labels.execution_available
 					.replace('{ready}', String(readyEvidence.size))
 					.replace('{review}', String(selectedReviewed));
-				setText('ztum-batch-execution-state', state);
-				setText('ztum-batch-exec-status', labels.execution_ready);
+				setStateText('ztum-batch-execution-state', state, 'success');
+				setStateText('ztum-batch-exec-status', labels.execution_ready, 'success');
 				setText('ztum-batch-exec-not-attempted', String(executionCount));
 			}
 			else if (counts.review > 0) {
-				setText('ztum-batch-execution-state', labels.execution_review_only);
-				setText('ztum-batch-exec-status', labels.execution_review_only);
+				setStateText('ztum-batch-execution-state', labels.execution_review_only, 'warning');
+				setStateText('ztum-batch-exec-status', labels.execution_review_only, 'warning');
 				setText('ztum-batch-exec-not-attempted', '0');
 			}
 			else {
-				setText('ztum-batch-execution-state', labels.execution_none);
-				setText('ztum-batch-exec-status', labels.execution_none);
+				setStateText('ztum-batch-execution-state', labels.execution_none, 'muted');
+				setStateText('ztum-batch-exec-status', labels.execution_none, 'muted');
 				setText('ztum-batch-exec-not-attempted', '0');
 			}
 		}
@@ -577,8 +617,8 @@ $script = <<<'JS'
 		let anyWrite = false;
 		let stopped = false;
 
-		setText('ztum-batch-execution-state', labels.execution_running);
-		setText('ztum-batch-exec-status', labels.execution_running);
+		setStateText('ztum-batch-execution-state', labels.execution_running, 'info');
+		setStateText('ztum-batch-exec-status', labels.execution_running, 'info');
 		setText('ztum-batch-exec-updated', '0');
 		setText('ztum-batch-exec-failed', '0');
 		setText('ztum-batch-exec-not-attempted', String(notAttempted));
@@ -648,10 +688,16 @@ $script = <<<'JS'
 		setText('ztum-batch-exec-failed', String(failed));
 		setText('ztum-batch-exec-not-attempted', String(notAttempted));
 		setText('ztum-batch-exec-write', anyWrite ? labels.yes : labels.no);
-		setText('ztum-batch-exec-status',
-			stopped ? labels.execution_failed : labels.execution_completed);
-		setText('ztum-batch-execution-state',
-			stopped ? labels.execution_failed : labels.execution_completed);
+		setStateText(
+			'ztum-batch-exec-status',
+			stopped ? labels.execution_failed : labels.execution_completed,
+			stopped ? 'danger' : 'success'
+		);
+		setStateText(
+			'ztum-batch-execution-state',
+			stopped ? labels.execution_failed : labels.execution_completed,
+			stopped ? 'danger' : 'success'
+		);
 	};
 
 	const retryFailedPreparation = async () => {
