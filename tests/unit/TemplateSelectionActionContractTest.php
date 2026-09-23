@@ -1,89 +1,86 @@
 <?php
 
 $root = dirname(__DIR__, 2);
-$controller = (string) file_get_contents($root.'/actions/TemplateSelectionReview.php');
+$listController = (string) file_get_contents($root.'/actions/TemplateList.php');
 $listView = (string) file_get_contents($root.'/views/ztum.template.list.php');
-$reviewView = (string) file_get_contents($root.'/views/ztum.template.selection.review.php');
+$manifest = (string) file_get_contents($root.'/manifest.json');
 
-$requiredControllerFragments = [
-	"'templateids' => 'required|array_id'",
-	'USER_TYPE_ZABBIX_ADMIN',
-	'USER_TYPE_SUPER_ADMIN',
-	'MAX_SELECTED_TEMPLATES = 500',
-	'UpstreamIndexRepository',
-	'TemplateVersionComparator'
-];
-
-foreach ($requiredControllerFragments as $fragment) {
-	if (strpos($controller, $fragment) === false) {
-		fwrite(STDERR, "Selected-template controller contract missing: {$fragment}\n");
+function assertSelectionContract(bool $condition, string $message): void {
+	if (!$condition) {
+		fwrite(STDERR, $message."\n");
 		exit(1);
 	}
 }
 
-if (strpos($controller, 'disableCsrfValidation') !== false) {
-	fwrite(STDERR, "Selected-template review must keep native CSRF validation enabled.\n");
-	exit(1);
-}
+assertSelectionContract(
+	strpos($listController, "'can_prepare_updates' => \$this->getUserType() === USER_TYPE_SUPER_ADMIN") !== false,
+	'Bulk update preparation capability must remain super-admin-only.'
+);
 
-$requiredViewFragments = [
+foreach ([
 	"new CCheckBox('all_templates')",
 	"checkAll('",
 	"'templateids'",
 	"new CCheckBox('templateids['",
 	'CActionButtonList',
-	'ztum.templates.review_selected',
-	'Review selected updates'
-];
-
-foreach ($requiredViewFragments as $fragment) {
-	if (strpos($listView, $fragment) === false) {
-		fwrite(STDERR, "Native selected-template list contract missing: {$fragment}\n");
-		exit(1);
-	}
+	'ztum.templates.prepare_selected',
+	'Prepare selected updates'
+] as $fragment) {
+	assertSelectionContract(
+		strpos($listView, $fragment) !== false,
+		'Direct selected-update preparation contract missing: '.$fragment
+	);
 }
 
-if (strpos($listView, "'ztum.templates.review_selected' => [\n\t\t\t\t'name' => _('Review selected updates')") === false) {
-	fwrite(STDERR, "Review selected updates must use CActionButtonList native submit mode.\n");
-	exit(1);
-}
+assertSelectionContract(
+	strpos($listView, "'ztum.templates.prepare_selected' => [\n\t\t\t\t'name' => _('Prepare selected updates')") !== false,
+	'Prepare selected updates must use CActionButtonList native submit mode.'
+);
 
-if (strpos($listView, "'content' => (new CSimpleButton(_('Review selected updates')))") !== false) {
-	fwrite(STDERR, "Review selected updates must not use an unbound CSimpleButton content override.\n");
-	exit(1);
-}
+assertSelectionContract(
+	strpos($listView, "CCsrfTokenHelper::get(\n\t\t\t\t\$installSelectionMode\n\t\t\t\t\t? 'ztum.templates.install_prepare_selected'\n\t\t\t\t\t: 'ztum.templates.prepare_selected'") !== false,
+	'Direct bulk update submission must bind the prepare-selected CSRF token.'
+);
+
+assertSelectionContract(
+	strpos($listView, "&& !empty(\$data['can_prepare_updates'])") !== false,
+	'Bulk update checkboxes must not be actionable for users who cannot prepare updates.'
+);
+
+assertSelectionContract(
+	strpos($listView, 'does not import Zabbix configuration') !== false
+		&& strpos($listView, 'later explicitly confirmed execution step') !== false,
+	'The catalog must explain that direct preparation remains non-writing until later confirmation.'
+);
 
 foreach ([
-	'ztum.templates.prepare_selected',
-	'Prepare selected updates',
-	'CCsrfTokenHelper::get',
-	'one template per HTTP request'
-] as $fragment) {
-	if (strpos($reviewView, $fragment) === false) {
-		fwrite(STDERR, "Selected-template review batch-preparation contract missing: {$fragment}\n");
-		exit(1);
-	}
+	'ztum.templates.review_selected',
+	'Review selected updates',
+	'ztum.template.selection.review'
+] as $obsolete) {
+	assertSelectionContract(
+		strpos($listView.$manifest, $obsolete) === false,
+		'Redundant selected-review workflow must not remain reachable: '.$obsolete
+	);
 }
 
-if (strpos($controller, 'BATCH_PREPARE_LIMIT') !== false
-		|| strpos($reviewView, 'controlled batch preparation is limited') !== false) {
-	fwrite(STDERR, "The obsolete 25-template update preparation ceiling must not remain.\n");
-	exit(1);
-}
+assertSelectionContract(
+	!is_file($root.'/actions/TemplateSelectionReview.php')
+		&& !is_file($root.'/views/ztum.template.selection.review.php'),
+	'Redundant selected-review controller/view must be removed from the module.'
+);
 
-$forbidden = [
+foreach ([
 	'API::Configuration()->import(',
 	'API::Template()->update(',
 	'API::Template()->delete(',
 	'DB::update(',
 	'DB::delete('
-];
-
-foreach ($forbidden as $fragment) {
-	if (strpos($controller.$reviewView, $fragment) !== false) {
-		fwrite(STDERR, "Selected-template review contains forbidden write operation: {$fragment}\n");
-		exit(1);
-	}
+] as $fragment) {
+	assertSelectionContract(
+		strpos($listController.$listView, $fragment) === false,
+		'Catalog selection flow contains forbidden write operation: '.$fragment
+	);
 }
 
 echo "Template selection action contract tests passed.\n";
