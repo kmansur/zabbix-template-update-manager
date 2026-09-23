@@ -3,6 +3,7 @@
 $root = dirname(__DIR__, 2);
 $service = (string) file_get_contents($root.'/src/Service/TemplateConfigurationImportService.php');
 $executeOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchExecuteOne.php');
+$controlledInstall = (string) file_get_contents($root.'/src/Service/TemplateControlledInstallService.php');
 $batchView = (string) file_get_contents($root.'/views/template.install.batch.prepare.php');
 $preflight = (string) file_get_contents($root.'/src/Service/TemplateInstallPreflightService.php');
 
@@ -31,13 +32,22 @@ assertImportDiagnosticContract(
 );
 
 assertImportDiagnosticContract(
-	strpos($executeOne, "$exception->getMessage()") !== false,
-	'Super Admin request-bounded install execution must return the controlled failure detail.'
+	strpos($executeOne, '$exception->getMessage()') !== false,
+	'Super Admin request-bounded install execution must return unexpected controller-level failure detail.'
 );
 
 assertImportDiagnosticContract(
-	strpos($batchView, "labels.request_failed + (error?.message ? ': ' + error.message : '')") !== false,
-	'Batch installation UI must show the request-bounded failure detail inline.'
+	strpos($controlledInstall, "'status' => 'import_failed'") !== false
+		&& strpos($controlledInstall, "'error_detail' => self::sanitizeError") !== false
+		&& strpos($controlledInstall, "'write_outcome' => 'uncertain'") !== false,
+	'Controlled installation must convert import-stage rejection into a structured uncertain result with Zabbix detail.'
+);
+
+assertImportDiagnosticContract(
+	strpos($batchView, "result.status === 'import_failed'") !== false
+		&& strpos($batchView, 'result.error_detail') !== false
+		&& strpos($batchView, "setText('ztum-install-reason-' + uuid") !== false,
+	'Batch installation UI must show structured import failure detail inline without mislabeling it as a request failure.'
 );
 
 assertImportDiagnosticContract(
