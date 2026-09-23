@@ -1,6 +1,6 @@
 # Architecture
 
-## Zabbix Template Update Manager
+## Template Update Manager
 
 The project is designed as a native Zabbix frontend module.
 
