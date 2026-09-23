@@ -184,15 +184,21 @@ if ($status === 'passed' && !empty($data['can_install']) && $evidence !== '') {
 	$form = (new CForm('post'))
 		->setId('ztum-template-install-form')
 		->setAction($installAction)
+		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 		->addItem([
 			(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.install')))->removeId(),
 			(new CVar('uuid', $data['uuid']))->removeId(),
-			(new CVar('evidence_sha256', $evidence))->removeId(),
-			(new CCheckBox('confirm', '1'))->setLabel(_(
-				'I reviewed the official candidate, dependencies and creation-only import preview and want to install this template.'
-			)),
-			new CSubmitButton(_('Install official template'))
-		]);
+			(new CVar('evidence_sha256', $evidence))->removeId()
+		])
+		->addItem(
+			(new CFormList())->addRow(
+				_('Confirmation'),
+				(new CCheckBox('confirm', '1'))->setLabel(_(
+					'I reviewed the official candidate, dependencies and creation-only import preview and want to install this template.'
+				))
+			)
+		)
+		->addItem(makeFormFooter(new CSubmitButton(_('Install official template'))));
 
 	$page
 		->addItem(new CTag('h4', true, _('Controlled installation')))
