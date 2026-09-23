@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.51**
+Current version: **0.1.0-beta.52**
 
 This version is intended for **laboratory testing**.
 
@@ -15,7 +15,7 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.51 refines the catalog screen after the first beta.50 visual field pass: upstream source metadata is integrated into the native Official catalog summary, and contextual selection guidance is shorter, visually secondary and hidden for empty result sets. The safety/write architecture is unchanged.
+Beta.52 adds a persistent per-template **Never update** policy. Super Admin users can mark one or more installed official templates as protected, filter the catalog to show those templates, and later allow updates again. The policy is enforced in catalog eligibility, readiness, fresh preflight and immediately before controlled import.
 
 Formal tag/GitHub Release automation exists, but a community prerelease remains gated by this cross-version UI field pass and the still-unselected project license.
 
@@ -42,6 +42,7 @@ ZTUM currently provides:
 - installed/upstream vendor-version comparison;
 - official upstream source indexing by Zabbix release line;
 - native Zabbix checkbox/select-all selection of specific update candidates;
+- persistent **Never update** protection for selected installed official templates, with a dedicated catalog filter and explicit **Allow updates** reversal;
 - direct catalog-to-preparation bulk update flow for explicitly selected official update candidates, without a redundant scope-only review page;
 - request-bounded update-batch safety preparation for the full selected update set (up to the existing 500-template selection safety ceiling), executed one candidate per HTTP request with visible progress;
 - automatic creation/refresh of rollback artifacts for standard-path candidates (none/low plus narrowly recognized bounded-medium changes) and explicitly reviewed manual-update candidates;
