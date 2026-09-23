@@ -6,12 +6,20 @@ use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
 use RuntimeException;
 use Throwable;
 
-require_once dirname(__DIR__).'/Support/ProjectVersion.php';\nrequire_once __DIR__.'/OfflineBundleRepository.php';\nrequire_once __DIR__.'/UpstreamIndexRepository.php';
+require_once dirname(__DIR__).'/Support/ProjectVersion.php';
+require_once __DIR__.'/OfflineBundleRepository.php';
+require_once __DIR__.'/UpstreamIndexRepository.php';
 
 final class UpstreamTemplateSourceRepository {
 
+	private OfflineBundleRepository $offlineBundle;
+
 	private const BASE_URL = 'https://git.zabbix.com/projects/ZBX/repos/zabbix/raw/';
 	private const MAX_SOURCE_BYTES = 10485760;
+
+	public function __construct(?OfflineBundleRepository $offlineBundle = null) {
+		$this->offlineBundle = $offlineBundle ?? new OfflineBundleRepository();
+	}
 
 	public function fetch(array $indexSource, array $upstreamTemplate): array {
 		$commit = strtolower(trim((string) ($indexSource['commit'] ?? '')));
