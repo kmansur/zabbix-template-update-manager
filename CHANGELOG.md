@@ -4,6 +4,29 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.47] - 2026-09-23
+
+### Changed
+
+- Bulk update selection now goes directly from the template catalog to request-bounded safety preparation.
+- Removed the redundant `Selected template updates` scope-only review page and its `ztum.templates.review_selected` route/controller/view.
+- The catalog action is now **Prepare selected updates** and posts the explicitly selected template IDs directly to `ztum.templates.prepare_selected`.
+- Bulk update checkboxes are actionable only for Super Admin users, matching the permission required by batch preparation. Administrators still retain individual read-only comparison/review access.
+
+### Safety
+
+- No safety gate was removed: preparation still performs authoritative comparison, historical baseline, three-way analysis, risk evaluation, rollback verification and preparation evidence generation.
+- Preparation remains non-writing.
+- Controlled execution still requires explicit confirmation and reruns a complete authoritative fresh preflight immediately before each `configuration.import`.
+- The 500-template selected-update sanity ceiling and one-template-per-HTTP-request preparation model remain unchanged.
+- No additional configuration-write path or direct database write was introduced.
+
+### Tests
+
+- Reworked the selected-update action contract to require direct native `CActionButtonList` submission to `ztum.templates.prepare_selected`.
+- Added regression checks that the obsolete review route/view/controller are absent and that users without bulk-prepare permission cannot receive actionable bulk-update checkboxes.
+- Updated the laboratory test plan for the direct catalog-to-preparation workflow.
+
 ## [0.1.0-beta.46] - 2026-09-23
 
 ### Fixed
