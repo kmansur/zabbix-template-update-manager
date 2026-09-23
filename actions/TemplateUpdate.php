@@ -78,7 +78,7 @@ class TemplateUpdate extends CController {
 				$exception->getMessage()
 			));
 			$data['operation_error'] = _(
-				'The controlled update could not be completed. Review frontend logs and re-open the template comparison before retrying. If the import had already started, verify the current template state before taking any further action.'
+				'Update could not be completed. Review frontend logs and verify the current template state before retrying.'
 			);
 		}
 
