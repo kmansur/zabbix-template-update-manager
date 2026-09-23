@@ -15,6 +15,9 @@
             "class": "TemplateBatchPrepare",
             "view": "ztum.template.batch.prepare"
         },
+        "ztum.templates.update_policy": {
+            "class": "TemplateUpdatePolicy"
+        },
         "ztum.templates.prepare_one": {
             "class": "TemplateBatchPrepareOne",
             "layout": "layout.json",
