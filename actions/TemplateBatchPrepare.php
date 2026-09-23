@@ -80,7 +80,7 @@ class TemplateBatchPrepare extends CController {
 		catch (Throwable $exception) {
 			error_log('[Zabbix Template Update Manager] Batch preparation shell failed: '.$exception->getMessage());
 			$data['error'] = _(
-				'Unable to rebuild the selected template set. No preparation or configuration import was attempted.'
+				'Unable to prepare the selected template set. No configuration import was attempted.'
 			);
 		}
 
