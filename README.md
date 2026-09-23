@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.50**
+Current version: **0.1.0-beta.51**
 
 This version is intended for **laboratory testing**.
 
@@ -15,7 +15,7 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.50 is the native-UI field-test candidate. All user-facing screens now use the shared Zabbix-native presentation layer for section headings, status messages, contextual empty states, human-readable reason labels and compact technical fingerprints. The safety/write architecture is unchanged.
+Beta.51 refines the catalog screen after the first beta.50 visual field pass: upstream source metadata is integrated into the native Official catalog summary, and contextual selection guidance is shorter, visually secondary and hidden for empty result sets. The safety/write architecture is unchanged.
 
 Formal tag/GitHub Release automation exists, but a community prerelease remains gated by this cross-version UI field pass and the still-unselected project license.
 
