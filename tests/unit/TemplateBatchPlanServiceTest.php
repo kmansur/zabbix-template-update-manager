@@ -63,7 +63,26 @@ $service = new TemplateBatchPlanService(
 		'status' => 'passed',
 		'manual_override' => $manualOverride,
 		'evidence_sha256' => hash('sha256', ($manualOverride ? 'manual-' : 'evidence-').$templateId)
-	]
+	],
+	static function (array $analysis): array {
+		$readiness = is_array($analysis['update_readiness'] ?? null)
+			? $analysis['update_readiness']
+			: [];
+		$manual = !empty($readiness['manual_confirmation_required']);
+		$analysis['backup_verification'] = [
+			'status' => 'current_match',
+			'current_match' => true
+		];
+		$analysis['update_readiness']['status'] = $manual
+			? 'review_backup_verified'
+			: 'backup_verified';
+		$analysis['update_readiness']['next_step'] = $manual
+			? 'run_manual_preflight'
+			: 'run_controlled_preflight';
+		$analysis['update_readiness']['candidate_for_backup'] = false;
+		$analysis['update_readiness']['backup_verified'] = true;
+		return $analysis;
+	}
 );
 
 $plan = $service->build(['101', '102', '103', '104'], true);
@@ -74,6 +93,10 @@ assertBatchPlan(1, $plan['summary']['conflict'], 'Conflict template must be sepa
 assertBatchPlan(1, $plan['summary']['blocked'], 'Unresolved template must remain blocked.');
 assertBatchPlan(true, isset($backupCreated['101']), 'Candidate-for-backup template must receive a rollback artifact during preparation.');
 assertBatchPlan(true, isset($backupCreated['102']), 'Manual-review candidate may prepare rollback evidence without becoming batch-ready.');
+assertBatchPlan(1, $analysisCalls['101'],
+	'Backup preparation must not repeat the full template analysis after creating the rollback artifact.');
+assertBatchPlan(1, $analysisCalls['102'],
+	'Manual-review backup preparation must reuse the completed analysis snapshot.');
 assertBatchPlan('ready', $plan['items'][0]['category'], 'Prepared and preflighted template must be ready.');
 assertBatchPlan('review', $plan['items'][1]['category'], 'Reviewed manual-update template must remain review-only in batch mode.');
 assertBatchPlan('conflict', $plan['items'][2]['category'], 'Conflict template must classify as conflict.');
@@ -179,6 +202,88 @@ assertBatchPlan(
 	'comparison_error: Unable to complete comparison. Diagnostic: cross-template dependency Other template',
 	$comparisonErrorPlan['items'][0]['reason'],
 	'Batch preparation must surface the actual comparison diagnostic instead of a generic comparison_error token.'
+);
+
+$defaultPreflightAnalysisCalls = 0;
+$defaultPreflightPath = 'templates/test/template_test.yaml';
+$defaultPreflightSourceSha = str_repeat('b', 64);
+$defaultPreflightContentSha = str_repeat('c', 64);
+$defaultPreflightBackupSha = str_repeat('d', 64);
+$defaultPreflightService = new TemplateBatchPlanService(
+	static function (string $templateId) use (
+		&$defaultPreflightAnalysisCalls,
+		$defaultPreflightPath,
+		$defaultPreflightSourceSha,
+		$defaultPreflightContentSha,
+		$defaultPreflightBackupSha
+	): array {
+		$defaultPreflightAnalysisCalls++;
+		return [
+			'template' => [
+				'templateid' => $templateId,
+				'uuid' => str_repeat('a', 32),
+				'name' => 'Template '.$templateId,
+				'technical_name' => 'Template '.$templateId,
+				'vendor_version' => '7.0-1',
+				'upstream_vendor_version' => '7.0-2',
+				'host_count' => 0,
+				'upstream_status' => 'official_match',
+				'version_status' => 'update_available',
+				'upstream' => [
+					'uuid' => str_repeat('a', 32),
+					'name' => 'Template '.$templateId,
+					'technical_name' => 'Template '.$templateId,
+					'vendor_name' => 'Zabbix',
+					'vendor_version' => '7.0-2',
+					'content_sha256s' => [$defaultPreflightContentSha],
+					'sources' => [[
+						'path' => $defaultPreflightPath,
+						'sha256' => $defaultPreflightSourceSha
+					]]
+				]
+			],
+			'upstream_source' => [
+				'commit' => str_repeat('e', 40)
+			],
+			'source_path' => $defaultPreflightPath,
+			'external_template_names' => [],
+			'update_readiness' => [
+				'status' => 'backup_verified',
+				'next_step' => 'run_controlled_preflight',
+				'candidate_for_backup' => false,
+				'backup_verified' => true,
+				'manual_confirmation_required' => false,
+				'manual_reasons' => [],
+				'blockers' => [],
+				'review_flags' => [],
+				'write_enabled' => false
+			],
+			'backup_verification' => [
+				'status' => 'current_match',
+				'current_match' => true,
+				'latest' => [
+					'created_at' => '2026-09-23T12:00:00Z',
+					'bytes' => 1234,
+					'sha256' => $defaultPreflightBackupSha
+				],
+				'current_export' => [
+					'bytes' => 1234,
+					'sha256' => $defaultPreflightBackupSha
+				]
+			],
+			'comparison_error' => null
+		];
+	}
+);
+$defaultPreflightPlan = $defaultPreflightService->build(['201'], false);
+assertBatchPlan(1, $defaultPreflightAnalysisCalls,
+	'Batch preparation must not rerun complete analysis only to derive preparation preflight evidence.');
+assertBatchPlan('ready', $defaultPreflightPlan['items'][0]['category'],
+	'A verified template must remain Ready when preparation evidence is derived from the same fresh analysis snapshot.');
+assertBatchPlan(
+	true,
+	preg_match('/^[a-f0-9]{64}$/', $defaultPreflightPlan['items'][0]['evidence_sha256']) === 1,
+	'Prepared analysis reuse must still produce deterministic SHA-256 preflight evidence.'
 );
 
 $largeIds = array_map('strval', range(1001, 1026));

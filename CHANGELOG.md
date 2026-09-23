@@ -4,6 +4,34 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.45] - 2026-09-23
+
+### Fixed
+
+- Request-bounded update preparation no longer repeats the complete template analysis merely to derive batch preflight evidence from a state that was already analyzed in the same HTTP request.
+- After creating a rollback artifact, preparation now refreshes only the backup-verification/readiness state instead of repeating upstream retrieval, historical-baseline resolution, import comparison, three-way analysis and risk analysis.
+- A template that already has verified rollback evidence now needs one complete analysis during preparation instead of a second complete analysis solely for the preparation evidence fingerprint.
+- Slow single-template preparation requests now record bounded elapsed-time diagnostics in the frontend/PHP error log.
+
+### Performance / resilience
+
+- The change directly targets the field-observed per-template HTTP 504 class around 30 seconds without relaxing any safety gate.
+- Batch preparation still processes one template per HTTP request and remains safe to retry manually at the preparation layer.
+- Historical/source analysis itself is unchanged; beta.45 therefore requires field validation against cold and warm caches before the timeout blocker can be considered fully resolved.
+
+### Safety
+
+- Reusing an analysis snapshot is limited to non-writing batch preparation. The only state intentionally changed during that preparation step is the local rollback artifact.
+- Rollback verification still performs a fresh current-template export and SHA-256 equality check after the backup is created.
+- Controlled update execution still reruns a complete authoritative preflight immediately before `configuration.import`, validates the posted evidence against that fresh state and preserves the single approved write boundary.
+- No automatic retry, timeout increase, direct database write or additional configuration-import path was introduced.
+
+### Tests
+
+- Added regression coverage proving verified batch preparation does not rerun complete analysis only to derive preparation evidence.
+- Added regression coverage proving backup creation/verification does not trigger a second full analysis.
+- Existing controlled-write, native-UI, security and unit-test gates remain mandatory.
+
 ## [0.1.0-beta.44] - 2026-09-23
 
 ### Fixed

@@ -161,27 +161,7 @@ final class TemplateUpdateAnalysisService {
 			);
 
 			if (!empty($data['update_readiness']['candidate_for_backup'])) {
-				try {
-					$data['backup_verification'] = (new TemplateBackupVerificationService(
-						new TemplateExportService(),
-						new TemplateBackupRepository()
-					))->verifyCurrent($template);
-
-					$data['update_readiness'] = UpdateReadinessEvaluator::evaluate(
-						$template,
-						$data['historical_baseline'],
-						$data['three_way_analysis'],
-						$data['update_preview'],
-						$data['update_risk'],
-						$data['backup_verification']
-					);
-				}
-				catch (Throwable $exception) {
-					$this->logFailure('Backup verification', $templateId, $exception);
-					$data['backup_verification_error'] = _(
-						'Unable to inspect or verify the persistent rollback backup. The workflow remains at backup candidacy and no configuration-write step is enabled.'
-					).' '.$this->diagnosticMessage($exception);
-				}
+				$data = $this->refreshBackupVerification($data);
 			}
 		}
 		catch (Throwable $exception) {
@@ -192,6 +172,53 @@ final class TemplateUpdateAnalysisService {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Refreshes only rollback-artifact evidence for an already completed
+	 * read-only analysis. Creating a backup changes local artifact state, not
+	 * Zabbix configuration or upstream/template comparison state, so batch
+	 * preparation can safely avoid repeating history/source/importcompare work.
+	 *
+	 * Controlled update execution does not rely on this shortcut: it still runs
+	 * a complete fresh preflight immediately before the configuration import.
+	 */
+	public function refreshBackupVerification(array $analysis): array {
+		$template = is_array($analysis['template'] ?? null) ? $analysis['template'] : [];
+		$readiness = is_array($analysis['update_readiness'] ?? null) ? $analysis['update_readiness'] : [];
+		if ($template === [] || empty($readiness['candidate_for_backup'])) {
+			return $analysis;
+		}
+
+		$templateId = trim((string) ($template['templateid'] ?? ''));
+		if ($templateId === '' || !ctype_digit($templateId) || (int) $templateId <= 0) {
+			throw new RuntimeException('A valid numeric template ID is required for backup verification refresh.');
+		}
+
+		try {
+			$analysis['backup_verification'] = (new TemplateBackupVerificationService(
+				new TemplateExportService(),
+				new TemplateBackupRepository()
+			))->verifyCurrent($template);
+
+			$analysis['update_readiness'] = UpdateReadinessEvaluator::evaluate(
+				$template,
+				is_array($analysis['historical_baseline'] ?? null) ? $analysis['historical_baseline'] : null,
+				is_array($analysis['three_way_analysis'] ?? null) ? $analysis['three_way_analysis'] : null,
+				is_array($analysis['update_preview'] ?? null) ? $analysis['update_preview'] : null,
+				is_array($analysis['update_risk'] ?? null) ? $analysis['update_risk'] : null,
+				$analysis['backup_verification']
+			);
+			$analysis['backup_verification_error'] = null;
+		}
+		catch (Throwable $exception) {
+			$this->logFailure('Backup verification', $templateId, $exception);
+			$analysis['backup_verification_error'] = _(
+				'Unable to inspect or verify the persistent rollback backup. The workflow remains at backup candidacy and no configuration-write step is enabled.'
+			).' '.$this->diagnosticMessage($exception);
+		}
+
+		return $analysis;
 	}
 
 	private function resolveHistoricalAnalysis(
