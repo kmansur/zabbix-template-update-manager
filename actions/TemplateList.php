@@ -183,10 +183,12 @@ class TemplateList extends CController {
 			$actionableUpdates = 0;
 
 			foreach ($data['templates'] as $template) {
-				if (!empty($template['never_update'])) {
+				$isInstalled = (string) ($template['installation_status'] ?? 'installed') === 'installed';
+
+				if ($isInstalled && !empty($template['never_update'])) {
 					$neverUpdate++;
 				}
-				elseif (($template['version_status'] ?? null) === 'update_available') {
+				elseif ($isInstalled && ($template['version_status'] ?? null) === 'update_available') {
 					$actionableUpdates++;
 				}
 			}
@@ -215,7 +217,9 @@ class TemplateList extends CController {
 		if ($filterStatus === 'never_update') {
 			$data['templates'] = array_values(array_filter(
 				$data['templates'],
-				static fn(array $template): bool => !empty($template['never_update'])
+				static fn(array $template): bool =>
+					(string) ($template['installation_status'] ?? 'installed') === 'installed'
+					&& !empty($template['never_update'])
 			));
 		}
 		elseif ($filterStatus !== 'all') {
