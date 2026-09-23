@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.41**
+Current version: **0.1.0-beta.42**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.41 keeps the beta.40 production-readiness controls and fixes two field issues: trigger expressions containing arithmetic division before a history function can no longer create a synthetic dependency named `last(`, and the catalog hides its custom All/Pages display control when the filtered result already fits on one native Zabbix page.
+Beta.42 keeps the beta.40/41 production-readiness controls and refines missing-template installation after field testing: installation preview/import now use a dedicated create-only rule profile, import rejection is reported separately from HTTP/request failure, uncertain write outcomes stop the batch with explicit inspection guidance, and structural audits cover trigger/graph item references more deeply.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.41` after automation validation. Formal tag/GitHub Release automation now exists, but publishing a production-grade release remains gated by field validation and the still-unselected project license.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.42` after automation validation. Formal tag/GitHub Release automation now exists, but publishing a production-grade release remains gated by field validation and the still-unselected project license.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -165,8 +165,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.41
-git checkout -B release/0.1.0-beta.41 origin/release/0.1.0-beta.41
+git fetch origin release/0.1.0-beta.42
+git checkout -B release/0.1.0-beta.42 origin/release/0.1.0-beta.42
 cat VERSION
 git rev-parse HEAD
 ```
@@ -174,7 +174,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.41
+0.1.0-beta.42
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -190,7 +190,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.41**, enable the module and open:
+Confirm version **0.1.0-beta.42**, enable the module and open:
 
 ```text
 Data collection → Template updates
