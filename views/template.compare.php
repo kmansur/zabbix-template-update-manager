@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $versionLabels = [
 	'current' => _('Current'),
 	'update_available' => _('Update available'),
@@ -95,6 +99,73 @@ $backupVerificationLabels = [
 	'current_match' => _('Rollback backup matches current installed export')
 ];
 
+$versionTones = [
+	'current' => FrontendUi::SUCCESS,
+	'update_available' => FrontendUi::WARNING,
+	'installed_newer' => FrontendUi::INFO,
+	'installed_version_missing' => FrontendUi::DANGER,
+	'upstream_version_missing' => FrontendUi::DANGER,
+	'version_uncomparable' => FrontendUi::WARNING,
+	'not_applicable' => FrontendUi::MUTED
+];
+
+$contentTones = [
+	'matches_current_upstream' => FrontendUi::SUCCESS,
+	'local_modifications_detected' => FrontendUi::WARNING,
+	'update_available_no_local_modifications' => FrontendUi::INFO,
+	'update_available_local_modifications' => FrontendUi::WARNING,
+	'preview_against_newer_upstream' => FrontendUi::INFO,
+	'historical_baseline_required' => FrontendUi::WARNING,
+	'not_available' => FrontendUi::DANGER
+];
+
+$baselineTones = [
+	'found' => FrontendUi::SUCCESS,
+	'ambiguous' => FrontendUi::WARNING,
+	'not_found' => FrontendUi::WARNING,
+	'history_limit_reached' => FrontendUi::WARNING
+];
+
+$threeWayTones = [
+	'conflict_detected' => FrontendUi::DANGER,
+	'needs_review' => FrontendUi::WARNING,
+	'local_overwrite_risk' => FrontendUi::WARNING,
+	'compatible_overlap' => FrontendUi::SUCCESS,
+	'upstream_only' => FrontendUi::INFO,
+	'no_changes' => FrontendUi::SUCCESS
+];
+
+$riskTones = [
+	'none' => FrontendUi::SUCCESS,
+	'low' => FrontendUi::SUCCESS,
+	'medium' => FrontendUi::WARNING,
+	'high' => FrontendUi::WARNING,
+	'conflict' => FrontendUi::DANGER,
+	'unknown' => FrontendUi::MUTED
+];
+
+$backupTones = [
+	'no_backup' => FrontendUi::WARNING,
+	'repository_unavailable' => FrontendUi::DANGER,
+	'latest_invalid' => FrontendUi::DANGER,
+	'current_mismatch' => FrontendUi::WARNING,
+	'current_match' => FrontendUi::SUCCESS
+];
+
+$readinessTones = [
+	'not_applicable' => FrontendUi::MUTED,
+	'blocked_baseline' => FrontendUi::DANGER,
+	'blocked_unresolved' => FrontendUi::DANGER,
+	'blocked_conflict' => FrontendUi::DANGER,
+	'blocked_local_overwrite' => FrontendUi::WARNING,
+	'review_high' => FrontendUi::WARNING,
+	'review_medium' => FrontendUi::WARNING,
+	'review_required' => FrontendUi::WARNING,
+	'review_backup_verified' => FrontendUi::WARNING,
+	'candidate_for_backup' => FrontendUi::INFO,
+	'backup_verified' => FrontendUi::SUCCESS
+];
+
 $entityLabels = [
 	'templates' => _('Templates'),
 	'items' => _('Items'),
@@ -169,8 +240,14 @@ if (is_array($data['template'])) {
 			$template['name'],
 			$template['vendor_version'] !== '' ? $template['vendor_version'] : '—',
 			($template['upstream_vendor_version'] ?? '') !== '' ? $template['upstream_vendor_version'] : '—',
-			$versionLabels[$template['version_status'] ?? 'not_applicable'] ?? _('Unknown'),
-			$contentLabels[$data['content_status']] ?? _('Unknown'),
+			FrontendUi::status(
+				$versionLabels[$template['version_status'] ?? 'not_applicable'] ?? _('Unknown'),
+				$versionTones[$template['version_status'] ?? 'not_applicable'] ?? FrontendUi::MUTED
+			),
+			FrontendUi::status(
+				$contentLabels[$data['content_status']] ?? _('Unknown'),
+				$contentTones[$data['content_status']] ?? FrontendUi::MUTED
+			),
 			$data['source_path'] !== '' ? $data['source_path'] : '—',
 			$sourceCommit !== '' ? substr($sourceCommit, 0, 12) : '—'
 		]);
@@ -179,7 +256,10 @@ if (is_array($data['template'])) {
 }
 
 if ($data['comparison_error'] !== null) {
-	$page->addItem(new CTag('p', true, $data['comparison_error']));
+	$page->addItem(new CTag('p', true, FrontendUi::status(
+		$data['comparison_error'],
+		FrontendUi::DANGER
+	)));
 	$page->show();
 	return;
 }
@@ -224,7 +304,10 @@ if (is_array($data['historical_baseline'])) {
 			_('Closest LOCAL differences')
 		])
 		->addRow([
-			$baselineLabels[$baselineStatus] ?? _('Unknown'),
+			FrontendUi::status(
+				$baselineLabels[$baselineStatus] ?? _('Unknown'),
+				$baselineTones[$baselineStatus] ?? FrontendUi::MUTED
+			),
 			(string) ($baseline['vendor_version'] ?? '—'),
 			($baseline['commit'] ?? '') !== '' ? substr((string) $baseline['commit'], 0, 12) : '—',
 			(int) ($baseline['commits_examined'] ?? 0),
@@ -252,7 +335,10 @@ if (is_array($data['historical_baseline'])) {
 }
 
 if ($data['historical_error'] !== null) {
-	$page->addItem(new CTag('p', true, $data['historical_error']));
+	$page->addItem(new CTag('p', true, FrontendUi::status(
+		$data['historical_error'],
+		FrontendUi::DANGER
+	)));
 }
 
 if (is_array($data['three_way_analysis'])) {
@@ -271,7 +357,10 @@ if (is_array($data['three_way_analysis'])) {
 			_('Affected entities')
 		])
 		->addRow([
-			$threeWayStatusLabels[$threeWayStatus] ?? _('Unknown'),
+			FrontendUi::status(
+				$threeWayStatusLabels[$threeWayStatus] ?? _('Unknown'),
+				$threeWayTones[$threeWayStatus] ?? FrontendUi::MUTED
+			),
 			$threeWaySummary['upstream_only'],
 			$threeWaySummary['local_only_overwrite'],
 			$threeWaySummary['converged'],
@@ -348,9 +437,18 @@ if (is_array($data['update_risk']) && is_array($data['update_preview'])) {
 			_('Normalized changes')
 		])
 		->addRow([
-			$riskLevelLabels[$riskLevel] ?? _('Unknown'),
-			$riskLevelLabels[$technicalLevel] ?? _('Unknown'),
-			$riskCoverageLabels[$coverage] ?? _('Unknown'),
+			FrontendUi::status(
+				$riskLevelLabels[$riskLevel] ?? _('Unknown'),
+				$riskTones[$riskLevel] ?? FrontendUi::MUTED
+			),
+			FrontendUi::status(
+				$riskLevelLabels[$technicalLevel] ?? _('Unknown'),
+				$riskTones[$technicalLevel] ?? FrontendUi::MUTED
+			),
+			FrontendUi::status(
+				$riskCoverageLabels[$coverage] ?? _('Unknown'),
+				$coverage === 'complete' ? FrontendUi::SUCCESS : FrontendUi::WARNING
+			),
 			(int) ($risk['direct_host_count'] ?? 0),
 			(int) ($previewSummary['entities_affected'] ?? 0),
 			(int) ($previewSummary['total'] ?? 0)
@@ -392,7 +490,10 @@ if (is_array($data['update_risk']) && is_array($data['update_preview'])) {
 }
 
 if ($data['update_risk_error'] !== null) {
-	$page->addItem(new CTag('p', true, $data['update_risk_error']));
+	$page->addItem(new CTag('p', true, FrontendUi::status(
+		$data['update_risk_error'],
+		FrontendUi::DANGER
+	)));
 }
 
 if (is_array($data['backup_verification'])) {
@@ -414,7 +515,10 @@ if (is_array($data['backup_verification'])) {
 			_('Invalid')
 		])
 		->addRow([
-			$backupVerificationLabels[$backupStatus] ?? _('Unknown'),
+			FrontendUi::status(
+				$backupVerificationLabels[$backupStatus] ?? _('Unknown'),
+				$backupTones[$backupStatus] ?? FrontendUi::MUTED
+			),
 			$latestCreatedAt !== '' ? $latestCreatedAt : '—',
 			$latestSha !== '' ? substr($latestSha, 0, 16) : '—',
 			$latestBytes !== null ? $latestBytes : '—',
@@ -462,10 +566,13 @@ if (is_array($data['update_readiness'])
 			_('Update writes enabled')
 		])
 		->addRow([
-			$readinessStatusLabels[$readinessStatus] ?? _('Unknown'),
+			FrontendUi::status(
+				$readinessStatusLabels[$readinessStatus] ?? _('Unknown'),
+				$readinessTones[$readinessStatus] ?? FrontendUi::MUTED
+			),
 			$readinessNextStepLabels[$nextStep] ?? _('Unknown'),
 			(int) ($readiness['direct_host_count'] ?? 0),
-			!empty($readiness['write_enabled']) ? _('Yes') : _('No')
+			FrontendUi::yesNo(!empty($readiness['write_enabled']))
 		]);
 
 	$page
