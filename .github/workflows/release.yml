@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate tag and project
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '\r\n' < VERSION)"
+          tag="${GITHUB_REF_NAME#v}"
+          test "$version" = "$tag"
+          php tests/validate_manifest.php
+          php tests/validate_version.php
+          php tests/read_only_guard.php
+          php tests/ui_native_guard.php
+          php tests/security_guard.php
+          for test in tests/unit/*Test.php; do php "$test"; done
+      - name: Validate Python tools
+        run: |
+          python -m pip install --disable-pip-version-check -r requirements-dev.txt
+          python -m py_compile tools/build_upstream_index.py tools/build_offline_bundle.py
+          python tests/test_build_upstream_index.py
+          python tests/test_build_offline_bundle.py
+      - name: Build release archives
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '\r\n' < VERSION)"
+          prefix="zabbix-template-update-manager-$version/"
+          mkdir -p dist
+          git archive --format=tar.gz --prefix="$prefix" -o "dist/zabbix-template-update-manager-$version.tar.gz" HEAD
+          git archive --format=zip --prefix="$prefix" -o "dist/zabbix-template-update-manager-$version.zip" HEAD
+          (cd dist && sha256sum *.tar.gz *.zip > SHA256SUMS)
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(tr -d '\r\n' < VERSION)"
+          prerelease=()
+          [[ "$version" == *-* ]] && prerelease=(--prerelease)
+          gh release create "$GITHUB_REF_NAME"             "dist/zabbix-template-update-manager-$version.tar.gz"             "dist/zabbix-template-update-manager-$version.zip"             "dist/SHA256SUMS"             --title "Template Update Manager $version"             --generate-notes             "${prerelease[@]}"
