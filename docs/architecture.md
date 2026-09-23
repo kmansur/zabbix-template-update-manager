@@ -491,48 +491,55 @@ The comparison view is responsible for:
 
 Only Zabbix administrators and super administrators can open the comparison action because `configuration.importcompare` applies the same import-related role access checks used by Zabbix itself.
 
-All views use native Zabbix components and do not add a UI framework.
+All views use native Zabbix components and do not add a UI framework. Native UI conventions, status tones, theme behavior and automated UI guards are documented in `docs/ui-style.md`.
 
-### Comparison engine — next responsibilities
+### Implemented comparison and safety layers
 
-- cache successful historical baseline resolution to avoid repeated remote scans;
-- rename-aware historical raw-path resolution;
-- decompose selected nested collections such as macros/tags/preprocessing when a more granular semantic key is safe;
-- impact analysis against linked hosts;
-- risk scoring using change type, entity type and three-way classification;
-- filters/drill-down for large three-way detail sets.
+The comparison engine now includes:
 
-### Risk analyzer
+- cached historical baseline resolution;
+- current and historical `configuration.importcompare` normalization;
+- three-way BASE / LOCAL / UPSTREAM analysis;
+- entity/field risk analysis;
+- direct-host impact reporting;
+- readiness evaluation;
+- rollback-backup verification;
+- standard and reviewed preflight evidence;
+- dependency-aware handling of cross-template references;
+- request-bounded batch preparation.
 
-Future classifications may include:
-
-- low;
-- medium;
-- high;
-- conflict.
-
-A future risk score should combine at least:
-
-- three-way conflict/overwrite state;
-- entity type;
-- field type;
-- removals versus additions;
-- item key/value type/master-item changes;
-- trigger-expression changes;
-- discovery-rule/prototype changes;
-- number of linked hosts affected.
+Current risk classifications include `none`, `low`, `medium`, `high`, `conflict` and `unknown`. Standard-path eligibility remains a separate decision from technical severity. Medium/high/local-overwrite cases require reviewed paths unless an explicitly tested bounded exception is allowlisted.
 
 No operational safety decision is made solely from vendor version or the absence of a three-way conflict.
 
-### Update engine
+### Controlled write engines
 
-Not enabled during the read-only phase.
+Update, installation and rollback writes are implemented.
 
-Future responsibilities:
+All configuration writes converge on the single approved boundary:
 
-- backup/export;
-- reviewed update;
-- explicit confirmation;
-- controlled import;
-- post-import validation;
-- rollback.
+```text
+src/Service/TemplateConfigurationImportService.php
+```
+
+Implemented write-path properties include:
+
+- persistent rollback backup and fresh verification before update;
+- explicit reviewed override for medium/high technical-risk changes;
+- additional acknowledgement for reviewed local-customization overwrite;
+- immutable candidate reconstruction;
+- fresh preflight and evidence comparison immediately before import;
+- request-bounded sequential batch update/install;
+- stop-on-first-failure behavior;
+- post-update, post-install and post-rollback validation;
+- explicit rollback review and fresh recovery backup before restore;
+- no automatic retry or automatic rollback after ambiguous writes.
+
+### Remaining comparison/update work
+
+- rename-aware historical raw-path resolution;
+- richer inherited/indirect host impact analysis;
+- more granular semantic decomposition where stable keys are proven safe;
+- filters/drill-down for very large three-way detail sets;
+- persistent human-readable operation history/audit UI;
+- continued field validation against Zabbix 7.x and 8.x.
