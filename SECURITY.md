@@ -1,6 +1,6 @@
 # Security Policy
 
-Zabbix Template Update Manager executes inside the Zabbix frontend environment.
+Template Update Manager executes inside the Zabbix frontend environment.
 
 Security is therefore a core project requirement.
 
