@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.42
+# Laboratory test plan — 0.1.0-beta.50
 
 ## Release state
 
@@ -13,13 +13,13 @@ Status at publication:
 
 Use the exact prerelease tag when a public beta has been published. During internal laboratory work before that tag exists, record the exact `main` commit used so the test can be reproduced.
 
-Beta.39 retains the dependency-aware comparison/write safety chain and refactors the frontend to native Zabbix UI conventions. Field validation must prove native control rendering, status presentation and light/dark theme behavior on supported Zabbix generations while re-running the existing update/install/rollback regressions.
+Beta.50 is the native-UI field-test candidate. Field validation must prove the complete catalog/update/install/rollback workflow in both light and dark themes while confirming that the underlying comparison, evidence and controlled-write behavior remains unchanged.
 
 ## Safety assumptions
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.42 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance may remain on the standard path.
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. Medium/high and local-overwrite candidates may use the explicit reviewed batch path only after verified rollback evidence, per-row selection and the required acknowledgements. Conflict and unresolved templates remain hard blocked.
 
@@ -68,7 +68,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.42`, enable the module and open:
+Confirm `0.1.0-beta.50`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -104,7 +104,7 @@ Repeat this visual pass on at least one supported Zabbix 7.x lab and one support
 
 ## 2B. Request-bounded update regression
 
-For the first beta.42 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.50 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -165,11 +165,11 @@ For one non-critical official template that is absent locally and has no missing
 
 Also test at least one blocked dependency case if naturally available. Missing linked templates must be listed and the write must remain disabled.
 
-Do not test recursive dependency installation: beta.42 intentionally requires dependencies to be installed individually first.
+Do not test recursive dependency installation: dependencies are intentionally installed explicitly first.
 
 ## 3B. Multi-template installation
 
-From the `Not installed` filter, first verify the header checkbox selects all visible missing templates. For the write test, select 2–3 non-critical official templates with no missing linked-template dependencies and choose **Review selected installations**.
+From the `Not installed` filter, first verify the header checkbox selects all visible missing templates. For the write test, select 2–3 non-critical official templates with no missing linked-template dependencies and choose **Prepare selected installations**.
 
 Expected preparation:
 
@@ -203,7 +203,7 @@ Confirm:
 - select only 2–3 candidates for the first test;
 - **Prepare selected updates** opens the request-bounded preparation queue directly with only those explicitly selected template IDs.
 
-The former 25-template update-batch ceiling is removed in beta.42. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach preparation intact, and preparation must still run one template per HTTP request without silent truncation.
+The former 25-template update-batch ceiling remains removed. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach preparation intact, and preparation must still run one template per HTTP request without silent truncation.
 
 ## 4A. Large selected-update regression
 
@@ -286,26 +286,26 @@ Expected behavior:
 - a long historical scan may show `history_scan_pending` / continuation progress and issue several bounded requests for the same template before final classification;
 - no single historical continuation request should approach the previous ~30-second gateway failure window;
 - if an HTTP failure still occurs, the Reason should include elapsed time and gateway identity such as `server=cloudflare` / `cf-ray=...` when exposed by the response;
-- if a real 504 still occurs on beta.48, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
+- if a real 504 still occurs on beta.50, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
 - preparation continuation/retry must never call `configuration.import`.
 
 ## 5B. Manual-review continuation regression
 
-Select one or more candidates that naturally classify as `Manual review` with verified rollback evidence. Current field examples include Aranet Cloud, Asterisk by HTTP and AWS by HTTP.
+Select one or more candidates that naturally classify as `Manual review` with verified rollback evidence. Use any naturally available Manual review candidate in the test environment.
 
 Expected behavior:
 
-- every Manual review row shows `Review and update` in the Execution column;
+- every Manual review row exposes a native `Review details` link in the Execution column;
 - the link opens the existing individual template comparison for that exact template ID;
-- a review-only plan with `Ready = 0` explains that unattended batch execution is unavailable and directs the operator to `Review and update`;
+- a review-only plan with `Ready = 0` explains that unattended batch execution is unavailable and directs the operator to `Review details`;
 - the comparison page retains the detailed BASE / LOCAL / UPSTREAM, risk and rollback evidence;
 - when readiness is `review_backup_verified`, the next action is `Run reviewed controlled preflight`;
 - the reviewed preflight must bind the manual-review reasons and still require the additional explicit Super Admin acknowledgement before `configuration.import`;
-- clicking `Review and update` itself performs no configuration write.
+- opening `Review details` itself performs no configuration write.
 
 ## 5C. Explicit reviewed batch override regression
 
-Use Manual review candidates whose only reasons are `medium_technical_risk` and/or `high_technical_risk`. Current field examples include Aranet Cloud, Asterisk by HTTP and AWS by HTTP.
+Use Manual review candidates whose only reasons are `medium_technical_risk` and/or `high_technical_risk`. Use any naturally available Manual review candidate in the test environment.
 
 Expected behavior:
 
