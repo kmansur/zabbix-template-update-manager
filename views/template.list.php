@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $compatibility = $data['zabbix_supported'] ? _('Supported') : _('Unsupported or undetected');
 
 $upstreamLabels = [
@@ -9,6 +13,26 @@ $upstreamLabels = [
 	'no_uuid' => _('No UUID'),
 	'invalid_uuid' => _('Invalid UUID'),
 	'repository_unavailable' => _('Repository unavailable')
+];
+
+$versionTones = [
+	'current' => FrontendUi::SUCCESS,
+	'update_available' => FrontendUi::WARNING,
+	'not_installed' => FrontendUi::INFO,
+	'installed_newer' => FrontendUi::INFO,
+	'installed_version_missing' => FrontendUi::DANGER,
+	'upstream_version_missing' => FrontendUi::DANGER,
+	'version_uncomparable' => FrontendUi::WARNING,
+	'not_applicable' => FrontendUi::MUTED
+];
+
+$upstreamTones = [
+	'official_match' => FrontendUi::SUCCESS,
+	'official_catalog' => FrontendUi::INFO,
+	'not_found' => FrontendUi::MUTED,
+	'no_uuid' => FrontendUi::WARNING,
+	'invalid_uuid' => FrontendUi::DANGER,
+	'repository_unavailable' => FrontendUi::DANGER
 ];
 
 $versionLabels = [
@@ -208,8 +232,14 @@ foreach ($data['templates'] as $template) {
 		$template['vendor_name'] !== '' ? $template['vendor_name'] : '—',
 		$isInstalled && $template['vendor_version'] !== '' ? $template['vendor_version'] : '—',
 		($template['upstream_vendor_version'] ?? '') !== '' ? $template['upstream_vendor_version'] : '—',
-		$versionLabels[$template['version_status'] ?? 'not_applicable'] ?? _('Unknown'),
-		$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
+		FrontendUi::status(
+			$versionLabels[$template['version_status'] ?? 'not_applicable'] ?? _('Unknown'),
+			$versionTones[$template['version_status'] ?? 'not_applicable'] ?? FrontendUi::MUTED
+		),
+		FrontendUi::status(
+			$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
+			$upstreamTones[$template['upstream_status'] ?? 'repository_unavailable'] ?? FrontendUi::MUTED
+		),
 		$isInstalled ? (int) $template['host_count'] : '—',
 		$actionCell,
 		$backupCell,
@@ -244,15 +274,22 @@ if ($selectionForm !== null) {
 
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
-	->addItem(new CTag('p', true, sprintf(
-		_('Module %1$s · Zabbix %2$s · %3$s'),
-		$data['version'],
-		$data['zabbix_version'],
-		$compatibility
-	)));
+	->addItem(
+		(new CList())
+			->addClass(ZBX_STYLE_HOR_LIST)
+			->addItem(_('Module').' '.$data['version'])
+			->addItem(_('Zabbix').' '.$data['zabbix_version'])
+			->addItem(FrontendUi::status(
+				$compatibility,
+				$data['zabbix_supported'] ? FrontendUi::SUCCESS : FrontendUi::DANGER
+			))
+	);
 
 if ($data['inventory_error'] !== null) {
-	$page->addItem(new CTag('p', true, $data['inventory_error']))->show();
+	$page->addItem(new CTag('p', true, FrontendUi::status(
+		$data['inventory_error'],
+		FrontendUi::DANGER
+	)))->show();
 	return;
 }
 
@@ -275,11 +312,17 @@ if (is_array($data['upstream_source'])) {
 }
 
 if ($data['upstream_warning'] !== null) {
-	$page->addItem(new CTag('p', true, $data['upstream_warning']));
+	$page->addItem(new CTag('p', true, FrontendUi::status(
+		$data['upstream_warning'],
+		FrontendUi::WARNING
+	)));
 }
 
 if ($data['upstream_error'] !== null) {
-	$page->addItem(new CTag('p', true, $data['upstream_error']));
+	$page->addItem(new CTag('p', true, FrontendUi::status(
+		$data['upstream_error'],
+		FrontendUi::DANGER
+	)));
 
 	if (!empty($data['show_diagnostics']) && is_array($data['upstream_diagnostics'])) {
 		$transports = is_array($data['upstream_diagnostics']['transports'] ?? null)
