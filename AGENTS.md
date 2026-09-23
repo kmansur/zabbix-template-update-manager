@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.46`.
+Current test version: `0.1.0-beta.47`.
 
 ## Non-negotiable rules
 
@@ -55,6 +55,8 @@ Current test version: `0.1.0-beta.46`.
 Keep controllers thin. Put catalog, installation, comparison, repository, inventory, backup, preflight, update and rollback logic in `src/` services/classes rather than in views or controllers.
 
 For multi-template preparation, keep one heavy candidate preparation per HTTP request. Do not reintroduce a single synchronous request that analyzes/prepares the complete selected batch. Within one per-template preparation request, do not repeat the complete upstream/history/importcompare analysis merely to refresh rollback evidence or derive a preparation fingerprint: backup creation changes only local artifact state, so refresh backup verification/readiness from the completed analysis. This optimization is preparation-only; controlled write execution must still rerun the full authoritative preflight immediately before import.
+
+Bulk update selection from the catalog must post directly to the request-bounded preparation shell. Do not reintroduce a scope-only selected-template review page between catalog selection and safety preparation. The later execution confirmation remains mandatory and preparation itself must remain non-writing.
 
 Risk severity and standard-path eligibility are separate concepts. Never make all medium-risk changes automatic. Any medium automatic-path exception must be an explicit allowlisted change class with regression tests; unknown medium stays manual and unknown/high functional changes fail closed.
 
