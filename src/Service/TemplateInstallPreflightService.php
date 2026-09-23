@@ -121,7 +121,11 @@ final class TemplateInstallPreflightService {
 			]);
 		}
 
-		$diff = (new TemplateImportCompareService())->compare($isolated['source'], 'json');
+		$diff = (new TemplateImportCompareService())->compare(
+			$isolated['source'],
+			'json',
+			TemplateImportCompareService::PROFILE_INSTALL
+		);
 		$summary = ImportCompareSummary::summarize($diff);
 		$preview = UpdatePreviewAnalyzer::analyze($diff, 200);
 		$previewGate = TemplateInstallPreviewGate::evaluate($summary, $preview);
@@ -145,6 +149,7 @@ final class TemplateInstallPreflightService {
 			'source_sha256' => (string) ($candidate['source_sha256'] ?? ''),
 			'content_sha256' => (string) ($candidate['content_sha256'] ?? ''),
 			'import_sha256' => (string) ($candidate['import_sha256'] ?? ''),
+			'import_rule_profile' => TemplateImportCompareService::PROFILE_INSTALL,
 			'dependencies' => $dependencies['required'],
 			'external_template_names' => is_array($isolated['external_template_names'] ?? null)
 				? array_values(array_map('strval', $isolated['external_template_names']))
@@ -171,7 +176,8 @@ final class TemplateInstallPreflightService {
 			'preview' => $preview,
 			'evidence_sha256' => self::evidenceSha256($evidence),
 			'import_source' => $isolated['source'],
-			'import_format' => 'json'
+			'import_format' => 'json',
+			'import_rule_profile' => TemplateImportCompareService::PROFILE_INSTALL
 		];
 	}
 
@@ -228,7 +234,8 @@ final class TemplateInstallPreflightService {
 			'preview' => $extra['preview'] ?? null,
 			'evidence_sha256' => '',
 			'import_source' => '',
-			'import_format' => 'json'
+			'import_format' => 'json',
+			'import_rule_profile' => TemplateImportCompareService::PROFILE_INSTALL
 		];
 	}
 
