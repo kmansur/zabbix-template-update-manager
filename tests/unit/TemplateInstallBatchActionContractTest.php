@@ -95,7 +95,7 @@ assertInstallBatchContract(strpos($executeOne, 'disableView()') !== false,
 assertInstallBatchContract(
 	strpos($listView, "'not_installed'") !== false
 		&& strpos($listView, "new CCheckBox('uuids['") !== false
-		&& strpos($listView, 'Review selected installations') !== false
+		&& strpos($listView, 'Prepare selected installations') !== false
 		&& strpos($listView, '->setEnabled(true)') !== false,
 	'Not installed catalog mode must expose active multi-select/select-all installation review.'
 );
