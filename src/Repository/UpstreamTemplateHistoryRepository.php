@@ -6,14 +6,22 @@ use JsonException;
 use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
 use RuntimeException;
 
-require_once dirname(__DIR__).'/Support/ProjectVersion.php';\nrequire_once __DIR__.'/OfflineBundleRepository.php';\nrequire_once __DIR__.'/UpstreamIndexRepository.php';
+require_once dirname(__DIR__).'/Support/ProjectVersion.php';
+require_once __DIR__.'/OfflineBundleRepository.php';
+require_once __DIR__.'/UpstreamIndexRepository.php';
 
 final class UpstreamTemplateHistoryRepository {
+
+	private OfflineBundleRepository $offlineBundle;
 
 	private const BASE_URL = 'https://git.zabbix.com/rest/api/1.0/projects/ZBX/repos/zabbix/commits';
 	private const PAGE_SIZE = 25;
 	private const MAX_COMMITS = 75;
 	private const MAX_RESPONSE_BYTES = 2097152;
+
+	public function __construct(?OfflineBundleRepository $offlineBundle = null) {
+		$this->offlineBundle = $offlineBundle ?? new OfflineBundleRepository();
+	}
 
 	public function listCommits(string $path, string $until, int $maxCommits = self::MAX_COMMITS): array {
 		if (!UpstreamIndexRepository::isValidTemplatePath($path)) {
