@@ -16,7 +16,7 @@ function assertTemplateUpdateContract(bool $condition, string $message): void {
 assertTemplateUpdateContract(
 	isset($manifest['actions']['ztum.template.update'])
 		&& ($manifest['actions']['ztum.template.update']['class'] ?? null) === 'TemplateUpdate'
-		&& ($manifest['actions']['ztum.template.update']['view'] ?? null) === 'template.update',
+		&& ($manifest['actions']['ztum.template.update']['view'] ?? null) === 'ztum.template.update',
 	'Controlled update action must be registered with its result view.'
 );
 assertTemplateUpdateContract(
