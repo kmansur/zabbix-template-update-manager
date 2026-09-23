@@ -4,7 +4,7 @@ $root = dirname(__DIR__, 2);
 $service = (string) file_get_contents($root.'/src/Service/TemplateConfigurationImportService.php');
 $executeOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchExecuteOne.php');
 $controlledInstall = (string) file_get_contents($root.'/src/Service/TemplateControlledInstallService.php');
-$batchView = (string) file_get_contents($root.'/views/template.install.batch.prepare.php');
+$batchView = (string) file_get_contents($root.'/views/ztum.template.install.batch.prepare.php');
 $preflight = (string) file_get_contents($root.'/src/Service/TemplateInstallPreflightService.php');
 
 function assertImportDiagnosticContract(bool $condition, string $message): void {
