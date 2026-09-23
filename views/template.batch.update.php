@@ -2,10 +2,16 @@
 
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
-	->addItem(new CLink(
-		_('Back to template updates'),
-		(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
-	));
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				new CLink(
+					_('Back to template updates'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
+				)
+			)
+		))->setAttribute('aria-label', _('Content controls'))
+	);
 
 if ($data['error'] !== null || !is_array($data['result'])) {
 	$page->addItem(new CTag('p', true, $data['error'] ?? _('Batch execution returned no result.')))->show();
