@@ -70,8 +70,10 @@ final class HistoricalTemplateBaselineService {
 		string $expectedVendorName = 'Zabbix',
 		int $maxCommits = 75,
 		?callable $candidateEvaluator = null,
-		bool $allowExternalTemplateReferences = false
+		bool $allowExternalTemplateReferences = false,
+		float $maxRuntimeSeconds = 0.0
 	): array {
+		$startedAt = microtime(true);
 		$targetVendorVersion = trim($targetVendorVersion);
 		if ($targetVendorVersion === '') {
 			throw new RuntimeException('A target vendor version is required for historical baseline lookup.');
@@ -80,6 +82,17 @@ final class HistoricalTemplateBaselineService {
 		$history = ($this->historyLoader)($path, $currentCommit, $maxCommits);
 		if (!is_array($history) || !is_array($history['commits'] ?? null)) {
 			throw new RuntimeException('The historical commit loader returned an invalid result.');
+		}
+
+		if ($this->runtimeBudgetReached($startedAt, $maxRuntimeSeconds)) {
+			return $this->timeBudgetResult(
+				$path,
+				$targetVendorVersion,
+				0,
+				(bool) ($history['truncated'] ?? false),
+				0,
+				0
+			);
 		}
 
 		// Runtime analysis already loads these services. Using them here keeps
@@ -107,6 +120,17 @@ final class HistoricalTemplateBaselineService {
 		// Once the requested version block has been entered and an older version is
 		// reached, all revisions for this vendor version have been enumerated.
 		foreach ($history['commits'] as $commit) {
+			if ($this->runtimeBudgetReached($startedAt, $maxRuntimeSeconds)) {
+				return $this->timeBudgetResult(
+					$path,
+					$targetVendorVersion,
+					$examined,
+					(bool) ($history['truncated'] ?? false),
+					$matchingCommitCount,
+					count($candidatesByHash)
+				);
+			}
+
 			$id = strtolower(trim((string) ($commit['id'] ?? '')));
 			if (!preg_match('/^[a-f0-9]{40}$/', $id)) {
 				throw new RuntimeException('The historical commit loader returned an invalid commit ID.');
@@ -239,6 +263,34 @@ final class HistoricalTemplateBaselineService {
 			'selection' => 'no_exact_local_match',
 			'closest_commit' => $closest['commit'] ?? '',
 			'closest_changes' => $closest['semantic_distance'] ?? null,
+			'source' => null
+		];
+	}
+
+	private function runtimeBudgetReached(float $startedAt, float $maxRuntimeSeconds): bool {
+		return $maxRuntimeSeconds > 0.0
+			&& (microtime(true) - $startedAt) >= $maxRuntimeSeconds;
+	}
+
+	private function timeBudgetResult(
+		string $path,
+		string $vendorVersion,
+		int $examined,
+		bool $historyTruncated,
+		int $candidateCount,
+		int $distinctCandidateCount
+	): array {
+		return [
+			'status' => 'time_budget_reached',
+			'commit' => '',
+			'path' => $path,
+			'vendor_version' => $vendorVersion,
+			'commits_examined' => $examined,
+			'history_truncated' => $historyTruncated,
+			'candidate_count' => $candidateCount,
+			'distinct_candidate_count' => $distinctCandidateCount,
+			'exact_match_count' => 0,
+			'selection' => 'continue_request_bounded_scan',
 			'source' => null
 		];
 	}
