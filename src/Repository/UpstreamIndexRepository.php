@@ -8,7 +8,8 @@ use RuntimeException;
 use Throwable;
 
 require_once dirname(__DIR__).'/Support/ProjectVersion.php';
-require_once dirname(__DIR__).'/Support/ZabbixVersion.php';\nrequire_once __DIR__.'/OfflineBundleRepository.php';
+require_once dirname(__DIR__).'/Support/ZabbixVersion.php';
+require_once __DIR__.'/OfflineBundleRepository.php';
 
 final class UpstreamIndexRepository {
 
@@ -18,10 +19,12 @@ final class UpstreamIndexRepository {
 	private const BASE_URL = 'https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/upstream-index/indexes';
 
 	private string $cacheDir;
+	private OfflineBundleRepository $offlineBundle;
 
-	public function __construct(?string $cacheDir = null) {
+	public function __construct(?string $cacheDir = null, ?OfflineBundleRepository $offlineBundle = null) {
 		$this->cacheDir = $cacheDir ?? rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
 			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager';
+		$this->offlineBundle = $offlineBundle ?? new OfflineBundleRepository();
 	}
 
 	public static function endpointForVersion(string $zabbixVersion): ?string {
@@ -30,10 +33,13 @@ final class UpstreamIndexRepository {
 	}
 
 	public static function transportCapabilities(): array {
+		$offline = new OfflineBundleRepository();
 		return [
 			'curl' => function_exists('curl_init'),
 			'allow_url_fopen' => filter_var((string) ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOLEAN),
-			'openssl' => extension_loaded('openssl')
+			'openssl' => extension_loaded('openssl'),
+			'offline_bundle' => $offline->isConfigured(),
+			'offline_only' => $offline->isOfflineOnly()
 		];
 	}
 
