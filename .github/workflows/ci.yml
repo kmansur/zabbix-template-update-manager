@@ -54,6 +54,9 @@ jobs:
       - name: Enforce controlled-write boundary
         run: php tests/read_only_guard.php
 
+      - name: Enforce native Zabbix UI
+        run: php tests/ui_native_guard.php
+
       - name: PHP unit tests
         shell: bash
         run: |
