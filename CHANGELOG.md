@@ -4,6 +4,17 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Polished the public README for beta.52 community testing with native GitHub CI/Security/Quality badges, clearer project positioning and a dedicated **Never update** usage section.
+- Synchronized the engineering status and laboratory test plan with beta.52, including an explicit **Never update / Allow updates** field-validation regression.
+
+### Fixed
+
+- Corrected stale beta.50 installation references, the obsolete beta.42 laboratory exit criteria and outdated selected-update/install wording.
+- Restored the missing Markdown code fence around the official-catalog installation workflow diagram.
+
+
 ## [0.1.0-beta.52] - 2026-09-23
 
 ### Added

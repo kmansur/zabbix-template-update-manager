@@ -23,9 +23,11 @@ The estimate deliberately separates implementation from automation and field val
 
 Weighted result: **92%**.
 
-## Major improvements through beta.50
+## Major improvements through beta.52
 
 The external review's principal technical/process findings were converted into implementation work:
+
+- persistent update protection: per-template **Never update** policy with UUID-based private storage, catalog filter, explicit reversal and fail-closed enforcement at preparation/preflight/import gates;
 
 - air-gapped operation: implemented through a verified local bundle with offline-only fail-closed mode;
 - architecture/documentation drift: synchronized to controlled-write reality;
@@ -47,7 +49,7 @@ The external review's principal technical/process findings were converted into i
    - The code supports major versions 7 and 8, but the complete real workflow matrix still needs to be recorded on Zabbix 8.x.
 
 3. **Cross-version UI field validation**
-   - Beta.50 completed the native Zabbix presentation/copy pass.
+   - Beta.52 includes the beta.50 native Zabbix presentation/copy pass plus the native **Never update / Allow updates** controls, filter and policy status.
    - Light/dark rendering and all operator flows still need field evidence on supported Zabbix 7.x and 8.x instances before community UI validation is considered complete.
 
 ## Medium-priority work
@@ -64,14 +66,14 @@ The external review's principal technical/process findings were converted into i
 - select and publish project license;
 - complete/record Zabbix 7.x and 8.x field-validation matrix;
 - validate fresh install, standard update, reviewed update, local-overwrite acknowledgement, batch stop-on-failure, offline mode, concurrency and rollback on real supported instances;
-- complete the beta.50 cross-version native-UI field pass and record any remaining browser/runtime limitations;
+- complete the beta.52 cross-version native-UI field pass and record any remaining browser/runtime limitations;
 - complete compatibility/homologation notes;
 - confirm no unresolved high-severity safety/data-loss issue;
 - publish at least one validated formal prerelease using the new release pipeline.
 
 ## Completion interpretation
 
-A green CI/Security run means automation validation passed. It does not make beta.50 production-ready.
+A green CI/Security run means automation validation passed. It does not make beta.52 production-ready.
 
 Track these states independently:
 

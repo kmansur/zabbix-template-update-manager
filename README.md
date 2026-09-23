@@ -1,6 +1,10 @@
 # Template Update Manager
 
-Template Update Manager (ZTUM) is an independent native Zabbix frontend module for discovering, matching, comparing and safely managing updates of installed Zabbix templates.
+[![CI](https://github.com/kmansur/zabbix-template-update-manager/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kmansur/zabbix-template-update-manager/actions/workflows/ci.yml)
+[![Security](https://github.com/kmansur/zabbix-template-update-manager/actions/workflows/security.yml/badge.svg?branch=main)](https://github.com/kmansur/zabbix-template-update-manager/actions/workflows/security.yml)
+[![Quality metrics](https://github.com/kmansur/zabbix-template-update-manager/actions/workflows/quality-metrics.yml/badge.svg?branch=main)](https://github.com/kmansur/zabbix-template-update-manager/actions/workflows/quality-metrics.yml)
+
+Template Update Manager (ZTUM) is an independent native Zabbix frontend module for discovering, installing, matching, comparing and safely managing official Zabbix templates.
 
 It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
@@ -14,6 +18,7 @@ This version is intended for **laboratory testing**.
 - Automation validation: must be green for the beta snapshot commit.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
+- Community testing: feedback and reproducible field-validation reports are welcome.
 
 Beta.52 adds a persistent per-template **Never update** policy. Super Admin users can mark one or more installed official templates as protected, filter the catalog to show those templates, and later allow updates again. The policy is enforced in catalog eligibility, readiness, fresh preflight and immediately before controlled import.
 
@@ -99,7 +104,7 @@ If an import has occurred but final validation cannot prove the expected state, 
 
 ## Installing multiple missing official templates
 
-In the `Not installed` status filter, Super Admins can use row checkboxes or the header select-all control and choose **Review selected installations**. Missing-template selection remains bounded to 500 catalog entries.
+In the `Not installed` status filter, Super Admins can use row checkboxes or the header select-all control and choose **Prepare selected installations**. Missing-template selection remains bounded to 500 catalog entries.
 
 The preparation page runs one bounded request per UUID and classifies every candidate:
 
@@ -111,6 +116,24 @@ Only Ready candidates are executed by **Install ready templates**. Execution is 
 Batch installation deliberately does not recursively install dependencies. If a selected template requires another template that is still missing, it remains Blocked even if that dependency is also selected. Install the dependency first, then prepare the dependent template again.
 
 No automatic uninstall is performed after any ambiguous/failed install. Successful candidates remain installed and validated; candidates after the first failure are reported as Not attempted.
+
+## Protecting an installed template from ZTUM updates
+
+Super Admins can place an installed official template under a persistent **Never update** policy without removing it from inventory or read-only comparison.
+
+1. Open **Data collection → Template updates**.
+2. Use **All**, **Current** or **Update available** and select one or more installed official templates.
+3. Choose **Never update** and confirm the policy change.
+4. Use the dedicated **Never update** filter to review protected templates.
+5. To reverse the policy, select the protected template and choose **Allow updates**.
+
+Protected templates remain visible and comparable, but they are excluded from actionable update counts, normal update preparation, fresh update preflight and controlled import. The policy is keyed by official template UUID and stored privately in:
+
+```text
+/var/lib/zabbix-template-update-manager/update-policy.json
+```
+
+Policy changes are Super-Admin-only and CSRF-protected. If the policy store is malformed or unreadable, ZTUM fails closed for update writes rather than silently ignoring the protection.
 
 ## Installing an official template that is not local
 
@@ -205,7 +228,7 @@ git rev-parse HEAD
 Expected `VERSION` for the current laboratory build:
 
 ```text
-0.1.0-beta.50
+0.1.0-beta.52
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -221,7 +244,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.50**, enable the module and open:
+Confirm version **0.1.0-beta.52**, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -241,7 +264,9 @@ installed templates
       v
 UUID official identity + vendor-version comparison
       |
-      +--> checkbox/select update candidates (selection safety ceiling 500)
+      +--> policy = Never update -> read-only inventory/comparison only
+      |
+      +--> managed -> checkbox/select update candidates (selection safety ceiling 500)
                     |
                     v
            batch safety preparation
@@ -310,6 +335,7 @@ single configuration.import boundary
 post-rollback validation
 ```
 
+```text
 official upstream catalog
       |
       +--> installed locally? yes -> update/comparison workflows above
@@ -335,6 +361,7 @@ official upstream catalog
                  |
                  v
         post-install UUID/version/content validation
+```
 
 ## Upstream source model
 

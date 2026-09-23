@@ -13,7 +13,7 @@ Status at publication:
 
 Use the exact prerelease tag when a public beta has been published. During internal laboratory work before that tag exists, record the exact `main` commit used so the test can be reproduced.
 
-Beta.50 is the native-UI field-test candidate. Field validation must prove the complete catalog/update/install/rollback workflow in both light and dark themes while confirming that the underlying comparison, evidence and controlled-write behavior remains unchanged.
+Beta.52 is the current native-UI and update-policy field-test candidate. Field validation must prove the complete catalog/update/install/rollback workflow in both light and dark themes while confirming that the underlying comparison, evidence and controlled-write behavior remains unchanged.
 
 ## Safety assumptions
 
@@ -110,7 +110,7 @@ Repeat this visual pass on at least one supported Zabbix 7.x lab and one support
 
 ## 2B. Request-bounded update regression
 
-For the first beta.50 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.52 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -195,7 +195,7 @@ Confirm **Install ready templates** when at least one candidate is Ready and ver
 - the batch reports Installed / Failed / Not attempted / Any configuration write;
 - returning to the catalog shows successful rows as installed/current.
 
-Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. Beta.39 does not recursively install selected dependencies.
+Negative case: include one candidate with a missing linked-template dependency if available. It must remain Blocked and must not be present in the execution set. ZTUM does not recursively install selected dependencies.
 
 Stop-on-first-failure remains mandatory: if one controlled install returns a non-success, subsequent Ready UUIDs must be reported Not attempted.
 
@@ -211,7 +211,28 @@ Confirm:
 
 The former 25-template update-batch ceiling remains removed. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach preparation intact, and preparation must still run one template per HTTP request without silent truncation.
 
-## 4A. Large selected-update regression
+## 4A. Never update policy regression
+
+As Super Admin, choose one installed official template that is safe to use for a policy-only test.
+
+1. From **All**, **Current** or **Update available**, select the template and choose **Never update**.
+2. Confirm the row shows **Never update** in the **Update policy** column.
+3. Confirm the protected-template summary count increases and, when the template had an update available, the actionable **Updates available** count no longer includes it.
+4. Open the **Never update** filter and confirm the template appears there.
+5. Confirm read-only comparison remains available, while normal update preparation/preflight refuses the protected template.
+6. As a non-Super Admin, confirm policy mutation controls are unavailable.
+7. Return as Super Admin, select the template under the **Never update** filter and choose **Allow updates**.
+8. Confirm the policy returns to managed state and normal eligibility is recalculated.
+
+Also verify the private policy file is created under:
+
+```text
+/var/lib/zabbix-template-update-manager/update-policy.json
+```
+
+A malformed/unreadable policy store must fail closed for update writes; it must never silently restore update eligibility.
+
+## 4B. Large selected-update regression
 
 Select at least 26 eligible official update candidates in the lab.
 
@@ -292,7 +313,7 @@ Expected behavior:
 - a long historical scan may show `history_scan_pending` / continuation progress and issue several bounded requests for the same template before final classification;
 - no single historical continuation request should approach the previous ~30-second gateway failure window;
 - if an HTTP failure still occurs, the Reason should include elapsed time and gateway identity such as `server=cloudflare` / `cf-ray=...` when exposed by the response;
-- if a real 504 still occurs on beta.50, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
+- if a real 504 still occurs on beta.52, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
 - preparation continuation/retry must never call `configuration.import`.
 
 ## 5B. Manual-review continuation regression
@@ -525,13 +546,13 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.42 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; ZTUM does not perform automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
 Confirm:
 
-- normal Admin can inspect supported read-only pages but cannot run batch preparation/execution;
+- normal Admin can inspect supported read-only pages but cannot run batch preparation/execution or change the Never update policy;
 - only Super Admin can prepare and execute selected updates;
 - leaving batch confirmation unchecked is rejected;
 - direct POST without the valid action-specific CSRF token is rejected by native Zabbix handling;
@@ -560,7 +581,7 @@ Expected behavior:
 
 ## 13B. Air-gapped/offline upstream regression
 
-Build a beta.42 offline bundle on a connected system using the exact validated 7.x or 8.x index and a local canonical Zabbix Git checkout. Copy it to private storage on the lab frontend.
+Build an offline bundle on a connected system using the exact validated 7.x or 8.x index and a local canonical Zabbix Git checkout. Copy it to private storage on the lab frontend.
 
 Configure:
 
@@ -708,14 +729,15 @@ Stop all further writes if any occurs:
 - backup integrity fails unexpectedly;
 - recovery backup does not match the current export;
 - a conflict/manual-review/unresolved item is offered as Ready;
+- a template protected by **Never update** is offered for update preparation or execution;
 - selected review contains IDs that were not selected;
 - frontend logs indicate an ambiguous `configuration.import` result.
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.42 laboratory validation
+## 16. Exit criteria for beta.52 laboratory validation
 
-A Zabbix generation passes beta.42 only after evidence demonstrates:
+A Zabbix generation passes beta.52 only after evidence demonstrates:
 
 ```text
 module discovery/enable
@@ -725,10 +747,11 @@ upstream-only Not installed detection
 controlled individual installation + post-install validation
 upstream UUID/version matching
 native subset selection
-selected review
+direct selected-update preparation
 batch safety preparation
 Ready/Review/Conflict/Blocked classification
 persistent rollback creation + verification
+Never update policy + Allow updates reversal
 controlled sequential update
 stop-on-first-failure behavior (real or safely simulated)
 post-update validation
