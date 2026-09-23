@@ -24,6 +24,17 @@ function assertUpstreamThrows(callable $callback, string $message): void {
 	exit(1);
 }
 
+assertUpstreamValue(
+	'https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/upstream-index/initial/7.0.json',
+	UpstreamIndexRepository::initialReleaseEndpointForVersion('7.0.31'),
+	'Initial-release baseline endpoint must follow the detected major.minor line.'
+);
+assertUpstreamValue(
+	null,
+	UpstreamIndexRepository::initialReleaseEndpointForVersion('invalid'),
+	'Unsupported Zabbix versions must not produce an initial-release baseline endpoint.'
+);
+
 $uuid = 'f8f7908280354f2abeed07dc788c3747';
 $valid = json_encode([
 	'schema_version' => 1,
