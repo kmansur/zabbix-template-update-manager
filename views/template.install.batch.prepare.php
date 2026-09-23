@@ -2,10 +2,16 @@
 
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
-	->addItem(new CLink(
-		_('Back to template catalog'),
-		(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
-	));
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				new CLink(
+					_('Back to template catalog'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
+				)
+			)
+		))->setAttribute('aria-label', _('Content controls'))
+	);
 
 if ($data['uuids'] === []) {
 	$page->addItem(new CTag('p', true, _('Batch installation preparation returned no selected templates.')))->show();
@@ -437,5 +443,5 @@ $script = str_replace(
 );
 
 $page
-	->addItem(new CScriptTag($script))
+	->addItem((new CScriptTag($script))->setOnDocumentReady())
 	->show();
