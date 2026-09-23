@@ -34,6 +34,12 @@ assertSourceValue(
 	$url,
 	'Canonical source URL was not built as expected.'
 );
+$mirrorUrl = UpstreamTemplateSourceRepository::buildMirrorUrl($commit, $path);
+assertSourceValue(
+	'https://raw.githubusercontent.com/zabbix/zabbix/'.$commit.'/templates/os/linux/template_os_linux.yaml',
+	$mirrorUrl,
+	'Official mirror source URL was not built as expected.'
+);
 assertSourceValue(true, UpstreamIndexRepository::isValidTemplatePath($path), 'Valid official source path was rejected.');
 assertSourceValue(false, UpstreamIndexRepository::isValidTemplatePath('templates/os/../secret.yaml'), 'Traversal path must be rejected.');
 assertSourceThrows(
