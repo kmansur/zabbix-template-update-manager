@@ -3,9 +3,9 @@
 $root = dirname(__DIR__, 2);
 $manifest = json_decode(file_get_contents($root.'/manifest.json'), true);
 $action = file_get_contents($root.'/actions/TemplatePreflight.php');
-$view = file_get_contents($root.'/views/template.preflight.php');
-$compareView = file_get_contents($root.'/views/template.compare.php');
-$listView = file_get_contents($root.'/views/template.list.php');
+$view = file_get_contents($root.'/views/ztum.template.preflight.php');
+$compareView = file_get_contents($root.'/views/ztum.template.compare.php');
+$listView = file_get_contents($root.'/views/ztum.template.list.php');
 
 function assertPreflightActionContract(bool $condition, string $message): void {
 	if (!$condition) {
