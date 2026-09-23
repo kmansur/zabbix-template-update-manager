@@ -17,9 +17,11 @@ This version is intended for **laboratory testing**.
 
 Beta.43 is a compatibility hotfix for the Zabbix frontend view loader. All module views are now internally namespaced as `ztum.*`, preventing Template Update Manager view files from shadowing native core views such as `template.list`. A permanent CI guard enforces the namespace.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.49` after automation validation. Formal tag/GitHub Release automation now exists, but publishing a production-grade release remains gated by field validation and the still-unselected project license.
+Formal tag/GitHub Release automation exists, but a production-grade release remains gated by broader field validation and the still-unselected project license.
 
-See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
+For a new laboratory installation, use the quick installer below. For validation work, always record the exact installed version and commit/source ref.
+
+See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before testing the beta.
 
 ## Supported Zabbix generations
 
@@ -158,20 +160,48 @@ sudo tools/ztum-runtime-setup.sh --check
 
 See [`docs/runtime-setup.md`](docs/runtime-setup.md).
 
-## Installation for laboratory testing
+## Quick install
 
-Use the fixed beta snapshot rather than the moving development branch:
+For a new laboratory installation, use the beginner-friendly installer:
+
+- [Quick Install — English](QUICK_INSTALL.md)
+- [Instalação Rápida — Português do Brasil](QUICK_INSTALL_PT-BR.md)
+
+English:
+
+```bash
+curl -fsSL \
+  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/main/tools/quickinstall.sh \
+  -o /tmp/ztum-quickinstall.sh
+
+sudo bash /tmp/ztum-quickinstall.sh
+```
+
+Português do Brasil:
+
+```bash
+curl -fsSL \
+  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/main/tools/quickinstall-pt-br.sh \
+  -o /tmp/ztum-quickinstall-pt-br.sh
+
+sudo bash /tmp/ztum-quickinstall-pt-br.sh
+```
+
+The quick installer is intentionally **new-install only**. It will not overwrite an existing ZTUM installation and it does not modify Nginx, Apache, PHP-FPM configuration, the Zabbix database or Zabbix templates.
+
+## Manual installation for laboratory testing
+
+Clone the current laboratory branch and record the exact commit used:
 
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.49
-git checkout -B release/0.1.0-beta.49 origin/release/0.1.0-beta.49
+git checkout main
 cat VERSION
 git rev-parse HEAD
 ```
 
-Expected `VERSION`:
+Expected `VERSION` for the current laboratory build:
 
 ```text
 0.1.0-beta.49
