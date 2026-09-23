@@ -246,12 +246,18 @@ final class TemplateUpdateAnalysisService {
 
 			if ($baseline === null) {
 				$cacheStatus = 'miss';
-				$baseline = $this->resolveInitialReleaseBaseline(
-					$template,
-					$data['zabbix_version'],
-					$sourceFile['path'],
-					$vendorName
-				);
+				try {
+					$baseline = $this->resolveInitialReleaseBaseline(
+						$template,
+						$data['zabbix_version'],
+						$sourceFile['path'],
+						$vendorName
+					);
+				}
+				catch (Throwable $exception) {
+					$this->logFailure('Initial-release baseline lookup', $templateId, $exception);
+					$baseline = null;
+				}
 
 				$historyRepository = null;
 				if ($baseline === null) {
