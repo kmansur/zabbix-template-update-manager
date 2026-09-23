@@ -1,4 +1,4 @@
-# Project status and engineering audit — 0.1.0-beta.40
+# Project status and engineering audit — 0.1.0-beta.50
 
 Date: 2026-09-23
 
@@ -6,24 +6,24 @@ This document is an engineering snapshot, not a release certification. Percentag
 
 ## Overall estimate toward stable 1.0 core scope
 
-**89% complete**
+**92% complete**
 
 The estimate deliberately separates implementation from automation and field validation. Provider expansion (GitHub/GitLab/community/private/custom repositories) remains post-1.0 scope.
 
 | Area | Weight | Estimated completion | Notes |
 |---|---:|---:|---|
-| Discovery/catalog/upstream identity | 10% | 96% | Core official catalog/index identity plus verified offline source mode implemented |
-| Comparison/risk/readiness | 20% | 93% | Three-way, risk, readiness and dependency-aware comparison implemented |
-| Update/install/rollback write paths | 20% | 95% | Controlled writes, evidence, validation, reviewed overrides and serialization implemented |
-| Native Zabbix UI/UX | 10% | 91% | Native refactor + lab warning complete; cross-version visual field pass still required |
-| Automated validation/CI | 10% | 97% | CI/UI/security/workflow/offline/runtime/coverage gates implemented; browser E2E and independent security review remain |
-| Runtime resilience | 10% | 87% | Request-bounded flows, offline mode, runtime helper and operation lock implemented; per-template timeout/rename edge cases remain |
-| Field validation | 10% | 65% | Stronger Zabbix 7.x evidence than Zabbix 8.x; full matrix incomplete |
-| Release engineering | 10% | 78% | Release workflow/assets/checksums/policy implemented; license decision and first community-test prerelease remain |
+| Discovery/catalog/upstream identity | 10% | 97% | Official catalog/index identity, immutable initial-release baselines and verified offline source mode implemented |
+| Comparison/risk/readiness | 20% | 96% | Historical/initial-release BASE, three-way, risk, readiness and dependency-aware comparison implemented |
+| Update/install/rollback write paths | 20% | 97% | Controlled writes, evidence, post-write validation, reviewed overrides and serialization implemented |
+| Native Zabbix UI/UX | 10% | 96% | Full native presentation/copy pass complete; cross-version light/dark field validation remains |
+| Automated validation/CI | 10% | 98% | CI/UI/security/workflow/offline/runtime/coverage gates implemented; browser E2E and independent security review remain |
+| Runtime resilience | 10% | 94% | Request-bounded flows, immutable history caching, rename-aware paths, initial-release BASE, offline mode and operation lock implemented |
+| Field validation | 10% | 70% | End-to-end Zabbix 7.x update field evidence is strong; Zabbix 8.x and cross-theme/community matrix remain incomplete |
+| Release engineering | 10% | 82% | Quick install, release workflow/assets/checksums/policy implemented; license decision and first community-test prerelease remain |
 
-Weighted result: **89%**.
+Weighted result: **92%**.
 
-## Major beta.40 improvements
+## Major improvements through beta.50
 
 The external review's principal technical/process findings were converted into implementation work:
 
@@ -46,13 +46,9 @@ The external review's principal technical/process findings were converted into i
 2. **Zabbix 8.x field-validation gap**
    - The code supports major versions 7 and 8, but the complete real workflow matrix still needs to be recorded on Zabbix 8.x.
 
-3. **Repeated per-template timeout class**
-   - Request-bounded architecture prevents cumulative batch timeouts, but an individual preparation/source/history operation can still hit proxy/runtime limits.
-   - Next work: stage timing, cache/reuse review and safe preparation-only retry improvements. Never retry an ambiguous configuration write.
-
-4. **Historical rename edge case**
-   - `followRenames=true` makes history enumeration rename-aware, but historical raw-source retrieval still uses the current path.
-   - Offline bundle generation intentionally preserves the same fail-closed boundary rather than guessing old paths.
+3. **Cross-version UI field validation**
+   - Beta.50 completed the native Zabbix presentation/copy pass.
+   - Light/dark rendering and all operator flows still need field evidence on supported Zabbix 7.x and 8.x instances before community UI validation is considered complete.
 
 ## Medium-priority work
 
@@ -68,14 +64,14 @@ The external review's principal technical/process findings were converted into i
 - select and publish project license;
 - complete/record Zabbix 7.x and 8.x field-validation matrix;
 - validate fresh install, standard update, reviewed update, local-overwrite acknowledgement, batch stop-on-failure, offline mode, concurrency and rollback on real supported instances;
-- resolve or explicitly accept/document remaining timeout and historical-rename limitations;
+- complete the beta.50 cross-version native-UI field pass and record any remaining browser/runtime limitations;
 - complete compatibility/homologation notes;
 - confirm no unresolved high-severity safety/data-loss issue;
 - publish at least one validated formal prerelease using the new release pipeline.
 
 ## Completion interpretation
 
-A green CI/Security run means automation validation passed. It does not make beta.40 production-ready.
+A green CI/Security run means automation validation passed. It does not make beta.50 production-ready.
 
 Track these states independently:
 
