@@ -4,6 +4,27 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.41] - 2026-09-23
+
+### Fixed
+
+- Corrected trigger-host extraction used by installation isolation/reference auditing. Arithmetic division such as `min(/Template/key,5m)/last(/Template/other.key)` could previously be misread as a cross-template dependency named `last(`.
+- Jira Data Center by JMX and Vyatta Virtual Router by SNMP no longer receive the false `Required dependencies = last(` / `Missing dependencies = last(` classification from that parser defect.
+- Runtime trigger-host extraction now prefers Zabbix's native `CExpressionParser`/expression-result host semantics; standalone tests use a narrow grammar-aware fallback.
+- Catalog pagination no longer shows the custom `All` / `Pages` display control when the complete filtered result fits on a single native Zabbix page.
+
+### Safety
+
+- Real cross-template trigger references remain dependency-aware and fail closed when the referenced template is actually missing.
+- The change does not weaken `configuration.importcompare`, installation reference auditing, immutable evidence or controlled-write gates.
+
+### Tests
+
+- Added direct Jira/Vyatta-style arithmetic-division expression regressions.
+- Added isolation and installation-reference-audit regressions proving `last(` cannot become a synthetic template dependency.
+- Added catalog controller contract coverage for suppressing unnecessary single-page display controls.
+
+
 ## [0.1.0-beta.40] - 2026-09-23
 
 ### Added
