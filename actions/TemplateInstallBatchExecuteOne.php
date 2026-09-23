@@ -4,7 +4,8 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 
 use CController;
 use CControllerResponseData;
-use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledInstallService;\nuse Modules\\ZabbixTemplateUpdateManager\\Service\\TemplateOperationLockService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledInstallService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Service/TemplateControlledInstallService.php';
