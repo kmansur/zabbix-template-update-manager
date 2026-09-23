@@ -7,9 +7,9 @@ $preflight = (string) file_get_contents($root.'/src/Service/TemplateInstallPrefl
 $controlled = (string) file_get_contents($root.'/src/Service/TemplateControlledInstallService.php');
 $post = (string) file_get_contents($root.'/src/Service/TemplatePostInstallValidationService.php');
 $listController = (string) file_get_contents($root.'/actions/TemplateList.php');
-$list = (string) file_get_contents($root.'/views/template.list.php');
-$reviewView = (string) file_get_contents($root.'/views/template.install.review.php');
-$resultView = (string) file_get_contents($root.'/views/template.install.php');
+$list = (string) file_get_contents($root.'/views/ztum.template.list.php');
+$reviewView = (string) file_get_contents($root.'/views/ztum.template.install.review.php');
+$resultView = (string) file_get_contents($root.'/views/ztum.template.install.php');
 
 function assertInstallContract(bool $condition, string $message): void {
 	if (!$condition) {
