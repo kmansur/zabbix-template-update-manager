@@ -81,7 +81,7 @@ class TemplateList extends CController {
 		$data = [
 			'title' => _('Zabbix Template Update Manager'),
 			'version' => ProjectVersion::current(),
-			'status' => _('Laboratory beta: inventory, comparison, controlled update and rollback'),
+			'status' => _('Laboratory beta'),
 			'zabbix_version' => $zabbixVersion,
 			'zabbix_supported' => ZabbixVersion::isSupported(),
 			'can_compare' => $canAdminister,
@@ -130,7 +130,7 @@ class TemplateList extends CController {
 				$exception->getMessage()
 			));
 			$data['inventory_error'] = _(
-				'Unable to load the template inventory. Check frontend logs and the current user permissions.'
+				'Unable to load template inventory. Check frontend logs and user permissions.'
 			);
 			$this->setResponse(new CControllerResponseData($data));
 			return;
@@ -148,7 +148,7 @@ class TemplateList extends CController {
 
 			if (($data['upstream_runtime']['cache_status'] ?? null) === 'stale') {
 				$data['upstream_warning'] = _(
-					'The upstream repository could not be refreshed. A previously cached index is being used.'
+					'Upstream could not be refreshed. A previously cached index is being used.'
 				);
 			}
 		}
@@ -161,7 +161,7 @@ class TemplateList extends CController {
 			$data['templates'] = $matched['templates'];
 			$data['upstream_summary'] = $matched['summary'];
 			$data['upstream_error'] = _(
-				'Unable to check the official upstream template index. The local inventory remains available.'
+				'Unable to load the official upstream catalog. Local inventory remains available.'
 			);
 			if ($data['show_diagnostics']) {
 				$data['upstream_diagnostics']['detail'] = self::diagnosticMessage($exception);
