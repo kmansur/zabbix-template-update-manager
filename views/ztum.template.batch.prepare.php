@@ -164,7 +164,7 @@ $page
 	->addItem(FrontendUi::description(_(
 		'Ready templates can be updated after preparation completes. Eligible Manual review rows require explicit selection. Each template receives a fresh preflight immediately before import; execution stops on the first failure and rollback is never automatic.'
 	)))
-	->addItem(new CTag('p', true, $executionState))
+	->addItem(FrontendUi::description($executionState))
 	->addItem(new CDiv([$confirm]))
 	->addItem(new CDiv([$confirmLocalOverwrite]))
 	->addItem(new CDiv([$submit]))
