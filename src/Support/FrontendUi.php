@@ -53,8 +53,8 @@ final class FrontendUi {
 		return new \CTag('h4', true, $title);
 	}
 
-	public static function description(string $text): \CTag {
-		return new \CTag('p', true, $text);
+	public static function description($content): \CTag {
+		return new \CTag('p', true, $content);
 	}
 
 	public static function fingerprint(string $value, int $visibleLength = 20): \CSpan {
