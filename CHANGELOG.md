@@ -4,6 +4,40 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.48] - 2026-09-23
+
+### Fixed
+
+- Long historical-baseline discovery no longer needs to finish inside one proxy-long preparation request.
+- Historical scans now have a bounded runtime budget and return the explicit retryable state `time_budget_reached` before starting another expensive revision fetch.
+- Batch preparation automatically continues that same template across bounded requests until the historical baseline settles or the continuation safety limit is reached.
+- Immutable historical raw sources are cached locally by exact commit/path and reused across later requests and templates that share the same upstream YAML file.
+- Immutable commit-history results are cached locally by exact path/current-commit/scan-limit.
+- Historical raw-source retrieval now prefers the official `zabbix/zabbix` GitHub mirror at the exact immutable commit and falls back to the canonical `git.zabbix.com` endpoint.
+- Preparation HTTP failures now include bounded gateway diagnostics (elapsed time plus response `Server` and `CF-Ray` when present) to distinguish application failures from reverse-proxy/CDN failures.
+
+### Performance / resilience
+
+- This directly targets the field-observed `HTTP 504 after 30.2s` preparation failures on large shared template files such as the AWS HTTP template source.
+- The AWS source path has a long official revision history; beta.48 avoids serially forcing the whole history through one HTTP request and lets later AWS templates reuse immutable revision bytes already fetched by the first candidate.
+- Source/history transport timeouts are kept below the per-request historical budget so network stalls fail boundedly instead of consuming the full frontend/proxy window.
+
+### Safety
+
+- No historical revision is silently skipped and no baseline is guessed.
+- Runtime caches are keyed by immutable commit/path identities; current-upstream bytes remain protected by the index SHA-256 fingerprint.
+- Offline-only mode still refuses network fallback.
+- A continuation state is non-writing and cannot become Ready by itself.
+- Controlled execution still reruns authoritative fresh preflight immediately before `configuration.import`; warmed immutable history caches only reduce repeated network I/O.
+- No Nginx, PHP-FPM or CDN timeout increase is required or recommended by this change.
+
+### Tests
+
+- Added request-budget regression coverage for historical baseline lookup.
+- Added official-mirror URL coverage.
+- Batch contracts require bounded historical continuation and gateway diagnostics.
+- Existing CI, Security and single-write-boundary guards remain mandatory.
+
 ## [0.1.0-beta.47] - 2026-09-23
 
 ### Changed
