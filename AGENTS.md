@@ -175,7 +175,7 @@ The controlled update flow must include all of the following:
 14. posted evidence fingerprint must exactly match freshly recomputed evidence;
 15. exact immutable upstream source re-fetched and raw-source SHA-256 revalidated against the path-specific index fingerprint;
 16. candidate identity revalidated and isolated to one template with its required group definitions and any top-level graphs/triggers owned exclusively by that template;
-17. cross-template top-level dependencies rejected rather than implicitly importing another template;
+17. cross-template trigger/graph/dashboard references may be preserved only as references to already installed external templates, must be bound into preflight evidence and revalidated before import, and must never cause sibling templates to be imported implicitly;
 18. `configuration.import` executed only through `TemplateConfigurationImportService`;
 19. fresh post-import analysis proving the template is current and content matches current upstream with zero remaining comparison differences.
 
