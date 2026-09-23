@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $integrityLabels = [
 	'valid' => _('Valid'),
 	'invalid' => _('Invalid')
@@ -70,7 +74,12 @@ $summaryTable = (new CTableInfo())
 		_('Result truncated')
 	])
 	->addRow([
-		$repositoryLabels[$data['repository_status']] ?? _('Unknown'),
+		FrontendUi::status(
+			$repositoryLabels[$data['repository_status']] ?? _('Unknown'),
+			$data['repository_status'] === 'ok'
+				? FrontendUi::SUCCESS
+				: ($data['repository_status'] === 'no_backup' ? FrontendUi::MUTED : FrontendUi::DANGER)
+		),
 		$data['scanned'],
 		$data['valid'],
 		$data['invalid'],
@@ -128,7 +137,10 @@ foreach ($data['artifacts'] as $artifact) {
 
 	$row = [
 		$artifact['created_at'] !== '' ? $artifact['created_at'] : '—',
-		$integrityLabels[$status] ?? _('Unknown'),
+		FrontendUi::status(
+			$integrityLabels[$status] ?? _('Unknown'),
+			$status === 'valid' ? FrontendUi::SUCCESS : FrontendUi::DANGER
+		),
 		$artifact['vendor_version'] !== '' ? $artifact['vendor_version'] : '—',
 		$artifact['bytes'] !== null ? $artifact['bytes'] : '—',
 		$sha256 !== '' ? substr($sha256, 0, 16) : '—',
