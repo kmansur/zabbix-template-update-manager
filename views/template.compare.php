@@ -653,11 +653,12 @@ if (is_array($data['update_readiness'])
 		$backupForm = (new CForm('post'))
 			->setId('ztum-template-backup-form')
 			->setAction($backupAction)
+			->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 			->addItem([
 				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.backup')))->removeId(),
-				(new CVar('templateid', (string) $data['template']['templateid']))->removeId(),
-				new CSubmitButton(_('Create rollback backup'))
-			]);
+				(new CVar('templateid', (string) $data['template']['templateid']))->removeId()
+			])
+			->addItem(makeFormFooter(new CSubmitButton(_('Create rollback backup'))));
 
 		$page
 			->addItem(new CTag('h4', true, _('Rollback backup')))
@@ -673,18 +674,21 @@ if (is_array($data['update_readiness'])
 		$preflightForm = (new CForm('post'))
 			->setId('ztum-template-preflight-form')
 			->setAction($preflightAction)
+			->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 			->addItem(array_values(array_filter([
 				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.preflight')))->removeId(),
 				(new CVar('templateid', (string) $data['template']['templateid']))->removeId(),
 				!empty($readiness['manual_confirmation_required'])
 					? (new CVar('manual_override', '1'))->removeId()
-					: null,
+					: null
+			], static fn($item): bool => $item !== null)))
+			->addItem(makeFormFooter(
 				new CSubmitButton(
 					!empty($readiness['manual_confirmation_required'])
 						? _('Run reviewed controlled preflight')
 						: _('Run controlled preflight')
 				)
-			], static fn($item): bool => $item !== null)));
+			));
 
 		$page
 			->addItem(new CTag('h4', true, _('Controlled update preflight')))
