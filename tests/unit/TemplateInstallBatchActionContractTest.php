@@ -78,6 +78,12 @@ assertInstallBatchContract(
 		&& strpos($prepareView, 'request_failure_notice') !== false,
 	'Batch execution must distinguish confirmed writes, import rejection and browser-request outcome uncertainty.'
 );
+assertInstallBatchContract(
+	strpos($prepareView, 'validationDetail') !== false
+		&& strpos($prepareView, 'ignored_shared_changes') !== false
+		&& strpos($prepareView, 'raw_remaining_changes') !== false,
+	'Batch installation must expose detailed post-install validation evidence instead of only a generic failure reason.'
+);
 
 assertInstallBatchContract(strpos($executeOne, "'confirm' => 'required|in 1'") !== false,
 	'Each request-bounded installation write must require explicit confirmation.');
