@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.49**
+Current version: **0.1.0-beta.50**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.43 is a compatibility hotfix for the Zabbix frontend view loader. All module views are now internally namespaced as `ztum.*`, preventing Template Update Manager view files from shadowing native core views such as `template.list`. A permanent CI guard enforces the namespace.
+Beta.50 is the native-UI field-test candidate. All user-facing screens now use the shared Zabbix-native presentation layer for section headings, status messages, contextual empty states, human-readable reason labels and compact technical fingerprints. The safety/write architecture is unchanged.
 
-Formal tag/GitHub Release automation exists, but a production-grade release remains gated by broader field validation and the still-unselected project license.
+Formal tag/GitHub Release automation exists, but a community prerelease remains gated by this cross-version UI field pass and the still-unselected project license.
 
 For a new laboratory installation, use the quick installer below. For validation work, always record the exact installed version and commit/source ref.
 
@@ -204,7 +204,7 @@ git rev-parse HEAD
 Expected `VERSION` for the current laboratory build:
 
 ```text
-0.1.0-beta.49
+0.1.0-beta.50
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -220,7 +220,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.49**, enable the module and open:
+Confirm version **0.1.0-beta.50**, enable the module and open:
 
 ```text
 Data collection → Template updates
