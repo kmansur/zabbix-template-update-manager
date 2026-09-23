@@ -244,27 +244,45 @@ class TemplateList extends CController {
 
 		$listUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates');
 
+		// Zabbix 8 renamed the native pager CSS constants used by 7.x.
+		// Resolve the native class names at runtime so the same module package
+		// remains compatible with both supported frontend generations.
+		$pagerClass = defined('ZBX_STYLE_PAGER')
+			? (string) constant('ZBX_STYLE_PAGER')
+			: (defined('ZBX_STYLE_TABLE_PAGING') ? (string) constant('ZBX_STYLE_TABLE_PAGING') : '');
+		$pagerContainerClass = defined('ZBX_STYLE_PAGER_CONTAINER')
+			? (string) constant('ZBX_STYLE_PAGER_CONTAINER')
+			: (defined('ZBX_STYLE_PAGING_BTN_CONTAINER')
+				? (string) constant('ZBX_STYLE_PAGING_BTN_CONTAINER')
+				: '');
+
 		if ($data['show_all']) {
 			$pagesUrl = clone $listUrl;
 			$pagesUrl->removeArgument('show_all');
 
-			$data['paging'] = (new CDiv())
-				->addClass(ZBX_STYLE_TABLE_PAGING)
+			$pager = new CDiv();
+			if ($pagerClass !== '') {
+				$pager->addClass($pagerClass);
+			}
+
+			$pagerNav = (new CTag('nav', true))
+				->setAttribute('role', 'navigation')
+				->setAttribute('aria-label', _x('Pager', 'page navigation'))
 				->addItem(
-					(new CTag('nav', true))
-						->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-						->setAttribute('role', 'navigation')
-						->setAttribute('aria-label', _x('Pager', 'page navigation'))
-						->addItem(
-							(new CLink(_('Pages'), $pagesUrl->getUrl()))
-								->setAttribute('aria-label', _('Return to paginated view'))
-						)
-						->addItem(
-							(new CDiv())
-								->addClass(ZBX_STYLE_TABLE_STATS)
-								->addItem(_s('Displaying all %1$s found', $data['filtered_count']))
-						)
+					(new CLink(_('Pages'), $pagesUrl->getUrl()))
+						->setAttribute('aria-label', _('Return to paginated view'))
+				)
+				->addItem(
+					(new CDiv())
+						->addClass(ZBX_STYLE_TABLE_STATS)
+						->addItem(_s('Displaying all %1$s found', $data['filtered_count']))
 				);
+
+			if ($pagerContainerClass !== '') {
+				$pagerNav->addClass($pagerContainerClass);
+			}
+
+			$data['paging'] = $pager->addItem($pagerNav);
 		}
 		else {
 			$pageNum = $this->getInput('page', 1);
@@ -280,15 +298,18 @@ class TemplateList extends CController {
 				$allUrl = clone $listUrl;
 				$allUrl->setArgument('show_all', '1');
 
-				$data['paging']->addItem(
-					(new CTag('nav', true,
-						(new CLink(_('All'), $allUrl->getUrl()))
-							->setAttribute('aria-label', _('Show all matching templates'))
-					))
-						->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-						->setAttribute('role', 'navigation')
-						->setAttribute('aria-label', _('Catalog display mode'))
-				);
+				$displayModeNav = (new CTag('nav', true,
+					(new CLink(_('All'), $allUrl->getUrl()))
+						->setAttribute('aria-label', _('Show all matching templates'))
+				))
+					->setAttribute('role', 'navigation')
+					->setAttribute('aria-label', _('Catalog display mode'));
+
+				if ($pagerContainerClass !== '') {
+					$displayModeNav->addClass($pagerContainerClass);
+				}
+
+				$data['paging']->addItem($displayModeNav);
 			}
 		}
 
