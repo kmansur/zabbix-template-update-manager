@@ -246,31 +246,47 @@ final class TemplateUpdateAnalysisService {
 
 			if ($baseline === null) {
 				$cacheStatus = 'miss';
-				$historyRepository = new UpstreamTemplateHistoryRepository();
-				$baselineService = new HistoricalTemplateBaselineService(
-					static fn(string $path, string $until, int $limit): array
-						=> $historyRepository->listCommits($path, $until, $limit),
-					static fn(string $commit, string $path): array
-						=> $sourceRepository->fetchAtCommit($commit, $path),
-					static function (string $source): array {
-						$historicalReader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
-						return $historicalReader->read($source);
-					},
-					static fn(string $commit, string $path): ?string
-						=> $historyRepository->previousPathAtCommit($commit, $path)
-				);
+				try {
+					$baseline = $this->resolveInitialReleaseBaseline(
+						$template,
+						$data['zabbix_version'],
+						$sourceFile['path'],
+						$vendorName
+					);
+				}
+				catch (Throwable $exception) {
+					$this->logFailure('Initial-release baseline lookup', $templateId, $exception);
+					$baseline = null;
+				}
 
-				$baseline = $baselineService->find(
-					$sourceFile['path'],
-					$currentCommit,
-					$template['uuid'],
-					$template['vendor_version'],
-					$vendorName,
-					75,
-					null,
-					true,
-					12.0
-				);
+				$historyRepository = null;
+				if ($baseline === null) {
+					$historyRepository = new UpstreamTemplateHistoryRepository();
+					$baselineService = new HistoricalTemplateBaselineService(
+						static fn(string $path, string $until, int $limit): array
+							=> $historyRepository->listCommits($path, $until, $limit),
+						static fn(string $commit, string $path): array
+							=> $sourceRepository->fetchAtCommit($commit, $path),
+						static function (string $source): array {
+							$historicalReader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
+							return $historicalReader->read($source);
+						},
+						static fn(string $commit, string $path): ?string
+							=> $historyRepository->previousPathAtCommit($commit, $path)
+					);
+
+					$baseline = $baselineService->find(
+						$sourceFile['path'],
+						$currentCommit,
+						$template['uuid'],
+						$template['vendor_version'],
+						$vendorName,
+						75,
+						null,
+						true,
+						12.0
+					);
+				}
 
 				if (($baseline['status'] ?? null) === 'found') {
 					$baselineCache->store(
@@ -320,6 +336,61 @@ final class TemplateUpdateAnalysisService {
 				'Unable to resolve the historical official baseline. The current-upstream comparison remains valid as an update preview.'
 			).' '.$this->diagnosticMessage($exception);
 		}
+	}
+
+	private function resolveInitialReleaseBaseline(
+		array $template,
+		string $zabbixVersion,
+		string $currentPath,
+		string $expectedVendorName
+	): ?array {
+		$line = ZabbixVersion::line($zabbixVersion);
+		$targetVersion = trim((string) ($template['vendor_version'] ?? ''));
+		$uuid = strtolower(str_replace('-', '', trim((string) ($template['uuid'] ?? ''))));
+
+		if ($line === null
+				|| $targetVersion !== $line.'-0'
+				|| preg_match('/^[a-f0-9]{32}$/', $uuid) !== 1) {
+			return null;
+		}
+
+		$index = (new UpstreamIndexRepository())->loadInitialRelease($zabbixVersion);
+		$record = $index['templates'][$uuid] ?? null;
+		if (!is_array($record)) {
+			return null;
+		}
+
+		if ((string) ($record['vendor_version'] ?? '') !== $targetVersion
+				|| ($expectedVendorName !== ''
+					&& (string) ($record['vendor_name'] ?? '') !== $expectedVendorName)) {
+			return null;
+		}
+
+		$sourceFile = (new UpstreamTemplateSourceRepository())->fetch($index['source'], $record);
+		$reader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
+		$document = $reader->read($sourceFile['content']);
+		$isolated = UpstreamTemplateDocumentService::buildHistoricalImportSource(
+			$document,
+			$uuid,
+			$targetVersion,
+			$expectedVendorName,
+			true
+		);
+
+		return [
+			'status' => 'found',
+			'commit' => (string) ($index['source']['commit'] ?? ''),
+			'path' => $currentPath,
+			'vendor_version' => $targetVersion,
+			'commits_examined' => 0,
+			'history_truncated' => false,
+			'candidate_count' => 1,
+			'distinct_candidate_count' => 1,
+			'exact_match_count' => 0,
+			'selection' => 'initial_release_index',
+			'semantic_distance' => null,
+			'source' => $isolated['source']
+		];
 	}
 
 	private function emptyResult(): array {

@@ -177,10 +177,45 @@ jobs:
               --output "build/upstream/${line}.json"
           }
 
+          build_initial_line() {
+            local line="$1"
+            local ref="${line}.0"
+            local safe_line
+            local source_dir
+            local commit
+            local commit_date
+
+            safe_line="${line//./-}"
+            source_dir="/tmp/zabbix-initial-${safe_line}"
+
+            if ! git ls-remote --exit-code --tags "$CANONICAL_REPO" "refs/tags/${ref}" >/dev/null 2>&1; then
+              echo "Initial immutable release tag ${ref} is not published; skipping this line."
+              return 0
+            fi
+
+            echo "Building immutable Zabbix ${line} initial baseline index from tag ${ref}."
+            clone_ref_with_retry "$ref" "$source_dir"
+
+            commit="$(git -C "$source_dir" rev-parse HEAD)"
+            commit_date="$(git -C "$source_dir" show -s --format=%cI HEAD)"
+
+            python tools/build_upstream_index.py \
+              --source-dir "$source_dir" \
+              --line "$line" \
+              --source-ref "$ref" \
+              --source-commit "$commit" \
+              --source-commit-date "$commit_date" \
+              --output "build/upstream-initial/${line}.json"
+          }
+
           build_line '7.0'
           build_line '7.2'
           build_line '7.4'
           build_line '8.0'
+          build_initial_line '7.0'
+          build_initial_line '7.2'
+          build_initial_line '7.4'
+          build_initial_line '8.0'
 
       - name: Validate generated indexes with runtime decoder
         shell: bash
@@ -191,6 +226,7 @@ jobs:
             sudo apt-get install -y php-cli
           fi
           php tests/validate_generated_indexes.php build/upstream
+          php tests/validate_generated_indexes.php build/upstream-initial
 
       - name: Verify canonical raw source endpoint
         shell: bash
@@ -318,9 +354,10 @@ jobs:
           cd /tmp/ztum-upstream-index
           git switch -C upstream-index
 
-          mkdir -p indexes
-          rm -f indexes/*.json
+          mkdir -p indexes initial
+          rm -f indexes/*.json initial/*.json
           cp "$GITHUB_WORKSPACE"/build/upstream/*.json indexes/
+          cp "$GITHUB_WORKSPACE"/build/upstream-initial/*.json initial/
 
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'

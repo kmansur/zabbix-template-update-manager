@@ -4,6 +4,35 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.49] - 2026-09-23
+
+### Fixed
+
+- Installed official templates at vendor version `<major>.<minor>-0` now resolve their BASE from an immutable initial-release UUID index generated from the official Zabbix `<major>.<minor>.0` tag.
+- This fixes baseline failures caused by later upstream source-file restructuring that cannot be reconstructed reliably from the current file path alone. In particular, Zabbix 7.0 AWS templates that were separate YAML files in 7.0.0 and were later consolidated into `templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml` now retain an authoritative historical BASE.
+- The same fast path removes false `historical_baseline_unavailable`, `historical_baseline_ambiguous` and continuation-limit results for other unchanged initial-release templates when the exact official 7.0.0 UUID/content is available.
+- If the immutable initial-release index is unavailable, ZTUM logs that condition and conservatively falls back to the existing request-bounded historical scan.
+
+### Upstream data
+
+- The upstream-index workflow now builds and publishes a second immutable index set under `upstream-index/initial/<line>.json`.
+- Initial indexes are generated from official `7.0.0`, `7.2.0`, `7.4.0` and `8.0.0` tags.
+- Each index preserves the historical UUID, vendor metadata, source path and raw-source SHA-256 at the initial release tag.
+
+### Safety
+
+- The initial-release baseline is accepted only when UUID, vendor name and vendor version exactly match the installed template.
+- Historical raw bytes are fetched at the exact immutable release commit and verified against the SHA-256 stored in the generated baseline index.
+- The initial-release result feeds the existing native `configuration.importcompare` and three-way analysis; it does not bypass local-customization detection or risk classification.
+- If the UUID/version is absent from the initial release index, the normal fail-closed request-bounded historical workflow remains in force.
+- Controlled execution still reruns a fresh authoritative preflight immediately before `configuration.import`.
+
+### Tests
+
+- Added initial-release endpoint validation.
+- Added analysis-contract coverage requiring the immutable initial-release fast path before runtime history scanning.
+- The generated initial indexes are validated with the same runtime decoder used for moving upstream indexes.
+
 ## [0.1.0-beta.48] - 2026-09-23
 
 ### Fixed

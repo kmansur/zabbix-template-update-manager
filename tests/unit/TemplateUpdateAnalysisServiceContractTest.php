@@ -77,6 +77,19 @@ assertUpdateAnalysisContract(
 	'Reusable update analysis must never update templates directly.'
 );
 
+assertUpdateAnalysisContract(
+	true,
+	str_contains($service, 'resolveInitialReleaseBaseline')
+		&& str_contains($service, 'loadInitialRelease')
+		&& str_contains($service, "'selection' => 'initial_release_index'"),
+	'Installed <line>-0 templates must resolve their authoritative baseline from the immutable initial-release index before runtime history scanning.'
+);
+assertUpdateAnalysisContract(
+	true,
+	str_contains($service, "Initial-release baseline lookup"),
+	'Initial-release baseline transport failure must remain diagnosable while allowing the conservative historical fallback.'
+);
+
 $controllerLines = substr_count($controller, "\n") + 1;
 assertUpdateAnalysisContract(
 	true,

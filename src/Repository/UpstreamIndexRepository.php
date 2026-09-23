@@ -17,6 +17,7 @@ final class UpstreamIndexRepository {
 	private const CACHE_TTL = 900;
 	private const MAX_INDEX_BYTES = 5242880;
 	private const BASE_URL = 'https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/upstream-index/indexes';
+	private const INITIAL_RELEASE_BASE_URL = 'https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/upstream-index/initial';
 
 	private string $cacheDir;
 	private OfflineBundleRepository $offlineBundle;
@@ -30,6 +31,11 @@ final class UpstreamIndexRepository {
 	public static function endpointForVersion(string $zabbixVersion): ?string {
 		$line = ZabbixVersion::line($zabbixVersion);
 		return $line === null ? null : self::BASE_URL.'/'.rawurlencode($line).'.json';
+	}
+
+	public static function initialReleaseEndpointForVersion(string $zabbixVersion): ?string {
+		$line = ZabbixVersion::line($zabbixVersion);
+		return $line === null ? null : self::INITIAL_RELEASE_BASE_URL.'/'.rawurlencode($line).'.json';
 	}
 
 	public static function transportCapabilities(): array {
@@ -109,6 +115,62 @@ final class UpstreamIndexRepository {
 				$exception
 			);
 		}
+	}
+
+	/**
+	 * Loads the immutable initial-release template index for the detected
+	 * Zabbix line (for example 7.0.0 -> vendor baseline 7.0-0).
+	 *
+	 * This is intentionally separate from the moving release/<line> index: it
+	 * provides a stable UUID -> historical source-path mapping across later file
+	 * consolidation/renames and avoids reconstructing that first official
+	 * baseline from dozens of runtime history requests.
+	 */
+	public function loadInitialRelease(string $zabbixVersion): array {
+		$line = ZabbixVersion::line($zabbixVersion);
+		if ($line === null) {
+			throw new RuntimeException('Unable to determine the Zabbix major.minor line.');
+		}
+
+		if ($this->offlineBundle->isOfflineOnly()) {
+			throw new RuntimeException(
+				'Offline-only mode is enabled and the initial-release baseline index is not available from the network.'
+			);
+		}
+
+		$cacheFile = rtrim($this->cacheDir, DIRECTORY_SEPARATOR)
+			.DIRECTORY_SEPARATOR.'upstream-initial-'.str_replace('.', '-', $line).'.json';
+		$cached = $this->readCache($cacheFile);
+
+		// Initial-release indexes are immutable by tag/commit. Once a valid copy
+		// is cached there is no need for a TTL refresh.
+		if ($cached !== null) {
+			$index = self::decodeIndex($cached['content'], $line);
+			$index['runtime'] = [
+				'cache_status' => 'immutable',
+				'cache_age_seconds' => $cached['age']
+			];
+			return $index;
+		}
+
+		$endpoint = self::initialReleaseEndpointForVersion($zabbixVersion);
+		if ($endpoint === null) {
+			throw new RuntimeException('Unable to build the initial-release baseline index endpoint.');
+		}
+
+		$content = $this->fetch($endpoint);
+		$index = self::decodeIndex($content, $line);
+		$expectedRef = $line.'.0';
+		if ((string) ($index['source']['ref'] ?? '') !== $expectedRef) {
+			throw new RuntimeException('The initial-release baseline index source ref is not the expected immutable release tag.');
+		}
+
+		$this->writeCache($cacheFile, $content);
+		$index['runtime'] = [
+			'cache_status' => 'remote',
+			'cache_age_seconds' => 0
+		];
+		return $index;
 	}
 
 	public static function decodeIndex(string $json, string $expectedLine): array {
