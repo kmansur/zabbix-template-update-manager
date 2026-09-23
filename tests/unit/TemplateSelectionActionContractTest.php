@@ -48,9 +48,9 @@ assertSelectionContract(
 );
 
 assertSelectionContract(
-	strpos($listView, 'does not import Zabbix configuration') !== false
-		&& strpos($listView, 'later explicitly confirmed execution step') !== false,
-	'The catalog must explain that direct preparation remains non-writing until later confirmation.'
+	strpos($listView, 'Preparation is read-only') !== false
+		&& strpos($listView, 'later explicit confirmation') !== false,
+	'The catalog must explain that direct preparation remains read-only until later confirmation.'
 );
 
 foreach ([
