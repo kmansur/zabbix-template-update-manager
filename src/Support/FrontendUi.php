@@ -35,6 +35,21 @@ final class FrontendUi {
 		);
 	}
 
+	public static function message(string $text, string $tone = self::INFO): \CTag {
+		$class = match ($tone) {
+			self::SUCCESS => defined('ZBX_STYLE_MSG_GOOD') ? ZBX_STYLE_MSG_GOOD : '',
+			self::WARNING => defined('ZBX_STYLE_MSG_WARNING') ? ZBX_STYLE_MSG_WARNING : '',
+			self::DANGER => defined('ZBX_STYLE_MSG_BAD') ? ZBX_STYLE_MSG_BAD : '',
+			default => defined('ZBX_STYLE_MSG_INFO') ? ZBX_STYLE_MSG_INFO : ''
+		};
+
+		if ($class !== '' && function_exists('makeMessageBox')) {
+			return makeMessageBox($class, [], $text, false);
+		}
+
+		return new \CTag('p', true, self::status($text, $tone));
+	}
+
 	private static function styleForTone(string $tone): string {
 		$constant = match ($tone) {
 			self::SUCCESS => 'ZBX_STYLE_GREEN',

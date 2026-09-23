@@ -286,6 +286,11 @@ $page = (new CHtmlPage())
 			))
 	);
 
+$page->addItem(FrontendUi::message(
+	_('Laboratory beta: production use is not recommended yet. Validate backups, review every blocked/reviewed state and complete the documented field-validation matrix before using this module on critical monitoring configuration.'),
+	FrontendUi::WARNING
+));
+
 if ($data['inventory_error'] !== null) {
 	$page->addItem(new CTag('p', true, FrontendUi::status(
 		$data['inventory_error'],
