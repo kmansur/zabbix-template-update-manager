@@ -98,8 +98,9 @@ $selectAllCheckbox = (new CCheckBox('all_templates'))
 	->setAttribute('title', _('Select all is unavailable for the current view.'));
 $selectAllHeader = (new CColHeader($selectAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
 
-$canRenderSelectionForm = $data['can_compare']
-	&& (($data['filter']['status'] ?? 'all') !== 'not_installed' || $data['can_install']);
+$canRenderSelectionForm = $installSelectionMode
+	? $data['can_install']
+	: ($data['can_compare'] && !empty($data['can_prepare_updates']));
 
 if ($canRenderSelectionForm) {
 	$selectionForm = (new CForm())
@@ -109,7 +110,7 @@ if ($canRenderSelectionForm) {
 			CCsrfTokenHelper::get(
 				$installSelectionMode
 					? 'ztum.templates.install_prepare_selected'
-					: 'ztum.templates.review_selected'
+					: 'ztum.templates.prepare_selected'
 			)
 		))->removeId())
 		->setId('ztum-template-list')
@@ -182,6 +183,7 @@ foreach ($data['templates'] as $template) {
 	$updateSelectionEligible = !$installSelectionMode
 		&& $isInstalled
 		&& $data['can_compare']
+		&& !empty($data['can_prepare_updates'])
 		&& ($template['upstream_status'] ?? null) === 'official_match'
 		&& ($template['version_status'] ?? null) === 'update_available';
 
@@ -261,8 +263,8 @@ if ($selectionForm !== null) {
 	}
 	else {
 		$actionButtons = new CActionButtonList('action', 'templateids', [
-			'ztum.templates.review_selected' => [
-				'name' => _('Review selected updates'),
+			'ztum.templates.prepare_selected' => [
+				'name' => _('Prepare selected updates'),
 				'attributes' => [
 					'class' => ZBX_STYLE_BTN_ALT.' js-no-chkbxrange'
 				]
@@ -367,7 +369,7 @@ $page
 	->addItem(new CTag('p', true, _(
 		$installSelectionMode
 			? 'Select the Not installed official templates to review them for controlled sequential installation. Preparation and execution are request-bounded per template; missing dependencies and unsafe previews remain blocked.'
-			: 'Update selection applies only to installed official templates with a newer version. Use the Not installed filter to select multiple official templates for controlled installation.'
+			: 'Select installed official templates with a newer version, then prepare them directly. Preparation performs the full request-bounded safety analysis and does not import Zabbix configuration; only a later explicitly confirmed execution step can write configuration.'
 	)))
 	->addItem(new CTag('h4', true, _('Templates')));
 
