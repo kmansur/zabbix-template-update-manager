@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.48**
+Current version: **0.1.0-beta.49**
 
 This version is intended for **laboratory testing**.
 
@@ -17,7 +17,7 @@ This version is intended for **laboratory testing**.
 
 Beta.43 is a compatibility hotfix for the Zabbix frontend view loader. All module views are now internally namespaced as `ztum.*`, preventing Template Update Manager view files from shadowing native core views such as `template.list`. A permanent CI guard enforces the namespace.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.48` after automation validation. Formal tag/GitHub Release automation now exists, but publishing a production-grade release remains gated by field validation and the still-unselected project license.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.49` after automation validation. Formal tag/GitHub Release automation now exists, but publishing a production-grade release remains gated by field validation and the still-unselected project license.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -165,8 +165,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.48
-git checkout -B release/0.1.0-beta.48 origin/release/0.1.0-beta.48
+git fetch origin release/0.1.0-beta.49
+git checkout -B release/0.1.0-beta.49 origin/release/0.1.0-beta.49
 cat VERSION
 git rev-parse HEAD
 ```
@@ -174,7 +174,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.48
+0.1.0-beta.49
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -190,7 +190,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.48**, enable the module and open:
+Confirm version **0.1.0-beta.49**, enable the module and open:
 
 ```text
 Data collection → Template updates
