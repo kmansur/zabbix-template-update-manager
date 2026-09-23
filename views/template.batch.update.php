@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
 	->setControls(
@@ -26,11 +30,14 @@ $notAttempted = is_array($result['not_attempted'] ?? null) ? $result['not_attemp
 $summary = (new CTableInfo())
 	->setHeader([_('Status'), _('Updated'), _('Failed'), _('Not attempted'), _('Any configuration write')])
 	->addRow([
-		(string) ($result['status'] ?? 'unknown'),
+		FrontendUi::status(
+			(string) ($result['status'] ?? 'unknown'),
+			($result['status'] ?? '') === 'completed' ? FrontendUi::SUCCESS : FrontendUi::DANGER
+		),
 		count($updated),
 		$failed !== null ? 1 : 0,
 		count($notAttempted),
-		!empty($result['write_performed']) ? _('Yes') : _('No')
+		FrontendUi::yesNo(!empty($result['write_performed']))
 	]);
 
 $page
@@ -58,7 +65,7 @@ if ($failed !== null) {
 			(string) ($failed['templateid'] ?? '—'),
 			(string) ($failed['status'] ?? 'unknown'),
 			(string) ($failed['reason'] ?? '') !== '' ? (string) $failed['reason'] : '—',
-			!empty($failed['write_performed']) ? _('Yes') : _('No')
+			FrontendUi::yesNo(!empty($failed['write_performed']))
 		]);
 
 	$page
