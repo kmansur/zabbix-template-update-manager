@@ -5,6 +5,8 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
 use JsonException;
 use RuntimeException;
 
+require_once __DIR__.'/ZabbixExpressionHostExtractor.php';
+
 final class TemplateIsolationSafetyException extends RuntimeException {
 
 	private string $reasonCode;
@@ -290,13 +292,8 @@ final class UpstreamTemplateDocumentService {
 
 		$hosts = [];
 		foreach ($expressions as $expression) {
-			if (preg_match_all('~/([^/\r\n]+)/[^,\)\s]+~', $expression, $matches) !== false) {
-				foreach (($matches[1] ?? []) as $host) {
-					$host = trim((string) $host);
-					if ($host !== '') {
-						$hosts[$host] = true;
-					}
-				}
+			foreach (ZabbixExpressionHostExtractor::extract($expression) as $host) {
+				$hosts[$host] = true;
 			}
 		}
 
