@@ -18,7 +18,10 @@ $page = (new CHtmlPage())
 	);
 
 if ($data['error'] !== null || !is_array($data['result'])) {
-	$page->addItem(new CTag('p', true, $data['error'] ?? _('Batch execution returned no result.')))->show();
+	$page->addItem(FrontendUi::message(
+		(string) ($data['error'] ?? _('Batch execution returned no result.')),
+		FrontendUi::DANGER
+	))->show();
 	return;
 }
 
@@ -31,7 +34,7 @@ $summary = (new CTableInfo())
 	->setHeader([_('Status'), _('Updated'), _('Failed'), _('Not attempted'), _('Any configuration write')])
 	->addRow([
 		FrontendUi::status(
-			(string) ($result['status'] ?? 'unknown'),
+			FrontendUi::reason((string) ($result['status'] ?? 'unknown')),
 			($result['status'] ?? '') === 'completed' ? FrontendUi::SUCCESS : FrontendUi::DANGER
 		),
 		count($updated),
@@ -41,7 +44,7 @@ $summary = (new CTableInfo())
 	]);
 
 $page
-	->addItem(new CTag('h4', true, _('Sequential batch result')))
+	->addItem(FrontendUi::section(_('Batch result')))
 	->addItem($summary);
 
 if ($updated !== []) {
@@ -52,10 +55,10 @@ if ($updated !== []) {
 			(string) ($item['templateid'] ?? '—'),
 			_('Updated'),
 			(string) ($item['available_version'] ?? '') !== '' ? (string) $item['available_version'] : '—',
-			(string) ($item['validation_status'] ?? '') !== '' ? (string) $item['validation_status'] : '—'
+			FrontendUi::reason((string) ($item['validation_status'] ?? ''))
 		]);
 	}
-	$page->addItem(new CTag('h4', true, _('Updated successfully')))->addItem($table);
+	$page->addItem(FrontendUi::section(_('Updated templates')))->addItem($table);
 }
 
 if ($failed !== null) {
@@ -63,17 +66,18 @@ if ($failed !== null) {
 		->setHeader([_('Template ID'), _('Status'), _('Reason'), _('Write performed for failed template')])
 		->addRow([
 			(string) ($failed['templateid'] ?? '—'),
-			(string) ($failed['status'] ?? 'unknown'),
-			(string) ($failed['reason'] ?? '') !== '' ? (string) $failed['reason'] : '—',
+			FrontendUi::reason((string) ($failed['status'] ?? 'unknown')),
+			FrontendUi::reason((string) ($failed['reason'] ?? '')),
 			FrontendUi::yesNo(!empty($failed['write_performed']))
 		]);
 
 	$page
-		->addItem(new CTag('h4', true, _('Execution stopped')))
+		->addItem(FrontendUi::section(_('Execution stopped')))
 		->addItem($failure)
-		->addItem(new CTag('p', true, _(
-			'Execution stopped at the first non-successful template. Inspect the failed template and its rollback artifact before retrying. No automatic rollback is performed.'
-		)));
+		->addItem(FrontendUi::message(
+			_('Execution stopped at the first failed template. Inspect that template and its rollback backup before retrying. No automatic rollback is performed.'),
+			FrontendUi::WARNING
+		));
 }
 
 if ($notAttempted !== []) {
@@ -81,7 +85,7 @@ if ($notAttempted !== []) {
 	foreach ($notAttempted as $templateId) {
 		$table->addRow([(string) $templateId, _('Not attempted')]);
 	}
-	$page->addItem(new CTag('h4', true, _('Not attempted')))->addItem($table);
+	$page->addItem(FrontendUi::section(_('Not attempted')))->addItem($table);
 }
 
 $page->show();
