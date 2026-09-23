@@ -114,13 +114,14 @@ if ($eligibleIds !== [] && !empty($data['can_prepare'])) {
 	$form = (new CForm('post'))
 		->setId('ztum-batch-prepare-form')
 		->setAction($prepareAction)
+		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 		->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.templates.prepare_selected')))->removeId());
 
 	foreach ($eligibleIds as $index => $templateId) {
 		$form->addItem((new CVar('templateids['.$index.']', $templateId))->removeId());
 	}
 
-	$form->addItem(new CSubmitButton(_('Prepare selected updates')));
+	$form->addItem(makeFormFooter(new CSubmitButton(_('Prepare selected updates'))));
 
 	$page
 		->addItem(new CTag('h4', true, _('Batch safety preparation')))
