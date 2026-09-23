@@ -17,7 +17,7 @@ function assertPreflightActionContract(bool $condition, string $message): void {
 assertPreflightActionContract(
 	isset($manifest['actions']['ztum.template.preflight'])
 		&& ($manifest['actions']['ztum.template.preflight']['class'] ?? null) === 'TemplatePreflight'
-		&& ($manifest['actions']['ztum.template.preflight']['view'] ?? null) === 'template.preflight',
+		&& ($manifest['actions']['ztum.template.preflight']['view'] ?? null) === 'ztum.template.preflight',
 	'Preflight action must be registered with its native view.'
 );
 
