@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.38**
+Current version: **0.1.0-beta.39**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.38 changes the module display name from **Zabbix Template Update Manager** to **Template Update Manager** while keeping the existing module ID, namespace, repository name, routes and `ZTUM` acronym unchanged. Beta.37 dependency-aware update comparison and diagnostics remain intact.
+Beta.39 performs a native-Zabbix UI/UX refactor and repository audit. User-facing controls now use Zabbix frontend components consistently, reviewed batch checkboxes are server-rendered native `CCheckBox` controls, page navigation uses native page controls, semantic states use Zabbix theme classes, and a CI UI guard prevents raw controls/hard-coded theme styling from returning. Empty legacy stubs were removed and architecture/roadmap documentation was refreshed to match the implemented controlled-write design.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.38` after the beta.27 changes are merged and automation-validated. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation is sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.39` after automation validation. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation and release gates are sufficiently complete.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -43,8 +43,8 @@ ZTUM currently provides:
 - read-only selected-template review that rebuilds authoritative inventory/upstream/version state for the chosen subset;
 - request-bounded update-batch safety preparation for the full selected update set (up to the existing 500-template selection safety ceiling), executed one candidate per HTTP request with visible progress;
 - automatic creation/refresh of rollback artifacts for standard-path candidates (none/low plus narrowly recognized bounded-medium changes) and explicitly reviewed manual-update candidates;
-- batch classification into Ready, Manual review, Conflict and Blocked; reviewed candidates use leading per-row checkboxes plus explicit Select all eligible / Clear selection controls, but never become unattended Ready;
-- controlled sequential update of Ready templates only, with one HTTP request per Ready template;
+- batch classification into Ready, Manual review, Conflict and Blocked; reviewed candidates use native leading per-row checkboxes plus explicit Select all eligible / Clear selection controls, but never become unattended Ready;
+- controlled sequential update of Ready plus explicitly selected reviewed templates, with one HTTP request per template;
 - stop-on-first-failure/evidence-change/ambiguous-state behavior with explicit not-attempted reporting;
 - current-upstream comparison through `configuration.importcompare`;
 - historical official baseline resolution;
@@ -65,7 +65,7 @@ ZTUM currently provides:
 - runtime module-version reporting from the repository `VERSION` file;
 - administrator-only diagnostics for upstream index endpoint and PHP HTTP transport capabilities.
 
-Batch execution does not create a second write path. Each Ready template is executed through `TemplateControlledUpdateService`, which reruns fresh preflight, verifies the page evidence has not changed, rebuilds the immutable upstream candidate and then uses the same single configuration-import service already used by individual update/rollback flows.
+Batch execution does not create a second write path. Each executable template is processed through `TemplateControlledUpdateService`, which reruns fresh preflight in the bound standard/reviewed mode, verifies the page evidence has not changed, rebuilds the immutable upstream candidate and then uses the same single configuration-import service already used by individual update/rollback flows.
 
 ## Safety model
 
@@ -100,7 +100,7 @@ The preparation page runs one bounded request per UUID and classifies every cand
 
 Only Ready candidates are executed by **Install ready templates**. Execution is browser-driven and request-bounded: each Ready UUID gets its own CSRF-protected HTTP request, reruns the full controlled install preflight immediately before its write, completes post-install validation, and only then advances to the next template. Execution stops on the first non-success.
 
-Beta.27 deliberately does not recursively install dependencies. If a selected template requires another template that is still missing, it remains Blocked even if that dependency is also selected. Install the dependency first, then prepare the dependent template again.
+Batch installation deliberately does not recursively install dependencies. If a selected template requires another template that is still missing, it remains Blocked even if that dependency is also selected. Install the dependency first, then prepare the dependent template again.
 
 No automatic uninstall is performed after any ambiguous/failed install. Successful candidates remain installed and validated; candidates after the first failure are reported as Not attempted.
 
@@ -122,7 +122,7 @@ Only a super administrator can confirm the write. The install action reruns the 
 
 After import, ZTUM resolves the new template by UUID and performs a fresh current-upstream validation. Because the template did not exist before the operation, there is no prior local rollback artifact. ZTUM therefore does not automatically uninstall a newly imported template if validation fails.
 
-Beta.27 supports request-bounded controlled batch installation, but still does **not** recursively install missing dependencies. Install required dependencies first, then prepare dependent templates again.
+Request-bounded controlled batch installation does **not** recursively install missing dependencies. Install required dependencies first, then prepare dependent templates again.
 
 ## Persistent storage
 
@@ -150,8 +150,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.38
-git checkout -B release/0.1.0-beta.38 origin/release/0.1.0-beta.38
+git fetch origin release/0.1.0-beta.39
+git checkout -B release/0.1.0-beta.39 origin/release/0.1.0-beta.39
 cat VERSION
 git rev-parse HEAD
 ```
@@ -159,7 +159,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.38
+0.1.0-beta.39
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -175,7 +175,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.38**, enable the module and open:
+Confirm version **0.1.0-beta.39**, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -317,6 +317,8 @@ Detailed design and safety documentation is available in:
 - [`docs/rollback.md`](docs/rollback.md)
 - [`docs/runtime-validation-notes.md`](docs/runtime-validation-notes.md)
 - [`docs/lab-test-plan.md`](docs/lab-test-plan.md)
+- [`docs/ui-style.md`](docs/ui-style.md)
+- [`docs/roadmap.md`](docs/roadmap.md)
 
 ## Development validation
 
@@ -339,6 +341,7 @@ find . -type f -name '*.php' -print0 | xargs -0 -n1 php -l
 php tests/validate_manifest.php
 php tests/validate_version.php
 php tests/read_only_guard.php
+php tests/ui_native_guard.php
 for test in tests/unit/*Test.php; do php "$test"; done
 python -m py_compile tools/build_upstream_index.py
 python tests/test_build_upstream_index.py
