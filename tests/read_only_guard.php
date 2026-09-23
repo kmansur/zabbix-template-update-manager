@@ -59,7 +59,7 @@ foreach ($iterator as $file) {
 			$violations[] = sprintf('%s: additional Zabbix API write method', $path);
 		}
 
-		if (strpos($content, 'TemplateImportCompareService::rules()') === false) {
+		if (strpos($content, 'TemplateImportCompareService::rules(') === false) {
 			$violations[] = sprintf('%s: controlled import must reuse reviewed import-comparison rules', $path);
 		}
 		continue;
