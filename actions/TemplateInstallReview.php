@@ -52,7 +52,7 @@ class TemplateInstallReview extends CController {
 				$exception->getMessage()
 			));
 			$data['preflight_error'] = _(
-				'Unable to complete the installation review. No Zabbix configuration change was attempted.'
+				'Unable to complete installation review. No Zabbix configuration change was attempted.'
 			);
 		}
 
