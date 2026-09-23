@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $statusLabels = [
 	'ready' => _('Ready for explicit rollback confirmation'),
 	'already_restored' => _('Selected backup already matches the installed template'),
@@ -35,9 +39,14 @@ $evidenceSha = (string) ($preflight['evidence_sha256'] ?? '');
 $stateTable = (new CTableInfo())
 	->setHeader([_('Rollback preflight'), _('Reason'), _('Configuration write enabled')])
 	->addRow([
-		$statusLabels[$status] ?? _('Unknown'),
+		FrontendUi::status(
+			$statusLabels[$status] ?? _('Unknown'),
+			$status === 'ready'
+				? FrontendUi::SUCCESS
+				: ($status === 'already_restored' ? FrontendUi::INFO : FrontendUi::DANGER)
+		),
 		($preflight['reason'] ?? null) !== null ? (string) $preflight['reason'] : '—',
-		!empty($preflight['write_enabled']) ? _('Yes') : _('No')
+		FrontendUi::yesNo(!empty($preflight['write_enabled']))
 	]);
 
 $page
