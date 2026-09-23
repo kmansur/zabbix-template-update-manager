@@ -43,7 +43,9 @@ final class TemplateInstallReferenceAuditService {
 			'value_map_references' => 0,
 			'dashboard_item_references' => 0,
 			'trigger_host_references' => 0,
-			'graph_item_host_references' => 0
+			'trigger_item_references' => 0,
+			'graph_item_host_references' => 0,
+			'graph_item_references' => 0
 		];
 
 		self::auditNestedReferences(
@@ -55,8 +57,8 @@ final class TemplateInstallReferenceAuditService {
 			$counts
 		);
 		self::auditDashboards($template, $allowedHosts, $topLevelItemKeys, $issues, $counts);
-		self::auditTriggerHosts($template, $allowedHosts, $issues, $counts);
-		self::auditGraphHosts($template, $allowedHosts, $issues, $counts);
+		self::auditTriggerReferences($template, $allowedHosts, $allItemKeys, $issues, $counts);
+		self::auditGraphReferences($template, $template, $allowedHosts, $allItemKeys, $issues, $counts);
 
 		$issues = self::uniqueIssues($issues);
 
@@ -244,9 +246,10 @@ final class TemplateInstallReferenceAuditService {
 		}
 	}
 
-	private static function auditTriggerHosts(
+	private static function auditTriggerReferences(
 		array $template,
 		array $allowedHosts,
+		array $allItemKeys,
 		array &$issues,
 		array &$counts
 	): void {
@@ -254,13 +257,30 @@ final class TemplateInstallReferenceAuditService {
 		self::collectExpressions($template, $expressions);
 
 		foreach ($expressions as $expression) {
-			foreach (ZabbixExpressionHostExtractor::extract($expression) as $host) {
+			foreach (ZabbixExpressionHostExtractor::extractReferences($expression) as $reference) {
+				$host = trim((string) ($reference['host'] ?? ''));
+				$itemKey = trim((string) ($reference['item'] ?? ''));
+				if ($host === '') {
+					continue;
+				}
+
 				$counts['trigger_host_references']++;
 				if (!isset($allowedHosts[$host])) {
 					$issues[] = [
 						'code' => 'unresolved_trigger_host',
 						'reference' => $host
 					];
+					continue;
+				}
+
+				if ($itemKey !== '' && self::isSelfHost($template, $host)) {
+					$counts['trigger_item_references']++;
+					if (!isset($allItemKeys[$itemKey])) {
+						$issues[] = [
+							'code' => 'missing_trigger_item',
+							'reference' => $host.':'.$itemKey
+						];
+					}
 				}
 			}
 		}
@@ -287,9 +307,11 @@ final class TemplateInstallReferenceAuditService {
 		}
 	}
 
-	private static function auditGraphHosts(
+	private static function auditGraphReferences(
 		$value,
+		array $template,
 		array $allowedHosts,
+		array $allItemKeys,
 		array &$issues,
 		array &$counts,
 		?string $key = null
@@ -303,30 +325,74 @@ final class TemplateInstallReferenceAuditService {
 				if (!is_array($graphItem) || !is_array($graphItem['item'] ?? null)) {
 					continue;
 				}
-
-				$host = trim((string) ($graphItem['item']['host'] ?? ''));
-				if ($host === '') {
-					continue;
-				}
-
-				$counts['graph_item_host_references']++;
-				if (!isset($allowedHosts[$host])) {
-					$issues[] = [
-						'code' => 'unresolved_graph_item_host',
-						'reference' => $host
-					];
-				}
+				self::auditGraphItemReference(
+					$template,
+					$graphItem['item'],
+					$allowedHosts,
+					$allItemKeys,
+					$issues,
+					$counts
+				);
 			}
 		}
 
-		foreach ($value as $childKey => $childValue) {
-			self::auditGraphHosts(
-				$childValue,
+		if (($key === 'ymin_item_1' || $key === 'ymax_item_1')
+				&& array_key_exists('host', $value)
+				&& array_key_exists('key', $value)) {
+			self::auditGraphItemReference(
+				$template,
+				$value,
 				$allowedHosts,
+				$allItemKeys,
+				$issues,
+				$counts
+			);
+		}
+
+		foreach ($value as $childKey => $childValue) {
+			self::auditGraphReferences(
+				$childValue,
+				$template,
+				$allowedHosts,
+				$allItemKeys,
 				$issues,
 				$counts,
 				is_string($childKey) ? $childKey : null
 			);
+		}
+	}
+
+	private static function auditGraphItemReference(
+		array $template,
+		array $item,
+		array $allowedHosts,
+		array $allItemKeys,
+		array &$issues,
+		array &$counts
+	): void {
+		$host = trim((string) ($item['host'] ?? ''));
+		$itemKey = trim((string) ($item['key'] ?? ''));
+		if ($host === '') {
+			return;
+		}
+
+		$counts['graph_item_host_references']++;
+		if (!isset($allowedHosts[$host])) {
+			$issues[] = [
+				'code' => 'unresolved_graph_item_host',
+				'reference' => $host
+			];
+			return;
+		}
+
+		if ($itemKey !== '' && self::isSelfHost($template, $host)) {
+			$counts['graph_item_references']++;
+			if (!isset($allItemKeys[$itemKey])) {
+				$issues[] = [
+					'code' => 'missing_graph_item',
+					'reference' => $host.':'.$itemKey
+				];
+			}
 		}
 	}
 
