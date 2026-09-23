@@ -4,8 +4,8 @@ $root = dirname(__DIR__, 2);
 $prepare = (string) file_get_contents($root.'/actions/TemplateInstallBatchPrepare.php');
 $prepareOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchPrepareOne.php');
 $executeOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchExecuteOne.php');
-$prepareView = (string) file_get_contents($root.'/views/template.install.batch.prepare.php');
-$listView = (string) file_get_contents($root.'/views/template.list.php');
+$prepareView = (string) file_get_contents($root.'/views/ztum.template.install.batch.prepare.php');
+$listView = (string) file_get_contents($root.'/views/ztum.template.list.php');
 $manifest = (string) file_get_contents($root.'/manifest.json');
 
 function assertInstallBatchContract(bool $condition, string $message): void {
