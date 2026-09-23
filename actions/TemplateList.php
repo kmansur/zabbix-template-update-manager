@@ -11,6 +11,7 @@ use CPagerHelper;
 use CProfile;
 use CTag;
 use CUrl;
+use CWebUser;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
@@ -180,6 +181,14 @@ class TemplateList extends CController {
 
 		order_result($data['templates'], 'name', ZBX_SORT_UP);
 		$data['filtered_count'] = count($data['templates']);
+		$rowsPerPage = max(1, (int) (CWebUser::$data['rows_per_page'] ?? 1));
+		$needsPagination = $data['filtered_count'] > $rowsPerPage;
+
+		// Do not expose All/Pages display controls when the complete filtered
+		// result already fits on one native Zabbix page.
+		if (!$needsPagination) {
+			$data['show_all'] = false;
+		}
 
 		$listUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates');
 
@@ -215,18 +224,20 @@ class TemplateList extends CController {
 				$listUrl
 			);
 
-			$allUrl = clone $listUrl;
-			$allUrl->setArgument('show_all', '1');
+			if ($needsPagination) {
+				$allUrl = clone $listUrl;
+				$allUrl->setArgument('show_all', '1');
 
-			$data['paging']->addItem(
-				(new CTag('nav', true,
-					(new CLink(_('All'), $allUrl->getUrl()))
-						->setAttribute('aria-label', _('Show all matching templates'))
-				))
-					->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-					->setAttribute('role', 'navigation')
-					->setAttribute('aria-label', _('Catalog display mode'))
-			);
+				$data['paging']->addItem(
+					(new CTag('nav', true,
+						(new CLink(_('All'), $allUrl->getUrl()))
+							->setAttribute('aria-label', _('Show all matching templates'))
+					))
+						->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
+						->setAttribute('role', 'navigation')
+						->setAttribute('aria-label', _('Catalog display mode'))
+				);
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
