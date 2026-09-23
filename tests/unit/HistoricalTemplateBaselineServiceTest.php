@@ -199,6 +199,36 @@ assertBaseline(
 	'Historical source lookup must retry the older revision using the path from before the rename.'
 );
 
+$budgetService = new HistoricalTemplateBaselineService(
+	static function (string $path, string $until, int $limit): array {
+		usleep(3000);
+		return [
+			'commits' => [['id' => str_repeat('9', 40), 'message' => '']],
+			'truncated' => false,
+			'limit' => $limit
+		];
+	},
+	static function (string $commit, string $path): array {
+		throw new RuntimeException('Source loader must not run after the request budget is already exhausted.');
+	},
+	$reader
+);
+$budgetReached = $budgetService->find(
+	'templates/test/template_test.yaml',
+	str_repeat('f', 40),
+	$uuid,
+	'7.0-0',
+	'Zabbix',
+	75,
+	null,
+	false,
+	0.001
+);
+assertBaseline('time_budget_reached', $budgetReached['status'],
+	'Historical lookup must return a retryable time-budget state before starting another expensive revision fetch.');
+assertBaseline('continue_request_bounded_scan', $budgetReached['selection'],
+	'Time-budget state must explicitly identify request-bounded continuation.');
+
 $notFoundService = new HistoricalTemplateBaselineService(
 	static fn(string $path, string $until, int $limit): array => [
 		'commits' => [['id' => str_repeat('e', 40), 'message' => '']],
