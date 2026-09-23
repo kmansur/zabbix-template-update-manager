@@ -3,7 +3,7 @@
 $root = dirname(__DIR__, 2);
 $manifest = json_decode(file_get_contents($root.'/manifest.json'), true);
 $action = file_get_contents($root.'/actions/TemplateUpdate.php');
-$preflightView = file_get_contents($root.'/views/template.preflight.php');
+$preflightView = file_get_contents($root.'/views/ztum.template.preflight.php');
 $importService = file_get_contents($root.'/src/Service/TemplateConfigurationImportService.php');
 
 function assertTemplateUpdateContract(bool $condition, string $message): void {
