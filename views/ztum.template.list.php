@@ -290,7 +290,7 @@ foreach ($data['templates'] as $template) {
 	}
 
 	$actionCell = '—';
-	if ($selectionEligible && $compareUrl !== null) {
+	if ($updateSelectionEligible && $compareUrl !== null) {
 		$actionCell = new CLink(_('Review update'), $compareUrl);
 	}
 	elseif (!$isInstalled && $installReviewUrl !== null && $data['can_compare']) {
