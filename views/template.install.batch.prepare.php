@@ -123,7 +123,14 @@ $jsConfig = json_encode([
 	'executeOneUrl' => $executeOneUrl,
 	'csrfName' => CSRF_TOKEN_NAME,
 	'prepareCsrfToken' => CCsrfTokenHelper::get('ztum.templates.install_prepare_one'),
-	'executeCsrfToken' => CCsrfTokenHelper::get('ztum.templates.install_execute_one')
+	'executeCsrfToken' => CCsrfTokenHelper::get('ztum.templates.install_execute_one'),
+	'statusClasses' => [
+		'success' => ZBX_STYLE_GREEN,
+		'warning' => ZBX_STYLE_ORANGE,
+		'danger' => ZBX_STYLE_RED,
+		'info' => ZBX_STYLE_BLUE,
+		'muted' => ZBX_STYLE_GREY
+	]
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $jsLabels = json_encode([
@@ -169,6 +176,24 @@ $script = <<<'JS'
 		}
 	};
 
+	const setStateText = (id, value, tone = 'muted') => {
+		const element = byId(id);
+		if (element === null) {
+			return;
+		}
+
+		element.textContent = value;
+		for (const className of Object.values(config.statusClasses || {})) {
+			if (className) {
+				element.classList.remove(className);
+			}
+		}
+		const className = config.statusClasses?.[tone] || '';
+		if (className) {
+			element.classList.add(className);
+		}
+	};
+
 	const updateSummary = () => {
 		setText('ztum-install-summary-completed', String(completed));
 		setText('ztum-install-summary-ready', String(counts.ready));
@@ -192,8 +217,17 @@ $script = <<<'JS'
 
 		setText('ztum-install-name-' + uuid, item.name || uuid);
 		setText('ztum-install-version-' + uuid, item.available_version || '—');
-		setText('ztum-install-preflight-' + uuid, item.preflight_status || '—');
-		setText('ztum-install-category-' + uuid, labels[category]);
+		const preflightStatus = item.preflight_status || '—';
+		setStateText(
+			'ztum-install-preflight-' + uuid,
+			preflightStatus,
+			category === 'ready' ? 'success' : 'danger'
+		);
+		setStateText(
+			'ztum-install-category-' + uuid,
+			labels[category],
+			category === 'ready' ? 'success' : 'danger'
+		);
 		setText('ztum-install-required-' + uuid, listText(item.required_dependencies));
 		setText('ztum-install-missing-' + uuid, listText(item.missing_dependencies));
 		const referenceIssues = Array.isArray(item.reference_issues)
@@ -210,7 +244,11 @@ $script = <<<'JS'
 			'ztum-install-reason-' + uuid,
 			referenceIssues.length > 0 ? referenceIssues.join(' | ') : (item.reason || '—')
 		);
-		setText('ztum-install-execution-' + uuid, category === 'ready' ? labels.ready : labels.blocked);
+		setStateText(
+			'ztum-install-execution-' + uuid,
+			category === 'ready' ? labels.ready : labels.blocked,
+			category === 'ready' ? 'success' : 'danger'
+		);
 
 		if (category === 'ready' && /^[a-f0-9]{64}$/.test(item.evidence_sha256 || '')) {
 			readyEvidence.set(uuid, item.evidence_sha256);
@@ -219,10 +257,10 @@ $script = <<<'JS'
 
 	const applyRequestFailure = (uuid, error) => {
 		counts.blocked++;
-		setText('ztum-install-preflight-' + uuid, 'request_failed');
-		setText('ztum-install-category-' + uuid, labels.blocked);
+		setStateText('ztum-install-preflight-' + uuid, 'request_failed', 'danger');
+		setStateText('ztum-install-category-' + uuid, labels.blocked, 'danger');
 		setText('ztum-install-reason-' + uuid, error?.message || labels.request_failed);
-		setText('ztum-install-execution-' + uuid, labels.blocked);
+		setStateText('ztum-install-execution-' + uuid, labels.blocked, 'danger');
 	};
 
 	const prepareOne = async (uuid) => {
@@ -287,12 +325,12 @@ $script = <<<'JS'
 		submit.disabled = !(canExecute && confirm.checked);
 
 		if (fullyPrepared && readyEvidence.size > 0 && !executionStarted) {
-			setText('ztum-install-exec-status', labels.execution_ready);
+			setStateText('ztum-install-exec-status', labels.execution_ready, 'success');
 			setText('ztum-install-exec-not-attempted', String(readyEvidence.size));
 			setText('ztum-install-no-ready-message', '');
 		}
 		else if (fullyPrepared && readyEvidence.size === 0 && !executionStarted) {
-			setText('ztum-install-exec-status', labels.execution_unavailable);
+			setStateText('ztum-install-exec-status', labels.execution_unavailable, 'muted');
 			setText('ztum-install-exec-not-attempted', '0');
 			setText(
 				'ztum-install-no-ready-message',
@@ -318,7 +356,7 @@ $script = <<<'JS'
 		let anyWrite = false;
 		let stopped = false;
 
-		setText('ztum-install-exec-status', labels.execution_running);
+		setStateText('ztum-install-exec-status', labels.execution_running, 'info');
 		setText('ztum-install-exec-installed', '0');
 		setText('ztum-install-exec-failed', '0');
 		setText('ztum-install-exec-not-attempted', String(notAttempted));
@@ -382,9 +420,10 @@ $script = <<<'JS'
 		setText('ztum-install-exec-failed', String(failed));
 		setText('ztum-install-exec-not-attempted', String(notAttempted));
 		setText('ztum-install-exec-write', anyWrite ? labels.yes : labels.no);
-		setText(
+		setStateText(
 			'ztum-install-exec-status',
-			stopped ? labels.execution_stopped : labels.execution_completed
+			stopped ? labels.execution_stopped : labels.execution_completed,
+			stopped ? 'danger' : 'success'
 		);
 	};
 
