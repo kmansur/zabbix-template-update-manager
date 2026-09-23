@@ -313,8 +313,8 @@ $page
 
 if (is_array($data['upstream_source'])) {
 	$upstreamCommit = isset($data['upstream_source']['commit'])
-		? substr((string) $data['upstream_source']['commit'], 0, 12)
-		: '—';
+		? (string) $data['upstream_source']['commit']
+		: '';
 
 	$page
 		->addItem(FrontendUi::section(_('Official catalog')))
@@ -323,7 +323,7 @@ if (is_array($data['upstream_source'])) {
 			(new CList())
 				->addClass(ZBX_STYLE_HOR_LIST)
 				->addItem(_('Zabbix').' '.(string) ($data['upstream_source']['line'] ?? '—'))
-				->addItem([_('Commit').': ', FrontendUi::fingerprint($upstreamCommit, 12)])
+				->addItem([_('Commit').': ', $upstreamCommit !== '' ? FrontendUi::fingerprint($upstreamCommit, 12) : '—'])
 				->addItem(_('Index cache').': '.(string) ($data['upstream_runtime']['cache_status'] ?? 'unknown'))
 		);
 }
