@@ -2,8 +2,11 @@
 
 namespace Modules\ZabbixTemplateUpdateManager\Service;
 
+use Modules\ZabbixTemplateUpdateManager\Repository\TemplateUpdatePolicyRepository;
 use RuntimeException;
+use Throwable;
 
+require_once dirname(__DIR__).'/Repository/TemplateUpdatePolicyRepository.php';
 require_once __DIR__.'/TemplateUpdateAnalysisService.php';
 
 /**
@@ -17,10 +20,13 @@ require_once __DIR__.'/TemplateUpdateAnalysisService.php';
 final class TemplateUpdatePreflightService {
 
 	private $analyzer;
+	private $policyChecker;
 
-	public function __construct(?callable $analyzer = null) {
+	public function __construct(?callable $analyzer = null, ?callable $policyChecker = null) {
 		$this->analyzer = $analyzer ?? static fn(string $templateId): array
 			=> (new TemplateUpdateAnalysisService())->analyze($templateId);
+		$this->policyChecker = $policyChecker ?? static fn(string $templateId, string $uuid): bool
+			=> (new TemplateUpdatePolicyRepository())->isNeverUpdate($templateId, $uuid);
 	}
 
 	public function run(string $templateId, bool $manualOverride = false): array {
@@ -68,6 +74,21 @@ final class TemplateUpdatePreflightService {
 		if ($result['template']['templateid'] !== $templateId
 				|| !preg_match('/^[a-f0-9]{32}$/', $result['template']['uuid'])) {
 			$result['reason'] = 'template_identity_mismatch';
+			return $result;
+		}
+
+		try {
+			if (($this->policyChecker)($templateId, $result['template']['uuid'])) {
+				$result['status'] = 'blocked_update_policy';
+				$result['next_step'] = 'allow_updates';
+				$result['reason'] = 'update_policy_never';
+				return $result;
+			}
+		}
+		catch (Throwable $exception) {
+			$result['status'] = 'blocked_update_policy';
+			$result['next_step'] = 'resolve_update_policy';
+			$result['reason'] = 'update_policy_unavailable';
 			return $result;
 		}
 
