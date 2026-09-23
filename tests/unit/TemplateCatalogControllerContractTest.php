@@ -11,7 +11,7 @@ function assertCatalogControllerContract(bool $condition, string $message): void
 	}
 }
 
-foreach (['CPagerHelper', 'CUrl', 'CProfile', 'CDiv', 'CTag', 'CLink'] as $class) {
+foreach (['CPagerHelper', 'CUrl', 'CProfile', 'CDiv', 'CTag', 'CLink', 'CWebUser'] as $class) {
 	assertCatalogControllerContract(
 		preg_match('/^use '.preg_quote($class, '/').';$/m', $controller) === 1,
 		'TemplateList must import native global Zabbix class '.$class.'.'
@@ -43,6 +43,13 @@ assertCatalogControllerContract(
 		&& strpos($controller, "new CLink(_('All')") !== false
 		&& strpos($controller, "new CLink(_('Pages')") !== false,
 	'Catalog pager must provide reversible All/Pages display mode.'
+);
+
+assertCatalogControllerContract(
+	strpos($controller, "\$needsPagination = \$data['filtered_count'] > \$rowsPerPage;") !== false
+		&& strpos($controller, "if (!\$needsPagination)") !== false
+		&& strpos($controller, "if (\$needsPagination) {") !== false,
+	'Catalog All/Pages controls must be suppressed when the filtered result fits on one native Zabbix page.'
 );
 
 assertCatalogControllerContract(
