@@ -105,7 +105,11 @@ final class FrontendUi {
 			'request_failed' => _('Request failed'),
 			'state_unknown_after_failure' => _('State is unknown after the failed request'),
 			'evidence_changed' => _('Preflight evidence changed'),
-			'current_state_changed' => _('Current template state changed')
+			'current_state_changed' => _('Current template state changed'),
+			'update_policy_never' => _('Template is marked Never update'),
+			'update_policy_unavailable' => _('Update policy is unavailable'),
+			'blocked_update_policy' => _('Blocked by update policy'),
+			'allow_updates' => _('Allow updates to continue')
 		];
 
 		if (array_key_exists($code, $labels)) {
