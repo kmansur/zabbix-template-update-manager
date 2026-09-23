@@ -4,6 +4,21 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Beginner-friendly new-install quick installers in English and Brazilian Portuguese.
+- Matching quick-install guides with copy/paste installation commands and post-install Zabbix UI steps.
+
+### Changed
+
+- Repository hygiene policy now removes merged topic branches instead of retaining permanent per-beta release branches.
+- Laboratory installation documentation no longer depends on stale `release/<version>` branches; exact commits or formal prerelease tags are used instead.
+
+### Removed
+
+- Obsolete empty source placeholders that were never referenced by runtime code.
+- Superseded beta6/beta7 implementation-note documents that no longer represented the current architecture.
+
 ## [0.1.0-beta.49] - 2026-09-23
 
 ### Fixed
