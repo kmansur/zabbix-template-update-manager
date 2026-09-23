@@ -7,7 +7,8 @@ use CControllerResponseData;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;\nuse Modules\\ZabbixTemplateUpdateManager\\Service\\TemplateOperationLockService;
 use Throwable;
 
-require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';\nrequire_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 
 /**
  * Executes exactly one previously prepared Ready template.
