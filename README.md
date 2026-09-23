@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.46**
+Current version: **0.1.0-beta.47**
 
 This version is intended for **laboratory testing**.
 
@@ -17,7 +17,7 @@ This version is intended for **laboratory testing**.
 
 Beta.43 is a compatibility hotfix for the Zabbix frontend view loader. All module views are now internally namespaced as `ztum.*`, preventing Template Update Manager view files from shadowing native core views such as `template.list`. A permanent CI guard enforces the namespace.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.46` after automation validation. Formal tag/GitHub Release automation now exists, but publishing a production-grade release remains gated by field validation and the still-unselected project license.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.47` after automation validation. Formal tag/GitHub Release automation now exists, but publishing a production-grade release remains gated by field validation and the still-unselected project license.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -40,7 +40,7 @@ ZTUM currently provides:
 - installed/upstream vendor-version comparison;
 - official upstream source indexing by Zabbix release line;
 - native Zabbix checkbox/select-all selection of specific update candidates;
-- read-only selected-template review that rebuilds authoritative inventory/upstream/version state for the chosen subset;
+- direct catalog-to-preparation bulk update flow for explicitly selected official update candidates, without a redundant scope-only review page;
 - request-bounded update-batch safety preparation for the full selected update set (up to the existing 500-template selection safety ceiling), executed one candidate per HTTP request with visible progress;
 - automatic creation/refresh of rollback artifacts for standard-path candidates (none/low plus narrowly recognized bounded-medium changes) and explicitly reviewed manual-update candidates;
 - batch classification into Ready, Manual review, Conflict and Blocked; reviewed candidates use native leading per-row checkboxes plus explicit Select all eligible / Clear selection controls, but never become unattended Ready;
@@ -165,8 +165,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.46
-git checkout -B release/0.1.0-beta.46 origin/release/0.1.0-beta.46
+git fetch origin release/0.1.0-beta.47
+git checkout -B release/0.1.0-beta.47 origin/release/0.1.0-beta.47
 cat VERSION
 git rev-parse HEAD
 ```
@@ -174,7 +174,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.46
+0.1.0-beta.47
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -190,7 +190,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.46**, enable the module and open:
+Confirm version **0.1.0-beta.47**, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -198,7 +198,7 @@ Data collection → Template updates
 
 If the upstream index cannot be loaded, an administrator/super administrator sees an **Upstream diagnostics** table showing the requested index URL, cURL availability, `allow_url_fopen`, OpenSSL availability and a bounded failure detail. The module still fails closed and does not guess official identity when the repository cannot be validated.
 
-When upstream identity and version comparison succeed, checkboxes are shown only on official templates whose upstream vendor version is newer. **Review selected updates** sends only those selected template IDs to the review action. A super administrator may then choose **Prepare selected updates**, which performs the full safety analysis and prepares rollback evidence. Only rows classified **Ready** can be submitted to **Update ready templates**.
+When upstream identity and version comparison succeed, update checkboxes are actionable only for a super administrator and only on official templates whose upstream vendor version is newer. **Prepare selected updates** sends the explicitly selected template IDs directly to the request-bounded preparation queue. Preparation performs the full safety analysis and prepares rollback evidence but does not import configuration. Only rows classified **Ready**, plus explicitly selected eligible reviewed overrides, can reach the later confirmed execution step.
 
 For the exact beta test sequence, including update, batch stop behavior and rollback validation, follow [`docs/lab-test-plan.md`](docs/lab-test-plan.md).
 
@@ -210,10 +210,7 @@ installed templates
       v
 UUID official identity + vendor-version comparison
       |
-      +--> checkbox/select update candidates (request-bounded; selection safety ceiling 500)
-                    |
-                    v
-          selected-template review
+      +--> checkbox/select update candidates (selection safety ceiling 500)
                     |
                     v
            batch safety preparation

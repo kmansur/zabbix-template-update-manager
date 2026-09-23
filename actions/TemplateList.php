@@ -85,6 +85,7 @@ class TemplateList extends CController {
 			'zabbix_version' => $zabbixVersion,
 			'zabbix_supported' => ZabbixVersion::isSupported(),
 			'can_compare' => $canAdminister,
+			'can_prepare_updates' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
 			'can_install' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
 			'show_diagnostics' => $canAdminister,
 			'templates' => [],

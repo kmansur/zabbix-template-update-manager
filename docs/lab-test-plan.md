@@ -86,7 +86,6 @@ Validate the module in both Zabbix light and dark themes.
 Check at minimum:
 
 - **Data collection → Template updates** catalog;
-- selected-update review;
 - update batch preparation/execution;
 - template comparison;
 - individual preflight/update result;
@@ -207,9 +206,9 @@ Confirm:
 - current/unresolved/custom rows keep a visible but disabled checkbox and are not selectable through the normal update selection workflow;
 - the header checkbox uses native Zabbix selection behavior;
 - select only 2–3 candidates for the first test;
-- **Review selected updates** shows only those explicitly selected templates.
+- **Prepare selected updates** opens the request-bounded preparation queue directly with only those explicitly selected template IDs.
 
-The former 25-template update-batch ceiling is removed in beta.42. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach review and preparation intact, and preparation must still run one template per HTTP request without silent truncation.
+The former 25-template update-batch ceiling is removed in beta.42. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach preparation intact, and preparation must still run one template per HTTP request without silent truncation.
 
 ## 4A. Large selected-update regression
 
@@ -217,20 +216,17 @@ Select at least 26 eligible official update candidates in the lab.
 
 Expected behavior:
 
-- **Review selected updates** accepts the complete selection;
-- the review page shows all selected candidates without truncation;
-- a Super Admin can choose **Prepare selected updates**;
+- **Prepare selected updates** accepts the complete selection directly from the catalog;
+- the preparation queue shows all selected candidates without truncation;
 - preparation runs sequentially, one template per HTTP request;
 - progress reaches the full selected count;
 - Stop after current template remains available while preparation is running;
 - there is no reappearance of the old 25-template rejection;
 - the 500-template selected-update sanity ceiling remains fail-closed.
 
-## 5. Selected review → batch preparation
+## 5. Direct catalog selection → batch preparation
 
-On the selected review page confirm the chosen IDs/names/versions are correct.
-
-As Super Admin click:
+As Super Admin, select the intended official update candidates in the catalog and click:
 
 ```text
 Prepare selected updates
@@ -243,10 +239,11 @@ Expected behavior:
 3. conflict/local-overwrite/unresolved states remain blocked;
 4. high risk, local-overwrite and unrecognized medium-risk cases become Manual review; recognized bounded-medium cases may remain on the standard path;
 5. standard-path candidates (`none`/`low` plus recognized bounded-medium) that reached `candidate_for_backup` receive/refresh a persistent rollback artifact;
-6. analysis is rerun after backup creation;
-7. `backup_verified` candidates run fresh preflight;
-8. only a valid fresh preflight evidence SHA-256 can classify the template as `Ready`;
-9. no `configuration.import` occurs during preparation.
+6. after backup creation, only rollback verification/readiness is refreshed from the completed analysis snapshot;
+7. `backup_verified` candidates derive bounded preparation evidence without repeating the complete upstream/history/importcompare analysis;
+8. only a valid preparation evidence SHA-256 can classify the template as `Ready`;
+9. controlled execution still reruns a complete authoritative fresh preflight immediately before any write;
+10. no `configuration.import` occurs during preparation.
 
 The page must summarize:
 
