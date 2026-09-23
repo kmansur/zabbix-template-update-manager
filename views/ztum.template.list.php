@@ -62,6 +62,7 @@ $filter = (new CFilter())
 				->addValue(_('Not applicable'), 'not_applicable')
 				->addValue(_('Update available'), 'update_available')
 				->addValue(_('Not installed'), 'not_installed')
+				->addValue(_('Never update'), 'never_update')
 				->setModern(true)
 		)
 	]);
@@ -106,6 +107,7 @@ $catalogSummary = (new CTableInfo())
 		_('Installed'),
 		_('Not installed'),
 		_('Updates available'),
+		_('Never update'),
 		_('Source'),
 		_('Commit'),
 		_('Index cache')
@@ -115,40 +117,60 @@ $catalogSummary = (new CTableInfo())
 		$data['catalog_summary']['official_installed'],
 		$data['catalog_summary']['not_installed'],
 		$data['version_summary']['update_available'],
+		(int) ($data['policy_summary']['never_update'] ?? 0),
 		$catalogSourceLine !== '' ? _('Zabbix').' '.$catalogSourceLine : '—',
 		$catalogCommit !== '' ? FrontendUi::fingerprint($catalogCommit, 12) : '—',
 		FrontendUi::status($indexCacheLabel, $indexCacheTone)
 	]);
 
-$installSelectionMode = $data['can_install'] && ($data['filter']['status'] ?? 'all') === 'not_installed';
-$selectionGuidance = $installSelectionMode
-	? _('Select one or more missing official templates to prepare installation. Preparation is read-only; installation requires confirmation.')
-	: _('Select one or more templates with available updates to prepare an update. Preparation is read-only; changes require confirmation.');
+$filterStatus = (string) ($data['filter']['status'] ?? 'all');
+$installSelectionMode = $data['can_install'] && $filterStatus === 'not_installed';
+$allowUpdatesMode = !empty($data['can_manage_policy']) && $filterStatus === 'never_update';
+$updatePrepareMode = !empty($data['can_prepare_updates']) && $filterStatus === 'update_available';
+$policyMarkMode = !empty($data['can_manage_policy'])
+	&& !$installSelectionMode
+	&& !$allowUpdatesMode;
+
+$selectionGuidance = match (true) {
+	$installSelectionMode => _(
+		'Select one or more missing official templates to prepare installation. Preparation is read-only; installation requires confirmation.'
+	),
+	$allowUpdatesMode => _(
+		'Select one or more protected templates to allow ZTUM updates again.'
+	),
+	$updatePrepareMode => _(
+		'Select update candidates to prepare an update or mark them Never update.'
+	),
+	$policyMarkMode => _(
+		'Select installed official templates to mark Never update.'
+	),
+	default => ''
+};
+
 $selectionForm = null;
 $selectAllCheckbox = (new CCheckBox('all_templates'))
 	->setEnabled(false)
 	->setAttribute('title', _('Select all is unavailable for the current view.'));
 $selectAllHeader = (new CColHeader($selectAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
 
-$canRenderSelectionForm = $installSelectionMode
-	? $data['can_install']
-	: ($data['can_compare'] && !empty($data['can_prepare_updates']));
+$canRenderSelectionForm = $installSelectionMode || $allowUpdatesMode || $policyMarkMode;
 
 if ($canRenderSelectionForm) {
 	$selectionForm = (new CForm())
 		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-		->addItem((new CVar(
-			CSRF_TOKEN_NAME,
-			CCsrfTokenHelper::get(
-				$installSelectionMode
-					? 'ztum.templates.install_prepare_selected'
-					: 'ztum.templates.prepare_selected'
-			)
-		))->removeId())
 		->setId('ztum-template-list')
 		->setName('ztum_template_list');
 
 	$selectionNamespace = $installSelectionMode ? 'uuids' : 'templateids';
+
+	if (!$installSelectionMode) {
+		$selectionForm->addItem(
+			(new CVar(
+				'policy_operation',
+				$allowUpdatesMode ? 'allow_updates' : 'never_update'
+			))->removeId()
+		);
+	}
 
 	$selectAllCheckbox = (new CCheckBox('all_templates'))
 		->setEnabled(true)
@@ -157,9 +179,12 @@ if ($canRenderSelectionForm) {
 		)
 		->setAttribute(
 			'title',
-			$installSelectionMode
-				? _('Select all visible Not installed templates.')
-				: _('Select all visible update candidates.')
+			match (true) {
+				$installSelectionMode => _('Select all visible Not installed templates.'),
+				$allowUpdatesMode => _('Select all visible Never update templates.'),
+				$updatePrepareMode => _('Select all visible update candidates.'),
+				default => _('Select all visible official templates.')
+			}
 		);
 
 	$selectAllHeader = (new CColHeader($selectAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
@@ -169,6 +194,7 @@ $noData = match ((string) ($data['filter']['status'] ?? 'all')) {
 	'current' => [_('No current official templates found.'), _('Change the status filter to view other templates.')],
 	'update_available' => [_('No template updates are available.'), _('Installed official templates already match the current upstream catalog.')],
 	'not_installed' => [_('No official templates are missing.'), _('All templates in the current official catalog are already installed.')],
+	'never_update' => [_('No templates are marked Never update.'), _('Templates marked Never update will appear here.')],
 	'not_applicable' => [_('No templates match this status.'), _('Change the status filter to view other templates.')],
 	default => [_('No templates found.'), _('Change the filter or verify upstream catalog availability.')]
 };
@@ -183,6 +209,7 @@ $templateTable = (new CTableInfo())
 		_('Available'),
 		_('Status'),
 		_('Upstream identity'),
+		_('Update policy'),
 		_('Linked hosts'),
 		_('Action'),
 		_('Backups'),
@@ -221,24 +248,38 @@ foreach ($data['templates'] as $template) {
 		}
 	}
 
-	$updateSelectionEligible = !$installSelectionMode
-		&& $isInstalled
-		&& $data['can_compare']
-		&& !empty($data['can_prepare_updates'])
+	$officialInstalled = $isInstalled
 		&& ($template['upstream_status'] ?? null) === 'official_match'
+		&& trim((string) ($template['uuid'] ?? '')) !== '';
+	$neverUpdate = !empty($template['never_update']);
+
+	$updateSelectionEligible = $updatePrepareMode
+		&& $officialInstalled
+		&& !$neverUpdate
 		&& ($template['version_status'] ?? null) === 'update_available';
+
+	$policyMarkEligible = $policyMarkMode
+		&& $officialInstalled
+		&& !$neverUpdate;
+
+	$allowUpdatesEligible = $allowUpdatesMode
+		&& $officialInstalled
+		&& $neverUpdate;
 
 	$installSelectionEligible = $installSelectionMode
 		&& !$isInstalled
 		&& ($template['upstream_status'] ?? null) === 'official_catalog'
 		&& ($template['version_status'] ?? null) === 'not_installed';
 
-	$selectionEligible = $updateSelectionEligible || $installSelectionEligible;
+	$selectionEligible = $updateSelectionEligible
+		|| $policyMarkEligible
+		|| $allowUpdatesEligible
+		|| $installSelectionEligible;
 
 	if ($installSelectionEligible) {
 		$selectionCell = new CCheckBox('uuids['.$template['uuid'].']', $template['uuid']);
 	}
-	elseif ($updateSelectionEligible) {
+	elseif ($updateSelectionEligible || $policyMarkEligible || $allowUpdatesEligible) {
 		$selectionCell = new CCheckBox('templateids['.$template['templateid'].']', $template['templateid']);
 	}
 	else {
@@ -284,6 +325,18 @@ foreach ($data['templates'] as $template) {
 			$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
 			$upstreamTones[$template['upstream_status'] ?? 'repository_unavailable'] ?? FrontendUi::MUTED
 		),
+		FrontendUi::status(
+			match ((string) ($template['update_policy'] ?? 'managed')) {
+				'never_update' => _('Never update'),
+				'unavailable' => _('Unavailable'),
+				default => _('Managed')
+			},
+			match ((string) ($template['update_policy'] ?? 'managed')) {
+				'never_update' => FrontendUi::WARNING,
+				'unavailable' => FrontendUi::DANGER,
+				default => FrontendUi::MUTED
+			}
+		),
 		$isInstalled ? (int) $template['host_count'] : '—',
 		$actionCell,
 		$backupCell,
@@ -296,21 +349,57 @@ if ($selectionForm !== null) {
 		$actionButtons = new CActionButtonList('action', 'uuids', [
 			'ztum.templates.install_prepare_selected' => [
 				'name' => _('Prepare selected installations'),
+				'csrf_token' => CCsrfTokenHelper::get('ztum.templates.install_prepare_selected'),
 				'attributes' => [
 					'class' => ZBX_STYLE_BTN_ALT.' js-no-chkbxrange'
 				]
 			]
 		], 'ztum_selected_installations');
 	}
-	else {
+	elseif ($allowUpdatesMode) {
 		$actionButtons = new CActionButtonList('action', 'templateids', [
-			'ztum.templates.prepare_selected' => [
-				'name' => _('Prepare selected updates'),
+			'ztum.templates.update_policy' => [
+				'name' => _('Allow updates'),
+				'csrf_token' => CCsrfTokenHelper::get('ztum.templates.update_policy'),
+				'confirm_singular' => _('Allow ZTUM updates for the selected template?'),
+				'confirm_plural' => _('Allow ZTUM updates for the selected templates?'),
 				'attributes' => [
 					'class' => ZBX_STYLE_BTN_ALT.' js-no-chkbxrange'
 				]
 			]
-		], 'ztum_selected_templates');
+		], 'ztum_policy_allow_updates');
+	}
+	else {
+		$buttons = [];
+
+		if ($updatePrepareMode) {
+			$buttons['ztum.templates.prepare_selected'] = [
+				'name' => _('Prepare selected updates'),
+				'csrf_token' => CCsrfTokenHelper::get('ztum.templates.prepare_selected'),
+				'attributes' => [
+					'class' => ZBX_STYLE_BTN_ALT.' js-no-chkbxrange'
+				]
+			];
+		}
+
+		if (!empty($data['can_manage_policy'])) {
+			$buttons['ztum.templates.update_policy'] = [
+				'name' => _('Never update'),
+				'csrf_token' => CCsrfTokenHelper::get('ztum.templates.update_policy'),
+				'confirm_singular' => _('Mark the selected template Never update?'),
+				'confirm_plural' => _('Mark the selected templates Never update?'),
+				'attributes' => [
+					'class' => ZBX_STYLE_BTN_ALT.' js-no-chkbxrange'
+				]
+			];
+		}
+
+		$actionButtons = new CActionButtonList(
+			'action',
+			'templateids',
+			$buttons,
+			$updatePrepareMode ? 'ztum_selected_updates' : 'ztum_policy_never_update'
+		);
 	}
 
 	$selectionForm->addItem([$templateTable, $actionButtons]);
@@ -351,6 +440,10 @@ if ($data['upstream_warning'] !== null) {
 	$page->addItem(FrontendUi::message((string) $data['upstream_warning'], FrontendUi::WARNING));
 }
 
+if ($data['policy_error'] !== null) {
+	$page->addItem(FrontendUi::message((string) $data['policy_error'], FrontendUi::DANGER));
+}
+
 if ($data['upstream_error'] !== null) {
 	$page->addItem(FrontendUi::message((string) $data['upstream_error'], FrontendUi::DANGER));
 
@@ -386,7 +479,7 @@ $page
 	->addItem($filter)
 	->addItem(FrontendUi::section(_('Templates')));
 
-if ((int) $data['filtered_count'] > 0) {
+if ((int) $data['filtered_count'] > 0 && $selectionGuidance !== '') {
 	$page->addItem(FrontendUi::description(
 		FrontendUi::status($selectionGuidance, FrontendUi::MUTED)
 	));
