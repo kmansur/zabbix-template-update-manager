@@ -9,10 +9,16 @@ $categoryLabels = [
 
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
-	->addItem(new CLink(
-		_('Back to template updates'),
-		(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
-	));
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				new CLink(
+					_('Back to template updates'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
+				)
+			)
+		))->setAttribute('aria-label', _('Content controls'))
+	);
 
 if ($data['error'] !== null || $data['templateids'] === [] || $data['templates'] === []) {
 	$page->addItem(new CTag('p', true, $data['error'] ?? _('Batch preparation returned no selected templates.')))->show();
@@ -90,9 +96,14 @@ foreach ($data['templateids'] as $templateId) {
 	$installed = (string) ($template['vendor_version'] ?? '');
 	$hostCount = (int) ($template['host_count'] ?? 0);
 
+	$reviewCheckbox = (new CCheckBox('review_select['.$templateId.']', '1'))
+		->setId('ztum-review-select-'.$templateId)
+		->setEnabled(false)
+		->setAttribute('title', _('Preparation has not classified this template yet.'));
+
 	$table->addRow(
 		(new CRow([
-			(new CSpan('—'))->setId('ztum-select-'.$templateId),
+			$reviewCheckbox,
 			$name,
 			$installed !== '' ? $installed : '—',
 			(new CSpan('—'))->setId('ztum-available-'.$templateId),
@@ -237,36 +248,24 @@ $script = <<<'JS'
 	};
 
 	const setReviewedSelection = (templateId, category, manual = null) => {
-		const element = byId('ztum-select-' + templateId);
-		if (element === null) {
+		const checkbox = byId('ztum-review-select-' + templateId);
+		if (checkbox === null) {
 			return;
 		}
 
-		element.replaceChildren();
-		if (category === 'review' && manual?.eligible === true
-				&& isValidEvidence(manual.evidence || '')) {
-			const checkbox = document.createElement('input');
-			checkbox.type = 'checkbox';
-			checkbox.id = 'ztum-review-select-' + templateId;
-			checkbox.title = labels.select_reviewed;
+		const eligible = category === 'review'
+			&& manual?.eligible === true
+			&& isValidEvidence(manual.evidence || '');
+
+		checkbox.disabled = !eligible || executionStarted || retryInProgress;
+		checkbox.title = eligible ? labels.select_reviewed : labels.review_individual_only;
+
+		if (eligible) {
 			checkbox.checked = autoSelectReviewed;
-			checkbox.addEventListener('change', () => {
-				if (!checkbox.checked) {
-					autoSelectReviewed = false;
-				}
-				updateReviewedSelectAll();
-				updateExecutionState();
-			});
-			element.appendChild(checkbox);
-			return;
 		}
-
-		const marker = document.createElement('span');
-		marker.textContent = '—';
-		if (category === 'review') {
-			marker.title = labels.review_individual_only;
+		else {
+			checkbox.checked = false;
 		}
-		element.appendChild(marker);
 	};
 
 	const setExecutionState = (templateId, category, text = null, manual = null) => {
@@ -674,7 +673,6 @@ $script = <<<'JS'
 			setText('ztum-readiness-' + templateId, labels.processing);
 			setText('ztum-category-' + templateId, labels.processing);
 			setText('ztum-reason-' + templateId, '—');
-			setText('ztum-select-' + templateId, '—');
 			setText('ztum-execution-' + templateId, labels.pending);
 			updateSummary();
 
@@ -737,6 +735,19 @@ $script = <<<'JS'
 		progress(completed, labels.stopping);
 	});
 
+	for (const templateId of config.templateIds) {
+		const checkbox = byId('ztum-review-select-' + templateId);
+		if (checkbox !== null) {
+			checkbox.addEventListener('change', () => {
+				if (!checkbox.checked) {
+					autoSelectReviewed = false;
+				}
+				updateReviewedSelectAll();
+				updateExecutionState();
+			});
+		}
+	}
+
 	const run = async () => {
 		updateSummary();
 		updateReviewedSelectAll();
@@ -751,7 +762,6 @@ $script = <<<'JS'
 			setText('ztum-readiness-' + templateId, labels.processing);
 			setText('ztum-category-' + templateId, labels.processing);
 			setText('ztum-reason-' + templateId, '—');
-			setText('ztum-select-' + templateId, '—');
 			setText('ztum-execution-' + templateId, labels.pending);
 
 			try {
@@ -782,5 +792,5 @@ $script = str_replace(
 );
 
 $page
-	->addItem(new CScriptTag($script))
+	->addItem((new CScriptTag($script))->setOnDocumentReady())
 	->show();
