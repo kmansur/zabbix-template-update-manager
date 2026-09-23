@@ -4,16 +4,24 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.53] - 2026-09-23
+
 ### Changed
 
-- Polished the public README for beta.52 community testing with native GitHub CI/Security/Quality badges, clearer project positioning and a dedicated **Never update** usage section.
-- Synchronized the engineering status and laboratory test plan with beta.52, including an explicit **Never update / Allow updates** field-validation regression.
+- Polished the public README for community testing with native GitHub CI/Security/Quality badges, clearer project positioning and a dedicated **Never update** usage section.
+- Synchronized the engineering status and laboratory test plan with the current beta, including explicit **Never update / Allow updates** and Zabbix 8 pager compatibility regressions.
 
 ### Fixed
 
-- Corrected stale beta.50 installation references, the obsolete beta.42 laboratory exit criteria and outdated selected-update/install wording.
+- Fixed an HTTP 500 on the Zabbix 8 template catalog caused by frontend pager constants renamed after Zabbix 7.x.
+- Catalog pager composition now resolves the native Zabbix 8 `ZBX_STYLE_PAGER` / `ZBX_STYLE_PAGER_CONTAINER` constants first and safely falls back to the Zabbix 7.x `ZBX_STYLE_TABLE_PAGING` / `ZBX_STYLE_PAGING_BTN_CONTAINER` constants.
+- Corrected stale beta.50 installation references, obsolete beta.42 laboratory exit criteria and outdated selected-update/install wording.
 - Restored the missing Markdown code fence around the official-catalog installation workflow diagram.
 
+### Tests
+
+- Catalog contracts now require both Zabbix 7.x and 8.x pager constant families to be runtime-resolved and reject direct use of the removed Zabbix 7.x pager constants.
+- Laboratory validation now includes explicit Zabbix 8 paginated/All/Pages catalog regression checks and log verification for undefined pager constants.
 
 ## [0.1.0-beta.52] - 2026-09-23
 
