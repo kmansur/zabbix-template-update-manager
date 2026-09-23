@@ -18,9 +18,9 @@ $page = (new CHtmlPage())
 
 if ($data['operation_error'] !== null) {
 	$page
-		->addItem(new CTag('p', true, $data['operation_error']))
-		->addItem(new CTag('p', true, _(
-			'Because the exact point of failure may be after configuration.import started, inspect the installed template and frontend logs before taking another write action.'
+		->addItem(FrontendUi::message((string) $data['operation_error'], FrontendUi::DANGER))
+		->addItem(FrontendUi::description(_(
+			'Inspect the installed template and frontend logs before taking another write action.'
 		)))
 		->show();
 	return;
@@ -49,11 +49,11 @@ $stateTable = (new CTableInfo())
 				: (str_starts_with($status, 'blocked_') ? FrontendUi::WARNING : FrontendUi::DANGER)
 		),
 		FrontendUi::yesNo($writePerformed),
-		($result['reason'] ?? null) !== null ? (string) $result['reason'] : '—'
+		FrontendUi::reason(($result['reason'] ?? null) !== null ? (string) $result['reason'] : null)
 	]);
 
 $page
-	->addItem(new CTag('h4', true, _('Rollback operation')))
+	->addItem(FrontendUi::section(_('Rollback result')))
 	->addItem($stateTable);
 
 $recovery = is_array($result['recovery_backup'] ?? null) ? $result['recovery_backup'] : [];
@@ -64,12 +64,12 @@ if ($recovery !== []) {
 		->addRow([
 			(string) ($recovery['created_at'] ?? '—'),
 			(int) ($recovery['bytes'] ?? 0),
-			$sha !== '' ? substr($sha, 0, 20) : '—',
+			$sha !== '' ? FrontendUi::fingerprint($sha, 20) : '—',
 			(string) ($recovery['manifest_file'] ?? '—'),
 			(string) ($recovery['source_file'] ?? '—')
 		]);
 	$page
-		->addItem(new CTag('h4', true, _('Recovery backup created before rollback')))
+		->addItem(FrontendUi::section(_('Recovery backup')))
 		->addItem($recoveryTable);
 }
 
@@ -85,7 +85,7 @@ if ($target !== []) {
 			$sha !== '' ? substr($sha, 0, 20) : '—',
 			(string) ($target['manifest_file'] ?? '—')
 		]);
-	$page->addItem(new CTag('h4', true, _('Rollback target')))->addItem($targetTable);
+	$page->addItem(FrontendUi::section(_('Rollback target')))->addItem($targetTable);
 }
 
 $validation = is_array($result['validation'] ?? null) ? $result['validation'] : null;
@@ -103,25 +103,28 @@ if ($validation !== null) {
 			(string) ($validation['expected_version'] ?? '—'),
 			(string) ($validation['installed_version'] ?? '—'),
 			(int) ($validation['remaining_changes'] ?? -1),
-			($validation['reasons'] ?? []) !== [] ? implode(', ', $validation['reasons']) : '—'
+			FrontendUi::reasonList(is_array($validation['reasons'] ?? null) ? $validation['reasons'] : [])
 		]);
-	$page->addItem(new CTag('h4', true, _('Post-rollback validation')))->addItem($validationTable);
+	$page->addItem(FrontendUi::section(_('Post-rollback validation')))->addItem($validationTable);
 }
 
 if ($status === 'rolled_back') {
-	$page->addItem(new CTag('p', true, _(
-		'The selected rollback artifact was imported and a fresh configuration.importcompare found no remaining differences. The recovery backup and rollback target remain stored.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('Rollback completed and validation found no remaining differences.'),
+		FrontendUi::SUCCESS
+	));
 }
 elseif ($writePerformed) {
-	$page->addItem(new CTag('p', true, _(
-		'A configuration write occurred, but the final state was not proven valid. Do not retry automatically. Inspect the template and use the newly created recovery backup only through a fresh explicit rollback review.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('A configuration write occurred, but the final state was not proven valid. Inspect the template before any further write action.'),
+		FrontendUi::DANGER
+	));
 }
 else {
-	$page->addItem(new CTag('p', true, _(
-		'No Zabbix configuration write was performed. Re-open rollback review to obtain fresh evidence before trying again.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('No configuration write was performed. Reopen rollback review to obtain fresh evidence before retrying.'),
+		FrontendUi::WARNING
+	));
 }
 
 $page->show();
