@@ -1,8 +1,46 @@
 # Changelog
 
-All notable changes to Zabbix Template Update Manager will be documented in this file.
+All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
+
+## [0.1.0-beta.39] - 2026-09-22
+
+### Changed
+
+- Refactored user-facing views toward the native Zabbix frontend visual language.
+- Moved secondary/back navigation into `CHtmlPage::setControls()` instead of rendering ad-hoc navigation inside page content.
+- Reviewed batch row selection is now server-rendered with native Zabbix `CCheckBox` controls; JavaScript only changes enabled/checked state.
+- Batch JavaScript now initializes through `CScriptTag::setOnDocumentReady()`.
+- Added native semantic status styling backed only by Zabbix `ZBX_STYLE_*` classes for success, review/warning, blocked/error, running/info and neutral states.
+- Catalog metadata now uses native horizontal-list presentation.
+- Removed empty legacy action/view/asset stubs that were not registered or used.
+- Rewrote stale architecture/roadmap sections to match the implemented update/install/rollback engines.
+
+### Added
+
+- `src/Support/FrontendUi.php` as a small native-status presentation helper.
+- `docs/ui-style.md` defining the module's native Zabbix UI contract.
+- `tests/ui_native_guard.php` and CI enforcement for native controls, theme-safe styling and batch document-ready lifecycle.
+- Beta.39 light/dark and Zabbix 7.x/8.x visual regression checklist.
+
+### Fixed
+
+- Eliminated dynamically created raw HTML reviewed-update checkboxes, the main source of inconsistent checkbox appearance/behavior compared with built-in Zabbix controls.
+- Removed the raw text separator used between update-result navigation links.
+- User-visible status text now has consistent native semantic styling while retaining explicit text so meaning never depends on color alone.
+
+### Safety
+
+- This is a presentation/composition refactor; the controlled-write security model is unchanged.
+- UI state remains non-authoritative. Permissions, fresh preflight, evidence comparison, reviewed acknowledgements and the single approved `configuration.import` boundary remain server-side requirements.
+- No third-party UI framework or hard-coded theme color was added.
+
+### Tests
+
+- Added a repository-level native UI guard.
+- Strengthened batch action contracts to require native reviewed `CCheckBox` controls, native status constants and document-ready initialization.
+- Existing PHP syntax, manifest/version, controlled-write, unit/contract and upstream-index validation remain required.
 
 ## [0.1.0-beta.38] - 2026-09-22
 
