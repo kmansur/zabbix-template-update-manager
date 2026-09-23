@@ -70,7 +70,7 @@ assertTemplateUpdateContract(
 	'Controlled import service must contain exactly one configuration.import call.'
 );
 assertTemplateUpdateContract(
-	strpos($importService, 'TemplateImportCompareService::rules()') !== false,
+	strpos($importService, 'TemplateImportCompareService::rules(') !== false,
 	'Controlled import must reuse the reviewed import-comparison rule profile.'
 );
 
