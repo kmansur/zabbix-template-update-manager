@@ -52,7 +52,7 @@ class TemplateBatchPrepare extends CController {
 		)));
 
 		$data = [
-			'title' => _('Prepare selected template updates'),
+			'title' => _('Prepare template updates'),
 			'templateids' => $templateIds,
 			'templates' => [],
 			'error' => null
