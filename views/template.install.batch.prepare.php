@@ -91,23 +91,35 @@ $noReadyMessage = (new CSpan(''))
 	->setId('ztum-install-no-ready-message');
 
 $executionSummary = (new CTableInfo())
-	->setHeader([_('Status'), _('Installed'), _('Failed'), _('Not attempted'), _('Any configuration write')])
+	->setHeader([
+		_('Status'),
+		_('Installed'),
+		_('Failed'),
+		_('Not attempted'),
+		_('Confirmed configuration write'),
+		_('Uncertain import')
+	])
 	->addRow([
 		(new CSpan(_('Waiting for preparation')))->setId('ztum-install-exec-status'),
 		(new CSpan('0'))->setId('ztum-install-exec-installed'),
 		(new CSpan('0'))->setId('ztum-install-exec-failed'),
 		(new CSpan('0'))->setId('ztum-install-exec-not-attempted'),
-		(new CSpan(_('No')))->setId('ztum-install-exec-write')
+		(new CSpan(_('No')))->setId('ztum-install-exec-write'),
+		(new CSpan('0'))->setId('ztum-install-exec-uncertain')
 	]);
+
+$executionNotice = (new CSpan(''))
+	->setId('ztum-install-exec-notice');
 
 $page
 	->addItem(new CTag('h4', true, _('Controlled sequential installation')))
 	->addItem(new CTag('p', true, _(
-		'Only Ready candidates are executed. Each template uses its own HTTP request, reruns the complete installation preflight immediately before import and is validated before the next template begins. Execution stops on the first failure and no automatic uninstall is performed.'
+		'Only Ready candidates are executed. Ready means the read-only safety gates passed; the actual Zabbix import remains authoritative and can still reject a candidate. Each template uses its own HTTP request, reruns the complete installation preflight immediately before import and is validated before the next template begins. Execution stops on the first failure and no automatic uninstall is performed.'
 	)))
 	->addItem(new CDiv([$confirm, ' ', $submit]))
 	->addItem(new CDiv($noReadyMessage))
-	->addItem($executionSummary);
+	->addItem($executionSummary)
+	->addItem(new CDiv($executionNotice));
 
 $prepareOneUrl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'ztum.templates.install_prepare_one')
@@ -147,12 +159,17 @@ $jsLabels = json_encode([
 	'execution_running' => _('Running'),
 	'execution_completed' => _('Completed'),
 	'execution_stopped' => _('Stopped on first failure'),
+	'execution_stopped_uncertain' => _('Stopped — inspect uncertain import state'),
 	'executing' => _('Installing...'),
 	'installed' => _('Installed and validated'),
+	'import_failed' => _('Import failed — inspect state'),
+	'validation_failed' => _('Installed but validation failed'),
 	'failed' => _('Failed'),
 	'not_attempted' => _('Not attempted'),
 	'yes' => _('Yes'),
 	'no' => _('No'),
+	'import_failure_notice' => _('The failed import reached the controlled Zabbix import stage but did not return confirmed success. Remaining templates were not attempted. Inspect the catalog/local template state before any retry.'),
+	'request_failure_notice' => _('The execution request did not complete cleanly. Its write outcome cannot be proven from the browser response, so remaining templates were not attempted. Inspect local template state before any retry.'),
 	'execution_unavailable' => _('Unavailable — no Ready templates'),
 	'no_ready' => _('No templates are eligible for installation. {blocked} selected template(s) were blocked during safety analysis. Review the blocked reasons above or return to the catalog.')
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
@@ -354,13 +371,17 @@ $script = <<<'JS'
 		let failed = 0;
 		let notAttempted = entries.length;
 		let anyWrite = false;
+		let uncertain = 0;
 		let stopped = false;
+		let stoppedUncertain = false;
 
 		setStateText('ztum-install-exec-status', labels.execution_running, 'info');
 		setText('ztum-install-exec-installed', '0');
 		setText('ztum-install-exec-failed', '0');
 		setText('ztum-install-exec-not-attempted', String(notAttempted));
 		setText('ztum-install-exec-write', labels.no);
+		setText('ztum-install-exec-uncertain', '0');
+		setText('ztum-install-exec-notice', '');
 
 		for (let index = 0; index < entries.length; index++) {
 			const [uuid, evidence] = entries[index];
@@ -377,13 +398,33 @@ $script = <<<'JS'
 				if (result.status !== 'installed') {
 					failed++;
 					notAttempted = entries.length - index - 1;
-					setText(
-						'ztum-install-execution-' + uuid,
-						labels.failed + (result.status ? ' (' + result.status + ')' : '')
-					);
+
+					if (result.status === 'import_failed') {
+						uncertain++;
+						stoppedUncertain = true;
+						const inspection = result.failure_inspection?.state || 'state_unknown_after_failure';
+						const detail = result.error_detail || result.reason || labels.failed;
+						setStateText('ztum-install-execution-' + uuid, labels.import_failed, 'danger');
+						setText('ztum-install-reason-' + uuid, detail + ' [' + inspection + ']');
+						setStateText('ztum-install-exec-notice', labels.import_failure_notice, 'danger');
+					}
+					else if (result.status === 'validation_failed') {
+						setStateText('ztum-install-execution-' + uuid, labels.validation_failed, 'danger');
+						setText('ztum-install-reason-' + uuid, result.reason || 'post_install_validation_failed');
+					}
+					else {
+						setStateText(
+							'ztum-install-execution-' + uuid,
+							labels.failed + (result.status ? ' (' + result.status + ')' : ''),
+							'danger'
+						);
+						if (result.reason) {
+							setText('ztum-install-reason-' + uuid, result.reason);
+						}
+					}
 
 					for (let pending = index + 1; pending < entries.length; pending++) {
-						setText('ztum-install-execution-' + entries[pending][0], labels.not_attempted);
+						setStateText('ztum-install-execution-' + entries[pending][0], labels.not_attempted, 'muted');
 					}
 
 					stopped = true;
@@ -393,18 +434,20 @@ $script = <<<'JS'
 				installed++;
 				notAttempted = entries.length - index - 1;
 				const validation = result.validation?.status || 'validated';
-				setText('ztum-install-execution-' + uuid, labels.installed + ' (' + validation + ')');
+				setStateText('ztum-install-execution-' + uuid, labels.installed + ' (' + validation + ')', 'success');
 			}
 			catch (error) {
 				failed++;
+				uncertain++;
+				stoppedUncertain = true;
 				notAttempted = entries.length - index - 1;
-				setText(
-					'ztum-install-execution-' + uuid,
-					labels.request_failed + (error?.message ? ': ' + error.message : '')
-				);
+				const detail = error?.message || labels.request_failed;
+				setStateText('ztum-install-execution-' + uuid, labels.request_failed, 'danger');
+				setText('ztum-install-reason-' + uuid, detail);
+				setStateText('ztum-install-exec-notice', labels.request_failure_notice, 'danger');
 
 				for (let pending = index + 1; pending < entries.length; pending++) {
-					setText('ztum-install-execution-' + entries[pending][0], labels.not_attempted);
+					setStateText('ztum-install-execution-' + entries[pending][0], labels.not_attempted, 'muted');
 				}
 
 				stopped = true;
@@ -414,15 +457,19 @@ $script = <<<'JS'
 			setText('ztum-install-exec-installed', String(installed));
 			setText('ztum-install-exec-failed', String(failed));
 			setText('ztum-install-exec-not-attempted', String(notAttempted));
+			setText('ztum-install-exec-uncertain', String(uncertain));
 		}
 
 		setText('ztum-install-exec-installed', String(installed));
 		setText('ztum-install-exec-failed', String(failed));
 		setText('ztum-install-exec-not-attempted', String(notAttempted));
 		setText('ztum-install-exec-write', anyWrite ? labels.yes : labels.no);
+		setText('ztum-install-exec-uncertain', String(uncertain));
 		setStateText(
 			'ztum-install-exec-status',
-			stopped ? labels.execution_stopped : labels.execution_completed,
+			stopped
+				? (stoppedUncertain ? labels.execution_stopped_uncertain : labels.execution_stopped)
+				: labels.execution_completed,
 			stopped ? 'danger' : 'success'
 		);
 	};
