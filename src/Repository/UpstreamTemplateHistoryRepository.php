@@ -46,6 +46,11 @@ final class UpstreamTemplateHistoryRepository {
 			throw new RuntimeException('Offline-only mode is enabled but the required template history is missing.');
 		}
 
+		$cached = $this->readImmutableHistoryCache($path, $until, $maxCommits);
+		if ($cached !== null) {
+			return $cached;
+		}
+
 		$commits = [];
 		$seen = [];
 		$start = 0;
@@ -77,11 +82,13 @@ final class UpstreamTemplateHistoryRepository {
 			$start = $next;
 		}
 
-		return [
+		$result = [
 			'commits' => $commits,
 			'truncated' => !$isLastPage,
 			'limit' => $maxCommits
 		];
+		$this->writeImmutableHistoryCache($path, $until, $maxCommits, $result);
+		return $result;
 	}
 
 	/**
@@ -269,8 +276,8 @@ final class UpstreamTemplateHistoryRepository {
 				CURLOPT_RETURNTRANSFER => false,
 				CURLOPT_FOLLOWLOCATION => true,
 				CURLOPT_MAXREDIRS => 3,
-				CURLOPT_CONNECTTIMEOUT => 5,
-				CURLOPT_TIMEOUT => 15,
+				CURLOPT_CONNECTTIMEOUT => 3,
+				CURLOPT_TIMEOUT => 6,
 				CURLOPT_USERAGENT => ProjectVersion::userAgent(),
 				CURLOPT_SSL_VERIFYPEER => true,
 				CURLOPT_SSL_VERIFYHOST => 2,
@@ -310,7 +317,7 @@ final class UpstreamTemplateHistoryRepository {
 		$context = stream_context_create([
 			'http' => [
 				'method' => 'GET',
-				'timeout' => 15,
+				'timeout' => 6,
 				'follow_location' => 0,
 				'header' => 'User-Agent: '.ProjectVersion::userAgent()."\r\n"
 			],
@@ -329,4 +336,79 @@ final class UpstreamTemplateHistoryRepository {
 		}
 		return $content;
 	}
+	private function immutableHistoryCacheFile(string $path, string $until, int $maxCommits): string {
+		$identity = json_encode([$path, $until, $maxCommits], JSON_UNESCAPED_SLASHES);
+		if (!is_string($identity)) {
+			throw new RuntimeException('Unable to encode the immutable history cache identity.');
+		}
+
+		return rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
+			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager'
+			.DIRECTORY_SEPARATOR.'historical-history'
+			.DIRECTORY_SEPARATOR.'history-'.hash('sha256', $identity).'.json';
+	}
+
+	private function readImmutableHistoryCache(string $path, string $until, int $maxCommits): ?array {
+		$file = $this->immutableHistoryCacheFile($path, $until, $maxCommits);
+		if (!is_file($file)) {
+			return null;
+		}
+
+		$content = @file_get_contents($file);
+		if (!is_string($content) || $content === '' || strlen($content) > self::MAX_RESPONSE_BYTES) {
+			return null;
+		}
+
+		$data = json_decode($content, true);
+		if (!is_array($data)
+				|| !is_array($data['commits'] ?? null)
+				|| !is_bool($data['truncated'] ?? null)
+				|| (int) ($data['limit'] ?? 0) !== $maxCommits) {
+			return null;
+		}
+
+		foreach ($data['commits'] as $commit) {
+			if (!is_array($commit)
+					|| preg_match('/^[a-f0-9]{40}$/', (string) ($commit['id'] ?? '')) !== 1
+					|| !is_string($commit['message'] ?? null)) {
+				return null;
+			}
+		}
+
+		return [
+			'commits' => array_values($data['commits']),
+			'truncated' => $data['truncated'],
+			'limit' => $maxCommits
+		];
+	}
+
+	private function writeImmutableHistoryCache(
+		string $path,
+		string $until,
+		int $maxCommits,
+		array $result
+	): void {
+		$encoded = json_encode($result, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		if (!is_string($encoded) || strlen($encoded) > self::MAX_RESPONSE_BYTES) {
+			return;
+		}
+
+		$file = $this->immutableHistoryCacheFile($path, $until, $maxCommits);
+		$directory = dirname($file);
+		if (!is_dir($directory)
+				&& !@mkdir($directory, 0700, true)
+				&& !is_dir($directory)) {
+			return;
+		}
+
+		$tmp = $file.'.tmp-'.getmypid();
+		if (@file_put_contents($tmp, $encoded, LOCK_EX) === false) {
+			return;
+		}
+		@chmod($tmp, 0600);
+		if (!@rename($tmp, $file)) {
+			@unlink($tmp);
+		}
+	}
+
 }

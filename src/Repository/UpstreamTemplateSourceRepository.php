@@ -15,6 +15,7 @@ final class UpstreamTemplateSourceRepository {
 	private OfflineBundleRepository $offlineBundle;
 
 	private const BASE_URL = 'https://git.zabbix.com/projects/ZBX/repos/zabbix/raw/';
+	private const MIRROR_RAW_BASE_URL = 'https://raw.githubusercontent.com/zabbix/zabbix/';
 	private const MAX_SOURCE_BYTES = 10485760;
 
 	public function __construct(?OfflineBundleRepository $offlineBundle = null) {
@@ -123,13 +124,36 @@ final class UpstreamTemplateSourceRepository {
 			throw new RuntimeException('Offline-only mode is enabled but the required template source is missing.');
 		}
 
-		$url = self::buildUrl($commit, $path);
-		return [
-			'content' => $this->fetchUrl($url),
-			'path' => $path,
-			'commit' => $commit,
-			'url' => $url
-		];
+		$cached = $this->readImmutableCache($commit, $path);
+		if ($cached !== null) {
+			return [
+				'content' => $cached,
+				'path' => $path,
+				'commit' => $commit,
+				'url' => 'runtime-cache://'.$commit.'/'.$path
+			];
+		}
+
+		$errors = [];
+		foreach ([self::buildMirrorUrl($commit, $path), self::buildUrl($commit, $path)] as $url) {
+			try {
+				$content = $this->fetchUrl($url);
+				$this->writeImmutableCache($commit, $path, $content);
+				return [
+					'content' => $content,
+					'path' => $path,
+					'commit' => $commit,
+					'url' => $url
+				];
+			}
+			catch (Throwable $exception) {
+				$errors[] = $exception->getMessage();
+			}
+		}
+
+		throw new RuntimeException(
+			'Unable to retrieve the immutable upstream template source. '.implode(' | ', $errors)
+		);
 	}
 
 	public static function buildUrl(string $commit, string $path): string {
@@ -145,6 +169,19 @@ final class UpstreamTemplateSourceRepository {
 		return self::BASE_URL.$encodedPath.'?at='.rawurlencode($commit);
 	}
 
+	public static function buildMirrorUrl(string $commit, string $path): string {
+		$commit = strtolower(trim($commit));
+		if (!preg_match('/^[a-f0-9]{40}$/', $commit)) {
+			throw new RuntimeException('The upstream source commit is invalid.');
+		}
+		if (!UpstreamIndexRepository::isValidTemplatePath($path)) {
+			throw new RuntimeException('The upstream source path is invalid.');
+		}
+
+		$encodedPath = implode('/', array_map('rawurlencode', explode('/', $path)));
+		return self::MIRROR_RAW_BASE_URL.rawurlencode($commit).'/'.$encodedPath;
+	}
+
 	private function fetchUrl(string $url): string {
 		if (function_exists('curl_init')) {
 			return $this->fetchWithCurl($url);
@@ -153,7 +190,7 @@ final class UpstreamTemplateSourceRepository {
 		$context = stream_context_create([
 			'http' => [
 				'method' => 'GET',
-				'timeout' => 15,
+				'timeout' => 5,
 				'follow_location' => 0,
 				'header' => 'User-Agent: '.ProjectVersion::userAgent()."\r\n"
 			],
@@ -186,8 +223,8 @@ final class UpstreamTemplateSourceRepository {
 			CURLOPT_RETURNTRANSFER => false,
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_MAXREDIRS => 3,
-			CURLOPT_CONNECTTIMEOUT => 5,
-			CURLOPT_TIMEOUT => 15,
+			CURLOPT_CONNECTTIMEOUT => 3,
+			CURLOPT_TIMEOUT => 5,
 			CURLOPT_USERAGENT => ProjectVersion::userAgent(),
 			CURLOPT_SSL_VERIFYPEER => true,
 			CURLOPT_SSL_VERIFYHOST => 2,
@@ -219,8 +256,11 @@ final class UpstreamTemplateSourceRepository {
 		if ($result === false || $status !== 200) {
 			throw new RuntimeException(sprintf('Upstream source request failed with HTTP %d: %s', $status, $error));
 		}
-		if (strtolower((string) parse_url($effectiveUrl, PHP_URL_HOST)) !== 'git.zabbix.com') {
-			throw new RuntimeException('The upstream source request redirected outside the canonical Zabbix host.');
+		$requestedHost = strtolower((string) parse_url($url, PHP_URL_HOST));
+		$effectiveHost = strtolower((string) parse_url($effectiveUrl, PHP_URL_HOST));
+		if (!in_array($requestedHost, ['git.zabbix.com', 'raw.githubusercontent.com'], true)
+				|| $effectiveHost !== $requestedHost) {
+			throw new RuntimeException('The upstream source request redirected outside the approved official hosts.');
 		}
 		if ($content === '') {
 			throw new RuntimeException('The upstream template source is empty.');
@@ -228,4 +268,57 @@ final class UpstreamTemplateSourceRepository {
 
 		return $content;
 	}
+
+	private function immutableCacheFile(string $commit, string $path): string {
+		$identity = json_encode([$commit, $path], JSON_UNESCAPED_SLASHES);
+		if (!is_string($identity)) {
+			throw new RuntimeException('Unable to encode the immutable source cache identity.');
+		}
+
+		return rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
+			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager'
+			.DIRECTORY_SEPARATOR.'historical-sources'
+			.DIRECTORY_SEPARATOR.'source-'.hash('sha256', $identity).'.yaml';
+	}
+
+	private function readImmutableCache(string $commit, string $path): ?string {
+		$file = $this->immutableCacheFile($commit, $path);
+		if (!is_file($file)) {
+			return null;
+		}
+
+		$content = @file_get_contents($file);
+		if (!is_string($content)
+				|| $content === ''
+				|| strlen($content) > self::MAX_SOURCE_BYTES
+				|| strpos($content, 'zabbix_export:') === false) {
+			return null;
+		}
+
+		return $content;
+	}
+
+	private function writeImmutableCache(string $commit, string $path, string $content): void {
+		if ($content === '' || strpos($content, 'zabbix_export:') === false) {
+			return;
+		}
+
+		$file = $this->immutableCacheFile($commit, $path);
+		$directory = dirname($file);
+		if (!is_dir($directory)
+				&& !@mkdir($directory, 0700, true)
+				&& !is_dir($directory)) {
+			return;
+		}
+
+		$tmp = $file.'.tmp-'.getmypid();
+		if (@file_put_contents($tmp, $content, LOCK_EX) === false) {
+			return;
+		}
+		@chmod($tmp, 0600);
+		if (!@rename($tmp, $file)) {
+			@unlink($tmp);
+		}
+	}
+
 }
