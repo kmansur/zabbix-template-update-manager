@@ -5,7 +5,8 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
-use Modules\ZabbixTemplateUpdateManager\Service\TemplateRollbackService;\nuse Modules\\ZabbixTemplateUpdateManager\\Service\\TemplateOperationLockService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateRollbackService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Service/TemplateRollbackService.php';
