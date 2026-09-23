@@ -49,7 +49,7 @@ if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
   die "Execute este instalador como root, por exemplo: sudo bash tools/quickinstall-pt-br.sh"
 fi
 
-for command in tar find install cp chmod chown sort awk grep sed mktemp; do
+for command in tar find install cp chmod chown sort awk grep sed mktemp xargs; do
   command -v "$command" >/dev/null 2>&1 || die "Comando obrigatório não encontrado: $command"
 done
 
