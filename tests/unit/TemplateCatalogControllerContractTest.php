@@ -46,6 +46,16 @@ assertCatalogControllerContract(
 );
 
 assertCatalogControllerContract(
+	strpos($controller, "defined('ZBX_STYLE_PAGER')") !== false
+		&& strpos($controller, "defined('ZBX_STYLE_TABLE_PAGING')") !== false
+		&& strpos($controller, "defined('ZBX_STYLE_PAGER_CONTAINER')") !== false
+		&& strpos($controller, "defined('ZBX_STYLE_PAGING_BTN_CONTAINER')") !== false
+		&& strpos($controller, '->addClass(ZBX_STYLE_TABLE_PAGING)') === false
+		&& strpos($controller, '->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)') === false,
+	'Catalog pager must resolve the renamed native Zabbix 7.x/8.x pager constants at runtime.'
+);
+
+assertCatalogControllerContract(
 	strpos($controller, "\$needsPagination = \$data['filtered_count'] > \$rowsPerPage;") !== false
 		&& strpos($controller, "if (!\$needsPagination)") !== false
 		&& strpos($controller, "if (\$needsPagination) {") !== false,
