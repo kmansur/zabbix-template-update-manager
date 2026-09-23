@@ -22,6 +22,7 @@ jobs:
           tag="${GITHUB_REF_NAME#v}"
           test "$version" = "$tag"
           php tests/validate_manifest.php
+          php tests/module_view_namespace_guard.php
           php tests/validate_version.php
           php tests/read_only_guard.php
           php tests/ui_native_guard.php
