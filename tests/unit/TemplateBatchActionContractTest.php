@@ -76,8 +76,18 @@ assertBatchContract(strpos($prepareView, 'Retry failed preparation') !== false
 		&& strpos($prepareView, 'requestFailures = new Set()') !== false
 		&& strpos($prepareView, 'retryFailedPreparation = async () =>') !== false,
 	'Failed per-template preparation must expose an explicit operator-controlled retry path.');
-assertBatchContract(strpos($prepareView, "throw new Error('HTTP ' + response.status + ' after '") !== false,
-	'Preparation transport failures must include elapsed-request timing for field diagnostics.');
+assertBatchContract(
+	strpos($prepareView, "'HTTP ' + response.status + ' after ' + elapsedSeconds + 's'") !== false
+		&& strpos($prepareView, "response.headers.get('server')") !== false
+		&& strpos($prepareView, "response.headers.get('cf-ray')") !== false,
+	'Preparation transport failures must include elapsed-request timing and bounded gateway identity diagnostics.'
+);
+assertBatchContract(
+	strpos($prepareView, 'maxHistoricalContinuationRequests') !== false
+		&& strpos($prepareView, "item?.reason === 'historical_baseline_time_budget_reached'") !== false
+		&& strpos($prepareView, 'prepareUntilSettled') !== false,
+	'Long historical baseline scans must continue across bounded preparation requests instead of one proxy-long request.'
+);
 assertBatchContract(strpos($prepareView, "'compareUrl' => \$compareUrl") !== false
 		&& strpos($prepareView, "link.href = config.compareUrl + '&templateid=' + encodeURIComponent(templateId);") !== false
 		&& strpos($prepareView, "link.textContent = labels.review_details;") !== false,
