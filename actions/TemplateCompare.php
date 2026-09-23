@@ -35,7 +35,7 @@ class TemplateCompare extends CController {
 		$data = (new TemplateUpdateAnalysisService())->analyze(
 			(string) $this->getInput('templateid')
 		);
-		$data['title'] = _('Template content comparison');
+		$data['title'] = _('Template update review');
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
