@@ -224,6 +224,21 @@ $historicalMixedTrigger = UpstreamTemplateDocumentService::buildHistoricalImport
 assertDocumentValue(['Other'], $historicalMixedTrigger['external_template_names'],
 	'Dependency-aware historical isolation must preserve and report external trigger hosts.');
 
+$divisionTrigger = $document;
+$divisionTrigger['zabbix_export']['triggers'][0]['expression'] =
+	'min(/Target by agent/target.metric,5m)/last(/Target by agent/target.metric)>1';
+$divisionResult = UpstreamTemplateDocumentService::buildImportSource(
+	$divisionTrigger,
+	$uuid,
+	$expected,
+	true
+);
+assertDocumentValue([], $divisionResult['external_template_names'],
+	'Arithmetic division before last() must not create a false external template dependency.');
+$divisionSource = json_decode($divisionResult['source'], true);
+assertDocumentValue(1, count($divisionSource['zabbix_export']['triggers']),
+	'Division expressions that reference only the selected template must remain isolated normally.');
+
 $missingDashboardGraph = $document;
 $missingDashboardGraph['zabbix_export']['graphs'] = [$document['zabbix_export']['graphs'][1]];
 assertIsolationReason(
