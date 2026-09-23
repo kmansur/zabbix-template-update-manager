@@ -4,6 +4,29 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.46] - 2026-09-23
+
+### Fixed
+
+- Historical baseline retrieval is now source-path rename aware.
+- The Bitbucket/Zabbix commit history may correctly follow file renames while immutable raw-source retrieval still requires the path that existed at the requested historical revision. ZTUM now resolves the source path from the preceding rename/move commit when the currently tracked path cannot be parsed/resolved at an older revision.
+- Historical path fallback is lazy: the additional commit-changes request is made only after the tracked path fails, avoiding an extra network request for every historical revision.
+- Historical read failures now include the immutable commit and attempted path in their bounded diagnostic instead of surfacing only a generic YAML parsing failure.
+
+### Safety
+
+- Rename handling does not skip unreadable revisions or guess an arbitrary historical source.
+- Fallback is accepted only when the official commit changes metadata maps the tracked destination path to a different valid `templates/.../*.yaml` source path.
+- If the rename cannot be proven, historical baseline resolution still fails closed and update readiness remains blocked.
+- Offline-only mode never uses a network rename lookup and therefore preserves its fail-closed boundary when rename evidence is absent from the local bundle.
+- Controlled update execution, rollback verification, immutable source fingerprints and the single approved `configuration.import` boundary are unchanged.
+
+### Tests
+
+- Added commit-changes URL/path decoding regressions.
+- Added a historical-baseline regression covering an official template file rename where the older revision exists only at the pre-rename path.
+- CI and Security validation remain mandatory before field testing.
+
 ## [0.1.0-beta.45] - 2026-09-23
 
 ### Fixed

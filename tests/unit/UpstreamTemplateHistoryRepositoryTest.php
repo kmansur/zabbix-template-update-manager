@@ -38,6 +38,38 @@ assertHistory(2, count($page['commits']), 'History page must normalize commit re
 assertHistory(false, $page['is_last_page'], 'History page must retain pagination state.');
 assertHistory(2, $page['next_page_start'], 'History page must retain the next cursor.');
 
+$renameCommit = str_repeat('d', 40);
+$changesUrl = UpstreamTemplateHistoryRepository::buildChangesUrl($renameCommit);
+assertHistory(
+	true,
+	str_contains($changesUrl, '/commits/'.$renameCommit.'/changes?'),
+	'Rename-path lookup must use the immutable commit changes endpoint.'
+);
+
+$previousPath = UpstreamTemplateHistoryRepository::decodePreviousPath(json_encode([
+	'values' => [[
+		'type' => 'MOVE',
+		'path' => ['components' => ['templates', 'cloud', 'AWS', 'aws_http', 'template_cloud_aws_http.yaml']],
+		'srcPath' => ['components' => ['templates', 'cloud', 'aws', 'template_aws_http.yaml']]
+	]],
+	'isLastPage' => true
+]), 'templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml');
+assertHistory(
+	'templates/cloud/aws/template_aws_http.yaml',
+	$previousPath,
+	'Rename-path decoding must return the source path that existed before the move.'
+);
+
+$noRename = UpstreamTemplateHistoryRepository::decodePreviousPath(json_encode([
+	'values' => [[
+		'type' => 'MODIFY',
+		'path' => ['components' => ['templates', 'os', 'linux', 'template_os_linux.yaml']],
+		'srcPath' => ['components' => ['templates', 'os', 'linux', 'template_os_linux.yaml']]
+	]],
+	'isLastPage' => true
+]), 'templates/os/linux/template_os_linux.yaml');
+assertHistory(null, $noRename, 'Ordinary modifications must not synthesize a rename path.');
+
 $rejected = false;
 try {
 	UpstreamTemplateHistoryRepository::buildUrl('templates/os/../secret.yaml', $commit);

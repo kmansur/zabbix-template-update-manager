@@ -129,6 +129,76 @@ assertBaseline(2, $ambiguous['distinct_candidate_count'], 'Ambiguous result must
 assertBaseline(4, $ambiguous['closest_changes'], 'Closest semantic distance may be shown diagnostically without becoming authoritative.');
 assertBaseline(null, $ambiguous['source'], 'An ambiguous baseline must not feed a guessed source into three-way analysis.');
 
+$renameCommits = [str_repeat('4', 40), str_repeat('5', 40)];
+$renameNewPath = 'templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml';
+$renameOldPath = 'templates/cloud/aws/template_aws_http.yaml';
+$renameCalls = [];
+$renameHistory = static fn(string $path, string $until, int $limit): array => [
+	'commits' => array_map(static fn(string $id): array => ['id' => $id, 'message' => ''], $renameCommits),
+	'truncated' => false,
+	'limit' => $limit
+];
+$renameSource = static function (string $commit, string $path) use (
+	&$renameCalls,
+	$renameCommits,
+	$renameNewPath,
+	$renameOldPath,
+	$uuid
+): array {
+	$renameCalls[] = [$commit, $path];
+
+	if ($commit === $renameCommits[1] && $path === $renameNewPath) {
+		throw new RuntimeException('Current path does not exist before rename.');
+	}
+
+	$version = $commit === $renameCommits[0] ? '7.0-4' : '7.0-3';
+	return [
+		'content' => json_encode([
+			'zabbix_export' => [
+				'version' => '7.0',
+				'templates' => [[
+					'uuid' => $uuid,
+					'template' => 'AWS Cost Explorer by HTTP',
+					'name' => 'AWS Cost Explorer by HTTP',
+					'vendor' => ['name' => 'Zabbix', 'version' => $version]
+				]]
+			]
+		]),
+		'path' => $path,
+		'commit' => $commit
+	];
+};
+$renameResolver = static function (string $commit, string $path) use (
+	$renameCommits,
+	$renameNewPath,
+	$renameOldPath
+): ?string {
+	return $commit === $renameCommits[0] && $path === $renameNewPath
+		? $renameOldPath
+		: null;
+};
+$renameService = new HistoricalTemplateBaselineService(
+	$renameHistory,
+	$renameSource,
+	$reader,
+	$renameResolver
+);
+$renamedBaseline = $renameService->find(
+	$renameNewPath,
+	str_repeat('f', 40),
+	$uuid,
+	'7.0-3'
+);
+assertBaseline('found', $renamedBaseline['status'],
+	'Historical baseline lookup must continue across an official source-path rename.');
+assertBaseline($renameCommits[1], $renamedBaseline['commit'],
+	'Rename-aware lookup must return the older commit containing the installed vendor version.');
+assertBaseline(
+	true,
+	in_array([$renameCommits[1], $renameOldPath], $renameCalls, true),
+	'Historical source lookup must retry the older revision using the path from before the rename.'
+);
+
 $notFoundService = new HistoricalTemplateBaselineService(
 	static fn(string $path, string $until, int $limit): array => [
 		'commits' => [['id' => str_repeat('e', 40), 'message' => '']],

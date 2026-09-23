@@ -246,15 +246,18 @@ final class TemplateUpdateAnalysisService {
 
 			if ($baseline === null) {
 				$cacheStatus = 'miss';
+				$historyRepository = new UpstreamTemplateHistoryRepository();
 				$baselineService = new HistoricalTemplateBaselineService(
 					static fn(string $path, string $until, int $limit): array
-						=> (new UpstreamTemplateHistoryRepository())->listCommits($path, $until, $limit),
+						=> $historyRepository->listCommits($path, $until, $limit),
 					static fn(string $commit, string $path): array
 						=> $sourceRepository->fetchAtCommit($commit, $path),
 					static function (string $source): array {
 						$historicalReader = CImportReaderFactory::getReader(CImportReaderFactory::YAML);
 						return $historicalReader->read($source);
-					}
+					},
+					static fn(string $commit, string $path): ?string
+						=> $historyRepository->previousPathAtCommit($commit, $path)
 				);
 
 				$baseline = $baselineService->find(
