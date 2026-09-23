@@ -336,12 +336,22 @@ if ($data['upstream_error'] !== null) {
 			: [];
 		$page->addItem(
 			(new CTableInfo())
-				->setHeader([_('Requested index'), _('cURL'), _('allow_url_fopen'), _('OpenSSL'), _('Failure detail')])
+				->setHeader([
+					_('Requested index'),
+					_('cURL'),
+					_('allow_url_fopen'),
+					_('OpenSSL'),
+					_('Offline bundle'),
+					_('Offline-only'),
+					_('Failure detail')
+				])
 				->addRow([
 					$data['upstream_diagnostics']['endpoint'] ?? '—',
 					!empty($transports['curl']) ? _('Available') : _('Unavailable'),
 					!empty($transports['allow_url_fopen']) ? _('Enabled') : _('Disabled'),
 					!empty($transports['openssl']) ? _('Available') : _('Unavailable'),
+					!empty($transports['offline_bundle']) ? _('Configured') : _('Not configured'),
+					!empty($transports['offline_only']) ? _('Enabled') : _('Disabled'),
 					$data['upstream_diagnostics']['detail'] ?? '—'
 				])
 		);

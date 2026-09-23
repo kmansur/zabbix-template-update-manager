@@ -68,6 +68,9 @@ jobs:
             php "$test"
           done
 
+      - name: Validate runtime setup helper
+        run: tests/test_runtime_setup.sh
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
