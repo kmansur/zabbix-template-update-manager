@@ -4,6 +4,37 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.52] - 2026-09-23
+
+### Added
+
+- Persistent per-template **Never update** policy for installed official templates.
+- Native bulk actions to mark one or more templates **Never update** and later **Allow updates** again.
+- Dedicated **Never update** catalog filter and **Update policy** table column.
+- Official-catalog summary count for protected templates.
+- Private UUID-based policy storage at `/var/lib/zabbix-template-update-manager/update-policy.json`.
+
+### Changed
+
+- The actionable **Updates available** count excludes protected templates.
+- Protected templates remain available for read-only comparison but are excluded from normal update preparation.
+- Catalog selection behavior is mode-aware: update candidates can be prepared or protected; current/all official templates can be protected; the **Never update** filter exposes the reversal action.
+
+### Safety
+
+- Policy mutation is Super-Admin-only and uses native CSRF validation.
+- **Never update** is enforced in readiness analysis, fresh preflight and immediately before controlled import.
+- Policy mutation serializes with the existing global controlled-operation lock.
+- Existing malformed/unreadable policy storage fails closed for update writes.
+- Policy storage never writes to the Zabbix database and introduces no second `configuration.import` boundary.
+
+### Tests
+
+- Added persistent policy repository tests including atomic private storage and malformed-state failure.
+- Added UI/action/write-boundary policy contracts.
+- Added fresh-preflight and immediate-before-import policy enforcement regressions.
+- Added a laboratory field matrix for mark/filter/block/allow behavior.
+
 ## [0.1.0-beta.51] - 2026-09-23
 
 ### Changed
