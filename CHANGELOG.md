@@ -4,6 +4,48 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.40] - 2026-09-23
+
+### Added
+
+- Verified air-gapped/offline upstream bundle support with SHA-256 manifest enforcement and fail-closed `ZTUM_OFFLINE_ONLY` behavior.
+- `tools/build_offline_bundle.py` plus deterministic generator/repository tests.
+- Global controlled-operation filesystem lock covering individual/batch update, install and rollback write controllers.
+- Explicit individual local-customization-overwrite acknowledgement before controlled import.
+- `tools/ztum-runtime-setup.sh` for fail-closed runtime directory creation/validation and PHP-FPM account handling.
+- Visible native-Zabbix laboratory warning on the module catalog.
+- Dedicated security workflow, deterministic runtime security guard and dependency audit.
+- Formal tag/release workflow producing tar/zip assets and SHA-256 checksums.
+- Xdebug-backed transparent PHP coverage metrics and separate runtime-file reachability metric.
+- GitHub issue/field-validation/feature-request templates and pull-request safety checklist.
+- GitHub workflow YAML/action-pin validation.
+- Offline, concurrency, runtime-setup, test-metrics and release-policy documentation.
+
+### Changed
+
+- Runtime diagnostics now report offline-bundle/offline-only state.
+- Documentation is synchronized with the implemented controlled-write architecture rather than describing the former read-only phase.
+- Release policy now distinguishes development commits from field-test beta snapshots instead of treating every internal change as a public beta.
+- Controlled write workflows are serialized before their fresh authoritative preflight and remain locked through post-operation validation.
+
+### Safety
+
+- Offline bundle data is used only after manifest SHA-256 verification and the existing index/source identity validation.
+- Offline-only mode never silently falls back to internet access.
+- Concurrent controlled writes fail closed before starting a second authoritative write workflow.
+- Global locking is defense in depth; stale-evidence/preflight gates remain authoritative.
+- The existing single `TemplateConfigurationImportService` write boundary is unchanged.
+- No automatic retry, rollback or uninstall was introduced after ambiguous writes.
+
+### Tests
+
+- Added operation-lock service and action-contract regression coverage.
+- Added offline bundle repository/generator integrity and tamper tests.
+- Added runtime setup helper validation.
+- Added workflow YAML/action-pin validation and runtime security guard coverage.
+- CI and Security workflows are green on the beta.40 preparation branch before snapshot promotion.
+
+
 ## [0.1.0-beta.39] - 2026-09-22
 
 ### Changed
