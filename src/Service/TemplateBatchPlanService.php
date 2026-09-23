@@ -32,8 +32,7 @@ final class TemplateBatchPlanService {
 			=> (new TemplateUpdateAnalysisService())->analyze($templateId);
 		$this->backupCreator = $backupCreator ?? static fn(array $template): array
 			=> (new TemplateBackupService())->create($template);
-		$this->preflightRunner = $preflightRunner ?? static fn(string $templateId, bool $manualOverride = false): array
-			=> (new TemplateUpdatePreflightService())->run($templateId, $manualOverride);
+		$this->preflightRunner = $preflightRunner;
 	}
 
 	public function build(array $templateIds, bool $prepareBackups = false): array {
@@ -104,7 +103,7 @@ final class TemplateBatchPlanService {
 			];
 
 			if ($status === 'backup_verified') {
-				$preflight = ($this->preflightRunner)($templateId, false);
+				$preflight = $this->runPreparedPreflight($templateId, false, $analysis);
 				if (is_array($preflight) && ($preflight['status'] ?? null) === 'passed') {
 					$evidence = strtolower(trim((string) ($preflight['evidence_sha256'] ?? '')));
 					if (preg_match('/^[a-f0-9]{64}$/', $evidence)) {
@@ -126,7 +125,7 @@ final class TemplateBatchPlanService {
 			}
 			elseif ($status === 'review_backup_verified'
 					&& $this->isBatchManualEligible($manualReasons)) {
-				$preflight = ($this->preflightRunner)($templateId, true);
+				$preflight = $this->runPreparedPreflight($templateId, true, $analysis);
 				$evidence = is_array($preflight)
 					? strtolower(trim((string) ($preflight['evidence_sha256'] ?? '')))
 					: '';
@@ -172,6 +171,28 @@ final class TemplateBatchPlanService {
 				'backup_prepared' => false
 			];
 		}
+	}
+
+	/**
+	 * Batch preparation already owns a fresh analysis snapshot for this request.
+	 * Reusing that exact snapshot to derive preparation evidence avoids a second
+	 * complete read-only analysis (network/history/importcompare) in the same
+	 * HTTP request. The controlled write path does not use this helper and still
+	 * reruns an authoritative fresh preflight immediately before import.
+	 */
+	private function runPreparedPreflight(string $templateId, bool $manualOverride, array $analysis): array {
+		if ($this->preflightRunner !== null) {
+			$result = ($this->preflightRunner)($templateId, $manualOverride);
+			if (!is_array($result)) {
+				throw new RuntimeException('Batch preparation preflight returned an invalid result.');
+			}
+			return $result;
+		}
+
+		$service = new TemplateUpdatePreflightService(
+			static fn(string $requestedTemplateId): array => $analysis
+		);
+		return $service->run($templateId, $manualOverride);
 	}
 
 	private function normalizeIds(array $templateIds): array {
