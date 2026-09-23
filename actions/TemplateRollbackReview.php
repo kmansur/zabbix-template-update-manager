@@ -41,7 +41,7 @@ class TemplateRollbackReview extends CController {
 		$templateId = (string) $this->getInput('templateid');
 		$manifestFile = (string) $this->getInput('manifest_file');
 		$data = [
-			'title' => _('Review template rollback'),
+			'title' => _('Template rollback review'),
 			'templateid' => $templateId,
 			'manifest_file' => $manifestFile,
 			'preflight' => null,
