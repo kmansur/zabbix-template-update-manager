@@ -97,6 +97,8 @@ assertReferenceAudit(1, $audit['counts']['value_map_references'], 'Value-map ref
 assertReferenceAudit(1, $audit['counts']['dashboard_item_references'], 'Dashboard ITEM references must be counted.');
 assertReferenceAudit(1, $audit['counts']['trigger_host_references'], 'Trigger host references must be counted.');
 assertReferenceAudit(1, $audit['counts']['graph_item_host_references'], 'Graph-item host references must be counted.');
+assertReferenceAudit(1, $audit['counts']['trigger_item_references'], 'Self trigger item references must be counted.');
+assertReferenceAudit(1, $audit['counts']['graph_item_references'], 'Self graph item references must be counted.');
 
 $missingMaster = $base;
 $missingMaster['items'][1]['master_item']['key'] = 'missing.master';
@@ -147,6 +149,18 @@ assertReferenceAudit(true, $audit['safe'],
 	'Arithmetic division before last() must not create a false unresolved trigger host.');
 assertReferenceAudit(false, in_array('unresolved_trigger_host', issueCodes($audit), true),
 	'The structural audit must never report last( as a template dependency.');
+
+$badTriggerItem = $base;
+$badTriggerItem['triggers'][0]['expression'] = 'last(/Test template by HTTP/missing.trigger.item)>0';
+$audit = TemplateInstallReferenceAuditService::analyze($badTriggerItem, []);
+assertReferenceAudit(true, in_array('missing_trigger_item', issueCodes($audit), true),
+	'Missing self trigger item keys must be detected before import.');
+
+$badGraphItem = $base;
+$badGraphItem['discovery_rules'][0]['graph_prototypes'][0]['graph_items'][0]['item']['key'] = 'missing.graph.item';
+$audit = TemplateInstallReferenceAuditService::analyze($badGraphItem, []);
+assertReferenceAudit(true, in_array('missing_graph_item', issueCodes($audit), true),
+	'Missing self graph item keys must be detected before import.');
 
 $badGraphHost = $base;
 $badGraphHost['discovery_rules'][0]['graph_prototypes'][0]['graph_items'][0]['item']['host'] = 'Other template';
