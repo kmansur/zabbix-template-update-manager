@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $statusLabels = [
 	'passed' => _('Passed — eligible for controlled installation'),
 	'blocked_version' => _('Blocked — unsupported Zabbix version'),
@@ -61,9 +65,12 @@ $page
 		(new CTableInfo())
 			->setHeader([_('State'), _('Reason'), _('Configuration write enabled')])
 			->addRow([
-				$statusLabels[$status] ?? $status,
+				FrontendUi::status(
+					$statusLabels[$status] ?? $status,
+					$status === 'passed' ? FrontendUi::SUCCESS : FrontendUi::DANGER
+				),
 				$reason !== '' ? ($reasonLabels[$reason] ?? $reason) : '—',
-				!empty($preflight['write_enabled']) ? _('Yes') : _('No')
+				FrontendUi::yesNo(!empty($preflight['write_enabled']))
 			])
 	);
 
