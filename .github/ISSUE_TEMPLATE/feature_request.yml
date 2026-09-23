@@ -1,0 +1,22 @@
+name: Feature request
+description: Propose a change without weakening the safety model.
+title: "[Feature] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Safety/compatibility considerations
+      description: Explain any effect on fail-closed behavior, evidence, writes, Zabbix 7.x/8.x or offline operation.

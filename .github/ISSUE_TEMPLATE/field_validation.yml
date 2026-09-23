@@ -1,0 +1,46 @@
+name: Field validation report
+description: Share a sanitized laboratory/homologation validation result.
+title: "[Field validation] "
+labels: ["field-validation"]
+body:
+  - type: input
+    id: ztum_version
+    attributes:
+      label: ZTUM version
+    validations:
+      required: true
+  - type: input
+    id: zabbix_version
+    attributes:
+      label: Exact Zabbix version
+    validations:
+      required: true
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Theme
+      options:
+        - Light
+        - Dark
+        - Both
+    validations:
+      required: true
+  - type: checkboxes
+    id: workflows
+    attributes:
+      label: Workflows exercised
+      options:
+        - label: Catalog/discovery
+        - label: Standard update
+        - label: Reviewed update
+        - label: Local-overwrite acknowledgement
+        - label: Missing-template installation
+        - label: Batch stop-on-failure
+        - label: Rollback
+        - label: Offline/air-gapped mode
+  - type: textarea
+    id: result
+    attributes:
+      label: Result and sanitized evidence
+    validations:
+      required: true

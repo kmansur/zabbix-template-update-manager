@@ -1,0 +1,54 @@
+name: Bug report
+description: Report a reproducible Template Update Manager defect.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, API tokens, private template exports or customer-identifying data.
+  - type: input
+    id: ztum_version
+    attributes:
+      label: ZTUM version
+      placeholder: 0.1.0-beta.x
+    validations:
+      required: true
+  - type: input
+    id: zabbix_version
+    attributes:
+      label: Zabbix version
+      placeholder: 7.0.x / 8.0.x
+    validations:
+      required: true
+  - type: dropdown
+    id: workflow
+    attributes:
+      label: Workflow
+      options:
+        - Catalog/discovery
+        - Comparison/preflight
+        - Update
+        - Installation
+        - Rollback
+        - UI/UX
+        - Offline mode
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behavior
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence/logs
+      description: Remove secrets and customer-identifying data.
