@@ -38,4 +38,21 @@ assertExpressionHosts(
 	'Multiple real history-function hosts must still be preserved.'
 );
 
+function assertExpressionReferences(array $expected, string $expression, string $message): void {
+	$actual = ZabbixExpressionHostExtractor::extractReferences($expression);
+	if ($expected !== $actual) {
+		fwrite(STDERR, $message."\nExpected: ".var_export($expected, true)."\nActual: ".var_export($actual, true)."\n");
+		exit(1);
+	}
+}
+
+assertExpressionReferences(
+	[
+		['host' => 'Target by agent', 'item' => 'target.metric'],
+		['host' => 'Target by agent', 'item' => 'target.other']
+	],
+	'min(/Target by agent/target.metric,5m)/last(/Target by agent/target.other)>1',
+	'Trigger reference extraction must preserve both real host/item pairs across arithmetic division.'
+);
+
 echo "ZabbixExpressionHostExtractor tests passed.\n";
