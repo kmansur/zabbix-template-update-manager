@@ -41,6 +41,17 @@ assertTemplateUpdateContract(
 	'Reviewed update path must require a second explicit acknowledgement and bind manual override through POST.'
 );
 assertTemplateUpdateContract(
+	strpos($action, "'confirm_local_overwrite' => 'in 1'") !== false
+		&& strpos($preflightView, "new CCheckBox('confirm_local_overwrite', '1')") !== false
+		&& strpos($action, '$localOverwriteConfirmed') !== false,
+	'Individual local-customization overwrite must require its own explicit acknowledgement and pass it to the controlled service.'
+);
+assertTemplateUpdateContract(
+	strpos($action, 'TemplateOperationLockService') !== false
+		&& strpos($action, "->run(\n\t\t\t\t'update'") !== false,
+	'Individual controlled update must acquire the global operation lock before fresh preflight/write orchestration.'
+);
+assertTemplateUpdateContract(
 	strpos($action, 'TemplateControlledUpdateService') !== false,
 	'Controlled update action must delegate write orchestration to TemplateControlledUpdateService.'
 );
