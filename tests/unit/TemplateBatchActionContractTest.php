@@ -70,7 +70,7 @@ assertBatchContract(strpos($prepareView, 'Unavailable — no executable template
 		&& strpos($prepareView, 'Available — {ready} Ready + {review} selected reviewed template(s).') !== false
 		&& strpos($prepareView, 'Unavailable — preparation stopped.') !== false,
 	'Batch execution availability must be explicit for Ready, selected reviewed, zero-executable and stopped plans.');
-assertBatchContract(strpos($prepareView, "setText('ztum-batch-exec-status', labels.execution_none);") !== false,
+assertBatchContract(strpos($prepareView, "setStateText('ztum-batch-exec-status', labels.execution_none, 'muted');") !== false,
 	'Zero-Ready plans must synchronize the execution summary status instead of leaving Waiting for preparation.');
 assertBatchContract(strpos($prepareView, 'Retry failed preparation') !== false
 		&& strpos($prepareView, 'requestFailures = new Set()') !== false
@@ -82,11 +82,12 @@ assertBatchContract(strpos($prepareView, "'compareUrl' => \$compareUrl") !== fal
 		&& strpos($prepareView, "link.href = config.compareUrl + '&templateid=' + encodeURIComponent(templateId);") !== false
 		&& strpos($prepareView, "link.textContent = labels.review_details;") !== false,
 	'Manual-review rows must retain a direct Review details link to the individual comparison flow.');
-assertBatchContract(strpos($prepareView, "new CSpan('—'))->setId('ztum-select-'.\$templateId)") !== false
-		&& strpos($prepareView, "checkbox.id = 'ztum-review-select-' + templateId;") !== false
+assertBatchContract(strpos($prepareView, "new CCheckBox('review_select['.\$templateId.']', '1')") !== false
+		&& strpos($prepareView, "->setId('ztum-review-select-'.\$templateId)") !== false
+		&& strpos($prepareView, 'document.createElement(\'input\')') === false
 		&& strpos($prepareView, 'setReviewedSelection(templateId, category, manualState);') !== false
 		&& strpos($prepareView, 'reviewEvidence.set(templateId') !== false,
-	'Eligible technical-risk Manual review rows must expose an explicit reviewed-update checkbox in the leading selection column.');
+	'Eligible Manual review rows must use a server-rendered native Zabbix CCheckBox in the leading selection column.');
 assertBatchContract(strpos($prepareView, 'No unattended Ready templates. Select eligible Manual review rows below') !== false
 		&& strpos($prepareView, 'else if (counts.review > 0)') !== false,
 	'Review-only plans must explain how to continue with explicit reviewed selection.');
@@ -111,6 +112,12 @@ assertBatchContract(strpos($prepareView, 'selectAll.disabled = executionStarted 
 	'Selection controls must stay available during preparation, show explicit counts and disable an empty select-all after completion.');
 assertBatchContract(strpos($prepareView, 'Waiting for preparation to finish — {completed} of {total} completed.') !== false,
 	'Execution state must explain that updates wait for full preparation while selection can already be made.');
+assertBatchContract(strpos($prepareView, 'setOnDocumentReady()') !== false,
+	'Batch behavior must initialize through the native Zabbix document-ready script lifecycle.');
+assertBatchContract(strpos($prepareView, "'success' => ZBX_STYLE_GREEN") !== false
+		&& strpos($prepareView, "'warning' => ZBX_STYLE_ORANGE") !== false
+		&& strpos($prepareView, "'danger' => ZBX_STYLE_RED") !== false,
+	'Dynamic batch statuses must use native Zabbix style constants rather than custom colors.');
 assertBatchContract(strpos($prepareView, 'labels.review_batch_eligible') !== false
 		&& strpos($prepareView, 'labels.review_overwrite_eligible') !== false
 		&& strpos($prepareView, 'labels.review_individual_only') !== false,
