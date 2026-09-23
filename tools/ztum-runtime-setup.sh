@@ -111,11 +111,18 @@ for dir in "${DIRS[@]}"; do
   fi
 done
 
-if command -v runuser >/dev/null 2>&1; then
+if [[ "$(id -u)" -eq 0 ]] && command -v runuser >/dev/null 2>&1; then
   if ! runuser -u "$RUNTIME_USER" -- test -w "$BASE_DIR/backups"; then
     echo "FAIL  backup directory is not writable by $RUNTIME_USER"
     failed=1
   fi
+elif [[ "$(id -un)" == "$RUNTIME_USER" ]]; then
+  if [[ ! -w "$BASE_DIR/backups" ]]; then
+    echo "FAIL  backup directory is not writable by $RUNTIME_USER"
+    failed=1
+  fi
+else
+  echo "INFO  writability as $RUNTIME_USER was not tested; run --check as root for that validation."
 fi
 
 echo "Runtime account: $RUNTIME_USER:$RUNTIME_GROUP"
