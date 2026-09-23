@@ -30,10 +30,16 @@ $reasonLabels = [
 
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
-	->addItem(new CLink(
-		_('Back to template catalog'),
-		(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
-	));
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				new CLink(
+					_('Back to template catalog'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
+				)
+			)
+		))->setAttribute('aria-label', _('Content controls'))
+	);
 
 if ($data['preflight_error'] !== null) {
 	$page->addItem(new CTag('p', true, $data['preflight_error']))->show();
