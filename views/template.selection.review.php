@@ -21,7 +21,11 @@ $upstreamLabels = [
 $backUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates');
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
-	->addItem(new CLink(_('Back to template updates'), $backUrl))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(new CLink(_('Back to template updates'), $backUrl))
+		))->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem(new CTag('p', true, sprintf(
 		_('%1$d template(s) were explicitly selected. Only this subset is shown in the review below.'),
 		(int) $data['selected_count']
