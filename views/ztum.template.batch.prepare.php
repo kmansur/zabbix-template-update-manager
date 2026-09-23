@@ -66,7 +66,7 @@ $page
 		$retryFailedButton
 	]))
 	->addItem(new CTag('p', true, _(
-		'Each template is prepared in its own request. Preparation may create or refresh rollback evidence, but it never imports Zabbix configuration.'
+		'Preparation uses bounded requests. A long historical baseline scan may continue across multiple requests for the same template. Preparation may create or refresh rollback evidence, but it never imports Zabbix configuration.'
 	)));
 
 $selectAllReviewedButton = (new CButton('ztum-reviewed-select-all', _('Select all eligible')))
@@ -183,6 +183,7 @@ $jsConfig = json_encode([
 	'csrfName' => CSRF_TOKEN_NAME,
 	'prepareCsrfToken' => CCsrfTokenHelper::get('ztum.templates.prepare_one'),
 	'executeCsrfToken' => CCsrfTokenHelper::get('ztum.templates.batch_update_one'),
+	'maxHistoricalContinuationRequests' => 12,
 	'statusClasses' => [
 		'success' => ZBX_STYLE_GREEN,
 		'warning' => ZBX_STYLE_ORANGE,
@@ -199,6 +200,7 @@ $jsLabels = json_encode([
 	'blocked' => _('Blocked'),
 	'pending' => _('Pending'),
 	'processing' => _('Processing...'),
+	'history_continuing' => _('Continuing historical baseline scan ({attempt}/{max})...'),
 	'request_failed' => _('Request failed'),
 	'complete' => _('Preparation complete.'),
 	'stopped' => _('Preparation stopped. Reload or return to the selection review to prepare the full set.'),
@@ -445,6 +447,41 @@ $script = <<<'JS'
 		}
 
 		return payload.item;
+	};
+
+	const isHistoricalContinuation = (item) =>
+		item?.reason === 'historical_baseline_time_budget_reached';
+
+	const prepareUntilSettled = async (templateId) => {
+		const maxAttempts = Math.max(1, Number(config.maxHistoricalContinuationRequests || 1));
+
+		for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+			const item = await prepareOne(templateId);
+			if (!isHistoricalContinuation(item)) {
+				return item;
+			}
+
+			setStateText('ztum-readiness-' + templateId, 'history_scan_pending', 'warning');
+			setStateText('ztum-category-' + templateId, labels.processing, 'warning');
+			setText(
+				'ztum-reason-' + templateId,
+				labels.history_continuing
+					.replace('{attempt}', String(attempt))
+					.replace('{max}', String(maxAttempts))
+			);
+
+			if (stopRequested || attempt === maxAttempts) {
+				return {
+					...item,
+					readiness_status: 'blocked_history_continuation_limit',
+					reason: attempt === maxAttempts
+						? 'historical_baseline_continuation_limit_reached'
+						: item.reason
+				};
+			}
+		}
+
+		throw new Error(labels.request_failed);
 	};
 
 	const executeOne = async (templateId, evidence, manualOverride = false, confirmLocalOverwrite = false) => {
@@ -732,7 +769,7 @@ $script = <<<'JS'
 			updateSummary();
 
 			try {
-				applyItem(templateId, await prepareOne(templateId));
+				applyItem(templateId, await prepareUntilSettled(templateId));
 			}
 			catch (error) {
 				applyRequestFailure(templateId, error);
@@ -820,7 +857,7 @@ $script = <<<'JS'
 			setText('ztum-execution-' + templateId, labels.pending);
 
 			try {
-				applyItem(templateId, await prepareOne(templateId));
+				applyItem(templateId, await prepareUntilSettled(templateId));
 			}
 			catch (error) {
 				applyRequestFailure(templateId, error);
