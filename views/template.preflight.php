@@ -164,30 +164,43 @@ if ($status === 'passed') {
 		$updateAction = (new CUrl('zabbix.php'))
 			->setArgument('action', 'ztum.template.update')
 			->getUrl();
-		$confirmationItems = [
+		$confirmationList = (new CFormList())
+			->addRow(
+				_('Confirmation'),
+				(new CCheckBox('confirm', '1'))->setLabel(_(
+					'I reviewed the candidate and verified rollback evidence and want to update this template.'
+				))
+			);
+
+		$hiddenItems = [
 			(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.update')))->removeId(),
 			(new CVar('templateid', (string) $template['templateid']))->removeId(),
-			(new CVar('evidence_sha256', $evidenceSha))->removeId(),
-			(new CCheckBox('confirm', '1'))->setLabel(_(
-				'I reviewed the candidate and verified rollback evidence and want to update this template.'
-			))
+			(new CVar('evidence_sha256', $evidenceSha))->removeId()
 		];
 
 		if ($manualOverride) {
-			$confirmationItems[] = (new CVar('manual_override', '1'))->removeId();
-			$confirmationItems[] = (new CCheckBox('confirm_manual_override', '1'))->setLabel(_(
-				'I explicitly accept the reviewed local-overwrite and/or technical-risk conditions above. I understand that the official import may remove or replace those local differences.'
-			));
+			$hiddenItems[] = (new CVar('manual_override', '1'))->removeId();
+			$confirmationList->addRow(
+				_('Reviewed override'),
+				(new CCheckBox('confirm_manual_override', '1'))->setLabel(_(
+					'I explicitly accept the reviewed local-overwrite and/or technical-risk conditions above. I understand that the official import may remove or replace those local differences.'
+				))
+			);
 		}
-
-		$confirmationItems[] = new CSubmitButton(
-			$manualOverride ? _('Update official template with reviewed override') : _('Update official template')
-		);
 
 		$updateForm = (new CForm('post'))
 			->setId('ztum-template-update-form')
 			->setAction($updateAction)
-			->addItem($confirmationItems);
+			->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+			->addItem($hiddenItems)
+			->addItem($confirmationList)
+			->addItem(makeFormFooter(
+				new CSubmitButton(
+					$manualOverride
+						? _('Update official template with reviewed override')
+						: _('Update official template')
+				)
+			));
 
 		$page
 			->addItem(new CTag('h4', true, _('Controlled update confirmation')))
