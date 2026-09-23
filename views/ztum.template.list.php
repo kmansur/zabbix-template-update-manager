@@ -122,8 +122,8 @@ $catalogSummary = (new CTableInfo())
 
 $installSelectionMode = $data['can_install'] && ($data['filter']['status'] ?? 'all') === 'not_installed';
 $selectionGuidance = $installSelectionMode
-	? _('Select one or more missing official templates to prepare installation. Preparation is read-only.')
-	: _('Select one or more templates with available updates to prepare an update. Preparation is read-only.');
+	? _('Select one or more missing official templates to prepare installation. Preparation is read-only; installation requires confirmation.')
+	: _('Select one or more templates with available updates to prepare an update. Preparation is read-only; changes require confirmation.');
 $selectionForm = null;
 $selectAllCheckbox = (new CCheckBox('all_templates'))
 	->setEnabled(false)
