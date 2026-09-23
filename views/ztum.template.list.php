@@ -69,7 +69,7 @@ $filter = (new CFilter())
 $localSummary = (new CTableInfo())
 	->setHeader([
 		_('Installed templates'),
-		_('Vendor: Zabbix'),
+		_('Zabbix vendor'),
 		_('Other vendors'),
 		_('No vendor metadata'),
 		_('Linked to hosts')
@@ -83,7 +83,7 @@ $localSummary = (new CTableInfo())
 	]);
 
 $catalogSummary = (new CTableInfo())
-	->setHeader([_('Official catalog'), _('Official installed'), _('Not installed'), _('Updates available')])
+	->setHeader([_('Official catalog'), _('Installed'), _('Not installed'), _('Updates available')])
 	->addRow([
 		$data['catalog_summary']['official_catalog_total'],
 		$data['catalog_summary']['official_installed'],
@@ -133,7 +133,16 @@ if ($canRenderSelectionForm) {
 	$selectAllHeader = (new CColHeader($selectAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
 }
 
+$noData = match ((string) ($data['filter']['status'] ?? 'all')) {
+	'current' => [_('No current official templates found.'), _('Change the status filter to view other templates.')],
+	'update_available' => [_('No template updates are available.'), _('Installed official templates already match the current upstream catalog.')],
+	'not_installed' => [_('No official templates are missing.'), _('All templates in the current official catalog are already installed.')],
+	'not_applicable' => [_('No templates match this status.'), _('Change the status filter to view other templates.')],
+	default => [_('No templates found.'), _('Change the filter or verify upstream catalog availability.')]
+};
+
 $templateTable = (new CTableInfo())
+	->setNoDataMessage($noData[0], $noData[1])
 	->setHeader([
 		$selectAllHeader,
 		_('Template'),
@@ -254,7 +263,7 @@ if ($selectionForm !== null) {
 	if ($installSelectionMode) {
 		$actionButtons = new CActionButtonList('action', 'uuids', [
 			'ztum.templates.install_prepare_selected' => [
-				'name' => _('Review selected installations'),
+				'name' => _('Prepare selected installations'),
 				'attributes' => [
 					'class' => ZBX_STYLE_BTN_ALT.' js-no-chkbxrange'
 				]
@@ -280,7 +289,7 @@ $page = (new CHtmlPage())
 	->addItem(
 		(new CList())
 			->addClass(ZBX_STYLE_HOR_LIST)
-			->addItem(_('Module').' '.$data['version'])
+			->addItem('ZTUM '.$data['version'])
 			->addItem(_('Zabbix').' '.$data['zabbix_version'])
 			->addItem(FrontendUi::status(
 				$compatibility,
@@ -289,48 +298,42 @@ $page = (new CHtmlPage())
 	);
 
 $page->addItem(FrontendUi::message(
-	_('Laboratory beta: production use is not recommended yet. Validate backups, review every blocked/reviewed state and complete the documented field-validation matrix before using this module on critical monitoring configuration.'),
+	_('Laboratory beta. Production use is not recommended. Validate backups and complete the field test plan before using this module on critical monitoring environments.'),
 	FrontendUi::WARNING
 ));
 
 if ($data['inventory_error'] !== null) {
-	$page->addItem(new CTag('p', true, FrontendUi::status(
-		$data['inventory_error'],
-		FrontendUi::DANGER
-	)))->show();
+	$page->addItem(FrontendUi::message((string) $data['inventory_error'], FrontendUi::DANGER))->show();
 	return;
 }
 
 $page
-	->addItem(new CTag('h4', true, _('Local inventory')))
+	->addItem(FrontendUi::section(_('Local inventory')))
 	->addItem($localSummary);
 
 if (is_array($data['upstream_source'])) {
+	$upstreamCommit = isset($data['upstream_source']['commit'])
+		? substr((string) $data['upstream_source']['commit'], 0, 12)
+		: '—';
+
 	$page
-		->addItem(new CTag('h4', true, _('Official catalog')))
+		->addItem(FrontendUi::section(_('Official catalog')))
 		->addItem($catalogSummary)
-		->addItem(new CTag('p', true, sprintf(
-			_('Upstream %1$s · commit %2$s · index cache %3$s'),
-			(string) ($data['upstream_source']['line'] ?? '—'),
-			isset($data['upstream_source']['commit'])
-				? substr((string) $data['upstream_source']['commit'], 0, 12)
-				: '—',
-			(string) ($data['upstream_runtime']['cache_status'] ?? 'unknown')
-		)));
+		->addItem(
+			(new CList())
+				->addClass(ZBX_STYLE_HOR_LIST)
+				->addItem(_('Zabbix').' '.(string) ($data['upstream_source']['line'] ?? '—'))
+				->addItem([_('Commit').': ', FrontendUi::fingerprint($upstreamCommit, 12)])
+				->addItem(_('Index cache').': '.(string) ($data['upstream_runtime']['cache_status'] ?? 'unknown'))
+		);
 }
 
 if ($data['upstream_warning'] !== null) {
-	$page->addItem(new CTag('p', true, FrontendUi::status(
-		$data['upstream_warning'],
-		FrontendUi::WARNING
-	)));
+	$page->addItem(FrontendUi::message((string) $data['upstream_warning'], FrontendUi::WARNING));
 }
 
 if ($data['upstream_error'] !== null) {
-	$page->addItem(new CTag('p', true, FrontendUi::status(
-		$data['upstream_error'],
-		FrontendUi::DANGER
-	)));
+	$page->addItem(FrontendUi::message((string) $data['upstream_error'], FrontendUi::DANGER));
 
 	if (!empty($data['show_diagnostics']) && is_array($data['upstream_diagnostics'])) {
 		$transports = is_array($data['upstream_diagnostics']['transports'] ?? null)
@@ -362,16 +365,12 @@ if ($data['upstream_error'] !== null) {
 
 $page
 	->addItem($filter)
-	->addItem(new CTag('p', true, sprintf(
-		_('Showing %1$s template(s) for the selected status filter.'),
-		$data['filtered_count']
-	)))
-	->addItem(new CTag('p', true, _(
+	->addItem(FrontendUi::description(_(
 		$installSelectionMode
-			? 'Select the Not installed official templates to review them for controlled sequential installation. Preparation and execution are request-bounded per template; missing dependencies and unsafe previews remain blocked.'
-			: 'Select installed official templates with a newer version, then prepare them directly. Preparation performs the full request-bounded safety analysis and does not import Zabbix configuration; only a later explicitly confirmed execution step can write configuration.'
+			? 'Select missing official templates to prepare a controlled installation. Preparation is read-only and blocked dependencies remain non-executable.'
+			: 'Select official templates with newer upstream versions to prepare an update. Preparation is read-only; configuration changes require a later explicit confirmation.'
 	)))
-	->addItem(new CTag('h4', true, _('Templates')));
+	->addItem(FrontendUi::section(_('Templates')));
 
 if ($selectionForm !== null) {
 	$page->addItem($selectionForm);
