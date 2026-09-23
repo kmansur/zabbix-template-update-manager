@@ -6,7 +6,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.39**
+Current version: **0.1.0-beta.40**
 
 This version is intended for **laboratory testing**.
 
@@ -15,9 +15,9 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 
-Beta.39 performs a native-Zabbix UI/UX refactor and repository audit. User-facing controls now use Zabbix frontend components consistently, reviewed batch checkboxes are server-rendered native `CCheckBox` controls, page navigation uses native page controls, semantic states use Zabbix theme classes, and a CI UI guard prevents raw controls/hard-coded theme styling from returning. Empty legacy stubs were removed and architecture/roadmap documentation was refreshed to match the implemented controlled-write design.
+Beta.40 focuses on production-readiness gaps identified by the independent technical review: verified air-gapped upstream bundles, global serialization of controlled configuration-changing workflows, an explicit individual local-overwrite acknowledgement, safer runtime-directory setup, a visible laboratory-use warning, security/release CI gates, workflow validation, public quality/coverage metrics and contribution/field-validation templates.
 
-A fixed laboratory snapshot is published as branch `release/0.1.0-beta.39` after automation validation. A formal Git tag/GitHub Release remains intentionally deferred until runtime validation and release gates are sufficiently complete.
+A fixed laboratory snapshot is published as branch `release/0.1.0-beta.40` after automation validation. Formal tag/GitHub Release automation now exists, but publishing a production-grade release remains gated by field validation and the still-unselected project license.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before installing the beta.
 
@@ -63,7 +63,12 @@ ZTUM currently provides:
 - explicit controlled rollback;
 - post-rollback validation;
 - runtime module-version reporting from the repository `VERSION` file;
-- administrator-only diagnostics for upstream index endpoint and PHP HTTP transport capabilities.
+- administrator-only diagnostics for upstream index endpoint, PHP HTTP transport capabilities and configured offline mode;
+- verified air-gapped/offline upstream bundles with fail-closed `ZTUM_OFFLINE_ONLY=1`;
+- global filesystem serialization for update/install/rollback write workflows;
+- explicit individual local-overwrite confirmation in addition to reviewed-risk confirmation;
+- safe runtime-directory setup/check helper;
+- dedicated security, release and quality-metrics workflows.
 
 Batch execution does not create a second write path. Each executable template is processed through `TemplateControlledUpdateService`, which reruns fresh preflight in the bound standard/reviewed mode, verifies the page evidence has not changed, rebuilds the immutable upstream candidate and then uses the same single configuration-import service already used by individual update/rollback flows.
 
@@ -143,6 +148,16 @@ sudo install -d -o www-data -g www-data -m 0700 \
 
 The module intentionally does not fall back to a world-writable or temporary backup location.
 
+A fail-closed helper can validate or create the private runtime directories after resolving the PHP-FPM account:
+
+```bash
+sudo tools/ztum-runtime-setup.sh --check
+sudo tools/ztum-runtime-setup.sh --apply
+sudo tools/ztum-runtime-setup.sh --check
+```
+
+See [`docs/runtime-setup.md`](docs/runtime-setup.md).
+
 ## Installation for laboratory testing
 
 Use the fixed beta snapshot rather than the moving development branch:
@@ -150,8 +165,8 @@ Use the fixed beta snapshot rather than the moving development branch:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.39
-git checkout -B release/0.1.0-beta.39 origin/release/0.1.0-beta.39
+git fetch origin release/0.1.0-beta.40
+git checkout -B release/0.1.0-beta.40 origin/release/0.1.0-beta.40
 cat VERSION
 git rev-parse HEAD
 ```
@@ -159,7 +174,7 @@ git rev-parse HEAD
 Expected `VERSION`:
 
 ```text
-0.1.0-beta.39
+0.1.0-beta.40
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -175,7 +190,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.39**, enable the module and open:
+Confirm version **0.1.0-beta.40**, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -303,6 +318,10 @@ The source acquisition workflow prefers an official GitHub mirror when the requi
 
 The module may use a previously validated stale local index when refresh fails. If no validated cache exists, upstream identity becomes unavailable instead of being guessed.
 
+For isolated environments, the same runtime repositories can read a manifest/hash-verified local bundle instead of contacting the public endpoints. `ZTUM_OFFLINE_ONLY=1` forbids network fallback when a required offline artifact is missing. See [`docs/offline-mode.md`](docs/offline-mode.md).
+
+Configuration-changing update, install and rollback controllers also acquire one global non-blocking ZTUM operation lock before their fresh authoritative preflight and hold it through post-write validation. This prevents two operators on the same lock filesystem from racing controlled imports. See [`docs/concurrency.md`](docs/concurrency.md).
+
 ## Documentation
 
 Detailed design and safety documentation is available in:
@@ -320,6 +339,11 @@ Detailed design and safety documentation is available in:
 - [`docs/ui-style.md`](docs/ui-style.md)
 - [`docs/roadmap.md`](docs/roadmap.md)
 - [`docs/project-status.md`](docs/project-status.md)
+- [`docs/offline-mode.md`](docs/offline-mode.md)
+- [`docs/concurrency.md`](docs/concurrency.md)
+- [`docs/runtime-setup.md`](docs/runtime-setup.md)
+- [`docs/test-metrics.md`](docs/test-metrics.md)
+- [`docs/release-policy.md`](docs/release-policy.md)
 
 ## Development validation
 
@@ -331,7 +355,12 @@ manifest/action contract
 VERSION ↔ manifest version consistency
 controlled-write boundary
 PHP unit/contract tests
+native Zabbix UI guard
+runtime security guard
+runtime setup helper validation
 upstream-index generator validation
+offline-bundle generator validation
+GitHub workflow structure/action-pin validation
 runtime decoder validation of generated upstream indexes before publication
 ```
 
@@ -344,8 +373,12 @@ php tests/validate_version.php
 php tests/read_only_guard.php
 php tests/ui_native_guard.php
 for test in tests/unit/*Test.php; do php "$test"; done
-python -m py_compile tools/build_upstream_index.py
+php tests/security_guard.php
+tests/test_runtime_setup.sh
+python -m py_compile tools/build_upstream_index.py tools/build_offline_bundle.py tools/aggregate_coverage.py
 python tests/test_build_upstream_index.py
+python tests/test_build_offline_bundle.py
+python tests/test_workflows.py
 ```
 
 A green CI run proves automated checks only. It does not replace runtime field validation on Zabbix 7.x and 8.x.
