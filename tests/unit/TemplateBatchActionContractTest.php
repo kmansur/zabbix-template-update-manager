@@ -5,8 +5,8 @@ $prepare = (string) file_get_contents($root.'/actions/TemplateBatchPrepare.php')
 $prepareOne = (string) file_get_contents($root.'/actions/TemplateBatchPrepareOne.php');
 $update = (string) file_get_contents($root.'/actions/TemplateBatchUpdate.php');
 $updateOne = (string) file_get_contents($root.'/actions/TemplateBatchUpdateOne.php');
-$prepareView = (string) file_get_contents($root.'/views/template.batch.prepare.php');
-$updateView = (string) file_get_contents($root.'/views/template.batch.update.php');
+$prepareView = (string) file_get_contents($root.'/views/ztum.template.batch.prepare.php');
+$updateView = (string) file_get_contents($root.'/views/ztum.template.batch.update.php');
 $manifest = (string) file_get_contents($root.'/manifest.json');
 
 function assertBatchContract(bool $condition, string $message): void {
