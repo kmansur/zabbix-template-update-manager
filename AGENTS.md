@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.26`.
+Current test version: `0.1.0-beta.39`.
 
 ## Non-negotiable rules
 
@@ -106,9 +106,14 @@ The module should look and behave like Zabbix itself.
 
 - Reuse native Zabbix classes and components.
 - Prefer existing tables, filters, forms, tabs, buttons, messages and dialogs.
-- Keep custom CSS to an absolute minimum.
-- Do not hard-code theme colors when a native class/component can provide them.
+- Render user-visible checkboxes/buttons/select controls with Zabbix PHP components rather than raw HTML/DOM controls.
+- Use `src/Support/FrontendUi.php` for semantic status tones backed only by native `ZBX_STYLE_*` classes.
+- Keep custom CSS to an absolute minimum; the current UI contract requires no hard-coded theme colors.
 - Preserve light/dark theme behavior automatically.
+- Page navigation belongs in `CHtmlPage::setControls()` where practical.
+- Behavior-heavy batch scripts must run through `CScriptTag::setOnDocumentReady()`.
+- Keep `tests/ui_native_guard.php` green.
+- Follow `docs/ui-style.md`.
 
 ## Comparison, backup and preflight
 
