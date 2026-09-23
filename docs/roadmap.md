@@ -111,7 +111,7 @@ The project tracks implementation, automated validation and real field validatio
 ### Release engineering
 
 - Select and publish a project license.
-- Exercise the new release workflow with the first field-validated prerelease tag.
+- Publish the first community-test prerelease tag after license and public-test documentation are finalized.
 - Produce the final compatibility matrix.
 - Finish publication/homologation documentation.
 - Arrange independent security/code review before production recommendation.
