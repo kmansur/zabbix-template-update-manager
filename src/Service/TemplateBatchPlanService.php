@@ -21,17 +21,21 @@ final class TemplateBatchPlanService {
 
 	private $analysisRunner;
 	private $backupCreator;
+	private $backupStateRefresher;
 	private $preflightRunner;
 
 	public function __construct(
 		?callable $analysisRunner = null,
 		?callable $backupCreator = null,
-		?callable $preflightRunner = null
+		?callable $preflightRunner = null,
+		?callable $backupStateRefresher = null
 	) {
 		$this->analysisRunner = $analysisRunner ?? static fn(string $templateId): array
 			=> (new TemplateUpdateAnalysisService())->analyze($templateId);
 		$this->backupCreator = $backupCreator ?? static fn(array $template): array
 			=> (new TemplateBackupService())->create($template);
+		$this->backupStateRefresher = $backupStateRefresher ?? static fn(array $analysis): array
+			=> (new TemplateUpdateAnalysisService())->refreshBackupVerification($analysis);
 		$this->preflightRunner = $preflightRunner;
 	}
 
@@ -74,7 +78,10 @@ final class TemplateBatchPlanService {
 
 			if ($prepareBackups && !empty($readiness['candidate_for_backup']) && $template !== []) {
 				($this->backupCreator)($template);
-				$analysis = ($this->analysisRunner)($templateId);
+				$analysis = ($this->backupStateRefresher)($analysis);
+				if (!is_array($analysis)) {
+					throw new RuntimeException('Backup verification refresh returned an invalid analysis result.');
+				}
 				$template = is_array($analysis['template'] ?? null) ? $analysis['template'] : [];
 				$readiness = is_array($analysis['update_readiness'] ?? null) ? $analysis['update_readiness'] : [];
 				$status = (string) ($readiness['status'] ?? 'blocked_unresolved');
