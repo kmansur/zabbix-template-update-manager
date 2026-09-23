@@ -56,7 +56,7 @@ class TemplatePreflight extends CController {
 				$exception->getMessage()
 			));
 			$data['preflight_error'] = _(
-				'Unable to complete the update preflight. No Zabbix configuration change was attempted.'
+				'Unable to complete update preflight. No Zabbix configuration change was attempted.'
 			);
 		}
 
