@@ -83,3 +83,4 @@ jobs:
           python -m py_compile tools/build_upstream_index.py tools/build_offline_bundle.py tools/aggregate_coverage.py
           python tests/test_build_upstream_index.py
           python tests/test_build_offline_bundle.py
+          python tests/test_workflows.py
