@@ -243,7 +243,10 @@ $jsLabels = json_encode([
 	'reason_historical_baseline_time_budget_reached' => _('Historical baseline scan will continue'),
 	'reason_historical_baseline_continuation_limit_reached' => _('Historical baseline scan limit reached'),
 	'reason_invalid_preflight_evidence' => _('Invalid preflight evidence'),
-	'reason_request_failed' => _('Request failed')
+	'reason_request_failed' => _('Request failed'),
+	'reason_update_policy_never' => _('Template is marked Never update'),
+	'reason_update_policy_unavailable' => _('Update policy is unavailable'),
+	'reason_blocked_update_policy' => _('Blocked by update policy')
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $script = <<<'JS'
