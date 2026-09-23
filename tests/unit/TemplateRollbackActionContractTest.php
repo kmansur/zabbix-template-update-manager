@@ -18,13 +18,13 @@ function assertTemplateRollbackContract(bool $condition, string $message): void 
 assertTemplateRollbackContract(
 	isset($manifest['actions']['ztum.template.rollback.review'])
 		&& ($manifest['actions']['ztum.template.rollback.review']['class'] ?? null) === 'TemplateRollbackReview'
-		&& ($manifest['actions']['ztum.template.rollback.review']['view'] ?? null) === 'template.rollback.review',
+		&& ($manifest['actions']['ztum.template.rollback.review']['view'] ?? null) === 'ztum.template.rollback.review',
 	'Rollback review action must be registered with its read-only review view.'
 );
 assertTemplateRollbackContract(
 	isset($manifest['actions']['ztum.template.rollback'])
 		&& ($manifest['actions']['ztum.template.rollback']['class'] ?? null) === 'TemplateRollback'
-		&& ($manifest['actions']['ztum.template.rollback']['view'] ?? null) === 'template.rollback',
+		&& ($manifest['actions']['ztum.template.rollback']['view'] ?? null) === 'ztum.template.rollback',
 	'Controlled rollback action must be registered with its result view.'
 );
 assertTemplateRollbackContract(
