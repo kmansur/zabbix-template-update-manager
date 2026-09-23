@@ -199,7 +199,13 @@ jobs:
             commit="$(git -C "$source_dir" rev-parse HEAD)"
             commit_date="$(git -C "$source_dir" show -s --format=%cI HEAD)"
 
-            python tools/build_upstream_index.py               --source-dir "$source_dir"               --line "$line"               --source-ref "$ref"               --source-commit "$commit"               --source-commit-date "$commit_date"               --output "build/upstream-initial/${line}.json"
+            python tools/build_upstream_index.py \
+              --source-dir "$source_dir" \
+              --line "$line" \
+              --source-ref "$ref" \
+              --source-commit "$commit" \
+              --source-commit-date "$commit_date" \
+              --output "build/upstream-initial/${line}.json"
           }
 
           build_line '7.0'
