@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $statusLabels = [
 	'blocked_preflight' => _('Blocked — fresh installation preflight did not pass'),
 	'blocked_evidence_changed' => _('Blocked — installation evidence changed'),
@@ -40,8 +44,13 @@ $page
 		(new CTableInfo())
 			->setHeader([_('Result'), _('Configuration write performed'), _('Reason'), _('Fresh preflight state')])
 			->addRow([
-				$statusLabels[$status] ?? $status,
-				!empty($result['write_performed']) ? _('Yes') : _('No'),
+				FrontendUi::status(
+					$statusLabels[$status] ?? $status,
+					$status === 'installed'
+						? FrontendUi::SUCCESS
+						: ($status === 'validation_failed' ? FrontendUi::DANGER : FrontendUi::WARNING)
+				),
+				FrontendUi::yesNo(!empty($result['write_performed'])),
 				($result['reason'] ?? null) !== null ? (string) $result['reason'] : '—',
 				(string) ($result['preflight_status'] ?? '—')
 			])
