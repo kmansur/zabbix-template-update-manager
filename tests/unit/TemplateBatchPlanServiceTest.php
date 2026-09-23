@@ -63,7 +63,26 @@ $service = new TemplateBatchPlanService(
 		'status' => 'passed',
 		'manual_override' => $manualOverride,
 		'evidence_sha256' => hash('sha256', ($manualOverride ? 'manual-' : 'evidence-').$templateId)
-	]
+	],
+	static function (array $analysis): array {
+		$readiness = is_array($analysis['update_readiness'] ?? null)
+			? $analysis['update_readiness']
+			: [];
+		$manual = !empty($readiness['manual_confirmation_required']);
+		$analysis['backup_verification'] = [
+			'status' => 'current_match',
+			'current_match' => true
+		];
+		$analysis['update_readiness']['status'] = $manual
+			? 'review_backup_verified'
+			: 'backup_verified';
+		$analysis['update_readiness']['next_step'] = $manual
+			? 'run_manual_preflight'
+			: 'run_controlled_preflight';
+		$analysis['update_readiness']['candidate_for_backup'] = false;
+		$analysis['update_readiness']['backup_verified'] = true;
+		return $analysis;
+	}
 );
 
 $plan = $service->build(['101', '102', '103', '104'], true);
@@ -74,6 +93,10 @@ assertBatchPlan(1, $plan['summary']['conflict'], 'Conflict template must be sepa
 assertBatchPlan(1, $plan['summary']['blocked'], 'Unresolved template must remain blocked.');
 assertBatchPlan(true, isset($backupCreated['101']), 'Candidate-for-backup template must receive a rollback artifact during preparation.');
 assertBatchPlan(true, isset($backupCreated['102']), 'Manual-review candidate may prepare rollback evidence without becoming batch-ready.');
+assertBatchPlan(1, $analysisCalls['101'],
+	'Backup preparation must not repeat the full template analysis after creating the rollback artifact.');
+assertBatchPlan(1, $analysisCalls['102'],
+	'Manual-review backup preparation must reuse the completed analysis snapshot.');
 assertBatchPlan('ready', $plan['items'][0]['category'], 'Prepared and preflighted template must be ready.');
 assertBatchPlan('review', $plan['items'][1]['category'], 'Reviewed manual-update template must remain review-only in batch mode.');
 assertBatchPlan('conflict', $plan['items'][2]['category'], 'Conflict template must classify as conflict.');
