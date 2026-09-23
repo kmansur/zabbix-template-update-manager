@@ -32,7 +32,7 @@ class TemplateInstallBatchPrepare extends CController {
 
 	protected function doAction(): void {
 		$this->setResponse(new CControllerResponseData([
-			'title' => _('Prepare selected template installations'),
+			'title' => _('Prepare template installations'),
 			'uuids' => $this->normalizeUuids($this->getInput('uuids', []))
 		]));
 	}
