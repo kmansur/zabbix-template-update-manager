@@ -71,6 +71,19 @@ The project tracks implementation, automated validation and real field validatio
 - Native page controls.
 - Request-bounded progress UI.
 - Automated native-UI repository guard.
+- Visible laboratory-use warning.
+
+### Production-readiness infrastructure
+
+- Verified air-gapped/offline upstream bundle mode.
+- Fail-closed offline-only policy.
+- Global serialized controlled-operation lock.
+- Safe runtime-directory setup/check helper.
+- Dedicated runtime security guard + dependency audit.
+- Formal tag/release packaging workflow with checksums.
+- Transparent Xdebug coverage/reachability metrics.
+- Structured external bug/field-validation/feature-request/PR templates.
+- Release policy separating development commits from field-test beta snapshots.
 
 ## In progress before 1.0
 
@@ -98,10 +111,10 @@ The project tracks implementation, automated validation and real field validatio
 ### Release engineering
 
 - Select and publish a project license.
-- Add a dedicated release workflow.
-- Add a repository security-scan workflow/gate appropriate to PHP/source artifacts.
-- Produce release assets/checksums and a compatibility matrix.
+- Exercise the new release workflow with the first field-validated prerelease tag.
+- Produce the final compatibility matrix.
 - Finish publication/homologation documentation.
+- Arrange independent security/code review before production recommendation.
 
 ## Post-1.0 / provider expansion
 
