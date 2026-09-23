@@ -427,7 +427,16 @@ $script = <<<'JS'
 
 		if (!response.ok) {
 			const elapsedSeconds = ((performance.now() - startedAt) / 1000).toFixed(1);
-			throw new Error('HTTP ' + response.status + ' after ' + elapsedSeconds + 's');
+			const server = (response.headers.get('server') || '').trim();
+			const cfRay = (response.headers.get('cf-ray') || '').trim();
+			const transport = [
+				server !== '' ? 'server=' + server.slice(0, 80) : '',
+				cfRay !== '' ? 'cf-ray=' + cfRay.slice(0, 80) : ''
+			].filter((value) => value !== '').join(', ');
+			throw new Error(
+				'HTTP ' + response.status + ' after ' + elapsedSeconds + 's'
+				+ (transport !== '' ? ' (' + transport + ')' : '')
+			);
 		}
 
 		const payload = await response.json();
