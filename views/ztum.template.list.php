@@ -263,8 +263,10 @@ foreach ($data['templates'] as $template) {
 		&& !$neverUpdate;
 
 	$allowUpdatesEligible = $allowUpdatesMode
-		&& $officialInstalled
-		&& $neverUpdate;
+		&& $isInstalled
+		&& $neverUpdate
+		&& trim((string) ($template['templateid'] ?? '')) !== ''
+		&& trim((string) ($template['uuid'] ?? '')) !== '';
 
 	$installSelectionEligible = $installSelectionMode
 		&& !$isInstalled
