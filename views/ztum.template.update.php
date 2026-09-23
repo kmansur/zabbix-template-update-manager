@@ -30,10 +30,10 @@ $page = (new CHtmlPage())
 
 if ($data['operation_error'] !== null) {
 	$page
-		->addItem(new CTag('h4', true, _('Controlled update error')))
-		->addItem(new CTag('p', true, $data['operation_error']))
-		->addItem(new CTag('p', true, _(
-			'No automatic retry is performed. Re-open the comparison page and verify the installed state before attempting another update.'
+		->addItem(FrontendUi::section(_('Update error')))
+		->addItem(FrontendUi::message((string) $data['operation_error'], FrontendUi::DANGER))
+		->addItem(FrontendUi::description(_(
+			'Automatic retry is disabled. Reopen the comparison page and verify the installed state before retrying.'
 		)))
 		->show();
 	return;
@@ -58,12 +58,12 @@ $summaryTable = (new CTableInfo())
 				: ($status === 'validation_failed' ? FrontendUi::DANGER : FrontendUi::WARNING)
 		),
 		FrontendUi::yesNo($writePerformed),
-		($result['reason'] ?? null) !== null ? (string) $result['reason'] : '—',
-		(string) ($result['preflight_status'] ?? '—')
+		FrontendUi::reason(($result['reason'] ?? null) !== null ? (string) $result['reason'] : null),
+		FrontendUi::reason((string) ($result['preflight_status'] ?? ''))
 	]);
 
 $page
-	->addItem(new CTag('h4', true, _('Controlled update result')))
+	->addItem(FrontendUi::section(_('Update result')))
 	->addItem($summaryTable);
 
 if (is_array($result['candidate'] ?? null)) {
@@ -79,37 +79,41 @@ if (is_array($result['candidate'] ?? null)) {
 		])
 		->addRow([
 			(string) ($candidate['vendor_version'] ?? '—'),
-			isset($candidate['commit']) ? substr((string) $candidate['commit'], 0, 16) : '—',
+			isset($candidate['commit']) ? FrontendUi::fingerprint((string) $candidate['commit'], 16) : '—',
 			(string) ($candidate['path'] ?? '—'),
-			isset($candidate['source_sha256']) ? substr((string) $candidate['source_sha256'], 0, 20) : '—',
-			isset($candidate['content_sha256']) ? substr((string) $candidate['content_sha256'], 0, 20) : '—',
-			isset($candidate['import_sha256']) ? substr((string) $candidate['import_sha256'], 0, 20) : '—'
+			isset($candidate['source_sha256']) ? FrontendUi::fingerprint((string) $candidate['source_sha256'], 20) : '—',
+			isset($candidate['content_sha256']) ? FrontendUi::fingerprint((string) $candidate['content_sha256'], 20) : '—',
+			isset($candidate['import_sha256']) ? FrontendUi::fingerprint((string) $candidate['import_sha256'], 20) : '—'
 		]);
-	$page->addItem(new CTag('h4', true, _('Imported candidate')))->addItem($candidateTable);
+	$page->addItem(FrontendUi::section(_('Imported candidate')))->addItem($candidateTable);
 }
 
 if (isset($result['preflight_evidence_sha256'])) {
 	$page
-		->addItem(new CTag('h4', true, _('Confirmed preflight evidence')))
-		->addItem(new CTag('p', true, (string) $result['preflight_evidence_sha256']));
+		->addItem(FrontendUi::section(_('Confirmed evidence')))
+		->addItem(FrontendUi::description(
+			FrontendUi::fingerprint((string) $result['preflight_evidence_sha256'], 24)
+		));
 }
 
 if (!empty($result['manual_override'])) {
 	$manualReasons = is_array($result['manual_reasons'] ?? null)
-		? implode(', ', array_map('strval', $result['manual_reasons']))
-		: '';
+		? FrontendUi::reasonList($result['manual_reasons'])
+		: '—';
 	$page
-		->addItem(new CTag('h4', true, _('Reviewed manual override')))
-		->addItem(new CTag('p', true, _(
-			'The update was executed through the explicit reviewed path. Bound reasons: '
-		).($manualReasons !== '' ? $manualReasons : '—')));
+		->addItem(FrontendUi::section(_('Manual review')))
+		->addItem(FrontendUi::description(
+			_('Accepted review conditions').': '.$manualReasons
+		));
 }
 
 
 if (isset($result['rollback_sha256']) && (string) $result['rollback_sha256'] !== '') {
 	$page
-		->addItem(new CTag('h4', true, _('Rollback artifact used as prerequisite')))
-		->addItem(new CTag('p', true, (string) $result['rollback_sha256']));
+		->addItem(FrontendUi::section(_('Rollback protection')))
+		->addItem(FrontendUi::description(
+			FrontendUi::fingerprint((string) $result['rollback_sha256'], 24)
+		));
 }
 
 if (is_array($result['validation'] ?? null)) {
@@ -123,44 +127,48 @@ if (is_array($result['validation'] ?? null)) {
 			_('Remaining differences')
 		])
 		->addRow([
-			(string) ($validation['status'] ?? '—'),
+			FrontendUi::reason((string) ($validation['status'] ?? '')),
 			(string) ($validation['expected_version'] ?? '—'),
 			(string) ($validation['installed_version'] ?? '—'),
-			(string) ($validation['content_status'] ?? '—'),
+			FrontendUi::reason((string) ($validation['content_status'] ?? '')),
 			(int) ($validation['remaining_changes'] ?? -1)
 		]);
-	$page->addItem(new CTag('h4', true, _('Post-import validation')))->addItem($validationTable);
+	$page->addItem(FrontendUi::section(_('Post-import validation')))->addItem($validationTable);
 
 	if (($validation['reasons'] ?? []) !== []) {
-		$page->addItem(new CTag('p', true, _(
-			'Validation reasons: '.implode(', ', array_map('strval', $validation['reasons']))
-		)));
+		$page->addItem(FrontendUi::description(
+			_('Validation reasons').': '.FrontendUi::reasonList($validation['reasons'])
+		));
 	}
 }
 
 switch ($status) {
 	case 'updated':
-		$page->addItem(new CTag('p', true, _(
-			'The official template import completed and a fresh post-import comparison confirms that the installed template now matches the bound upstream candidate.'
-		)));
+		$page->addItem(FrontendUi::message(
+			_('The template was updated and validated successfully.'),
+			FrontendUi::SUCCESS
+		));
 		break;
 
 	case 'validation_failed':
-		$page->addItem(new CTag('p', true, _(
-			'The configuration import returned successfully, but the fresh post-import validation did not prove an exact current-upstream match. Do not retry blindly; inspect the comparison page and keep the verified rollback artifact available.'
-		)));
+		$page->addItem(FrontendUi::message(
+			_('The import completed, but validation did not prove the expected upstream state. Inspect the comparison and keep the verified rollback backup available.'),
+			FrontendUi::DANGER
+		));
 		break;
 
 	case 'blocked_evidence_changed':
-		$page->addItem(new CTag('p', true, _(
-			'The authoritative state changed after the confirmation page was rendered. The module refused to write. Rerun preflight and review the new evidence.'
-		)));
+		$page->addItem(FrontendUi::message(
+			_('The authoritative state changed before import. No write was performed; run preflight again.'),
+			FrontendUi::WARNING
+		));
 		break;
 
 	default:
-		$page->addItem(new CTag('p', true, _(
-			'The fresh server-side preflight did not satisfy the controlled update gate, so no configuration import was attempted.'
-		)));
+		$page->addItem(FrontendUi::message(
+			_('Fresh preflight did not pass, so no configuration import was attempted.'),
+			FrontendUi::WARNING
+		));
 }
 
 $page->show();
