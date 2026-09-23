@@ -2,8 +2,8 @@
 
 $root = dirname(__DIR__, 2);
 $controller = (string) file_get_contents($root.'/actions/TemplateSelectionReview.php');
-$listView = (string) file_get_contents($root.'/views/template.list.php');
-$reviewView = (string) file_get_contents($root.'/views/template.selection.review.php');
+$listView = (string) file_get_contents($root.'/views/ztum.template.list.php');
+$reviewView = (string) file_get_contents($root.'/views/ztum.template.selection.review.php');
 
 $requiredControllerFragments = [
 	"'templateids' => 'required|array_id'",
