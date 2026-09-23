@@ -9,14 +9,14 @@ function assertBackupHistoryContract($expected, $actual, string $message): void 
 
 $root = dirname(__DIR__, 2);
 $controller = (string) file_get_contents($root.'/actions/TemplateBackupList.php');
-$view = (string) file_get_contents($root.'/views/template.backup.list.php');
-$listView = (string) file_get_contents($root.'/views/template.list.php');
+$view = (string) file_get_contents($root.'/views/ztum.template.backup.list.php');
+$listView = (string) file_get_contents($root.'/views/ztum.template.list.php');
 $manifest = json_decode((string) file_get_contents($root.'/manifest.json'), true);
 
 $action = $manifest['actions']['ztum.template.backups'] ?? null;
 assertBackupHistoryContract(true, is_array($action), 'Rollback backup history action must be registered.');
 assertBackupHistoryContract('TemplateBackupList', $action['class'] ?? null, 'Rollback history action class must be exact.');
-assertBackupHistoryContract('template.backup.list', $action['view'] ?? null, 'Rollback history action view must be exact.');
+assertBackupHistoryContract('ztum.template.backup.list', $action['view'] ?? null, 'Rollback history action view must be exact.');
 
 assertBackupHistoryContract(
 	true,
