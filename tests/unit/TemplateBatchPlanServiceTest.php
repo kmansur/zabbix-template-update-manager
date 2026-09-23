@@ -181,6 +181,88 @@ assertBatchPlan(
 	'Batch preparation must surface the actual comparison diagnostic instead of a generic comparison_error token.'
 );
 
+$defaultPreflightAnalysisCalls = 0;
+$defaultPreflightPath = 'templates/test/template_test.yaml';
+$defaultPreflightSourceSha = str_repeat('b', 64);
+$defaultPreflightContentSha = str_repeat('c', 64);
+$defaultPreflightBackupSha = str_repeat('d', 64);
+$defaultPreflightService = new TemplateBatchPlanService(
+	static function (string $templateId) use (
+		&$defaultPreflightAnalysisCalls,
+		$defaultPreflightPath,
+		$defaultPreflightSourceSha,
+		$defaultPreflightContentSha,
+		$defaultPreflightBackupSha
+	): array {
+		$defaultPreflightAnalysisCalls++;
+		return [
+			'template' => [
+				'templateid' => $templateId,
+				'uuid' => str_repeat('a', 32),
+				'name' => 'Template '.$templateId,
+				'technical_name' => 'Template '.$templateId,
+				'vendor_version' => '7.0-1',
+				'upstream_vendor_version' => '7.0-2',
+				'host_count' => 0,
+				'upstream_status' => 'official_match',
+				'version_status' => 'update_available',
+				'upstream' => [
+					'uuid' => str_repeat('a', 32),
+					'name' => 'Template '.$templateId,
+					'technical_name' => 'Template '.$templateId,
+					'vendor_name' => 'Zabbix',
+					'vendor_version' => '7.0-2',
+					'content_sha256s' => [$defaultPreflightContentSha],
+					'sources' => [[
+						'path' => $defaultPreflightPath,
+						'sha256' => $defaultPreflightSourceSha
+					]]
+				]
+			],
+			'upstream_source' => [
+				'commit' => str_repeat('e', 40)
+			],
+			'source_path' => $defaultPreflightPath,
+			'external_template_names' => [],
+			'update_readiness' => [
+				'status' => 'backup_verified',
+				'next_step' => 'run_controlled_preflight',
+				'candidate_for_backup' => false,
+				'backup_verified' => true,
+				'manual_confirmation_required' => false,
+				'manual_reasons' => [],
+				'blockers' => [],
+				'review_flags' => [],
+				'write_enabled' => false
+			],
+			'backup_verification' => [
+				'status' => 'current_match',
+				'current_match' => true,
+				'latest' => [
+					'created_at' => '2026-09-23T12:00:00Z',
+					'bytes' => 1234,
+					'sha256' => $defaultPreflightBackupSha
+				],
+				'current_export' => [
+					'bytes' => 1234,
+					'sha256' => $defaultPreflightBackupSha
+				]
+			],
+			'comparison_error' => null
+		];
+	}
+);
+$defaultPreflightPlan = $defaultPreflightService->build(['201'], false);
+assertBatchPlan(1, $defaultPreflightAnalysisCalls,
+	'Batch preparation must not rerun complete analysis only to derive preparation preflight evidence.');
+assertBatchPlan('ready', $defaultPreflightPlan['items'][0]['category'],
+	'A verified template must remain Ready when preparation evidence is derived from the same fresh analysis snapshot.');
+assertBatchPlan(
+	true,
+	preg_match('/^[a-f0-9]{64}$/', $defaultPreflightPlan['items'][0]['evidence_sha256']) === 1,
+	'Prepared analysis reuse must still produce deterministic SHA-256 preflight evidence.'
+);
+
 $largeIds = array_map('strval', range(1001, 1026));
 $largeService = new TemplateBatchPlanService(
 	static fn(string $templateId): array => [
