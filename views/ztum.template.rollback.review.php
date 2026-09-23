@@ -24,7 +24,7 @@ $page = (new CHtmlPage())
 
 if ($data['preflight_error'] !== null) {
 	$page
-		->addItem(new CTag('p', true, $data['preflight_error']))
+		->addItem(FrontendUi::message((string) $data['preflight_error'], FrontendUi::DANGER))
 		->show();
 	return;
 }
@@ -45,15 +45,15 @@ $stateTable = (new CTableInfo())
 				? FrontendUi::SUCCESS
 				: ($status === 'already_restored' ? FrontendUi::INFO : FrontendUi::DANGER)
 		),
-		($preflight['reason'] ?? null) !== null ? (string) $preflight['reason'] : '—',
+		FrontendUi::reason(($preflight['reason'] ?? null) !== null ? (string) $preflight['reason'] : null),
 		FrontendUi::yesNo(!empty($preflight['write_enabled']))
 	]);
 
 $page
-	->addItem(new CTag('h4', true, _('Fresh rollback preflight')))
+	->addItem(FrontendUi::section(_('Rollback preflight')))
 	->addItem($stateTable)
-	->addItem(new CTag('p', true, _(
-		'This page revalidates the selected artifact, exports the currently installed template and runs configuration.importcompare. It does not modify Zabbix configuration.'
+	->addItem(FrontendUi::description(_(
+		'The selected backup and current template are revalidated before rollback. This page is read-only.'
 	)));
 
 if ($template !== []) {
@@ -65,7 +65,7 @@ if ($template !== []) {
 			(string) ($template['vendor_version'] ?? '—'),
 			(string) ($template['uuid'] ?? '—')
 		]);
-	$page->addItem(new CTag('h4', true, _('Current installed state')))->addItem($templateTable);
+	$page->addItem(FrontendUi::section(_('Current template')))->addItem($templateTable);
 }
 
 if ($target !== []) {
@@ -82,10 +82,10 @@ if ($target !== []) {
 			(string) ($target['created_at'] ?? '—'),
 			(string) ($target['vendor_version'] ?? '—'),
 			(int) ($target['bytes'] ?? 0),
-			$targetSha !== '' ? substr($targetSha, 0, 20) : '—',
+			$targetSha !== '' ? FrontendUi::fingerprint($targetSha, 20) : '—',
 			(string) ($target['manifest_file'] ?? '—')
 		]);
-	$page->addItem(new CTag('h4', true, _('Selected rollback target')))->addItem($targetTable);
+	$page->addItem(FrontendUi::section(_('Rollback target')))->addItem($targetTable);
 }
 
 if ($summary !== null) {
@@ -97,7 +97,7 @@ if ($summary !== null) {
 			(int) ($summary['removed'] ?? 0),
 			(int) ($summary['total'] ?? 0)
 		]);
-	$page->addItem(new CTag('h4', true, _('Rollback import preview')))->addItem($summaryTable);
+	$page->addItem(FrontendUi::section(_('Import preview')))->addItem($summaryTable);
 }
 
 if ($status === 'ready' && $evidenceSha !== '') {
@@ -119,31 +119,31 @@ if ($status === 'ready' && $evidenceSha !== '') {
 			(new CFormList())->addRow(
 				_('Confirmation'),
 				(new CCheckBox('confirm', '1'))->setLabel(_(
-					'I understand that this will import the selected stored template and change Zabbix configuration.'
+					'I reviewed the rollback target and want to restore this template.'
 				))
 			)
 		)
 		->addItem(makeFormFooter(new CSubmitButton(_('Rollback template'))));
 
 	$page
-		->addItem(new CTag('h4', true, _('Explicit rollback confirmation')))
-		->addItem(new CTag('p', true, _(
-			'Immediately before import, the module will rerun this preflight, create and verify a fresh recovery backup of the current state, revalidate the selected artifact again and refuse the rollback if any evidence changed.'
-		)))
-		->addItem(new CTag('p', true, _(
-			'The rollback is never retried automatically. If the import succeeds but validation fails, manual inspection is required.'
-		)))
+		->addItem(FrontendUi::section(_('Rollback confirmation')))
+		->addItem(FrontendUi::message(
+			_('Rollback writes Zabbix configuration. A fresh recovery backup and preflight are created immediately before import; rollback is never retried automatically.'),
+			FrontendUi::WARNING
+		))
 		->addItem($form);
 }
 elseif ($status === 'already_restored') {
-	$page->addItem(new CTag('p', true, _(
-		'No rollback action is offered because configuration.importcompare reports no differences between the installed template and the selected stored artifact.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('The selected backup already matches the installed template. No rollback is required.'),
+		FrontendUi::INFO
+	));
 }
 else {
-	$page->addItem(new CTag('p', true, _(
-		'Rollback remains blocked. No configuration-write control is available for this state.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('Rollback remains blocked. Resolve the reported issue and reopen the review.'),
+		FrontendUi::WARNING
+	));
 }
 
 $page->show();
