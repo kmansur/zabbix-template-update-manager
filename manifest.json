@@ -3,7 +3,7 @@
     "id": "kmansur_zabbix_template_update_manager",
     "name": "Template Update Manager",
     "namespace": "ZabbixTemplateUpdateManager",
-    "version": "0.1.0-beta.41",
+    "version": "0.1.0-beta.42",
     "author": "Karim Mansur",
     "description": "Discover, install, compare and safely manage official Zabbix templates.",
     "actions": {
