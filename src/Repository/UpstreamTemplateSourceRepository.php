@@ -6,7 +6,7 @@ use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
 use RuntimeException;
 use Throwable;
 
-require_once dirname(__DIR__).'/Support/ProjectVersion.php';
+require_once dirname(__DIR__).'/Support/ProjectVersion.php';\nrequire_once __DIR__.'/OfflineBundleRepository.php';\nrequire_once __DIR__.'/UpstreamIndexRepository.php';
 
 final class UpstreamTemplateSourceRepository {
 
@@ -94,11 +94,32 @@ final class UpstreamTemplateSourceRepository {
 	}
 
 	public function fetchAtCommit(string $commit, string $path): array {
+		$commit = strtolower(trim($commit));
+		if (!preg_match('/^[a-f0-9]{40}$/', $commit)) {
+			throw new RuntimeException('The upstream source commit is invalid.');
+		}
+		if (!UpstreamIndexRepository::isValidTemplatePath($path)) {
+			throw new RuntimeException('The upstream source path is invalid.');
+		}
+
+		$offline = $this->offlineBundle->readSource($commit, $path);
+		if ($offline !== null) {
+			return [
+				'content' => $offline,
+				'path' => $path,
+				'commit' => $commit,
+				'url' => 'offline-bundle://'.$commit.'/'.$path
+			];
+		}
+		if ($this->offlineBundle->isOfflineOnly()) {
+			throw new RuntimeException('Offline-only mode is enabled but the required template source is missing.');
+		}
+
 		$url = self::buildUrl($commit, $path);
 		return [
 			'content' => $this->fetchUrl($url),
 			'path' => $path,
-			'commit' => strtolower(trim($commit)),
+			'commit' => $commit,
 			'url' => $url
 		];
 	}

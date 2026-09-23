@@ -8,7 +8,7 @@ use RuntimeException;
 use Throwable;
 
 require_once dirname(__DIR__).'/Support/ProjectVersion.php';
-require_once dirname(__DIR__).'/Support/ZabbixVersion.php';
+require_once dirname(__DIR__).'/Support/ZabbixVersion.php';\nrequire_once __DIR__.'/OfflineBundleRepository.php';
 
 final class UpstreamIndexRepository {
 
@@ -41,6 +41,22 @@ final class UpstreamIndexRepository {
 		$line = ZabbixVersion::line($zabbixVersion);
 		if ($line === null) {
 			throw new RuntimeException('Unable to determine the Zabbix major.minor line.');
+		}
+
+		$offlineContent = $this->offlineBundle->readIndex($line);
+		if ($offlineContent !== null) {
+			$index = self::decodeIndex($offlineContent, $line);
+			$index['runtime'] = [
+				'cache_status' => 'offline',
+				'cache_age_seconds' => 0,
+				'offline_only' => $this->offlineBundle->isOfflineOnly()
+			];
+			return $index;
+		}
+		if ($this->offlineBundle->isOfflineOnly()) {
+			throw new RuntimeException(
+				'Offline-only mode is enabled but the configured bundle does not contain index '.$line.'.'
+			);
 		}
 
 		$cacheFile = $this->cacheFile($line);

@@ -6,7 +6,7 @@ use JsonException;
 use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
 use RuntimeException;
 
-require_once dirname(__DIR__).'/Support/ProjectVersion.php';
+require_once dirname(__DIR__).'/Support/ProjectVersion.php';\nrequire_once __DIR__.'/OfflineBundleRepository.php';\nrequire_once __DIR__.'/UpstreamIndexRepository.php';
 
 final class UpstreamTemplateHistoryRepository {
 
@@ -27,6 +27,14 @@ final class UpstreamTemplateHistoryRepository {
 
 		if ($maxCommits < 1 || $maxCommits > self::MAX_COMMITS) {
 			throw new RuntimeException('The upstream history scan limit is invalid.');
+		}
+
+		$offline = $this->offlineBundle->readHistory($path, $until, $maxCommits);
+		if ($offline !== null) {
+			return $offline;
+		}
+		if ($this->offlineBundle->isOfflineOnly()) {
+			throw new RuntimeException('Offline-only mode is enabled but the required template history is missing.');
 		}
 
 		$commits = [];
