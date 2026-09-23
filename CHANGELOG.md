@@ -4,6 +4,33 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.42] - 2026-09-23
+
+### Fixed
+
+- Missing-template installation now uses a dedicated create-only import rule profile for both `configuration.importcompare` and the controlled `configuration.import` write boundary.
+- Installation no longer asks Zabbix to update existing template groups, templates, items, discovery rules, triggers, graphs, HTTP tests, value maps or dashboards while creating a missing official template.
+- Batch installation no longer labels a Zabbix import rejection as a browser/request failure. Import-stage rejection, request outcome uncertainty and post-install validation failure are shown as distinct states.
+- The batch Reason column now receives the import failure detail and bounded read-only post-failure inspection state.
+- Individual installation results now distinguish import attempted, confirmed configuration write and uncertain write outcome.
+- Structural installation auditing now validates self trigger item references, graph item references and graph Y-axis item references in addition to host references.
+
+### Safety
+
+- The create-only installation profile still allows genuinely missing template/host groups required by the selected official source, but it never updates an existing group merely because it appears in the import file.
+- The selected rule profile is bound into fresh installation evidence and is revalidated immediately before the write.
+- An import rejection remains stop-on-first-failure. ZTUM does not retry the failed candidate and does not continue the batch automatically.
+- When an import request does not return confirmed success, the write outcome is reported as uncertain even if the target UUID is absent after a read-only inspection.
+- The single `TemplateConfigurationImportService` write boundary remains unchanged.
+
+### Tests
+
+- Added create-only import-rule profile assertions.
+- Added structured import-failure/result-view contracts.
+- Added trigger-item and graph-item structural reference regression coverage.
+- Extended expression parsing tests to preserve host/item pairs across arithmetic division expressions.
+
+
 ## [0.1.0-beta.41] - 2026-09-23
 
 ### Fixed
