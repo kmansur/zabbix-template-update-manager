@@ -50,11 +50,11 @@ if (is_array($data['template'])) {
 			$template['uuid'] !== '' ? $template['uuid'] : '—'
 		]);
 
-	$page->addItem(new CTag('h4', true, _('Template')))->addItem($templateTable);
+	$page->addItem(FrontendUi::section(_('Template')))->addItem($templateTable);
 }
 
 if ($data['error'] !== null) {
-	$page->addItem(new CTag('p', true, $data['error']));
+	$page->addItem(FrontendUi::message((string) $data['error'], FrontendUi::DANGER));
 	$page->show();
 	return;
 }
@@ -87,16 +87,17 @@ $summaryTable = (new CTableInfo())
 	]);
 
 $page
-	->addItem(new CTag('h4', true, _('Rollback repository summary')))
+	->addItem(FrontendUi::section(_('Rollback repository')))
 	->addItem($summaryTable);
 
 if ($data['repository_status'] === 'repository_unavailable') {
 	$page
-		->addItem(new CTag('p', true, _(
-			'The persistent rollback repository is unavailable or cannot be inspected safely. No conclusion about stored backup availability can be made.'
-		)))
-		->addItem(new CTag('p', true, _(
-			'Check the frontend logs, repository ownership and permissions before relying on rollback artifacts.'
+		->addItem(FrontendUi::message(
+			_('The rollback repository is unavailable or cannot be inspected safely.'),
+			FrontendUi::DANGER
+		))
+		->addItem(FrontendUi::description(_(
+			'Check frontend logs, repository ownership and permissions before relying on rollback backups.'
 		)))
 		->show();
 	return;
@@ -104,11 +105,12 @@ if ($data['repository_status'] === 'repository_unavailable') {
 
 if ($data['artifacts'] === []) {
 	$page
-		->addItem(new CTag('p', true, _(
-			'No stored rollback artifacts are available for this template.'
-		)))
-		->addItem(new CTag('p', true, _(
-			'Backup creation remains available from the comparison workflow when its readiness gate allows it.'
+		->addItem(FrontendUi::message(
+			_('No rollback backups are stored for this template.'),
+			FrontendUi::INFO
+		))
+		->addItem(FrontendUi::description(_(
+			'Create a rollback backup from the comparison page when the readiness gate allows it.'
 		)))
 		->show();
 	return;
@@ -143,7 +145,7 @@ foreach ($data['artifacts'] as $artifact) {
 		),
 		$artifact['vendor_version'] !== '' ? $artifact['vendor_version'] : '—',
 		$artifact['bytes'] !== null ? $artifact['bytes'] : '—',
-		$sha256 !== '' ? substr($sha256, 0, 16) : '—',
+		$sha256 !== '' ? FrontendUi::fingerprint($sha256, 16) : '—',
 		$artifact['source_file'] !== '' ? $artifact['source_file'] : '—',
 		$artifact['manifest_file'] !== '' ? $artifact['manifest_file'] : '—',
 		$reason !== '' ? ($reasonLabels[$reason] ?? $reason) : '—'
@@ -166,15 +168,15 @@ foreach ($data['artifacts'] as $artifact) {
 }
 
 $page
-	->addItem(new CTag('h4', true, _('Stored rollback artifacts')))
+	->addItem(FrontendUi::section(_('Stored rollback backups')))
 	->addItem($artifactTable)
-	->addItem(new CTag('p', true, _(
-		'Artifacts are listed newest first. Invalid artifacts are never eligible for rollback. Super administrators may open a valid artifact in a separate read-only review before any configuration write is possible.'
+	->addItem(FrontendUi::description(_(
+		'Backups are listed newest first. Invalid backups cannot be selected for rollback. Rollback review is read-only until explicit confirmation.'
 	)));
 
 if ($data['truncated']) {
-	$page->addItem(new CTag('p', true, _(
-		'Only the newest 50 manifest records are inspected and displayed. Older artifacts remain on disk but are not shown or eligible for selection in this bounded view.'
+	$page->addItem(FrontendUi::description(_(
+		'Only the newest 50 backup records are inspected and displayed. Older backups remain on disk.'
 	)));
 }
 
