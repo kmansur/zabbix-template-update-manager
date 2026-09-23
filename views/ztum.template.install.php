@@ -125,7 +125,9 @@ if ($validation !== []) {
 					_('Expected version'),
 					_('Installed version'),
 					_('Content state'),
-					_('Remaining differences')
+					_('Remaining differences'),
+					_('Raw differences'),
+					_('Ignored shared-group differences')
 				])
 				->addRow([
 					(string) ($validation['status'] ?? '—'),
@@ -133,7 +135,9 @@ if ($validation !== []) {
 					(string) ($validation['expected_version'] ?? '—'),
 					(string) ($validation['installed_version'] ?? '—'),
 					(string) ($validation['content_status'] ?? '—'),
-					(int) ($validation['remaining_changes'] ?? -1)
+					(int) ($validation['remaining_changes'] ?? -1),
+					(int) ($validation['raw_remaining_changes'] ?? ($validation['remaining_changes'] ?? -1)),
+					(int) ($validation['ignored_shared_changes'] ?? 0)
 				])
 		);
 
@@ -141,6 +145,13 @@ if ($validation !== []) {
 		$page->addItem(new CTag('p', true, _(
 			'Validation reasons: '.implode(', ', array_map('strval', $validation['reasons']))
 		)));
+	}
+
+	if ((int) ($validation['ignored_shared_changes'] ?? 0) > 0) {
+		$page->addItem(FrontendUi::message(
+			_('Create-only installation validation ignored only differences in pre-existing shared host/template groups. Those shared objects are intentionally not updated by the installation write profile; template-owned differences still fail validation.'),
+			FrontendUi::INFO
+		));
 	}
 }
 
