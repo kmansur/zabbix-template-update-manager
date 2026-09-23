@@ -68,6 +68,7 @@ $readinessStatusLabels = [
 	'blocked_unresolved' => _('Blocked — analysis unresolved'),
 	'blocked_conflict' => _('Blocked — conflict detected'),
 	'blocked_local_overwrite' => _('Blocked — local customization overwrite risk'),
+	'blocked_update_policy' => _('Blocked — Never update policy'),
 	'review_high' => _('Manual high-risk review required'),
 	'review_medium' => _('Manual review required'),
 	'review_required' => _('Manual review path — rollback backup required'),
@@ -88,7 +89,9 @@ $readinessNextStepLabels = [
 	'manual_change_review' => _('Perform manual change review'),
 	'create_and_verify_backup' => _('Create and verify rollback backup'),
 	'run_controlled_preflight' => _('Run fresh controlled update preflight'),
-	'run_manual_preflight' => _('Run explicit reviewed update preflight')
+	'run_manual_preflight' => _('Run explicit reviewed update preflight'),
+	'allow_updates' => _('Allow updates for this template'),
+	'resolve_update_policy' => _('Restore update-policy availability')
 ];
 
 $backupVerificationLabels = [
@@ -158,6 +161,7 @@ $readinessTones = [
 	'blocked_unresolved' => FrontendUi::DANGER,
 	'blocked_conflict' => FrontendUi::DANGER,
 	'blocked_local_overwrite' => FrontendUi::WARNING,
+	'blocked_update_policy' => FrontendUi::WARNING,
 	'review_high' => FrontendUi::WARNING,
 	'review_medium' => FrontendUi::WARNING,
 	'review_required' => FrontendUi::WARNING,
@@ -233,6 +237,7 @@ if (is_array($data['template'])) {
 			_('Available version'),
 			_('Version status'),
 			_('Content status'),
+			_('Update policy'),
 			_('Source path'),
 			_('Source commit')
 		])
@@ -248,11 +253,30 @@ if (is_array($data['template'])) {
 				$contentLabels[$data['content_status']] ?? _('Unknown'),
 				$contentTones[$data['content_status']] ?? FrontendUi::MUTED
 			),
+			FrontendUi::status(
+				(string) ($data['update_policy'] ?? 'managed') === 'never_update'
+					? _('Never update')
+					: ((string) ($data['update_policy'] ?? 'managed') === 'unavailable' ? _('Unavailable') : _('Managed')),
+				(string) ($data['update_policy'] ?? 'managed') === 'never_update'
+					? FrontendUi::WARNING
+					: ((string) ($data['update_policy'] ?? 'managed') === 'unavailable' ? FrontendUi::DANGER : FrontendUi::MUTED)
+			),
 			$data['source_path'] !== '' ? $data['source_path'] : '—',
 			$sourceCommit !== '' ? FrontendUi::fingerprint($sourceCommit, 12) : '—'
 		]);
 
 	$page->addItem(FrontendUi::section(_('Template')))->addItem($metadataTable);
+}
+
+if (($data['update_policy'] ?? 'managed') === 'never_update') {
+	$page->addItem(FrontendUi::message(
+		_('This template is marked Never update. Comparison remains available, but ZTUM will not prepare or execute an update until updates are allowed again.'),
+		FrontendUi::WARNING
+	));
+}
+
+if (($data['policy_error'] ?? null) !== null) {
+	$page->addItem(FrontendUi::message((string) $data['policy_error'], FrontendUi::DANGER));
 }
 
 if ($data['comparison_error'] !== null) {
@@ -628,6 +652,12 @@ if (is_array($data['update_readiness'])
 			$readinessText = _(
 				'The update path is blocked because an authoritative historical official baseline matching the installed vendor version has not been established.'
 			);
+			break;
+
+		case 'blocked_update_policy':
+			$readinessText = ($data['update_policy'] ?? 'managed') === 'never_update'
+				? _('The update path is intentionally blocked because this template is marked Never update.')
+				: _('The update path is blocked because the persistent update policy cannot be verified safely.');
 			break;
 
 		default:
