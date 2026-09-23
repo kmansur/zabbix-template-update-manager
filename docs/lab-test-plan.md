@@ -11,7 +11,7 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.42`. A formal Git tag/GitHub release remains a later publication step.
+Use the exact prerelease tag when a public beta has been published. During internal laboratory work before that tag exists, record the exact `main` commit used so the test can be reproduced.
 
 Beta.39 retains the dependency-aware comparison/write safety chain and refactors the frontend to native Zabbix UI conventions. Field validation must prove native control rendering, status presentation and light/dark theme behavior on supported Zabbix generations while re-running the existing update/install/rollback regressions.
 
@@ -55,17 +55,12 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.42
-git checkout -B release/0.1.0-beta.42 origin/release/0.1.0-beta.42
+git checkout main
 cat VERSION
 git rev-parse HEAD
 ```
 
-Expected project version:
-
-```text
-0.1.0-beta.42
-```
+Record the exact project version and commit before starting the test.
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
 
@@ -650,7 +645,7 @@ Zabbix version:
 PHP version:
 Frontend/web runtime user:
 Module version:
-Module commit/snapshot branch:
+Module version / exact commit or release tag:
 Visible templates:
 Official UUID matches:
 Updates available:
