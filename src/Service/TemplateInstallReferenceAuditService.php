@@ -2,6 +2,8 @@
 
 namespace Modules\ZabbixTemplateUpdateManager\Service;
 
+require_once __DIR__.'/ZabbixExpressionHostExtractor.php';
+
 /**
  * Performs bounded, read-only structural reference checks on one isolated
  * template before configuration.importcompare/import.
@@ -252,16 +254,7 @@ final class TemplateInstallReferenceAuditService {
 		self::collectExpressions($template, $expressions);
 
 		foreach ($expressions as $expression) {
-			if (preg_match_all('~/([^/\r\n]+)/[^,\)\s]+~', $expression, $matches) === false) {
-				continue;
-			}
-
-			foreach (($matches[1] ?? []) as $host) {
-				$host = trim((string) $host);
-				if ($host === '') {
-					continue;
-				}
-
+			foreach (ZabbixExpressionHostExtractor::extract($expression) as $host) {
 				$counts['trigger_host_references']++;
 				if (!isset($allowedHosts[$host])) {
 					$issues[] = [
