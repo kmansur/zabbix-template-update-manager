@@ -7,7 +7,8 @@ use CControllerResponseData;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledInstallService;\nuse Modules\\ZabbixTemplateUpdateManager\\Service\\TemplateOperationLockService;
 use Throwable;
 
-require_once dirname(__DIR__).'/src/Service/TemplateControlledInstallService.php';\nrequire_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateControlledInstallService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 
 class TemplateInstallBatchExecuteOne extends CController {
 
