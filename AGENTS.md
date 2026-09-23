@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.51`.
+Current test version: `0.1.0-beta.52`.
 
 ## Non-negotiable rules
 
@@ -39,6 +39,7 @@ Current test version: `0.1.0-beta.51`.
 24. Missing-template installation must use the reviewed create-only import rule profile. It may create missing groups/template content but must not update or delete pre-existing configuration objects.
 25. Global controlled-operation serialization is mandatory for update, installation and rollback write controllers. Acquire the ZTUM operation lock before fresh preflight and hold it through post-write validation; do not add an unlocked configuration-write route.
 26. Offline/air-gapped mode may use only admin-configured local bundle directories with manifest/hash verification. Missing/tampered offline evidence must fail closed, and offline-only mode must never silently fall back to network access.
+27. A template marked `Never update` is a hard global ZTUM policy gate. Catalog preparation, fresh preflight and controlled import must all respect it. Policy-store read failures must never result in an update write.
 
 ## Architecture
 
