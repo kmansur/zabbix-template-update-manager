@@ -190,7 +190,7 @@ final class UpstreamTemplateSourceRepository {
 		$context = stream_context_create([
 			'http' => [
 				'method' => 'GET',
-				'timeout' => 15,
+				'timeout' => 5,
 				'follow_location' => 0,
 				'header' => 'User-Agent: '.ProjectVersion::userAgent()."\r\n"
 			],
@@ -223,8 +223,8 @@ final class UpstreamTemplateSourceRepository {
 			CURLOPT_RETURNTRANSFER => false,
 			CURLOPT_FOLLOWLOCATION => true,
 			CURLOPT_MAXREDIRS => 3,
-			CURLOPT_CONNECTTIMEOUT => 5,
-			CURLOPT_TIMEOUT => 15,
+			CURLOPT_CONNECTTIMEOUT => 3,
+			CURLOPT_TIMEOUT => 5,
 			CURLOPT_USERAGENT => ProjectVersion::userAgent(),
 			CURLOPT_SSL_VERIFYPEER => true,
 			CURLOPT_SSL_VERIFYHOST => 2,
