@@ -1,0 +1,38 @@
+name: Quality metrics
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  php-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Xdebug
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-cli php-xdebug
+          php -m | grep -i xdebug
+      - name: Run tests with Xdebug coverage
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/ztum-coverage
+          for test in tests/unit/*Test.php; do
+            ZTUM_COVERAGE_DIR=/tmp/ztum-coverage XDEBUG_MODE=coverage               php -d auto_prepend_file=tests/coverage_bootstrap.php "$test"
+          done
+      - name: Aggregate coverage metrics
+        run: |
+          python tools/aggregate_coverage.py             --repo-root .             --coverage-dir /tmp/ztum-coverage             --output coverage-summary.md
+          cat coverage-summary.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ztum-coverage-metrics
+          path: coverage-summary.md
