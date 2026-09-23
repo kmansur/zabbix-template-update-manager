@@ -197,11 +197,12 @@ final class TemplateUpdatePolicyRepository {
 	}
 
 	private function readState(): array {
-		if (!file_exists($this->path)) {
-			return self::emptyState();
-		}
+		$this->assertReadableDirectory(dirname($this->path));
 		if (is_link($this->path)) {
 			throw new RuntimeException('Update-policy file path is unsafe.');
+		}
+		if (!file_exists($this->path)) {
+			return self::emptyState();
 		}
 
 		$handle = @fopen($this->path, 'rb');
@@ -222,11 +223,12 @@ final class TemplateUpdatePolicyRepository {
 	}
 
 	private function readStateUnlocked(): array {
-		if (!file_exists($this->path)) {
-			return self::emptyState();
-		}
+		$this->assertReadableDirectory(dirname($this->path));
 		if (is_link($this->path)) {
 			throw new RuntimeException('Update-policy file path is unsafe.');
+		}
+		if (!file_exists($this->path)) {
+			return self::emptyState();
 		}
 
 		$handle = @fopen($this->path, 'rb');
@@ -383,6 +385,16 @@ final class TemplateUpdatePolicyRepository {
 		}
 
 		return array_values($result);
+	}
+
+	private function assertReadableDirectory(string $directory): void {
+		if (is_link($directory)
+				|| !is_dir($directory)
+				|| !is_readable($directory)) {
+			throw new RuntimeException(
+				'Update-policy runtime directory is unavailable or not readable: '.$directory
+			);
+		}
 	}
 
 	private function assertWritableDirectory(string $directory): void {
