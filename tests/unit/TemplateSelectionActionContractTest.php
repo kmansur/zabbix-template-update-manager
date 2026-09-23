@@ -33,7 +33,9 @@ foreach ([
 }
 
 assertSelectionContract(
-	strpos($listView, "'ztum.templates.prepare_selected' => [\n\t\t\t\t'name' => _('Prepare selected updates')") !== false,
+	strpos($listView, "'ztum.templates.prepare_selected'") !== false
+		&& strpos($listView, "'name' => _('Prepare selected updates')") !== false
+		&& strpos($listView, "new CActionButtonList(") !== false,
 	'Prepare selected updates must use CActionButtonList native submit mode.'
 );
 
