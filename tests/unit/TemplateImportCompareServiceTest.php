@@ -33,6 +33,23 @@ assertImportRule(true, $rules['discoveryRules']['deleteMissing'], 'Local-only di
 assertImportRule(true, $rules['templateLinkage']['deleteMissing'], 'Local-only template links must be visible as preview removals.');
 assertImportRule(false, array_key_exists('hosts', $rules), 'Host imports are outside template content comparison scope.');
 
+$installRules = TemplateImportCompareService::rules(TemplateImportCompareService::PROFILE_INSTALL);
+assertImportRule(false, $installRules['templates']['updateExisting'],
+	'Installation must never update an existing template.');
+assertImportRule(true, $installRules['templates']['createMissing'],
+	'Installation must allow creation of the selected missing template.');
+assertImportRule(false, $installRules['items']['updateExisting'],
+	'Installation item rules must remain create-only.');
+assertImportRule(false, $installRules['items']['deleteMissing'],
+	'Installation must never delete existing items.');
+assertImportRule(false, $installRules['template_groups']['updateExisting'],
+	'Installation must not rewrite an existing template group.');
+assertImportRule(true, $installRules['template_groups']['createMissing'],
+	'Installation may create a genuinely missing template group.');
+assertImportRule(false, $installRules['templateLinkage']['deleteMissing'],
+	'Installation must never remove existing template linkage.');
+
+
 $service = new TemplateImportCompareService();
 $yaml = "zabbix_export:\n  version: '7.0'\n";
 $service->compare($yaml, 'yaml');
@@ -41,6 +58,13 @@ assertImportRule($yaml, API::$lastImportCompare['source'] ?? null, 'YAML rollbac
 
 $service->compare('{}');
 assertImportRule('json', API::$lastImportCompare['format'] ?? null, 'JSON must remain the default comparison format for isolated update candidates.');
+
+$service->compare('{}', 'json', TemplateImportCompareService::PROFILE_INSTALL);
+assertImportRule(
+	false,
+	API::$lastImportCompare['rules']['templates']['updateExisting'] ?? null,
+	'Installation preview must use the same create-only template rule profile as installation import.'
+);
 
 $threw = false;
 try {
