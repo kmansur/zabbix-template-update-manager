@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.41`.
+Current test version: `0.1.0-beta.42`.
 
 ## Non-negotiable rules
 
@@ -36,8 +36,9 @@ Current test version: `0.1.0-beta.41`.
 21. Multi-template installation must prepare one UUID per HTTP request and only execute candidates with passed install preflight plus bound evidence.
 22. Batch installation must execute one Ready UUID per HTTP request, reuse TemplateControlledInstallService per candidate and stop on the first non-success. Never bypass the existing single configuration-import boundary.
 23. Installation preflight must run the structural reference audit before import comparison. Proven unresolved internal references must fail closed and be bound into preflight evidence; do not use the audit to relax Zabbix's own import validation.
-24. Global controlled-operation serialization is mandatory for update, installation and rollback write controllers. Acquire the ZTUM operation lock before fresh preflight and hold it through post-write validation; do not add an unlocked configuration-write route.
-25. Offline/air-gapped mode may use only admin-configured local bundle directories with manifest/hash verification. Missing/tampered offline evidence must fail closed, and offline-only mode must never silently fall back to network access.
+24. Missing-template installation must use the reviewed create-only import rule profile. It may create missing groups/template content but must not update or delete pre-existing configuration objects.
+25. Global controlled-operation serialization is mandatory for update, installation and rollback write controllers. Acquire the ZTUM operation lock before fresh preflight and hold it through post-write validation; do not add an unlocked configuration-write route.
+26. Offline/air-gapped mode may use only admin-configured local bundle directories with manifest/hash verification. Missing/tampered offline evidence must fail closed, and offline-only mode must never silently fall back to network access.
 
 ## Architecture
 
