@@ -19,6 +19,7 @@ final class HistoricalTemplateBaselineService {
 		?callable $documentReader = null,
 		?callable $previousPathResolver = null
 	) {
+		$historyRepository = null;
 		if ($historyLoader === null) {
 			$historyRepository = new UpstreamTemplateHistoryRepository();
 			$historyLoader = static fn(string $path, string $until, int $limit): array
@@ -39,9 +40,10 @@ final class HistoricalTemplateBaselineService {
 		}
 
 		if ($previousPathResolver === null) {
-			$historyRepository = $historyRepository ?? new UpstreamTemplateHistoryRepository();
-			$previousPathResolver = static fn(string $commit, string $path): ?string
-				=> $historyRepository->previousPathAtCommit($commit, $path);
+			$previousPathResolver = $historyRepository !== null
+				? static fn(string $commit, string $path): ?string
+					=> $historyRepository->previousPathAtCommit($commit, $path)
+				: static fn(string $commit, string $path): ?string => null;
 		}
 
 		$this->historyLoader = $historyLoader;
