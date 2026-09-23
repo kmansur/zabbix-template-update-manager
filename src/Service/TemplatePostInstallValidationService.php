@@ -56,7 +56,7 @@ final class TemplatePostInstallValidationService {
 			$reasons[] = 'technical_name_mismatch';
 		}
 
-		$validation = (new TemplatePostUpdateValidationService())->validate($templateId, $candidate);
+		$validation = (new TemplatePostUpdateValidationService())->validateCreateOnlyInstall($templateId, $candidate);
 		if ($reasons !== []) {
 			$validation['valid'] = false;
 			$validation['status'] = 'validation_failed';
