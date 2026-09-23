@@ -9,15 +9,15 @@
     "actions": {
         "ztum.templates": {
             "class": "TemplateList",
-            "view": "template.list"
+            "view": "ztum.template.list"
         },
         "ztum.templates.review_selected": {
             "class": "TemplateSelectionReview",
-            "view": "template.selection.review"
+            "view": "ztum.template.selection.review"
         },
         "ztum.templates.prepare_selected": {
             "class": "TemplateBatchPrepare",
-            "view": "template.batch.prepare"
+            "view": "ztum.template.batch.prepare"
         },
         "ztum.templates.prepare_one": {
             "class": "TemplateBatchPrepareOne",
@@ -31,11 +31,11 @@
         },
         "ztum.templates.batch_update": {
             "class": "TemplateBatchUpdate",
-            "view": "template.batch.update"
+            "view": "ztum.template.batch.update"
         },
         "ztum.templates.install_prepare_selected": {
             "class": "TemplateInstallBatchPrepare",
-            "view": "template.install.batch.prepare"
+            "view": "ztum.template.install.batch.prepare"
         },
         "ztum.templates.install_prepare_one": {
             "class": "TemplateInstallBatchPrepareOne",
@@ -49,38 +49,38 @@
         },
         "ztum.template.install.review": {
             "class": "TemplateInstallReview",
-            "view": "template.install.review"
+            "view": "ztum.template.install.review"
         },
         "ztum.template.install": {
             "class": "TemplateInstall",
-            "view": "template.install"
+            "view": "ztum.template.install"
         },
         "ztum.template.compare": {
             "class": "TemplateCompare",
-            "view": "template.compare"
+            "view": "ztum.template.compare"
         },
         "ztum.template.backup": {
             "class": "TemplateBackup"
         },
         "ztum.template.backups": {
             "class": "TemplateBackupList",
-            "view": "template.backup.list"
+            "view": "ztum.template.backup.list"
         },
         "ztum.template.preflight": {
             "class": "TemplatePreflight",
-            "view": "template.preflight"
+            "view": "ztum.template.preflight"
         },
         "ztum.template.update": {
             "class": "TemplateUpdate",
-            "view": "template.update"
+            "view": "ztum.template.update"
         },
         "ztum.template.rollback.review": {
             "class": "TemplateRollbackReview",
-            "view": "template.rollback.review"
+            "view": "ztum.template.rollback.review"
         },
         "ztum.template.rollback": {
             "class": "TemplateRollback",
-            "view": "template.rollback"
+            "view": "ztum.template.rollback"
         }
     }
 }
