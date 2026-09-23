@@ -103,6 +103,7 @@ $canRenderSelectionForm = $data['can_compare']
 
 if ($canRenderSelectionForm) {
 	$selectionForm = (new CForm())
+		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 		->addItem((new CVar(
 			CSRF_TOKEN_NAME,
 			CCsrfTokenHelper::get(
