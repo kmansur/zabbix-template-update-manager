@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.41
+# Laboratory test plan — 0.1.0-beta.42
 
 ## Release state
 
@@ -11,7 +11,7 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.41`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.42`. A formal Git tag/GitHub release remains a later publication step.
 
 Beta.39 retains the dependency-aware comparison/write safety chain and refactors the frontend to native Zabbix UI conventions. Field validation must prove native control rendering, status presentation and light/dark theme behavior on supported Zabbix generations while re-running the existing update/install/rollback regressions.
 
@@ -19,7 +19,7 @@ Beta.39 retains the dependency-aware comparison/write safety chain and refactors
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.41 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.42 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. Medium/high and local-overwrite candidates may use the explicit reviewed batch path only after verified rollback evidence, per-row selection and the required acknowledgements. Conflict and unresolved templates remain hard blocked.
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.41
-git checkout -B release/0.1.0-beta.41 origin/release/0.1.0-beta.41
+git fetch origin release/0.1.0-beta.42
+git checkout -B release/0.1.0-beta.42 origin/release/0.1.0-beta.42
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.41
+0.1.0-beta.42
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.41`, enable the module and open:
+Confirm `0.1.0-beta.42`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -110,7 +110,7 @@ Repeat this visual pass on at least one supported Zabbix 7.x lab and one support
 
 ## 2B. Request-bounded update regression
 
-For the first beta.41 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.42 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -171,7 +171,7 @@ For one non-critical official template that is absent locally and has no missing
 
 Also test at least one blocked dependency case if naturally available. Missing linked templates must be listed and the write must remain disabled.
 
-Do not test recursive dependency installation: beta.41 intentionally requires dependencies to be installed individually first.
+Do not test recursive dependency installation: beta.42 intentionally requires dependencies to be installed individually first.
 
 ## 3B. Multi-template installation
 
@@ -209,7 +209,7 @@ Confirm:
 - select only 2–3 candidates for the first test;
 - **Review selected updates** shows only those explicitly selected templates.
 
-The former 25-template update-batch ceiling is removed in beta.41. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach review and preparation intact, and preparation must still run one template per HTTP request without silent truncation.
+The former 25-template update-batch ceiling is removed in beta.42. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach review and preparation intact, and preparation must still run one template per HTTP request without silent truncation.
 
 ## 4A. Large selected-update regression
 
@@ -512,7 +512,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.41 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.42 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -547,7 +547,7 @@ Expected behavior:
 
 ## 13B. Air-gapped/offline upstream regression
 
-Build a beta.41 offline bundle on a connected system using the exact validated 7.x or 8.x index and a local canonical Zabbix Git checkout. Copy it to private storage on the lab frontend.
+Build a beta.42 offline bundle on a connected system using the exact validated 7.x or 8.x index and a local canonical Zabbix Git checkout. Copy it to private storage on the lab frontend.
 
 Configure:
 
@@ -615,6 +615,20 @@ Expected behavior:
 - the custom `All` / `Pages` display-mode control is not rendered;
 - when the filtered result exceeds rows per page, native pagination plus the reversible `All` control remains available.
 
+## 13G. Create-only installation rule regression
+
+Prepare a genuinely missing official template whose template group already exists locally, then execute controlled installation.
+
+Expected behavior:
+
+- fresh preflight and the write use the same `install_create_only_v1` rule profile;
+- existing template groups and other pre-existing configuration are not updated/deleted by the installation rule profile;
+- missing required groups may be created;
+- a successful install is followed by exact post-install validation;
+- a Zabbix import rejection is reported as `import_failed`, not as an HTTP request failure;
+- the batch stops immediately and reports an uncertain import outcome plus read-only target inspection;
+- no automatic retry or continuation occurs.
+
 ## 14. Evidence to capture
 
 Record for each Zabbix generation:
@@ -669,9 +683,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.41 laboratory validation
+## 16. Exit criteria for beta.42 laboratory validation
 
-A Zabbix generation passes beta.41 only after evidence demonstrates:
+A Zabbix generation passes beta.42 only after evidence demonstrates:
 
 ```text
 module discovery/enable
