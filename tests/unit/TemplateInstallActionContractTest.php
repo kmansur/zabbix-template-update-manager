@@ -38,6 +38,11 @@ assertInstallContract(strpos($preflight, 'TemplateInstallReferenceAuditService')
 assertInstallContract(strpos($preflight, 'TemplateInstallPreviewGate') !== false,
 	'Install preflight must enforce creation-only preview semantics.');
 assertInstallContract(
+	strpos($preflight, 'TemplateImportCompareService::PROFILE_INSTALL') !== false
+		&& strpos($preflight, "'import_rule_profile'") !== false,
+	'Install preflight must bind the reviewed create-only import rule profile into fresh evidence.'
+);
+assertInstallContract(
 	strpos($preflight, 'source_sha256') !== false
 		&& strpos($preflight, 'content_sha256') !== false
 		&& strpos($preflight, 'import_sha256') !== false,
@@ -52,6 +57,13 @@ assertInstallContract(strpos($controlled, 'hash_equals') !== false,
 	'Controlled install must reject changed evidence before writing.');
 assertInstallContract(strpos($controlled, 'TemplateConfigurationImportService') !== false,
 	'Controlled install must reuse the single approved configuration-import boundary.');
+assertInstallContract(
+	strpos($controlled, 'TemplateImportCompareService::PROFILE_INSTALL') !== false
+		&& strpos($controlled, "'status' => 'import_failed'") !== false
+		&& strpos($controlled, "'write_outcome' => 'uncertain'") !== false
+		&& strpos($controlled, 'TemplateInstallFailureInspectionService') !== false,
+	'Controlled install must keep create-only rules and classify import rejection as an uncertain write requiring inspection.'
+);
 assertInstallContract(strpos($controlled, 'TemplatePostInstallValidationService') !== false,
 	'Controlled install must perform fresh post-install validation.');
 assertInstallContract(strpos($controlled, 'API::Configuration()->import(') === false,
