@@ -62,7 +62,7 @@ $page
 				),
 				FrontendUi::yesNo(!empty($result['write_attempted'])),
 				FrontendUi::yesNo(!empty($result['write_performed'])),
-				(string) ($result['write_outcome'] ?? 'none'),
+				FrontendUi::reason((string) ($result['write_outcome'] ?? 'none')),
 				FrontendUi::reason(($result['reason'] ?? null) !== null ? (string) $result['reason'] : null),
 				FrontendUi::reason((string) ($result['preflight_status'] ?? ''))
 			])
