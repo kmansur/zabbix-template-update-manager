@@ -262,6 +262,8 @@ Preferred branches:
 - `refactor/<description>`
 - `chore/<description>`
 
+Merged topic branches should be deleted after integration. Keep the long-lived repository surface intentionally small: `main`, `upstream-index`, and temporary automation branches such as active Dependabot PRs. Do not create permanent per-beta `release/<version>` branches; public beta snapshots use Git tags/GitHub prereleases once the release gate is satisfied.
+
 Use Conventional Commits:
 
 - `feat:`

@@ -19,7 +19,7 @@ The estimate deliberately separates implementation from automation and field val
 | Automated validation/CI | 10% | 97% | CI/UI/security/workflow/offline/runtime/coverage gates implemented; browser E2E and independent security review remain |
 | Runtime resilience | 10% | 87% | Request-bounded flows, offline mode, runtime helper and operation lock implemented; per-template timeout/rename edge cases remain |
 | Field validation | 10% | 65% | Stronger Zabbix 7.x evidence than Zabbix 8.x; full matrix incomplete |
-| Release engineering | 10% | 78% | Release workflow/assets/checksums/policy implemented; license and first validated formal tag/release remain |
+| Release engineering | 10% | 78% | Release workflow/assets/checksums/policy implemented; license decision and first community-test prerelease remain |
 
 Weighted result: **89%**.
 
@@ -61,7 +61,7 @@ The external review's principal technical/process findings were converted into i
 - inherited/indirect host impact analysis;
 - move large batch JavaScript to dedicated assets without weakening server-authoritative controls;
 - independent security/code review before any production recommendation;
-- first formal prerelease tag/GitHub Release after beta.40 field evidence and license decision.
+- first community-test prerelease tag/GitHub Release after the license decision and final public-test documentation pass.
 
 ## Stable 1.0 blockers
 
