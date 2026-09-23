@@ -46,14 +46,10 @@ done
 [[ -n "$REF" ]] || die "--ref cannot be empty."
 
 if [[ ${EUID:-$(id -u)} -ne 0 ]]; then
-  if command -v sudo >/dev/null 2>&1; then
-    info "Root privileges are required. Re-running with sudo."
-    exec sudo --preserve-env=ZTUM_REF bash "$0" "$@"
-  fi
-  die "Run this installer as root (or with sudo)."
+  die "Run this installer as root, for example: sudo bash tools/quickinstall.sh"
 fi
 
-for command in tar find install cp chmod chown sort awk grep sed mktemp; do
+for command in tar find install cp chmod chown sort awk grep sed mktemp xargs; do
   command -v "$command" >/dev/null 2>&1 || die "Required command not found: $command"
 done
 
