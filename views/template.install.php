@@ -9,10 +9,16 @@ $statusLabels = [
 
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
-	->addItem(new CLink(
-		_('Back to template catalog'),
-		(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
-	));
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				new CLink(
+					_('Back to template catalog'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
+				)
+			)
+		))->setAttribute('aria-label', _('Content controls'))
+	);
 
 if ($data['operation_error'] !== null) {
 	$page
