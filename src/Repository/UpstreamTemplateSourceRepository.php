@@ -256,8 +256,11 @@ final class UpstreamTemplateSourceRepository {
 		if ($result === false || $status !== 200) {
 			throw new RuntimeException(sprintf('Upstream source request failed with HTTP %d: %s', $status, $error));
 		}
-		if (strtolower((string) parse_url($effectiveUrl, PHP_URL_HOST)) !== 'git.zabbix.com') {
-			throw new RuntimeException('The upstream source request redirected outside the canonical Zabbix host.');
+		$requestedHost = strtolower((string) parse_url($url, PHP_URL_HOST));
+		$effectiveHost = strtolower((string) parse_url($effectiveUrl, PHP_URL_HOST));
+		if (!in_array($requestedHost, ['git.zabbix.com', 'raw.githubusercontent.com'], true)
+				|| $effectiveHost !== $requestedHost) {
+			throw new RuntimeException('The upstream source request redirected outside the approved official hosts.');
 		}
 		if ($content === '') {
 			throw new RuntimeException('The upstream template source is empty.');
@@ -265,6 +268,7 @@ final class UpstreamTemplateSourceRepository {
 
 		return $content;
 	}
+
 	private function immutableCacheFile(string $commit, string $path): string {
 		$identity = json_encode([$commit, $path], JSON_UNESCAPED_SLASHES);
 		if (!is_string($identity)) {
