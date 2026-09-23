@@ -4,13 +4,22 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.50] - 2026-09-23
+
 ### Added
 
 - Beginner-friendly new-install quick installers in English and Brazilian Portuguese.
 - Matching quick-install guides with copy/paste installation commands and post-install Zabbix UI steps.
+- Shared native frontend presentation helpers for section headings, descriptions, message boxes, technical fingerprints and human-readable reason labels.
+- Context-aware native Zabbix empty states for catalog filters.
 
 ### Changed
 
+- Completed a full user-facing UI/copy pass across catalog, comparison, update preparation/execution, installation preparation/review/result, preflight, rollback history/review/result and backup views.
+- Standardized page titles, section names, confirmation language, status messages and write-boundary warnings.
+- Internal snake-case reason/status codes are translated into operator-readable labels before display while remaining unchanged in service/API evidence.
+- Commit, UUID and SHA-256 values use compact native monospace presentation with the complete value retained in the HTML title for inspection.
+- Long engineering explanations were reduced to concise operator guidance without changing fail-closed behavior or controlled-write requirements.
 - Repository hygiene policy now removes merged topic branches instead of retaining permanent per-beta release branches.
 - Laboratory installation documentation no longer depends on stale `release/<version>` branches; exact commits or formal prerelease tags are used instead.
 
@@ -18,6 +27,18 @@ All notable changes to Template Update Manager will be documented in this file.
 
 - Obsolete empty source placeholders that were never referenced by runtime code.
 - Superseded beta6/beta7 implementation-note documents that no longer represented the current architecture.
+
+### Safety
+
+- No comparison, backup, preflight, evidence, installation, update or rollback decision logic changed in the UI refactor.
+- Configuration writes remain restricted to the existing controlled `configuration.import` boundary with fresh server-side preflight and explicit confirmation.
+- The UI continues to use native Zabbix PHP components and `ZBX_STYLE_*` classes only; no custom CSS/UI framework was introduced.
+
+### Tests
+
+- Native UI guard now requires the shared presentation layer across every user-facing view and rejects direct per-view section/paragraph composition.
+- Catalog tests require contextual `CTableInfo::setNoDataMessage()` behavior.
+- Existing update/install/rollback write-boundary, security, CSRF and evidence contracts remain mandatory.
 
 ## [0.1.0-beta.49] - 2026-09-23
 
