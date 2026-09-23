@@ -293,7 +293,12 @@ For current upstream content, the document service:
 3. retains only the selected template;
 4. retains only top-level template-group definitions referenced by that template;
 5. retains host-group definitions referenced by discovered host prototypes;
-6. emits a minimal JSON Zabbix export for import comparison.
+6. retains relevant top-level trigger/graph definitions;
+7. in strict mode, rejects cross-template top-level references;
+8. in dependency-aware install/update mode, preserves those references without importing sibling templates and reports the external template-name set;
+9. emits a minimal JSON Zabbix export for import comparison.
+
+Dependency-aware update preflight binds the external template-name set into its evidence. Immutable candidate reconstruction must reproduce the same set before a write can proceed.
 
 For historical content, strict current name/version identity cannot be required because those fields may legitimately differ over time. Historical isolation instead requires:
 
