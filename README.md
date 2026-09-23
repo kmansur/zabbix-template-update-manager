@@ -10,7 +10,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.52**
+Current version: **0.1.0-beta.53**
 
 This version is intended for **laboratory testing**.
 
@@ -20,7 +20,7 @@ This version is intended for **laboratory testing**.
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
 
-Beta.52 adds a persistent per-template **Never update** policy. Super Admin users can mark one or more installed official templates as protected, filter the catalog to show those templates, and later allow updates again. The policy is enforced in catalog eligibility, readiness, fresh preflight and immediately before controlled import.
+Beta.53 fixes native catalog pager compatibility across Zabbix 7.x and 8.x after Zabbix 8 field testing exposed renamed frontend pager constants. It retains the persistent per-template **Never update** policy introduced in beta.52, including catalog filtering, explicit **Allow updates** reversal and fail-closed enforcement before controlled imports.
 
 Formal tag/GitHub Release automation exists, but a community prerelease remains gated by this cross-version UI field pass and the still-unselected project license.
 
@@ -228,7 +228,7 @@ git rev-parse HEAD
 Expected `VERSION` for the current laboratory build:
 
 ```text
-0.1.0-beta.52
+0.1.0-beta.53
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -244,7 +244,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.52**, enable the module and open:
+Confirm version **0.1.0-beta.53**, enable the module and open:
 
 ```text
 Data collection → Template updates
