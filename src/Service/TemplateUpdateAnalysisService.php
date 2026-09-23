@@ -268,7 +268,8 @@ final class TemplateUpdateAnalysisService {
 					$vendorName,
 					75,
 					null,
-					true
+					true,
+					12.0
 				);
 
 				if (($baseline['status'] ?? null) === 'found') {
