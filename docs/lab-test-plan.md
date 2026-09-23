@@ -234,7 +234,7 @@ Prepare selected updates
 
 Expected behavior:
 
-1. each selected template runs the full authoritative update analysis;
+1. each selected template runs the full authoritative update analysis using bounded HTTP work; long historical discovery may continue across multiple requests for that same template;
 2. historical baseline and BASE/LOCAL/UPSTREAM analysis are reused;
 3. conflict/local-overwrite/unresolved states remain blocked;
 4. high risk, local-overwrite and unrecognized medium-risk cases become Manual review; recognized bounded-medium cases may remain on the standard path;
@@ -276,8 +276,11 @@ Expected behavior:
 - the previous request-failed Blocked count is removed before fresh reclassification, so summary totals remain consistent;
 - an HTTP failure reason includes elapsed time, for example `HTTP 504 after 100.1s`;
 - if retry succeeds and produces an evidence-backed Ready row, normal execution controls become available;
-- if retry returns another 504 near the same elapsed time, capture that timing plus frontend/PHP logs and treat it as a repeatable per-template timeout rather than a cumulative batch timeout;
-- preparation retry must never call `configuration.import`.
+- a long historical scan may show `history_scan_pending` / continuation progress and issue several bounded requests for the same template before final classification;
+- no single historical continuation request should approach the previous ~30-second gateway failure window;
+- if an HTTP failure still occurs, the Reason should include elapsed time and gateway identity such as `server=cloudflare` / `cf-ray=...` when exposed by the response;
+- if a real 504 still occurs on beta.48, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
+- preparation continuation/retry must never call `configuration.import`.
 
 ## 5B. Manual-review continuation regression
 
