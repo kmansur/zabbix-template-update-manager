@@ -9,7 +9,7 @@ The project is designed as a native Zabbix frontend module.
 1. Do not modify Zabbix core files.
 2. Preserve the native Zabbix UI and UX.
 3. Prefer Zabbix native frontend components.
-4. Keep the initial implementation read-only.
+4. Keep discovery, comparison and preflight configuration-read-only; permit writes only through the reviewed controlled-import boundary.
 5. Never modify templates during discovery or comparison.
 6. Identify official templates primarily by UUID.
 7. Treat vendor metadata as metadata, not proof of upstream identity.
@@ -548,3 +548,57 @@ Implemented write-path properties include:
 - filters/drill-down for very large three-way detail sets;
 - persistent human-readable operation history/audit UI;
 - continued field validation against Zabbix 7.x and 8.x.
+
+
+## Production-readiness controls added in beta.40
+
+### Air-gapped / offline source provider
+
+Runtime upstream repositories now prefer a configured local `OfflineBundleRepository` when `ZTUM_OFFLINE_BUNDLE_DIR` is set.
+
+The bundle contract is intentionally narrow:
+
+- one private administrator-configured root;
+- `manifest.json` schema validation;
+- exact SHA-256 verification for every consumed file;
+- existing upstream-index schema/UUID/path/hash validation remains mandatory;
+- current/historical source paths are derived internally from validated commit/path values;
+- no arbitrary filesystem path is accepted from frontend input;
+- `ZTUM_OFFLINE_ONLY=1` converts every missing required bundle artifact into a fail-closed error instead of using network fallback.
+
+The bundle generator consumes a local canonical Zabbix Git checkout and validated upstream index. It verifies current raw YAML bytes against the index before packaging them.
+
+Historical bundle generation deliberately preserves the current rename limitation: if an older commit cannot be read at the current path, generation stops/truncates instead of guessing a renamed historical path.
+
+### Controlled-operation serialization
+
+All configuration-changing controllers acquire `TemplateOperationLockService` before invoking the fresh controlled-operation service.
+
+The lock:
+
+- is global per shared lock filesystem, not per template;
+- is non-blocking: a second operation fails closed immediately;
+- is acquired before the fresh authoritative preflight;
+- remains held through `configuration.import` and post-operation validation;
+- applies to individual update, batch update, individual install, batch install and rollback;
+- does not replace evidence/preflight checks.
+
+The default lock directory is private below the PHP temporary directory. `ZTUM_LOCK_DIR` can place it in persistent private storage. Multi-node frontends must use storage with reliable cross-node `flock()` semantics for serialization to be meaningful across nodes.
+
+### Runtime storage provisioning
+
+`tools/ztum-runtime-setup.sh` detects a single PHP-FPM runtime account or requires an explicit `--user`, then creates/checks private `0700` runtime directories without modifying PHP-FPM configuration or falling back to world-writable storage.
+
+### Release and security automation
+
+Beta.40 adds independent CI surfaces for:
+
+- deterministic runtime security invariants;
+- dependency auditing;
+- workflow YAML/action pin validation;
+- runtime-directory helper validation;
+- offline bundle generation/integrity;
+- transparent Xdebug coverage metrics;
+- formal tagged release packaging/checksums.
+
+These gates remain automation evidence only; real Zabbix 7.x/8.x runtime validation remains separate.
