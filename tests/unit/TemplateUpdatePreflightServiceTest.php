@@ -81,6 +81,25 @@ assertPreflight(true, is_string($result['evidence_sha256']) && strlen($result['e
 $resultAgain = $service->run('12345');
 assertPreflight($result['evidence_sha256'], $resultAgain['evidence_sha256'], 'Unchanged authoritative evidence must produce the same fingerprint.');
 
+$policyBlocked = new TemplateUpdatePreflightService(
+	static fn(string $templateId): array => $analysis,
+	static fn(string $templateId, string $uuid): bool => true
+);
+$result = $policyBlocked->run('12345');
+assertPreflight('blocked_update_policy', $result['status'], 'Never update policy must block fresh preflight.');
+assertPreflight('update_policy_never', $result['reason'], 'Never update policy blocker must be explicit.');
+assertPreflight(false, $result['write_enabled'], 'Never update policy must never enable configuration writes.');
+
+$policyUnavailable = new TemplateUpdatePreflightService(
+	static fn(string $templateId): array => $analysis,
+	static function (string $templateId, string $uuid): bool {
+		throw new RuntimeException('simulated policy store failure');
+	}
+);
+$result = $policyUnavailable->run('12345');
+assertPreflight('blocked_update_policy', $result['status'], 'Unavailable policy storage must fail closed.');
+assertPreflight('update_policy_unavailable', $result['reason'], 'Unavailable policy storage reason must be explicit.');
+
 $notReady = $analysis;
 $notReady['update_readiness']['status'] = 'candidate_for_backup';
 $result = (new TemplateUpdatePreflightService(static fn(string $templateId): array => $notReady))->run('12345');
