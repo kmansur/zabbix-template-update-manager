@@ -234,7 +234,7 @@ Prepare selected updates
 
 Expected behavior:
 
-1. each selected template runs the full authoritative update analysis using bounded HTTP work; long historical discovery may continue across multiple requests for that same template;
+1. each selected template runs the full authoritative update analysis using bounded HTTP work; an installed official `<major>.<minor>-0` template first resolves BASE from the immutable official `<major>.<minor>.0` UUID index, while other versions may use request-bounded historical continuation;
 2. historical baseline and BASE/LOCAL/UPSTREAM analysis are reused;
 3. conflict/local-overwrite/unresolved states remain blocked;
 4. high risk, local-overwrite and unrecognized medium-risk cases become Manual review; recognized bounded-medium cases may remain on the standard path;
@@ -263,6 +263,18 @@ For a mixed plan, deliberately keep at least one `Ready` and one `Manual review`
 - a Ready row without a valid 64-hex SHA-256 evidence value is converted to Blocked and cannot be submitted;
 - if `Ready = 0`, the execution state shows `Unavailable — no Ready templates.`;
 - stopping preparation keeps execution unavailable even if an earlier row had become Ready.
+
+### Initial-release baseline regression
+
+For Zabbix 7.0, include several untouched official templates still installed at vendor version `7.0-0`, including at least one AWS template whose source path changed after 7.0.0.
+
+Expected behavior:
+
+- the baseline is resolved from the immutable `7.0.0` UUID index without a historical continuation loop;
+- AWS templates that lived in separate YAML files at 7.0.0 remain resolvable even though the current upstream source is the consolidated AWS YAML;
+- `historical_baseline_unavailable`, `historical_baseline_ambiguous` and `historical_baseline_continuation_limit_reached` must not be produced solely because of later source-file restructuring;
+- the resulting BASE still feeds native import comparison, three-way analysis, risk evaluation and rollback gates;
+- if UUID/vendor/version does not match the immutable initial index exactly, the flow falls back conservatively to normal historical discovery.
 
 ## 5A. Preparation failure / zero-Ready regression
 
