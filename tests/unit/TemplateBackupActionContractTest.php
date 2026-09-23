@@ -9,7 +9,7 @@ function assertTemplateBackupAction($expected, $actual, string $message): void {
 
 $root = dirname(__DIR__, 2);
 $action = (string) file_get_contents($root.'/actions/TemplateBackup.php');
-$view = (string) file_get_contents($root.'/views/template.compare.php');
+$view = (string) file_get_contents($root.'/views/ztum.template.compare.php');
 $manifest = json_decode((string) file_get_contents($root.'/manifest.json'), true);
 
 assertTemplateBackupAction(
