@@ -70,6 +70,14 @@ assertInstallBatchContract(
 );
 assertInstallBatchContract(strpos($prepareView, 'stops on the first failure') !== false,
 	'Request-bounded execution must preserve stop-on-first-failure behavior.');
+assertInstallBatchContract(
+	strpos($prepareView, 'Confirmed configuration write') !== false
+		&& strpos($prepareView, 'Uncertain import') !== false
+		&& strpos($prepareView, "result.status === 'import_failed'") !== false
+		&& strpos($prepareView, 'failure_inspection') !== false
+		&& strpos($prepareView, 'request_failure_notice') !== false,
+	'Batch execution must distinguish confirmed writes, import rejection and browser-request outcome uncertainty.'
+);
 
 assertInstallBatchContract(strpos($executeOne, "'confirm' => 'required|in 1'") !== false,
 	'Each request-bounded installation write must require explicit confirmation.');
