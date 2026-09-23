@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.39
+# Laboratory test plan — 0.1.0-beta.40
 
 ## Release state
 
@@ -11,7 +11,7 @@ Status at publication:
 - field validation: in progress;
 - target Zabbix generations: 7.x and 8.x.
 
-The fixed test snapshot branch is `release/0.1.0-beta.39`. A formal Git tag/GitHub release remains a later publication step.
+The fixed test snapshot branch is `release/0.1.0-beta.40`. A formal Git tag/GitHub release remains a later publication step.
 
 Beta.39 retains the dependency-aware comparison/write safety chain and refactors the frontend to native Zabbix UI conventions. Field validation must prove native control rendering, status presentation and light/dark theme behavior on supported Zabbix generations while re-running the existing update/install/rollback regressions.
 
@@ -19,7 +19,7 @@ Beta.39 retains the dependency-aware comparison/write safety chain and refactors
 
 Use a disposable or otherwise non-production Zabbix environment.
 
-For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.39 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
+For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; beta.40 also permits only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance.
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. Medium/high and local-overwrite candidates may use the explicit reviewed batch path only after verified rollback evidence, per-row selection and the required acknowledgements. Conflict and unresolved templates remain hard blocked.
 
@@ -55,8 +55,8 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git fetch origin release/0.1.0-beta.39
-git checkout -B release/0.1.0-beta.39 origin/release/0.1.0-beta.39
+git fetch origin release/0.1.0-beta.40
+git checkout -B release/0.1.0-beta.40 origin/release/0.1.0-beta.40
 cat VERSION
 git rev-parse HEAD
 ```
@@ -64,7 +64,7 @@ git rev-parse HEAD
 Expected project version:
 
 ```text
-0.1.0-beta.39
+0.1.0-beta.40
 ```
 
 Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
@@ -73,7 +73,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.39`, enable the module and open:
+Confirm `0.1.0-beta.40`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -110,7 +110,7 @@ Repeat this visual pass on at least one supported Zabbix 7.x lab and one support
 
 ## 2B. Request-bounded update regression
 
-For the first beta.39 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.40 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -171,7 +171,7 @@ For one non-critical official template that is absent locally and has no missing
 
 Also test at least one blocked dependency case if naturally available. Missing linked templates must be listed and the write must remain disabled.
 
-Do not test recursive dependency installation: beta.39 intentionally requires dependencies to be installed individually first.
+Do not test recursive dependency installation: beta.40 intentionally requires dependencies to be installed individually first.
 
 ## 3B. Multi-template installation
 
@@ -209,7 +209,7 @@ Confirm:
 - select only 2–3 candidates for the first test;
 - **Review selected updates** shows only those explicitly selected templates.
 
-The former 25-template update-batch ceiling is removed in beta.39. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach review and preparation intact, and preparation must still run one template per HTTP request without silent truncation.
+The former 25-template update-batch ceiling is removed in beta.40. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach review and preparation intact, and preparation must still run one template per HTTP request without silent truncation.
 
 ## 4A. Large selected-update regression
 
@@ -512,7 +512,7 @@ post-rollback validation = passed
 remaining differences = 0
 ```
 
-Rollback remains an explicit per-template operation; beta.39 does not provide automatic batch rollback.
+Rollback remains an explicit per-template operation; beta.40 does not provide automatic batch rollback.
 
 ## 12. Permission/CSRF negative checks
 
@@ -532,6 +532,67 @@ Confirm:
 If a stored backup YAML or JSON manifest is altered, the artifact must become invalid and must not be accepted as verified rollback evidence.
 
 Do not perform this on a production backup store.
+
+## 13A. Controlled-operation serialization regression
+
+In a disposable lab, start one controlled update/install/rollback request and, while it is still inside fresh preflight/import/validation, attempt a second configuration-changing ZTUM operation from another browser/session.
+
+Expected behavior:
+
+- the first operation proceeds normally;
+- the second operation fails closed with `Another Template Update Manager configuration operation is already in progress.`;
+- the second operation must not start a second controlled preflight/import;
+- after the first request finishes, a later controlled operation can acquire the lock normally;
+- on a multi-node frontend, run this only when all nodes share a lock filesystem with reliable cross-node `flock()`; otherwise record cross-node serialization as unproven.
+
+## 13B. Air-gapped/offline upstream regression
+
+Build a beta.40 offline bundle on a connected system using the exact validated 7.x or 8.x index and a local canonical Zabbix Git checkout. Copy it to private storage on the lab frontend.
+
+Configure:
+
+```text
+ZTUM_OFFLINE_BUNDLE_DIR=/var/lib/zabbix-template-update-manager/offline
+ZTUM_OFFLINE_ONLY=1
+```
+
+Expected behavior:
+
+- diagnostics show Offline bundle = Configured and Offline-only = Enabled;
+- catalog/comparison/preflight can use the bundle with network egress disabled;
+- the loaded index reports offline runtime state;
+- tampering one consumed bundle file causes SHA-256 verification failure and no network fallback;
+- removing a required index/source/history artifact blocks the operation rather than using public endpoints;
+- controlled update/install safety gates remain unchanged.
+
+## 13C. Runtime setup helper regression
+
+Run:
+
+```bash
+sudo tools/ztum-runtime-setup.sh --check
+sudo tools/ztum-runtime-setup.sh --apply --user <actual-php-fpm-user>
+sudo tools/ztum-runtime-setup.sh --check --user <actual-php-fpm-user>
+```
+
+Expected behavior:
+
+- private runtime directories exist as mode `0700`;
+- ownership matches the PHP-FPM runtime account;
+- the backup directory is writable by that account;
+- a symbolic-link runtime directory is refused;
+- when multiple PHP-FPM users are detected, the helper refuses to guess and requires `--user`.
+
+## 13D. Individual local-overwrite acknowledgement regression
+
+Exercise the individual reviewed update path for a candidate whose manual reasons include `local_customization_overwrite`.
+
+Expected behavior:
+
+- the normal reviewed-risk acknowledgement remains required;
+- a separate `Local customization overwrite` checkbox is rendered;
+- omitting that specific acknowledgement blocks before `configuration.import`;
+- accepting both acknowledgements allows only the existing fresh-preflight/evidence-controlled path.
 
 ## 14. Evidence to capture
 
@@ -587,9 +648,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.39 laboratory validation
+## 16. Exit criteria for beta.40 laboratory validation
 
-A Zabbix generation passes beta.39 only after evidence demonstrates:
+A Zabbix generation passes beta.40 only after evidence demonstrates:
 
 ```text
 module discovery/enable
@@ -611,6 +672,10 @@ rollback review
 recovery backup
 controlled rollback + post-validation
 permission/CSRF negative checks
+global controlled-operation serialization
+air-gapped/offline-only regression
+runtime setup helper validation
+individual local-overwrite acknowledgement
 no unexpected PHP/frontend errors
 ```
 
