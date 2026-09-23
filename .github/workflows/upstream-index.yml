@@ -189,8 +189,8 @@ jobs:
             source_dir="/tmp/zabbix-initial-${safe_line}"
 
             if ! git ls-remote --exit-code --tags "$CANONICAL_REPO" "refs/tags/${ref}" >/dev/null 2>&1; then
-              echo "Initial immutable release tag ${ref} is unavailable." >&2
-              return 1
+              echo "Initial immutable release tag ${ref} is not published; skipping this line."
+              return 0
             fi
 
             echo "Building immutable Zabbix ${line} initial baseline index from tag ${ref}."
