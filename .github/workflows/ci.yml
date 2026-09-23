@@ -48,6 +48,9 @@ jobs:
       - name: Validate manifest
         run: php tests/validate_manifest.php
 
+      - name: Enforce module view namespace
+        run: php tests/module_view_namespace_guard.php
+
       - name: Validate version
         run: php tests/validate_version.php
 
