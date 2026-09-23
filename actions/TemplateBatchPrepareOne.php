@@ -47,10 +47,12 @@ class TemplateBatchPrepareOne extends CController {
 
 	protected function doAction(): void {
 		$templateId = (string) $this->getInput('templateid');
+		$startedAt = microtime(true);
 		$output = [
 			'ok' => false,
 			'item' => null,
-			'error' => null
+			'error' => null,
+			'elapsed_ms' => 0
 		];
 
 		try {
@@ -64,12 +66,23 @@ class TemplateBatchPrepareOne extends CController {
 			$output['item'] = $item;
 		}
 		catch (Throwable $exception) {
+			$elapsedMs = (int) round((microtime(true) - $startedAt) * 1000);
 			error_log(sprintf(
-				'[Zabbix Template Update Manager] Batch preparation failed for template %s: %s',
+				'[Zabbix Template Update Manager] Batch preparation failed for template %s after %.1fs: %s',
 				$templateId,
+				$elapsedMs / 1000,
 				$exception->getMessage()
 			));
 			$output['error'] = _('Unable to prepare this template. No Zabbix configuration import was attempted.');
+		}
+
+		$output['elapsed_ms'] = (int) round((microtime(true) - $startedAt) * 1000);
+		if ($output['ok'] && $output['elapsed_ms'] >= 10000) {
+			error_log(sprintf(
+				'[Zabbix Template Update Manager] Slow batch preparation for template %s completed in %.1fs.',
+				$templateId,
+				$output['elapsed_ms'] / 1000
+			));
 		}
 
 		$this->setResponse(
