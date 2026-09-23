@@ -79,7 +79,7 @@ assertInstallContract(strpos($listController, 'CPagerHelper::paginate') !== fals
 		&& strpos($listController, "CPagerHelper::savePage('ztum.template.catalog'") !== false
 		&& strpos($list, 'setPageNavigation') !== false,
 	'Expanded official catalog must use native Zabbix pagination end to end.');
-assertInstallContract(strpos($reviewView, 'Structural reference audit') !== false
+assertInstallContract(strpos($reviewView, "FrontendUi::section(_('Reference audit'))") !== false
 		&& strpos($reviewView, "'blocked_references'") !== false
 		&& strpos($reviewView, "'unresolved_internal_references'") !== false,
 	'Installation review must expose structural-reference audit state and blockers.');
@@ -96,7 +96,7 @@ assertInstallContract(
 	strpos($resultView, "'import_failed'") !== false
 		&& strpos($resultView, 'Import attempted') !== false
 		&& strpos($resultView, 'Confirmed configuration write') !== false
-		&& strpos($resultView, 'Read-only post-failure inspection') !== false,
+		&& strpos($resultView, "FrontendUi::section(_('Post-failure inspection'))") !== false,
 	'Individual install result must distinguish import attempt, confirmed write and post-failure target inspection.'
 );
 
