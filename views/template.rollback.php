@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $backUrl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'ztum.template.backups')
 	->setArgument('templateid', $data['templateid']);
@@ -38,8 +42,13 @@ $statusLabels = [
 $stateTable = (new CTableInfo())
 	->setHeader([_('Result'), _('Configuration write performed'), _('Reason')])
 	->addRow([
-		$statusLabels[$status] ?? $status,
-		$writePerformed ? _('Yes') : _('No'),
+		FrontendUi::status(
+			$statusLabels[$status] ?? $status,
+			$status === 'rolled_back'
+				? FrontendUi::SUCCESS
+				: (str_starts_with($status, 'blocked_') ? FrontendUi::WARNING : FrontendUi::DANGER)
+		),
+		FrontendUi::yesNo($writePerformed),
 		($result['reason'] ?? null) !== null ? (string) $result['reason'] : '—'
 	]);
 
