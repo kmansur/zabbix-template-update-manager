@@ -7,6 +7,7 @@ require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
 $statusLabels = [
 	'blocked_preflight' => _('Blocked — fresh installation preflight did not pass'),
 	'blocked_evidence_changed' => _('Blocked — installation evidence changed'),
+	'import_failed' => _('Import failed — inspect state'),
 	'installed' => _('Installed and validated'),
 	'validation_failed' => _('Installed but post-install validation failed')
 ];
@@ -42,19 +43,56 @@ $page
 	->addItem(new CTag('h4', true, _('Controlled installation result')))
 	->addItem(
 		(new CTableInfo())
-			->setHeader([_('Result'), _('Configuration write performed'), _('Reason'), _('Fresh preflight state')])
+			->setHeader([
+				_('Result'),
+				_('Import attempted'),
+				_('Confirmed configuration write'),
+				_('Write outcome'),
+				_('Reason'),
+				_('Fresh preflight state')
+			])
 			->addRow([
 				FrontendUi::status(
 					$statusLabels[$status] ?? $status,
 					$status === 'installed'
 						? FrontendUi::SUCCESS
-						: ($status === 'validation_failed' ? FrontendUi::DANGER : FrontendUi::WARNING)
+						: (in_array($status, ['validation_failed', 'import_failed'], true)
+							? FrontendUi::DANGER
+							: FrontendUi::WARNING)
 				),
+				FrontendUi::yesNo(!empty($result['write_attempted'])),
 				FrontendUi::yesNo(!empty($result['write_performed'])),
+				(string) ($result['write_outcome'] ?? 'none'),
 				($result['reason'] ?? null) !== null ? (string) $result['reason'] : '—',
 				(string) ($result['preflight_status'] ?? '—')
 			])
 	);
+
+if ($status === 'import_failed') {
+	$detail = trim((string) ($result['error_detail'] ?? ''));
+	if ($detail !== '') {
+		$page->addItem(FrontendUi::message(
+			_('Zabbix rejected the controlled import: ').$detail,
+			FrontendUi::DANGER
+		));
+	}
+
+	$inspection = is_array($result['failure_inspection'] ?? null) ? $result['failure_inspection'] : [];
+	if ($inspection !== []) {
+		$page
+			->addItem(new CTag('h4', true, _('Read-only post-failure inspection')))
+			->addItem(
+				(new CTableInfo())
+					->setHeader([_('Target state'), _('Matches'), _('Template ID'), _('Observed version')])
+					->addRow([
+						(string) ($inspection['state'] ?? 'state_unknown_after_failure'),
+						(int) ($inspection['match_count'] ?? 0),
+						(string) (($inspection['templateid'] ?? '') !== '' ? $inspection['templateid'] : '—'),
+						(string) (($inspection['vendor_version'] ?? '') !== '' ? $inspection['vendor_version'] : '—')
+					])
+			);
+	}
+}
 
 $candidate = is_array($result['candidate'] ?? null) ? $result['candidate'] : [];
 if ($candidate !== []) {
