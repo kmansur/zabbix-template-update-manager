@@ -108,16 +108,22 @@ if ($status === 'ready' && $evidenceSha !== '') {
 	$form = (new CForm('post'))
 		->setId('ztum-template-rollback-form')
 		->setAction($rollbackAction)
+		->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 		->addItem([
 			(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.rollback')))->removeId(),
 			(new CVar('templateid', $data['templateid']))->removeId(),
 			(new CVar('manifest_file', $data['manifest_file']))->removeId(),
-			(new CVar('evidence_sha256', $evidenceSha))->removeId(),
-			(new CCheckBox('confirm', '1'))->setLabel(_(
-				'I understand that this will import the selected stored template and change Zabbix configuration.'
-			)),
-			new CSubmitButton(_('Rollback template'))
-		]);
+			(new CVar('evidence_sha256', $evidenceSha))->removeId()
+		])
+		->addItem(
+			(new CFormList())->addRow(
+				_('Confirmation'),
+				(new CCheckBox('confirm', '1'))->setLabel(_(
+					'I understand that this will import the selected stored template and change Zabbix configuration.'
+				))
+			)
+		)
+		->addItem(makeFormFooter(new CSubmitButton(_('Rollback template'))));
 
 	$page
 		->addItem(new CTag('h4', true, _('Explicit rollback confirmation')))
