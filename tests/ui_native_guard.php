@@ -41,6 +41,16 @@ foreach ($views as $file) {
 		}
 	}
 
+	if (strpos($content, 'FrontendUi') === false) {
+		$fail('User-facing views must use the shared native FrontendUi helper: '.basename($file));
+	}
+	if (strpos($content, "new CTag('h4'") !== false || strpos($content, 'new CTag("h4"') !== false) {
+		$fail('Section headings must use FrontendUi::section() for consistent native Zabbix presentation: '.basename($file));
+	}
+	if (strpos($content, "new CTag('p'") !== false || strpos($content, 'new CTag("p"') !== false) {
+		$fail('Descriptive copy must use FrontendUi::description()/message() for consistent native Zabbix presentation: '.basename($file));
+	}
+
 	if (preg_match('/#[0-9a-fA-F]{6}\b/', $content)) {
 		$fail('Hard-coded six-digit theme color found in '.basename($file).'. Use native ZBX_STYLE_* classes.');
 	}
@@ -56,12 +66,23 @@ foreach ([
 	}
 }
 
+$catalog = (string) file_get_contents($root.'/views/ztum.template.list.php');
+if (strpos($catalog, 'setNoDataMessage') === false) {
+	$fail('Template catalog must provide contextual native Zabbix no-data messaging.');
+}
+
+$helper = (string) file_get_contents($root.'/src/Support/FrontendUi.php');
+foreach (['section(', 'description(', 'message(', 'fingerprint(', 'reason(', 'reasonList('] as $method) {
+	if (strpos($helper, 'function '.$method) === false) {
+		$fail('FrontendUi is missing shared presentation helper '.$method.'.');
+	}
+}
+
 $updateBatch = (string) file_get_contents($root.'/views/ztum.template.batch.prepare.php');
 if (strpos($updateBatch, "new CCheckBox('review_select['.\$templateId.']', '1')") === false) {
 	$fail('Reviewed update selection must be rendered with native CCheckBox controls.');
 }
 
-$helper = (string) file_get_contents($root.'/src/Support/FrontendUi.php');
 foreach (['ZBX_STYLE_GREEN', 'ZBX_STYLE_ORANGE', 'ZBX_STYLE_RED', 'ZBX_STYLE_BLUE', 'ZBX_STYLE_GREY'] as $constant) {
 	if (strpos($helper, "'".$constant."'") === false) {
 		$fail('FrontendUi must map status tones to native Zabbix style constant '.$constant.'.');

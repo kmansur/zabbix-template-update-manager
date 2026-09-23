@@ -68,8 +68,9 @@ assertPreflightActionContract(
 	'Preflight view must display the deterministic evidence fingerprint when available.'
 );
 assertPreflightActionContract(
-	stripos($view, 'configuration import') !== false,
-	'Preflight view must explicitly state that it does not perform a configuration import.'
+	strpos($view, 'This preflight was recomputed') !== false
+		&& strpos($view, 'This operation writes Zabbix configuration') !== false,
+	'Preflight view must distinguish read-only evidence recomputation from the later confirmed configuration write.'
 );
 
 echo "Template preflight action contract tests passed.\n";

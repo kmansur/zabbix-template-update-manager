@@ -249,17 +249,14 @@ if (is_array($data['template'])) {
 				$contentTones[$data['content_status']] ?? FrontendUi::MUTED
 			),
 			$data['source_path'] !== '' ? $data['source_path'] : '—',
-			$sourceCommit !== '' ? substr($sourceCommit, 0, 12) : '—'
+			$sourceCommit !== '' ? FrontendUi::fingerprint($sourceCommit, 12) : '—'
 		]);
 
-	$page->addItem(new CTag('h4', true, _('Comparison target')))->addItem($metadataTable);
+	$page->addItem(FrontendUi::section(_('Template')))->addItem($metadataTable);
 }
 
 if ($data['comparison_error'] !== null) {
-	$page->addItem(new CTag('p', true, FrontendUi::status(
-		$data['comparison_error'],
-		FrontendUi::DANGER
-	)));
+	$page->addItem(FrontendUi::message((string) $data['comparison_error'], FrontendUi::DANGER));
 	$page->show();
 	return;
 }
@@ -270,7 +267,7 @@ $summaryTable = (new CTableInfo())
 	->addRow([$summary['added'], $summary['updated'], $summary['removed'], $summary['total']]);
 
 $page
-	->addItem(new CTag('h4', true, _('Current upstream update preview')))
+	->addItem(FrontendUi::section(_('Update preview')))
 	->addItem($summaryTable);
 
 if ($summary['by_entity'] !== []) {
@@ -286,7 +283,7 @@ if ($summary['by_entity'] !== []) {
 		]);
 	}
 
-	$page->addItem(new CTag('h4', true, _('Current-upstream changes by entity')))->addItem($entityTable);
+	$page->addItem(FrontendUi::section(_('Changes by entity')))->addItem($entityTable);
 }
 
 if (is_array($data['historical_baseline'])) {
@@ -309,7 +306,7 @@ if (is_array($data['historical_baseline'])) {
 				$baselineTones[$baselineStatus] ?? FrontendUi::MUTED
 			),
 			(string) ($baseline['vendor_version'] ?? '—'),
-			($baseline['commit'] ?? '') !== '' ? substr((string) $baseline['commit'], 0, 12) : '—',
+			($baseline['commit'] ?? '') !== '' ? FrontendUi::fingerprint((string) $baseline['commit'], 12) : '—',
 			(int) ($baseline['commits_examined'] ?? 0),
 			(int) ($baseline['candidate_count'] ?? 0),
 			(int) ($baseline['distinct_candidate_count'] ?? 0),
@@ -318,7 +315,7 @@ if (is_array($data['historical_baseline'])) {
 				: (isset($baseline['semantic_distance']) ? (int) $baseline['semantic_distance'] : '—')
 		]);
 
-	$page->addItem(new CTag('h4', true, _('Historical official baseline')))->addItem($baselineTable);
+	$page->addItem(FrontendUi::section(_('Historical baseline')))->addItem($baselineTable);
 
 	if ($baselineStatus === 'found') {
 		$historical = $data['historical_summary'];
@@ -330,15 +327,12 @@ if (is_array($data['historical_baseline'])) {
 				$historical['removed'],
 				$historical['total']
 			]);
-		$page->addItem(new CTag('h4', true, _('Installed content vs historical baseline')))->addItem($historicalTable);
+		$page->addItem(FrontendUi::section(_('Local changes from baseline')))->addItem($historicalTable);
 	}
 }
 
 if ($data['historical_error'] !== null) {
-	$page->addItem(new CTag('p', true, FrontendUi::status(
-		$data['historical_error'],
-		FrontendUi::DANGER
-	)));
+	$page->addItem(FrontendUi::message((string) $data['historical_error'], FrontendUi::DANGER));
 }
 
 if (is_array($data['three_way_analysis'])) {
@@ -370,10 +364,10 @@ if (is_array($data['three_way_analysis'])) {
 		]);
 
 	$page
-		->addItem(new CTag('h4', true, _('Three-way change analysis')))
+		->addItem(FrontendUi::section(_('Three-way analysis')))
 		->addItem($threeWayStatusTable)
-		->addItem(new CTag('p', true, _(
-			'BASE is the official historical template matching the installed vendor version, LOCAL is the currently installed template and UPSTREAM is the current official template.'
+		->addItem(FrontendUi::description(_(
+			'BASE is the official template at the installed version, LOCAL is the installed template and UPSTREAM is the current official template.'
 		)));
 
 	if (($analysis['details'] ?? []) !== []) {
@@ -400,23 +394,23 @@ if (is_array($data['three_way_analysis'])) {
 			]);
 		}
 
-		$page->addItem(new CTag('h4', true, _('Three-way field details')))->addItem($detailsTable);
+		$page->addItem(FrontendUi::section(_('Field-level differences')))->addItem($detailsTable);
 
 		if (!empty($analysis['details_truncated'])) {
-			$page->addItem(new CTag('p', true, sprintf(
-				_('Only the first %1$d detailed changes are displayed; summary counts include all analyzed changes.'),
+			$page->addItem(FrontendUi::description(sprintf(
+				_('Showing the first %1$d detailed changes. Summary counts include all analyzed changes.'),
 				(int) ($analysis['detail_limit'] ?? 0)
 			)));
 		}
 	}
 
-	$page->addItem(new CTag('p', true, _(
-		'A conflict means the same normalized field has different BASE, LOCAL and UPSTREAM values. A local overwrite risk means UPSTREAM still has the BASE value while LOCAL was customized, so importing the official template would tend to replace that customization. These classifications are review signals, not an automatic update-safety decision.'
+	$page->addItem(FrontendUi::description(_(
+		'Conflict means LOCAL and UPSTREAM changed the same field differently. Local overwrite risk means the official update would replace a known local customization.'
 	)));
 }
 
 if ($data['three_way_error'] !== null) {
-	$page->addItem(new CTag('p', true, $data['three_way_error']));
+	$page->addItem(FrontendUi::message((string) $data['three_way_error'], FrontendUi::DANGER));
 }
 
 if (is_array($data['update_risk']) && is_array($data['update_preview'])) {
@@ -469,31 +463,30 @@ if (is_array($data['update_risk']) && is_array($data['update_preview'])) {
 		]);
 
 	$page
-		->addItem(new CTag('h4', true, _('Update review priority and known impact')))
+		->addItem(FrontendUi::section(_('Risk and impact')))
 		->addItem($riskTable)
 		->addItem($operationTable);
 
 	if ($riskLevel === 'unknown') {
-		$page->addItem(new CTag('p', true, _(
-			'Overall review priority is unknown because local-overlap coverage is incomplete. Technical severity is shown separately and must not be interpreted as an update-safety decision.'
-		)));
+		$page->addItem(FrontendUi::message(
+			_('Review priority is unknown because local-overlap analysis is incomplete.'),
+			FrontendUi::WARNING
+		));
 	}
 	elseif ($riskLevel === 'conflict') {
-		$page->addItem(new CTag('p', true, _(
-			'The update preview contains at least one confirmed three-way conflict. Manual review is required before any controlled update can be considered.'
-		)));
+		$page->addItem(FrontendUi::message(
+			_('The update contains at least one confirmed conflict. Manual review is required.'),
+			FrontendUi::WARNING
+		));
 	}
 
-	$page->addItem(new CTag('p', true, _(
-		'The host impact count currently represents only hosts directly linked to this template. Inherited or indirect template impact is not yet included, and host count does not artificially change technical severity.'
+	$page->addItem(FrontendUi::description(_(
+		'Host impact currently counts only directly linked hosts; inherited or indirect impact is not included.'
 	)));
 }
 
 if ($data['update_risk_error'] !== null) {
-	$page->addItem(new CTag('p', true, FrontendUi::status(
-		$data['update_risk_error'],
-		FrontendUi::DANGER
-	)));
+	$page->addItem(FrontendUi::message((string) $data['update_risk_error'], FrontendUi::DANGER));
 }
 
 if (is_array($data['backup_verification'])) {
@@ -520,7 +513,7 @@ if (is_array($data['backup_verification'])) {
 				$backupTones[$backupStatus] ?? FrontendUi::MUTED
 			),
 			$latestCreatedAt !== '' ? $latestCreatedAt : '—',
-			$latestSha !== '' ? substr($latestSha, 0, 16) : '—',
+			$latestSha !== '' ? FrontendUi::fingerprint($latestSha, 16) : '—',
 			$latestBytes !== null ? $latestBytes : '—',
 			(int) ($backupVerification['scanned'] ?? 0),
 			(int) ($backupVerification['valid'] ?? 0),
@@ -528,28 +521,31 @@ if (is_array($data['backup_verification'])) {
 		]);
 
 	$page
-		->addItem(new CTag('h4', true, _('Rollback backup verification')))
+		->addItem(FrontendUi::section(_('Rollback protection')))
 		->addItem($backupVerificationTable);
 
 	if ($backupStatus === 'current_match') {
-		$page->addItem(new CTag('p', true, _(
-			'The newest rollback artifact passed manifest, path, size, permission and SHA-256 validation and matches a fresh export of the currently installed template exactly.'
-		)));
+		$page->addItem(FrontendUi::message(
+			_('The newest rollback backup is valid and matches the current installed template.'),
+			FrontendUi::SUCCESS
+		));
 	}
 	elseif ($backupStatus === 'current_mismatch') {
-		$page->addItem(new CTag('p', true, _(
-			'The newest intact rollback artifact does not match the current installed template export. It is treated as stale and does not satisfy the rollback prerequisite.'
-		)));
+		$page->addItem(FrontendUi::message(
+			_('The newest rollback backup is valid but does not match the current installed template.'),
+			FrontendUi::WARNING
+		));
 	}
 	elseif ($backupStatus === 'latest_invalid') {
-		$page->addItem(new CTag('p', true, _(
-			'The newest rollback artifact failed integrity validation. The module does not silently fall back to an older backup.'
-		)));
+		$page->addItem(FrontendUi::message(
+			_('The newest rollback backup failed integrity validation. Older backups are not selected automatically.'),
+			FrontendUi::DANGER
+		));
 	}
 }
 
 if ($data['backup_verification_error'] !== null) {
-	$page->addItem(new CTag('p', true, $data['backup_verification_error']));
+	$page->addItem(FrontendUi::message((string) $data['backup_verification_error'], FrontendUi::DANGER));
 }
 
 if (is_array($data['update_readiness'])
@@ -576,7 +572,7 @@ if (is_array($data['update_readiness'])
 		]);
 
 	$page
-		->addItem(new CTag('h4', true, _('Update readiness gate')))
+		->addItem(FrontendUi::section(_('Update readiness')))
 		->addItem($readinessTable);
 
 	switch ($readinessStatus) {
@@ -641,9 +637,9 @@ if (is_array($data['update_readiness'])
 	}
 
 	$page
-		->addItem(new CTag('p', true, $readinessText))
-		->addItem(new CTag('p', true, _(
-			'This comparison page does not call configuration.import. Controlled writes are available only through the separate preflight and confirmation flow after all safety gates pass.'
+		->addItem(FrontendUi::description($readinessText))
+		->addItem(FrontendUi::description(_(
+			'This page is read-only. Configuration changes are available only after a fresh preflight and explicit confirmation.'
 		)));
 
 	if (!empty($readiness['candidate_for_backup']) && is_array($data['template'])) {
@@ -661,9 +657,9 @@ if (is_array($data['update_readiness'])
 			->addItem(makeFormFooter(new CSubmitButton(_('Create rollback backup'))));
 
 		$page
-			->addItem(new CTag('h4', true, _('Rollback backup')))
-			->addItem(new CTag('p', true, _(
-				'This action exports the currently installed template and stores a private persistent rollback artifact. It does not change the template.'
+			->addItem(FrontendUi::section(_('Rollback backup')))
+			->addItem(FrontendUi::description(_(
+				'Creates a private backup of the current installed template. No Zabbix configuration is changed.'
 			)))
 			->addItem($backupForm);
 	}
@@ -691,9 +687,9 @@ if (is_array($data['update_readiness'])
 			));
 
 		$page
-			->addItem(new CTag('h4', true, _('Controlled update preflight')))
-			->addItem(new CTag('p', true, _(
-				'The preflight recomputes the complete authoritative state and rollback match before showing any super-administrator update confirmation.'
+			->addItem(FrontendUi::section(_('Update preflight')))
+			->addItem(FrontendUi::description(_(
+				'Recomputes the authoritative comparison and rollback match before any update confirmation is shown.'
 			)))
 			->addItem($preflightForm);
 	}
@@ -741,9 +737,9 @@ switch ($data['content_status']) {
 }
 
 $page
-	->addItem(new CTag('h4', true, _('Interpretation')))
-	->addItem(new CTag('p', true, $interpretation))
-	->addItem(new CTag('p', true, _(
-		'This comparison page uses configuration.importcompare and configuration.export only. A controlled configuration.import is performed only by the separate super-administrator update action after fresh preflight, explicit confirmation and immutable source verification.'
+	->addItem(FrontendUi::section(_('Summary')))
+	->addItem(FrontendUi::description($interpretation))
+	->addItem(FrontendUi::description(_(
+		'Comparison is read-only. Import is available only through the controlled update action after fresh preflight and explicit confirmation.'
 	)))
 	->show();

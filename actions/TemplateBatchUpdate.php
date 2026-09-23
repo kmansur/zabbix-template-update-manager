@@ -38,7 +38,7 @@ class TemplateBatchUpdate extends CController {
 
 	protected function doAction(): void {
 		$data = [
-			'title' => _('Selected template update results'),
+			'title' => _('Template update results'),
 			'result' => null,
 			'error' => null
 		];

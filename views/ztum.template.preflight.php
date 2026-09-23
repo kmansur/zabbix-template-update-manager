@@ -26,7 +26,7 @@ $page = (new CHtmlPage())
 
 if ($data['preflight_error'] !== null) {
 	$page
-		->addItem(new CTag('p', true, $data['preflight_error']))
+		->addItem(FrontendUi::message((string) $data['preflight_error'], FrontendUi::DANGER))
 		->show();
 	return;
 }
@@ -54,16 +54,16 @@ $stateTable = (new CTableInfo())
 			$statusLabels[$status] ?? _('Unknown'),
 			$status === 'passed' ? FrontendUi::SUCCESS : FrontendUi::DANGER
 		),
-		($preflight['reason'] ?? null) !== null ? (string) $preflight['reason'] : '—',
-		(string) ($preflight['next_step'] ?? '—'),
+		FrontendUi::reason(($preflight['reason'] ?? null) !== null ? (string) $preflight['reason'] : null),
+		FrontendUi::reason((string) ($preflight['next_step'] ?? '')),
 		FrontendUi::yesNo(!empty($preflight['write_enabled']))
 	]);
 
 $page
-	->addItem(new CTag('h4', true, _('Fresh server-side preflight')))
+	->addItem(FrontendUi::section(_('Update preflight')))
 	->addItem($stateTable)
-	->addItem(new CTag('p', true, _(
-		'This result was recomputed from the current Zabbix template, the current validated official upstream source and the newest rollback artifact. It does not trust an earlier page state.'
+	->addItem(FrontendUi::description(_(
+		'This preflight was recomputed from the current template, current validated upstream source and newest verified rollback backup.'
 	)));
 
 if ($template !== []) {
@@ -85,7 +85,7 @@ if ($template !== []) {
 			(int) ($preflight['direct_host_count'] ?? 0)
 		]);
 
-	$page->addItem(new CTag('h4', true, _('Template identity')))->addItem($templateTable);
+	$page->addItem(FrontendUi::section(_('Template')))->addItem($templateTable);
 }
 
 if ($candidate !== []) {
@@ -101,13 +101,13 @@ if ($candidate !== []) {
 		->addRow([
 			(string) ($candidate['vendor_version'] ?? '—'),
 			(string) ($candidate['vendor_name'] ?? '—'),
-			isset($candidate['commit']) ? substr((string) $candidate['commit'], 0, 16) : '—',
+			isset($candidate['commit']) ? FrontendUi::fingerprint((string) $candidate['commit'], 16) : '—',
 			(string) ($candidate['path'] ?? '—'),
-			isset($candidate['source_sha256']) ? substr((string) $candidate['source_sha256'], 0, 20) : '—',
-			isset($candidate['content_sha256']) ? substr((string) $candidate['content_sha256'], 0, 20) : '—'
+			isset($candidate['source_sha256']) ? FrontendUi::fingerprint((string) $candidate['source_sha256'], 20) : '—',
+			isset($candidate['content_sha256']) ? FrontendUi::fingerprint((string) $candidate['content_sha256'], 20) : '—'
 		]);
 
-	$page->addItem(new CTag('h4', true, _('Bound upstream candidate')))->addItem($candidateTable);
+	$page->addItem(FrontendUi::section(_('Official candidate')))->addItem($candidateTable);
 }
 
 if ($rollback !== []) {
@@ -121,13 +121,13 @@ if ($rollback !== []) {
 		->addRow([
 			(string) ($rollback['created_at'] ?? '—'),
 			(int) ($rollback['bytes'] ?? 0),
-			isset($rollback['sha256']) ? substr((string) $rollback['sha256'], 0, 20) : '—',
+			isset($rollback['sha256']) ? FrontendUi::fingerprint((string) $rollback['sha256'], 20) : '—',
 			isset($rollback['current_export_sha256'])
-				? substr((string) $rollback['current_export_sha256'], 0, 20)
+				? FrontendUi::fingerprint((string) $rollback['current_export_sha256'], 20)
 				: '—'
 		]);
 
-	$page->addItem(new CTag('h4', true, _('Verified rollback evidence')))->addItem($rollbackTable);
+	$page->addItem(FrontendUi::section(_('Rollback protection')))->addItem($rollbackTable);
 }
 
 if ($manualOverride) {
@@ -142,23 +142,25 @@ if ($manualOverride) {
 	}
 
 	$page
-		->addItem(new CTag('h4', true, _('Explicit manual-review path')))
-		->addItem(new CTag('p', true, _(
-			'This candidate is not eligible for unattended update. The following reviewed conditions are bound into the preflight evidence and require an additional explicit acknowledgement before import:'
-		)))
-		->addItem(new CTag('p', true, implode('; ', $labels)));
+		->addItem(FrontendUi::section(_('Manual review')))
+		->addItem(FrontendUi::message(
+			_('This update requires explicit manual review before import.'),
+			FrontendUi::WARNING
+		))
+		->addItem(FrontendUi::description(implode('; ', $labels)));
 }
 
 if ($evidenceSha !== '') {
 	$page
-		->addItem(new CTag('h4', true, _('Preflight evidence fingerprint')))
-		->addItem(new CTag('p', true, $evidenceSha));
+		->addItem(FrontendUi::section(_('Evidence fingerprint')))
+		->addItem(FrontendUi::description(FrontendUi::fingerprint($evidenceSha, 24)));
 }
 
 if ($status === 'passed') {
-	$page->addItem(new CTag('p', true, _(
-		'All implemented safety prerequisites passed for this selected path. The update action will rerun this complete preflight immediately before configuration.import and will refuse the write if this evidence or the selected review mode changes.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('Preflight passed. The same checks will run again immediately before import.'),
+		FrontendUi::SUCCESS
+	));
 
 	if (!empty($data['can_update']) && $evidenceSha !== '' && $template !== []) {
 		$updateAction = (new CUrl('zabbix.php'))
@@ -212,22 +214,25 @@ if ($status === 'passed') {
 			));
 
 		$page
-			->addItem(new CTag('h4', true, _('Controlled update confirmation')))
-			->addItem(new CTag('p', true, _(
-				'This operation writes Zabbix configuration. It is restricted to super administrators. The stored rollback backup is not deleted after the update.'
-			)))
+			->addItem(FrontendUi::section(_('Update confirmation')))
+			->addItem(FrontendUi::message(
+				_('This operation writes Zabbix configuration. The verified rollback backup is retained after the update.'),
+				FrontendUi::WARNING
+			))
 			->addItem($updateForm);
 	}
 	else {
-		$page->addItem(new CTag('p', true, _(
-			'A Zabbix super administrator is required for the controlled configuration import.'
-		)));
+		$page->addItem(FrontendUi::message(
+			_('A Zabbix Super Admin is required to perform the controlled update.'),
+			FrontendUi::WARNING
+		));
 	}
 }
 else {
-	$page->addItem(new CTag('p', true, _(
-		'The update workflow remains blocked. Return to the comparison page, resolve the reported prerequisite and rerun preflight.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('Update remains blocked. Resolve the reported prerequisite and run preflight again.'),
+		FrontendUi::WARNING
+	));
 }
 
 $page->show();

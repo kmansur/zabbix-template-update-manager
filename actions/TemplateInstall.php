@@ -63,7 +63,7 @@ class TemplateInstall extends CController {
 				$exception->getMessage()
 			));
 			$data['operation_error'] = _(
-				'The controlled installation could not be completed. If the import had already started, inspect the local template inventory before retrying. No automatic uninstall is performed.'
+				'Installation could not be completed. Inspect the local template inventory before retrying. Automatic uninstall is never performed.'
 			);
 		}
 

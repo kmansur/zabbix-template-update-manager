@@ -59,7 +59,7 @@ class TemplateInstallBatchPrepareOne extends CController {
 				$exception->getMessage()
 			));
 			$output['error'] = _(
-				'Unable to prepare this installation candidate. No Zabbix configuration import was attempted.'
+				'Unable to prepare this template. No Zabbix configuration import was attempted.'
 			);
 		}
 

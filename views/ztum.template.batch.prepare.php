@@ -1,9 +1,13 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $categoryLabels = [
 	'ready' => _('Ready'),
 	'review' => _('Manual review'),
-	'conflict' => _('Conflict / local overwrite'),
+	'conflict' => _('Conflict'),
 	'blocked' => _('Blocked')
 ];
 
@@ -21,7 +25,10 @@ $page = (new CHtmlPage())
 	);
 
 if ($data['error'] !== null || $data['templateids'] === [] || $data['templates'] === []) {
-	$page->addItem(new CTag('p', true, $data['error'] ?? _('Batch preparation returned no selected templates.')))->show();
+	$page->addItem(FrontendUi::message(
+		(string) ($data['error'] ?? _('No templates were selected for preparation.')),
+		FrontendUi::DANGER
+	))->show();
 	return;
 }
 
@@ -56,7 +63,7 @@ $retryFailedButton = (new CButton('ztum-batch-retry-failed', _('Retry failed pre
 	->addClass(ZBX_STYLE_BTN_ALT);
 
 $page
-	->addItem(new CTag('h4', true, _('Batch preparation')))
+	->addItem(FrontendUi::section(_('Preparation')))
 	->addItem($summaryTable)
 	->addItem(new CDiv([
 		$progressText,
@@ -65,8 +72,8 @@ $page
 		' ',
 		$retryFailedButton
 	]))
-	->addItem(new CTag('p', true, _(
-		'Preparation uses bounded requests. A long historical baseline scan may continue across multiple requests for the same template. Preparation may create or refresh rollback evidence, but it never imports Zabbix configuration.'
+	->addItem(FrontendUi::description(_(
+		'Each template is analyzed in bounded requests. Preparation may create or refresh rollback evidence, but it does not import configuration.'
 	)));
 
 $selectAllReviewedButton = (new CButton('ztum-reviewed-select-all', _('Select all eligible')))
@@ -85,7 +92,7 @@ $table = (new CTableInfo())
 		_('Available'),
 		_('Linked hosts'),
 		_('Readiness'),
-		_('Batch class'),
+		_('Review class'),
 		_('Reason'),
 		_('Execution')
 	]);
@@ -117,7 +124,7 @@ foreach ($data['templateids'] as $templateId) {
 }
 
 $page
-	->addItem(new CTag('h4', true, _('Prepared templates')))
+	->addItem(FrontendUi::section(_('Prepared templates')))
 	->addItem(new CDiv([
 		$selectAllReviewedButton,
 		' ',
@@ -130,12 +137,12 @@ $executionState = (new CSpan(_('Waiting for preparation.')))
 
 $confirm = (new CCheckBox('confirm', '1'))
 	->setId('ztum-batch-confirm')
-	->setLabel(_('I reviewed the completed batch plan and explicitly accept the Manual review reasons for any reviewed templates I selected.'))
+	->setLabel(_('I reviewed the completed plan and accept the Manual review reasons for the selected templates.'))
 	->setEnabled(false);
 
 $confirmLocalOverwrite = (new CCheckBox('confirm_local_overwrite', '1'))
 	->setId('ztum-batch-confirm-local-overwrite')
-	->setLabel(_('I explicitly accept overwriting local customizations for the selected templates.'))
+	->setLabel(_('I accept overwriting the identified local customizations for the selected templates.'))
 	->setEnabled(false);
 
 $submit = (new CButton('ztum-batch-update-submit', _('Update eligible templates')))
@@ -153,11 +160,11 @@ $executionSummary = (new CTableInfo())
 	]);
 
 $page
-	->addItem(new CTag('h4', true, _('Controlled sequential execution')))
-	->addItem(new CTag('p', true, _(
-		'After preparation completes, Ready templates can run normally. Manual review templates with verified rollback and valid reviewed-preflight evidence can be explicitly selected from the Include column, including local-customization-overwrite cases. Local-overwrite selections require an additional explicit acknowledgement before execution. Conflict and Blocked rows remain non-executable. Each selected template runs in its own HTTP request, reruns fresh preflight immediately before import and is validated before the next template begins. Execution stops on the first failure and no automatic rollback is performed.'
+	->addItem(FrontendUi::section(_('Execution')))
+	->addItem(FrontendUi::description(_(
+		'Ready templates can be updated after preparation completes. Eligible Manual review rows require explicit selection. Each template receives a fresh preflight immediately before import; execution stops on the first failure and rollback is never automatic.'
 	)))
-	->addItem(new CTag('p', true, $executionState))
+	->addItem(FrontendUi::description($executionState))
 	->addItem(new CDiv([$confirm]))
 	->addItem(new CDiv([$confirmLocalOverwrite]))
 	->addItem(new CDiv([$submit]))
@@ -196,7 +203,7 @@ $jsConfig = json_encode([
 $jsLabels = json_encode([
 	'ready' => _('Ready'),
 	'review' => _('Manual review'),
-	'conflict' => _('Conflict / local overwrite'),
+	'conflict' => _('Conflict'),
 	'blocked' => _('Blocked'),
 	'pending' => _('Pending'),
 	'processing' => _('Processing...'),
@@ -230,7 +237,13 @@ $jsLabels = json_encode([
 	'failed' => _('Failed'),
 	'not_attempted' => _('Not attempted'),
 	'yes' => _('Yes'),
-	'no' => _('No')
+	'no' => _('No'),
+	'reason_historical_baseline_unavailable' => _('Historical baseline unavailable'),
+	'reason_historical_baseline_ambiguous' => _('Historical baseline is ambiguous'),
+	'reason_historical_baseline_time_budget_reached' => _('Historical baseline scan will continue'),
+	'reason_historical_baseline_continuation_limit_reached' => _('Historical baseline scan limit reached'),
+	'reason_invalid_preflight_evidence' => _('Invalid preflight evidence'),
+	'reason_request_failed' => _('Request failed')
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $script = <<<'JS'
@@ -339,6 +352,19 @@ $script = <<<'JS'
 		? value.trim().toLowerCase()
 		: '';
 
+	const formatCode = (value) => {
+		if (typeof value !== 'string' || value.trim() === '') {
+			return '—';
+		}
+		const key = value.trim();
+		const translated = labels['reason_' + key];
+		if (translated) {
+			return translated;
+		}
+		return key.replaceAll('_', ' ').replaceAll('-', ' ')
+			.replace(/^./, (first) => first.toUpperCase());
+	};
+
 	const isValidEvidence = (value) => /^[a-f0-9]{64}$/.test(value);
 
 	const applyItem = (templateId, item) => {
@@ -367,9 +393,9 @@ $script = <<<'JS'
 			? 'danger'
 			: (readinessStatus.includes('review') ? 'warning'
 				: (readinessStatus.includes('verified') || readinessStatus.includes('passed') ? 'success' : 'muted'));
-		setStateText('ztum-readiness-' + templateId, readinessStatus, readinessTone);
+		setStateText('ztum-readiness-' + templateId, formatCode(readinessStatus), readinessTone);
 		setStateText('ztum-category-' + templateId, labels[category] || labels.blocked, categoryTone);
-		setText('ztum-reason-' + templateId, reason);
+		setText('ztum-reason-' + templateId, formatCode(reason));
 		const manualState = {
 			eligible: manualEligible,
 			evidence: manualEvidence,
@@ -406,7 +432,7 @@ $script = <<<'JS'
 		requestFailures.add(templateId);
 		readyEvidence.delete(templateId);
 		reviewEvidence.delete(templateId);
-		setStateText('ztum-readiness-' + templateId, 'request_failed', 'danger');
+		setStateText('ztum-readiness-' + templateId, labels.request_failed, 'danger');
 		setStateText('ztum-category-' + templateId, labels.blocked, 'danger');
 		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
 		setReviewedSelection(templateId, 'blocked');

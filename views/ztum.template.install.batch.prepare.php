@@ -1,5 +1,9 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+
+require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
 	->setControls(
@@ -14,7 +18,7 @@ $page = (new CHtmlPage())
 	);
 
 if ($data['uuids'] === []) {
-	$page->addItem(new CTag('p', true, _('Batch installation preparation returned no selected templates.')))->show();
+	$page->addItem(FrontendUi::message(_('No templates were selected for installation preparation.'), FrontendUi::DANGER))->show();
 	return;
 }
 
@@ -37,14 +41,14 @@ $stopButton = (new CButton('ztum-install-batch-stop', _('Stop after current temp
 	->addClass(ZBX_STYLE_BTN_ALT);
 
 $page
-	->addItem(new CTag('h4', true, _('Batch installation preparation')))
+	->addItem(FrontendUi::section(_('Installation preparation')))
 	->addItem($summaryTable)
 	->addItem(new CDiv([$progressText, ' ', $stopButton]))
-	->addItem(new CTag('p', true, _(
-		'Each selected official template is prepared in its own request. Preparation is read-only and never imports Zabbix configuration.'
+	->addItem(FrontendUi::description(_(
+		'Each template is analyzed in its own request. Preparation is read-only and does not import configuration.'
 	)))
-	->addItem(new CTag('p', true, _(
-		'Candidates with missing linked-template dependencies remain Blocked, even when the dependency is also selected. Install dependencies first, then prepare dependent templates again.'
+	->addItem(FrontendUi::description(_(
+		'Templates with missing dependencies remain Blocked. Install the required dependencies first, then prepare the dependent template again.'
 	)));
 
 $table = (new CTableInfo())
@@ -52,7 +56,7 @@ $table = (new CTableInfo())
 		_('Template'),
 		_('Available'),
 		_('Preflight'),
-		_('Batch class'),
+		_('Review class'),
 		_('Required dependencies'),
 		_('Missing dependencies'),
 		_('Reason'),
@@ -75,12 +79,12 @@ foreach ($data['uuids'] as $uuid) {
 }
 
 $page
-	->addItem(new CTag('h4', true, _('Prepared installation candidates')))
+	->addItem(FrontendUi::section(_('Prepared templates')))
 	->addItem($table);
 
 $confirm = (new CCheckBox('confirm', '1'))
 	->setId('ztum-install-batch-confirm')
-	->setLabel(_('I reviewed the completed installation plan and want to install the Ready templates sequentially.'))
+	->setLabel(_('I reviewed the completed plan and want to install the Ready templates.'))
 	->setEnabled(false);
 
 $submit = (new CButton('ztum-install-batch-submit', _('Install ready templates')))
@@ -112,9 +116,9 @@ $executionNotice = (new CSpan(''))
 	->setId('ztum-install-exec-notice');
 
 $page
-	->addItem(new CTag('h4', true, _('Controlled sequential installation')))
-	->addItem(new CTag('p', true, _(
-		'Only Ready candidates are executed. Ready means the read-only safety gates passed; the actual Zabbix import remains authoritative and can still reject a candidate. Each template uses its own HTTP request, reruns the complete installation preflight immediately before import and is validated before the next template begins. Execution stops on the first failure and no automatic uninstall is performed.'
+	->addItem(FrontendUi::section(_('Execution')))
+	->addItem(FrontendUi::description(_(
+		'Only Ready templates can be installed. Each template receives a fresh preflight immediately before import and is validated before the next template. Execution stops on the first failure and uninstall is never automatic.'
 	)))
 	->addItem(new CDiv([$confirm, ' ', $submit]))
 	->addItem(new CDiv($noReadyMessage))
@@ -176,7 +180,18 @@ $jsLabels = json_encode([
 	'import_failure_notice' => _('The failed import reached the controlled Zabbix import stage but did not return confirmed success. Remaining templates were not attempted. Inspect the catalog/local template state before any retry.'),
 	'request_failure_notice' => _('The execution request did not complete cleanly. Its write outcome cannot be proven from the browser response, so remaining templates were not attempted. Inspect local template state before any retry.'),
 	'execution_unavailable' => _('Unavailable — no Ready templates'),
-	'no_ready' => _('No templates are eligible for installation. {blocked} selected template(s) were blocked during safety analysis. Review the blocked reasons above or return to the catalog.')
+	'no_ready' => _('No templates are eligible for installation. {blocked} selected template(s) were blocked during safety analysis. Review the blocked reasons above or return to the catalog.'),
+	'reason_unsupported_zabbix_version' => _('Unsupported Zabbix version'),
+	'reason_official_template_not_found' => _('Official template not found'),
+	'reason_template_already_installed' => _('Template is already installed'),
+	'reason_technical_name_collision' => _('Technical name is already used by another template'),
+	'reason_missing_template_dependencies' => _('Required template dependencies are missing'),
+	'reason_unresolved_internal_references' => _('Template references could not be resolved safely'),
+	'reason_install_would_modify_existing_configuration' => _('Installation would modify existing configuration'),
+	'reason_install_preview_contains_no_creations' => _('Installation preview contains no new objects'),
+	'reason_post_install_validation_failed' => _('Post-install validation failed'),
+	'reason_content_not_current_upstream' => _('Installed content does not match current upstream'),
+	'reason_remaining_import_differences' => _('Import differences remain after validation')
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
 
 $script = <<<'JS'
@@ -233,6 +248,19 @@ $script = <<<'JS'
 
 	const listText = (value) => Array.isArray(value) && value.length > 0 ? value.join(', ') : '—';
 
+	const formatCode = (value) => {
+		if (typeof value !== 'string' || value.trim() === '') {
+			return '—';
+		}
+		const key = value.trim();
+		const translated = labels['reason_' + key];
+		if (translated) {
+			return translated;
+		}
+		return key.replaceAll('_', ' ').replaceAll('-', ' ')
+			.replace(/^./, (first) => first.toUpperCase());
+	};
+
 	const validationDetail = (result) => {
 		const validation = result?.validation && typeof result.validation === 'object'
 			? result.validation
@@ -243,7 +271,7 @@ $script = <<<'JS'
 		const parts = [];
 
 		if (reasons.length > 0) {
-			parts.push(labels.validation_reasons + ': ' + reasons.join(', '));
+			parts.push(labels.validation_reasons + ': ' + reasons.map(formatCode).join(', '));
 		}
 
 		const remaining = Number(validation.remaining_changes);
@@ -263,7 +291,7 @@ $script = <<<'JS'
 
 		return parts.length > 0
 			? parts.join(' | ')
-			: (result?.reason || 'post_install_validation_failed');
+			: formatCode(result?.reason || 'post_install_validation_failed');
 	};
 
 	const applyItem = (uuid, item) => {
@@ -275,7 +303,7 @@ $script = <<<'JS'
 		const preflightStatus = item.preflight_status || '—';
 		setStateText(
 			'ztum-install-preflight-' + uuid,
-			preflightStatus,
+			formatCode(preflightStatus),
 			category === 'ready' ? 'success' : 'danger'
 		);
 		setStateText(
@@ -297,7 +325,7 @@ $script = <<<'JS'
 
 		setText(
 			'ztum-install-reason-' + uuid,
-			referenceIssues.length > 0 ? referenceIssues.join(' | ') : (item.reason || '—')
+			referenceIssues.length > 0 ? referenceIssues.map(formatCode).join(' | ') : formatCode(item.reason || '')
 		);
 		setStateText(
 			'ztum-install-execution-' + uuid,
@@ -312,7 +340,7 @@ $script = <<<'JS'
 
 	const applyRequestFailure = (uuid, error) => {
 		counts.blocked++;
-		setStateText('ztum-install-preflight-' + uuid, 'request_failed', 'danger');
+		setStateText('ztum-install-preflight-' + uuid, labels.request_failed, 'danger');
 		setStateText('ztum-install-category-' + uuid, labels.blocked, 'danger');
 		setText('ztum-install-reason-' + uuid, error?.message || labels.request_failed);
 		setStateText('ztum-install-execution-' + uuid, labels.blocked, 'danger');
@@ -440,7 +468,7 @@ $script = <<<'JS'
 					if (result.status === 'import_failed') {
 						uncertain++;
 						stoppedUncertain = true;
-						const inspection = result.failure_inspection?.state || 'state_unknown_after_failure';
+						const inspection = formatCode(result.failure_inspection?.state || 'state_unknown_after_failure');
 						const detail = result.error_detail || result.reason || labels.failed;
 						setStateText('ztum-install-execution-' + uuid, labels.import_failed, 'danger');
 						setText('ztum-install-reason-' + uuid, detail + ' [' + inspection + ']');
@@ -457,7 +485,7 @@ $script = <<<'JS'
 							'danger'
 						);
 						if (result.reason) {
-							setText('ztum-install-reason-' + uuid, result.reason);
+							setText('ztum-install-reason-' + uuid, formatCode(result.reason));
 						}
 					}
 

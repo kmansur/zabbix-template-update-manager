@@ -41,7 +41,7 @@ class TemplateRollbackReview extends CController {
 		$templateId = (string) $this->getInput('templateid');
 		$manifestFile = (string) $this->getInput('manifest_file');
 		$data = [
-			'title' => _('Review template rollback'),
+			'title' => _('Template rollback review'),
 			'templateid' => $templateId,
 			'manifest_file' => $manifestFile,
 			'preflight' => null,
@@ -59,7 +59,7 @@ class TemplateRollbackReview extends CController {
 				$exception->getMessage()
 			));
 			$data['preflight_error'] = _(
-				'The selected rollback artifact could not be safely revalidated. Review frontend logs and backup repository integrity.'
+				'The selected rollback backup could not be revalidated safely. Review frontend logs and backup repository integrity.'
 			);
 		}
 

@@ -71,7 +71,7 @@ class TemplateRollback extends CController {
 				$exception->getMessage()
 			));
 			$data['operation_error'] = _(
-				'The controlled rollback could not be completed. Review frontend logs and inspect the template before attempting another configuration write.'
+				'Rollback could not be completed. Review frontend logs and inspect the template before another write action.'
 			);
 		}
 

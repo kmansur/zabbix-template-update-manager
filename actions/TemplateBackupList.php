@@ -95,7 +95,7 @@ class TemplateBackupList extends CController {
 				$exception->getMessage()
 			));
 			$data['error'] = _(
-				'Unable to load rollback backup history. Check frontend logs and persistent backup-directory permissions.'
+				'Unable to load rollback backup history. Check frontend logs and backup-directory permissions.'
 			);
 		}
 

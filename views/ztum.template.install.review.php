@@ -46,7 +46,7 @@ $page = (new CHtmlPage())
 	);
 
 if ($data['preflight_error'] !== null) {
-	$page->addItem(new CTag('p', true, $data['preflight_error']))->show();
+	$page->addItem(FrontendUi::message((string) $data['preflight_error'], FrontendUi::DANGER))->show();
 	return;
 }
 
@@ -60,7 +60,7 @@ $referenceAudit = is_array($preflight['reference_audit'] ?? null) ? $preflight['
 $evidence = (string) ($preflight['evidence_sha256'] ?? '');
 
 $page
-	->addItem(new CTag('h4', true, _('Installation safety check')))
+	->addItem(FrontendUi::section(_('Installation preflight')))
 	->addItem(
 		(new CTableInfo())
 			->setHeader([_('State'), _('Reason'), _('Configuration write enabled')])
@@ -76,7 +76,7 @@ $page
 
 if ($candidate !== []) {
 	$page
-		->addItem(new CTag('h4', true, _('Official candidate')))
+		->addItem(FrontendUi::section(_('Official candidate')))
 		->addItem(
 			(new CTableInfo())
 				->setHeader([
@@ -91,10 +91,10 @@ if ($candidate !== []) {
 					(string) ($candidate['name'] ?? '—'),
 					(string) ($candidate['vendor_version'] ?? '—'),
 					(string) ($candidate['uuid'] ?? $data['uuid']),
-					isset($candidate['commit']) ? substr((string) $candidate['commit'], 0, 16) : '—',
+					isset($candidate['commit']) ? FrontendUi::fingerprint((string) $candidate['commit'], 16) : '—',
 					(string) ($candidate['path'] ?? '—'),
 					isset($candidate['source_sha256'])
-						? substr((string) $candidate['source_sha256'], 0, 20)
+						? FrontendUi::fingerprint((string) $candidate['source_sha256'], 20)
 						: '—'
 				])
 		);
@@ -103,7 +103,7 @@ if ($candidate !== []) {
 $required = is_array($dependencies['required'] ?? null) ? $dependencies['required'] : [];
 $missing = is_array($dependencies['missing'] ?? null) ? $dependencies['missing'] : [];
 $page
-	->addItem(new CTag('h4', true, _('Template dependencies')))
+	->addItem(FrontendUi::section(_('Dependencies')))
 	->addItem(
 		(new CTableInfo())
 			->setHeader([_('Required linked templates'), _('Missing')])
@@ -126,12 +126,12 @@ if ($referenceAudit !== []) {
 		$code = trim((string) ($issue['code'] ?? ''));
 		$reference = trim((string) ($issue['reference'] ?? ''));
 		if ($code !== '') {
-			$issueText[] = $code.($reference !== '' ? ': '.$reference : '');
+			$issueText[] = FrontendUi::reason($code).($reference !== '' ? ': '.$reference : '');
 		}
 	}
 
 	$page
-		->addItem(new CTag('h4', true, _('Structural reference audit')))
+		->addItem(FrontendUi::section(_('Reference audit')))
 		->addItem(
 			(new CTableInfo())
 				->setHeader([
@@ -157,7 +157,7 @@ if ($referenceAudit !== []) {
 
 if ($summary !== []) {
 	$page
-		->addItem(new CTag('h4', true, _('Installation import preview')))
+		->addItem(FrontendUi::section(_('Import preview')))
 		->addItem(
 			(new CTableInfo())
 				->setHeader([_('Added'), _('Updated'), _('Removed'), _('Total changes')])
@@ -172,8 +172,8 @@ if ($summary !== []) {
 
 if ($evidence !== '') {
 	$page
-		->addItem(new CTag('h4', true, _('Preflight evidence fingerprint')))
-		->addItem(new CTag('p', true, $evidence));
+		->addItem(FrontendUi::section(_('Evidence fingerprint')))
+		->addItem(FrontendUi::description(FrontendUi::fingerprint($evidence, 24)));
 }
 
 if ($status === 'passed' && !empty($data['can_install']) && $evidence !== '') {
@@ -194,28 +194,31 @@ if ($status === 'passed' && !empty($data['can_install']) && $evidence !== '') {
 			(new CFormList())->addRow(
 				_('Confirmation'),
 				(new CCheckBox('confirm', '1'))->setLabel(_(
-					'I reviewed the official candidate, dependencies and creation-only import preview and want to install this template.'
+					'I reviewed the candidate, dependencies and import preview and want to install this template.'
 				))
 			)
 		)
 		->addItem(makeFormFooter(new CSubmitButton(_('Install official template'))));
 
 	$page
-		->addItem(new CTag('h4', true, _('Controlled installation')))
-		->addItem(new CTag('p', true, _(
-			'This operation creates Zabbix configuration and is restricted to super administrators. Because the template is not currently installed, there is no prior local rollback artifact. If post-install validation fails, ZTUM will not automatically uninstall the imported configuration.'
-		)))
+		->addItem(FrontendUi::section(_('Installation confirmation')))
+		->addItem(FrontendUi::message(
+			_('This operation creates Zabbix configuration. Because the template is not installed yet, there is no prior local rollback artifact; ZTUM does not automatically uninstall a template if post-install validation fails.'),
+			FrontendUi::WARNING
+		))
 		->addItem($form);
 }
 elseif ($status === 'passed') {
-	$page->addItem(new CTag('p', true, _(
-		'A Zabbix super administrator is required to install the official template.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('A Zabbix Super Admin is required to install the official template.'),
+		FrontendUi::WARNING
+	));
 }
 else {
-	$page->addItem(new CTag('p', true, _(
-		'Installation remains blocked. Resolve the reported prerequisite and reopen this review.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('Installation remains blocked. Resolve the reported prerequisite and run the review again.'),
+		FrontendUi::WARNING
+	));
 }
 
 $page->show();
