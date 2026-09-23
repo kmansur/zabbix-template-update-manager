@@ -319,6 +319,7 @@ Detailed design and safety documentation is available in:
 - [`docs/lab-test-plan.md`](docs/lab-test-plan.md)
 - [`docs/ui-style.md`](docs/ui-style.md)
 - [`docs/roadmap.md`](docs/roadmap.md)
+- [`docs/project-status.md`](docs/project-status.md)
 
 ## Development validation
 
