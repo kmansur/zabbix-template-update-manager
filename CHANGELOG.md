@@ -4,6 +4,27 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.43] - 2026-09-23
+
+### Fixed
+
+- Critical frontend integration bug: generic module view names such as `template.list` could override native Zabbix core views because enabled module view directories are registered ahead of the core view directories.
+- Opening the native Zabbix `Data collection → Templates` page (`action=template.list`) could therefore render the Template Update Manager's incompatible `template.list.php` and return HTTP 500.
+- All Template Update Manager views are now namespaced with the `ztum.` prefix in both filenames and manifest view names.
+
+### Safety / compatibility
+
+- Module action names remain unchanged (`ztum.*`); only internal view identifiers were namespaced.
+- Native Zabbix actions such as `template.list` are no longer shadowed by module view files.
+- No controlled-write behavior, evidence gate or Zabbix configuration data path was changed.
+
+### Tests
+
+- Added a permanent module-view namespace guard: every registered module view and every PHP file below `views/` must begin with `ztum.`.
+- Updated manifest/native-UI validation to use the namespaced view filenames.
+- The guard is part of CI and the formal release validation path.
+
+
 ## [0.1.0-beta.42] - 2026-09-23
 
 ### Fixed
