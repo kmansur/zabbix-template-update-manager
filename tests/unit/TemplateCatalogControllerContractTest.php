@@ -2,7 +2,7 @@
 
 $root = dirname(__DIR__, 2);
 $controller = (string) file_get_contents($root.'/actions/TemplateList.php');
-$view = (string) file_get_contents($root.'/views/template.list.php');
+$view = (string) file_get_contents($root.'/views/ztum.template.list.php');
 
 function assertCatalogControllerContract(bool $condition, string $message): void {
 	if (!$condition) {
