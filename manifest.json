@@ -11,10 +11,6 @@
             "class": "TemplateList",
             "view": "ztum.template.list"
         },
-        "ztum.templates.review_selected": {
-            "class": "TemplateSelectionReview",
-            "view": "ztum.template.selection.review"
-        },
         "ztum.templates.prepare_selected": {
             "class": "TemplateBatchPrepare",
             "view": "ztum.template.batch.prepare"
