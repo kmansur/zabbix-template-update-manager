@@ -4,7 +4,7 @@ $root = dirname(__DIR__, 2);
 $manifest = json_decode(file_get_contents($root.'/manifest.json'), true);
 $reviewAction = file_get_contents($root.'/actions/TemplateRollbackReview.php');
 $rollbackAction = file_get_contents($root.'/actions/TemplateRollback.php');
-$reviewView = file_get_contents($root.'/views/template.rollback.review.php');
+$reviewView = file_get_contents($root.'/views/ztum.template.rollback.review.php');
 $rollbackService = file_get_contents($root.'/src/Service/TemplateRollbackService.php');
 $importService = file_get_contents($root.'/src/Service/TemplateConfigurationImportService.php');
 
