@@ -27,10 +27,10 @@ $page = (new CHtmlPage())
 
 if ($data['operation_error'] !== null) {
 	$page
-		->addItem(new CTag('h4', true, _('Controlled installation error')))
-		->addItem(new CTag('p', true, $data['operation_error']))
-		->addItem(new CTag('p', true, _(
-			'Do not retry blindly. Refresh the template catalog first and inspect whether the UUID now exists locally.'
+		->addItem(FrontendUi::section(_('Installation error')))
+		->addItem(FrontendUi::message((string) $data['operation_error'], FrontendUi::DANGER))
+		->addItem(FrontendUi::description(_(
+			'Refresh the catalog and inspect the local template state before retrying.'
 		)))
 		->show();
 	return;
@@ -40,7 +40,7 @@ $result = is_array($data['result']) ? $data['result'] : [];
 $status = (string) ($result['status'] ?? 'blocked_preflight');
 
 $page
-	->addItem(new CTag('h4', true, _('Controlled installation result')))
+	->addItem(FrontendUi::section(_('Installation result')))
 	->addItem(
 		(new CTableInfo())
 			->setHeader([
@@ -63,8 +63,8 @@ $page
 				FrontendUi::yesNo(!empty($result['write_attempted'])),
 				FrontendUi::yesNo(!empty($result['write_performed'])),
 				(string) ($result['write_outcome'] ?? 'none'),
-				($result['reason'] ?? null) !== null ? (string) $result['reason'] : '—',
-				(string) ($result['preflight_status'] ?? '—')
+				FrontendUi::reason(($result['reason'] ?? null) !== null ? (string) $result['reason'] : null),
+				FrontendUi::reason((string) ($result['preflight_status'] ?? ''))
 			])
 	);
 
@@ -80,12 +80,12 @@ if ($status === 'import_failed') {
 	$inspection = is_array($result['failure_inspection'] ?? null) ? $result['failure_inspection'] : [];
 	if ($inspection !== []) {
 		$page
-			->addItem(new CTag('h4', true, _('Read-only post-failure inspection')))
+			->addItem(FrontendUi::section(_('Post-failure inspection')))
 			->addItem(
 				(new CTableInfo())
 					->setHeader([_('Target state'), _('Matches'), _('Template ID'), _('Observed version')])
 					->addRow([
-						(string) ($inspection['state'] ?? 'state_unknown_after_failure'),
+						FrontendUi::reason((string) ($inspection['state'] ?? 'state_unknown_after_failure')),
 						(int) ($inspection['match_count'] ?? 0),
 						(string) (($inspection['templateid'] ?? '') !== '' ? $inspection['templateid'] : '—'),
 						(string) (($inspection['vendor_version'] ?? '') !== '' ? $inspection['vendor_version'] : '—')
@@ -97,7 +97,7 @@ if ($status === 'import_failed') {
 $candidate = is_array($result['candidate'] ?? null) ? $result['candidate'] : [];
 if ($candidate !== []) {
 	$page
-		->addItem(new CTag('h4', true, _('Imported official candidate')))
+		->addItem(FrontendUi::section(_('Official candidate')))
 		->addItem(
 			(new CTableInfo())
 				->setHeader([_('Template'), _('Version'), _('UUID'), _('Source path'), _('Import SHA-256')])
@@ -107,7 +107,7 @@ if ($candidate !== []) {
 					(string) ($candidate['uuid'] ?? $data['uuid']),
 					(string) ($candidate['path'] ?? '—'),
 					isset($candidate['import_sha256'])
-						? substr((string) $candidate['import_sha256'], 0, 20)
+						? FrontendUi::fingerprint((string) $candidate['import_sha256'], 20)
 						: '—'
 				])
 		);
@@ -116,7 +116,7 @@ if ($candidate !== []) {
 $validation = is_array($result['validation'] ?? null) ? $result['validation'] : [];
 if ($validation !== []) {
 	$page
-		->addItem(new CTag('h4', true, _('Post-install validation')))
+		->addItem(FrontendUi::section(_('Post-install validation')))
 		->addItem(
 			(new CTableInfo())
 				->setHeader([
@@ -130,11 +130,11 @@ if ($validation !== []) {
 					_('Ignored shared-group differences')
 				])
 				->addRow([
-					(string) ($validation['status'] ?? '—'),
+					FrontendUi::reason((string) ($validation['status'] ?? '')),
 					(string) ($validation['templateid'] ?? '—'),
 					(string) ($validation['expected_version'] ?? '—'),
 					(string) ($validation['installed_version'] ?? '—'),
-					(string) ($validation['content_status'] ?? '—'),
+					FrontendUi::reason((string) ($validation['content_status'] ?? '')),
 					(int) ($validation['remaining_changes'] ?? -1),
 					(int) ($validation['raw_remaining_changes'] ?? ($validation['remaining_changes'] ?? -1)),
 					(int) ($validation['ignored_shared_changes'] ?? 0)
@@ -142,33 +142,36 @@ if ($validation !== []) {
 		);
 
 	if (($validation['reasons'] ?? []) !== []) {
-		$page->addItem(new CTag('p', true, _(
-			'Validation reasons: '.implode(', ', array_map('strval', $validation['reasons']))
-		)));
+		$page->addItem(FrontendUi::description(
+			_('Validation reasons').': '.FrontendUi::reasonList($validation['reasons'])
+		));
 	}
 
 	if ((int) ($validation['ignored_shared_changes'] ?? 0) > 0) {
 		$page->addItem(FrontendUi::message(
-			_('Create-only installation validation ignored only differences in pre-existing shared host/template groups. Those shared objects are intentionally not updated by the installation write profile; template-owned differences still fail validation.'),
+			_('Validation ignored only differences in pre-existing shared host/template groups. Template-owned differences still fail validation.'),
 			FrontendUi::INFO
 		));
 	}
 }
 
 if ($status === 'installed') {
-	$page->addItem(new CTag('p', true, _(
-		'The official template was created and fresh validation confirms that the installed UUID/version/content match the bound upstream candidate.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('The official template was installed and validated successfully.'),
+		FrontendUi::SUCCESS
+	));
 }
 elseif ($status === 'validation_failed') {
-	$page->addItem(new CTag('p', true, _(
-		'The import returned successfully, but exact post-install state could not be proven. ZTUM does not automatically uninstall a newly created template; inspect the local state before taking further action.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('The import succeeded, but post-install validation did not prove the expected state. ZTUM does not automatically uninstall a newly created template; inspect the local state before taking further action.'),
+		FrontendUi::DANGER
+	));
 }
 else {
-	$page->addItem(new CTag('p', true, _(
-		'No installation write was performed. Reopen the catalog and review fresh server-side evidence.'
-	)));
+	$page->addItem(FrontendUi::message(
+		_('No installation write was performed. Return to the catalog and review fresh evidence.'),
+		FrontendUi::WARNING
+	));
 }
 
 $page->show();
