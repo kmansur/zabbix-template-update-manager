@@ -19,7 +19,26 @@ final class TemplatePostUpdateValidationService {
 			=> (new TemplateUpdateAnalysisService())->analyze($templateId);
 	}
 
+	private const CREATE_ONLY_INSTALL_IGNORED_ENTITIES = ['host_groups', 'template_groups'];
+
 	public function validate(string $templateId, array $candidate): array {
+		return $this->validateWithIgnoredEntities($templateId, $candidate, []);
+	}
+
+	/**
+	 * Validates a successful create-only installation without requiring ZTUM
+	 * to mutate pre-existing shared host/template groups. All template-owned
+	 * entities remain authoritative and any non-group difference fails closed.
+	 */
+	public function validateCreateOnlyInstall(string $templateId, array $candidate): array {
+		return $this->validateWithIgnoredEntities(
+			$templateId,
+			$candidate,
+			self::CREATE_ONLY_INSTALL_IGNORED_ENTITIES
+		);
+	}
+
+	private function validateWithIgnoredEntities(string $templateId, array $candidate, array $ignoredEntities): array {
 		$templateId = trim($templateId);
 		if ($templateId === '' || !ctype_digit($templateId) || (int) $templateId <= 0) {
 			throw new RuntimeException('A valid numeric template ID is required for post-update validation.');
@@ -57,12 +76,21 @@ final class TemplatePostUpdateValidationService {
 		if ((string) ($template['version_status'] ?? '') !== 'current') {
 			$reasons[] = 'version_not_current';
 		}
-		if ((string) ($analysis['content_status'] ?? '') !== 'matches_current_upstream') {
-			$reasons[] = 'content_not_current_upstream';
+		$summary = is_array($analysis['comparison_summary'] ?? null) ? $analysis['comparison_summary'] : [];
+		$comparison = self::effectiveComparison($summary, $ignoredEntities);
+		$rawContentStatus = (string) ($analysis['content_status'] ?? 'not_available');
+		$contentStatus = $rawContentStatus;
+
+		if ($comparison['remaining_changes'] === 0
+				&& $comparison['ignored_changes'] > 0
+				&& $rawContentStatus === 'local_modifications_detected') {
+			$contentStatus = 'matches_current_upstream';
 		}
 
-		$summary = is_array($analysis['comparison_summary'] ?? null) ? $analysis['comparison_summary'] : [];
-		if ((int) ($summary['total'] ?? -1) !== 0) {
+		if ($contentStatus !== 'matches_current_upstream') {
+			$reasons[] = 'content_not_current_upstream';
+		}
+		if ($comparison['remaining_changes'] !== 0) {
 			$reasons[] = 'remaining_import_differences';
 		}
 
@@ -74,8 +102,53 @@ final class TemplatePostUpdateValidationService {
 			'uuid' => $expectedUuid,
 			'expected_version' => $expectedVersion,
 			'installed_version' => (string) ($template['vendor_version'] ?? ''),
-			'content_status' => (string) ($analysis['content_status'] ?? 'not_available'),
-			'remaining_changes' => (int) ($summary['total'] ?? -1)
+			'content_status' => $contentStatus,
+			'raw_content_status' => $rawContentStatus,
+			'remaining_changes' => $comparison['remaining_changes'],
+			'raw_remaining_changes' => $comparison['raw_remaining_changes'],
+			'ignored_shared_changes' => $comparison['ignored_changes'],
+			'ignored_shared_entities' => $comparison['ignored_entities']
+		];
+	}
+
+	private static function effectiveComparison(array $summary, array $ignoredEntities): array {
+		$rawRemainingChanges = array_key_exists('total', $summary)
+			? (int) $summary['total']
+			: -1;
+
+		if ($rawRemainingChanges < 0 || $ignoredEntities === []) {
+			return [
+				'raw_remaining_changes' => $rawRemainingChanges,
+				'remaining_changes' => $rawRemainingChanges,
+				'ignored_changes' => 0,
+				'ignored_entities' => []
+			];
+		}
+
+		$byEntity = is_array($summary['by_entity'] ?? null) ? $summary['by_entity'] : [];
+		$ignoredChanges = 0;
+		$ignoredWithChanges = [];
+
+		foreach (array_values(array_unique(array_map('strval', $ignoredEntities))) as $entity) {
+			$counts = is_array($byEntity[$entity] ?? null) ? $byEntity[$entity] : [];
+			$entityChanges = max(0, (int) ($counts['added'] ?? 0))
+				+ max(0, (int) ($counts['updated'] ?? 0))
+				+ max(0, (int) ($counts['removed'] ?? 0));
+
+			if ($entityChanges > 0) {
+				$ignoredChanges += $entityChanges;
+				$ignoredWithChanges[] = $entity;
+			}
+		}
+
+		$ignoredChanges = min($rawRemainingChanges, $ignoredChanges);
+		sort($ignoredWithChanges, SORT_STRING);
+
+		return [
+			'raw_remaining_changes' => $rawRemainingChanges,
+			'remaining_changes' => $rawRemainingChanges - $ignoredChanges,
+			'ignored_changes' => $ignoredChanges,
+			'ignored_entities' => $ignoredWithChanges
 		];
 	}
 

@@ -55,4 +55,64 @@ $result = (new TemplatePostUpdateValidationService(static fn(string $templateId)
 assertPostUpdateValidation(false, $result['valid'], 'Post-import UUID drift must fail validation.');
 assertPostUpdateValidation(true, in_array('uuid_mismatch', $result['reasons'], true), 'UUID drift must be reported.');
 
+$groupOnlyAnalysis = $goodAnalysis;
+$groupOnlyAnalysis['content_status'] = 'local_modifications_detected';
+$groupOnlyAnalysis['comparison_summary'] = [
+	'added' => 0,
+	'updated' => 2,
+	'removed' => 0,
+	'total' => 2,
+	'by_entity' => [
+		'host_groups' => ['added' => 0, 'updated' => 1, 'removed' => 0],
+		'template_groups' => ['added' => 0, 'updated' => 1, 'removed' => 0]
+	]
+];
+
+$groupOnlyService = new TemplatePostUpdateValidationService(
+	static fn(string $templateId): array => $groupOnlyAnalysis
+);
+$result = $groupOnlyService->validateCreateOnlyInstall('12345', $candidate);
+assertPostUpdateValidation('validated', $result['status'],
+	'Create-only post-install validation must tolerate only pre-existing shared group differences.');
+assertPostUpdateValidation(0, $result['remaining_changes'],
+	'Shared group differences must not count as effective template-content differences after create-only install.');
+assertPostUpdateValidation(2, $result['raw_remaining_changes'],
+	'Raw post-install comparison differences must remain visible for diagnostics.');
+assertPostUpdateValidation(2, $result['ignored_shared_changes'],
+	'Ignored shared group differences must be counted explicitly.');
+assertPostUpdateValidation(
+	['host_groups', 'template_groups'],
+	$result['ignored_shared_entities'],
+	'Only the reviewed shared group entity classes may be ignored.'
+);
+assertPostUpdateValidation('matches_current_upstream', $result['content_status'],
+	'Effective create-only content status should validate when only shared groups differ.');
+assertPostUpdateValidation('local_modifications_detected', $result['raw_content_status'],
+	'Raw content status must remain available for diagnostics.');
+
+$result = $groupOnlyService->validate('12345', $candidate);
+assertPostUpdateValidation(false, $result['valid'],
+	'Standard post-update validation must continue to reject shared group differences.');
+
+$mixedAnalysis = $groupOnlyAnalysis;
+$mixedAnalysis['comparison_summary'] = [
+	'added' => 0,
+	'updated' => 3,
+	'removed' => 0,
+	'total' => 3,
+	'by_entity' => [
+		'template_groups' => ['added' => 0, 'updated' => 2, 'removed' => 0],
+		'items' => ['added' => 0, 'updated' => 1, 'removed' => 0]
+	]
+];
+$result = (new TemplatePostUpdateValidationService(
+	static fn(string $templateId): array => $mixedAnalysis
+))->validateCreateOnlyInstall('12345', $candidate);
+assertPostUpdateValidation(false, $result['valid'],
+	'Create-only post-install validation must fail closed on any non-group difference.');
+assertPostUpdateValidation(1, $result['remaining_changes'],
+	'Non-group differences must remain effective after shared-group filtering.');
+assertPostUpdateValidation(true, in_array('remaining_import_differences', $result['reasons'], true),
+	'Non-group post-install differences must be reported.');
+
 echo "TemplatePostUpdateValidationService tests passed.\n";

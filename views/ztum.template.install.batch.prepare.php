@@ -164,6 +164,11 @@ $jsLabels = json_encode([
 	'installed' => _('Installed and validated'),
 	'import_failed' => _('Import failed — inspect state'),
 	'validation_failed' => _('Installed but validation failed'),
+	'validation_reasons' => _('Validation reasons'),
+	'remaining_differences' => _('remaining differences'),
+	'raw_differences' => _('raw comparison differences'),
+	'ignored_shared_differences' => _('ignored shared-group differences'),
+	'create_only_validated' => _('Validated with create-only installation policy'),
 	'failed' => _('Failed'),
 	'not_attempted' => _('Not attempted'),
 	'yes' => _('Yes'),
@@ -227,6 +232,39 @@ $script = <<<'JS'
 	};
 
 	const listText = (value) => Array.isArray(value) && value.length > 0 ? value.join(', ') : '—';
+
+	const validationDetail = (result) => {
+		const validation = result?.validation && typeof result.validation === 'object'
+			? result.validation
+			: {};
+		const reasons = Array.isArray(validation.reasons)
+			? validation.reasons.filter((reason) => typeof reason === 'string' && reason !== '')
+			: [];
+		const parts = [];
+
+		if (reasons.length > 0) {
+			parts.push(labels.validation_reasons + ': ' + reasons.join(', '));
+		}
+
+		const remaining = Number(validation.remaining_changes);
+		if (Number.isInteger(remaining) && remaining >= 0) {
+			parts.push(labels.remaining_differences + ': ' + remaining);
+		}
+
+		const rawRemaining = Number(validation.raw_remaining_changes);
+		if (Number.isInteger(rawRemaining) && rawRemaining >= 0 && rawRemaining !== remaining) {
+			parts.push(labels.raw_differences + ': ' + rawRemaining);
+		}
+
+		const ignored = Number(validation.ignored_shared_changes);
+		if (Number.isInteger(ignored) && ignored > 0) {
+			parts.push(labels.ignored_shared_differences + ': ' + ignored);
+		}
+
+		return parts.length > 0
+			? parts.join(' | ')
+			: (result?.reason || 'post_install_validation_failed');
+	};
 
 	const applyItem = (uuid, item) => {
 		const category = item.category === 'ready' ? 'ready' : 'blocked';
@@ -410,7 +448,7 @@ $script = <<<'JS'
 					}
 					else if (result.status === 'validation_failed') {
 						setStateText('ztum-install-execution-' + uuid, labels.validation_failed, 'danger');
-						setText('ztum-install-reason-' + uuid, result.reason || 'post_install_validation_failed');
+						setText('ztum-install-reason-' + uuid, validationDetail(result));
 					}
 					else {
 						setStateText(
@@ -435,6 +473,12 @@ $script = <<<'JS'
 				notAttempted = entries.length - index - 1;
 				const validation = result.validation?.status || 'validated';
 				setStateText('ztum-install-execution-' + uuid, labels.installed + ' (' + validation + ')', 'success');
+				if (Number(result.validation?.ignored_shared_changes || 0) > 0) {
+					setText(
+						'ztum-install-reason-' + uuid,
+						labels.create_only_validated + ' | ' + validationDetail(result)
+					);
+				}
 			}
 			catch (error) {
 				failed++;

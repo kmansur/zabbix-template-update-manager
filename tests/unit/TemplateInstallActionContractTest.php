@@ -70,6 +70,8 @@ assertInstallContract(strpos($controlled, 'API::Configuration()->import(') === f
 	'Controlled install service must not introduce a second direct configuration.import call.');
 assertInstallContract(strpos($post, 'TemplatePostUpdateValidationService') !== false,
 	'Post-install validation must reuse authoritative current-upstream validation.');
+assertInstallContract(strpos($post, 'validateCreateOnlyInstall') !== false,
+	'Post-install validation must apply the explicit create-only shared-group validation policy.');
 
 assertInstallContract(strpos($list, 'Review installation') !== false,
 	'Catalog must expose a distinct installation-review action.');
@@ -85,6 +87,11 @@ assertInstallContract(strpos($reviewView, 'there is no prior local rollback arti
 	'Installation review must disclose the absence of a prior rollback artifact.');
 assertInstallContract(strpos($resultView, 'does not automatically uninstall') !== false,
 	'Install result must disclose that failed validation does not trigger automatic uninstall.');
+assertInstallContract(
+	strpos($resultView, 'Ignored shared-group differences') !== false
+		&& strpos($resultView, "'ignored_shared_changes'") !== false,
+	'Install result must expose create-only shared-group validation diagnostics.'
+);
 assertInstallContract(
 	strpos($resultView, "'import_failed'") !== false
 		&& strpos($resultView, 'Import attempted') !== false
