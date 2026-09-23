@@ -12,8 +12,9 @@ require_once __DIR__.'/TemplateImportCompareService.php';
  * The single intentionally write-enabled Zabbix configuration boundary.
  *
  * Callers must complete fresh preflight validation before invoking this class.
- * This service imports one already isolated official template source using the
- * exact same rule profile used by configuration.importcompare.
+ * This service imports one already isolated official template source using a
+ * reviewed named rule profile supplied by TemplateImportCompareService. The
+ * same profile must have been used by configuration.importcompare.
  */
 final class TemplateConfigurationImportService {
 
