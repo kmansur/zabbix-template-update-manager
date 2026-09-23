@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.50
+# Laboratory test plan — 0.1.0-beta.51
 
 ## Release state
 
@@ -68,7 +68,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.50`, enable the module and open:
+Confirm `0.1.0-beta.51`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -97,6 +97,8 @@ Expected behavior:
 - Ready/success states use native success styling, review/risk states native warning styling, blocked/error states native error styling and neutral/unavailable states native neutral styling;
 - state remains understandable from text without relying on color alone;
 - empty catalog filters use a contextual native Zabbix no-data message instead of a generic large empty table;
+- upstream source, commit and index-cache state are integrated into the **Official catalog** summary table rather than displayed as a loose metadata line;
+- empty filtered catalog views do not show selection instructions that cannot be acted on;
 - operator-visible reasons are readable labels such as `Historical baseline unavailable`, not raw snake-case service codes;
 - UUID/commit/SHA-256 values are compact and monospace where appropriate, with the complete value available through the element title;
 - section headings and descriptive/status messages are visually consistent across catalog, comparison, update, installation and rollback flows;

@@ -49,8 +49,8 @@ assertSelectionContract(
 
 assertSelectionContract(
 	strpos($listView, 'Preparation is read-only') !== false
-		&& strpos($listView, 'later explicit confirmation') !== false,
-	'The catalog must explain that direct preparation remains read-only until later confirmation.'
+		&& strpos($listView, 'requires confirmation') !== false,
+	'The catalog must explain that preparation remains read-only and the later write requires confirmation.'
 );
 
 foreach ([

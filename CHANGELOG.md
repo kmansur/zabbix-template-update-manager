@@ -4,6 +4,23 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.51] - 2026-09-23
+
+### Changed
+
+- Integrated upstream source, commit and cache state into the native **Official catalog** summary table instead of rendering them as a separate floating metadata line.
+- Shortened the catalog selection guidance, made it visually secondary and moved it below the **Templates** heading.
+- Empty filtered views no longer display irrelevant selection instructions; the contextual native no-data message is sufficient.
+- Index cache state now uses native success/warning/neutral status styling.
+
+### Safety
+
+- This change is presentation-only. Catalog filtering, selection eligibility, preparation, preflight and controlled-write behavior are unchanged.
+
+### Tests
+
+- Catalog contracts now require integrated source/commit/cache metadata and suppress guidance for empty filtered results.
+
 ## [0.1.0-beta.50] - 2026-09-23
 
 ### Added

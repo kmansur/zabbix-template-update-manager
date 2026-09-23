@@ -1,4 +1,4 @@
-# Project status and engineering audit — 0.1.0-beta.50
+# Project status and engineering audit — 0.1.0-beta.51
 
 Date: 2026-09-23
 

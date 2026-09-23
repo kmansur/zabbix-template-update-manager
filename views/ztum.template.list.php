@@ -82,16 +82,48 @@ $localSummary = (new CTableInfo())
 		$data['summary']['in_use']
 	]);
 
+$catalogSourceLine = is_array($data['upstream_source'])
+	? trim((string) ($data['upstream_source']['line'] ?? ''))
+	: '';
+$catalogCommit = is_array($data['upstream_source'])
+	? trim((string) ($data['upstream_source']['commit'] ?? ''))
+	: '';
+$indexCacheStatus = is_array($data['upstream_runtime'])
+	? trim((string) ($data['upstream_runtime']['cache_status'] ?? ''))
+	: '';
+$indexCacheLabel = $indexCacheStatus !== ''
+	? ucfirst(str_replace(['_', '-'], ' ', $indexCacheStatus))
+	: '—';
+$indexCacheTone = match ($indexCacheStatus) {
+	'fresh' => FrontendUi::SUCCESS,
+	'stale' => FrontendUi::WARNING,
+	default => FrontendUi::MUTED
+};
+
 $catalogSummary = (new CTableInfo())
-	->setHeader([_('Official catalog'), _('Installed'), _('Not installed'), _('Updates available')])
+	->setHeader([
+		_('Templates'),
+		_('Installed'),
+		_('Not installed'),
+		_('Updates available'),
+		_('Source'),
+		_('Commit'),
+		_('Index cache')
+	])
 	->addRow([
 		$data['catalog_summary']['official_catalog_total'],
 		$data['catalog_summary']['official_installed'],
 		$data['catalog_summary']['not_installed'],
-		$data['version_summary']['update_available']
+		$data['version_summary']['update_available'],
+		$catalogSourceLine !== '' ? _('Zabbix').' '.$catalogSourceLine : '—',
+		$catalogCommit !== '' ? FrontendUi::fingerprint($catalogCommit, 12) : '—',
+		FrontendUi::status($indexCacheLabel, $indexCacheTone)
 	]);
 
 $installSelectionMode = $data['can_install'] && ($data['filter']['status'] ?? 'all') === 'not_installed';
+$selectionGuidance = $installSelectionMode
+	? _('Select one or more missing official templates to prepare installation. Preparation is read-only; installation requires confirmation.')
+	: _('Select one or more templates with available updates to prepare an update. Preparation is read-only; changes require confirmation.');
 $selectionForm = null;
 $selectAllCheckbox = (new CCheckBox('all_templates'))
 	->setEnabled(false)
@@ -311,22 +343,9 @@ $page
 	->addItem(FrontendUi::section(_('Local inventory')))
 	->addItem($localSummary);
 
-if (is_array($data['upstream_source'])) {
-	$upstreamCommit = isset($data['upstream_source']['commit'])
-		? (string) $data['upstream_source']['commit']
-		: '';
-
-	$page
-		->addItem(FrontendUi::section(_('Official catalog')))
-		->addItem($catalogSummary)
-		->addItem(
-			(new CList())
-				->addClass(ZBX_STYLE_HOR_LIST)
-				->addItem(_('Zabbix').' '.(string) ($data['upstream_source']['line'] ?? '—'))
-				->addItem([_('Commit').': ', $upstreamCommit !== '' ? FrontendUi::fingerprint($upstreamCommit, 12) : '—'])
-				->addItem(_('Index cache').': '.(string) ($data['upstream_runtime']['cache_status'] ?? 'unknown'))
-		);
-}
+$page
+	->addItem(FrontendUi::section(_('Official catalog')))
+	->addItem($catalogSummary);
 
 if ($data['upstream_warning'] !== null) {
 	$page->addItem(FrontendUi::message((string) $data['upstream_warning'], FrontendUi::WARNING));
@@ -365,12 +384,13 @@ if ($data['upstream_error'] !== null) {
 
 $page
 	->addItem($filter)
-	->addItem(FrontendUi::description(_(
-		$installSelectionMode
-			? 'Select missing official templates to prepare a controlled installation. Preparation is read-only and blocked dependencies remain non-executable.'
-			: 'Select official templates with newer upstream versions to prepare an update. Preparation is read-only; configuration changes require a later explicit confirmation.'
-	)))
 	->addItem(FrontendUi::section(_('Templates')));
+
+if ((int) $data['filtered_count'] > 0) {
+	$page->addItem(FrontendUi::description(
+		FrontendUi::status($selectionGuidance, FrontendUi::MUTED)
+	));
+}
 
 if ($selectionForm !== null) {
 	$page->addItem($selectionForm);

@@ -66,5 +66,21 @@ assertCatalogControllerContract(
 	'Rows that are not eligible for the active bulk action must render a disabled checkbox instead of an empty cell.'
 );
 
+assertCatalogControllerContract(
+	strpos($view, "_('Source')") !== false
+		&& strpos($view, "_('Commit')") !== false
+		&& strpos($view, "_('Index cache')") !== false
+		&& strpos($view, 'FrontendUi::fingerprint($catalogCommit, 12)') !== false
+		&& strpos($view, 'FrontendUi::status($indexCacheLabel, $indexCacheTone)') !== false,
+	'Official catalog source/commit/cache metadata must be integrated into the native catalog summary table.'
+);
+
+assertCatalogControllerContract(
+	strpos($view, "if ((int) \$data['filtered_count'] > 0)") !== false
+		&& strpos($view, "FrontendUi::section(_('Templates'))") !== false
+		&& strpos($view, 'FrontendUi::status($selectionGuidance, FrontendUi::MUTED)') !== false,
+	'Selection guidance must be concise, visually secondary and hidden when the filtered catalog is empty.'
+);
+
 
 echo "Template catalog controller/filter contracts passed.\n";
