@@ -77,7 +77,7 @@ assertBackupHistoryContract(
 );
 assertBackupHistoryContract(
 	true,
-	str_contains($view, 'No conclusion about stored backup availability can be made.'),
+	str_contains($view, 'The rollback repository is unavailable or cannot be inspected safely.'),
 	'Unavailable repository messaging must fail closed instead of claiming that no backups exist.'
 );
 assertBackupHistoryContract(
