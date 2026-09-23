@@ -4,10 +4,10 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 
 use CController;
 use CControllerResponseData;
-use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledInstallService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledInstallService;\nuse Modules\\ZabbixTemplateUpdateManager\\Service\\TemplateOperationLockService;
 use Throwable;
 
-require_once dirname(__DIR__).'/src/Service/TemplateControlledInstallService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateControlledInstallService.php';\nrequire_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 
 class TemplateInstallBatchExecuteOne extends CController {
 
@@ -50,9 +50,11 @@ class TemplateInstallBatchExecuteOne extends CController {
 		$output = ['ok' => false, 'result' => null, 'error' => null];
 
 		try {
-			$result = (new TemplateControlledInstallService())->execute(
-				$uuid,
-				(string) $this->getInput('evidence_sha256')
+			$evidence = (string) $this->getInput('evidence_sha256');
+			$result = (new TemplateOperationLockService())->run(
+				'install',
+				'uuid-'.$uuid,
+				static fn(): array => (new TemplateControlledInstallService())->execute($uuid, $evidence)
 			);
 
 			$output['ok'] = true;

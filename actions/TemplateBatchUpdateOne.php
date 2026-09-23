@@ -4,10 +4,10 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 
 use CController;
 use CControllerResponseData;
-use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;\nuse Modules\\ZabbixTemplateUpdateManager\\Service\\TemplateOperationLockService;
 use Throwable;
 
-require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';\nrequire_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 
 /**
  * Executes exactly one previously prepared Ready template.
@@ -65,11 +65,15 @@ class TemplateBatchUpdateOne extends CController {
 		try {
 			$manualOverride = (string) $this->getInput('manual_override', '') === '1';
 			$localOverwriteConfirmed = (string) $this->getInput('confirm_local_overwrite', '') === '1';
-			$result = (new TemplateControlledUpdateService())->execute(
-				$templateId,
-				$evidence,
-				$manualOverride,
-				$localOverwriteConfirmed
+			$result = (new TemplateOperationLockService())->run(
+				'update',
+				'template-'.$templateId,
+				static fn(): array => (new TemplateControlledUpdateService())->execute(
+					$templateId,
+					$evidence,
+					$manualOverride,
+					$localOverwriteConfirmed
+				)
 			);
 			$output['ok'] = true;
 			$output['result'] = $result;

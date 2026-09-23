@@ -5,10 +5,10 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
-use Modules\ZabbixTemplateUpdateManager\Service\TemplateRollbackService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateRollbackService;\nuse Modules\\ZabbixTemplateUpdateManager\\Service\\TemplateOperationLockService;
 use Throwable;
 
-require_once dirname(__DIR__).'/src/Service/TemplateRollbackService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateRollbackService.php';\nrequire_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 
 /**
  * Performs one explicitly confirmed template rollback.
@@ -50,10 +50,15 @@ class TemplateRollback extends CController {
 		];
 
 		try {
-			$data['result'] = (new TemplateRollbackService())->execute(
-				$templateId,
-				$manifestFile,
-				(string) $this->getInput('evidence_sha256')
+			$evidence = (string) $this->getInput('evidence_sha256');
+			$data['result'] = (new TemplateOperationLockService())->run(
+				'rollback',
+				'template-'.$templateId,
+				static fn(): array => (new TemplateRollbackService())->execute(
+					$templateId,
+					$manifestFile,
+					$evidence
+				)
 			);
 		}
 		catch (Throwable $exception) {

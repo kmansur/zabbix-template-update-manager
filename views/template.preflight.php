@@ -183,9 +183,18 @@ if ($status === 'passed') {
 			$confirmationList->addRow(
 				_('Reviewed override'),
 				(new CCheckBox('confirm_manual_override', '1'))->setLabel(_(
-					'I explicitly accept the reviewed local-overwrite and/or technical-risk conditions above. I understand that the official import may remove or replace those local differences.'
+					'I explicitly accept the reviewed technical-risk conditions above.'
 				))
 			);
+
+			if (in_array('local_customization_overwrite', $manualReasons, true)) {
+				$confirmationList->addRow(
+					_('Local customization overwrite'),
+					(new CCheckBox('confirm_local_overwrite', '1'))->setLabel(_(
+						'I explicitly accept overwriting or removing the local customizations identified above.'
+					))
+				);
+			}
 		}
 
 		$updateForm = (new CForm('post'))

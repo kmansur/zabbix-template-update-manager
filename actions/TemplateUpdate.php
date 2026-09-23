@@ -5,10 +5,10 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
-use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;\nuse Modules\\ZabbixTemplateUpdateManager\\Service\\TemplateOperationLockService;
 use Throwable;
 
-require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';\nrequire_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 
 /**
  * Performs one explicitly confirmed official-template update.
@@ -25,7 +25,8 @@ class TemplateUpdate extends CController {
 			'evidence_sha256' => 'required|string',
 			'confirm' => 'required|in 1',
 			'manual_override' => 'in 1',
-			'confirm_manual_override' => 'in 1'
+			'confirm_manual_override' => 'in 1',
+			'confirm_local_overwrite' => 'in 1'
 		]);
 
 		if ($ret && (string) $this->getInput('manual_override', '') === '1') {
@@ -53,10 +54,19 @@ class TemplateUpdate extends CController {
 		];
 
 		try {
-			$data['result'] = (new TemplateControlledUpdateService())->execute(
-				$templateId,
-				(string) $this->getInput('evidence_sha256'),
-				(string) $this->getInput('manual_override', '') === '1'
+			$evidence = (string) $this->getInput('evidence_sha256');
+			$manualOverride = (string) $this->getInput('manual_override', '') === '1';
+			$localOverwriteConfirmed = (string) $this->getInput('confirm_local_overwrite', '') === '1';
+
+			$data['result'] = (new TemplateOperationLockService())->run(
+				'update',
+				'template-'.$templateId,
+				static fn(): array => (new TemplateControlledUpdateService())->execute(
+					$templateId,
+					$evidence,
+					$manualOverride,
+					$localOverwriteConfirmed
+				)
 			);
 		}
 		catch (Throwable $exception) {

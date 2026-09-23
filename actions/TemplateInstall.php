@@ -5,10 +5,10 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
-use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledInstallService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledInstallService;\nuse Modules\\ZabbixTemplateUpdateManager\\Service\\TemplateOperationLockService;
 use Throwable;
 
-require_once dirname(__DIR__).'/src/Service/TemplateControlledInstallService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateControlledInstallService.php';\nrequire_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 
 class TemplateInstall extends CController {
 
@@ -47,9 +47,11 @@ class TemplateInstall extends CController {
 		];
 
 		try {
-			$data['result'] = (new TemplateControlledInstallService())->execute(
-				$uuid,
-				(string) $this->getInput('evidence_sha256')
+			$evidence = (string) $this->getInput('evidence_sha256');
+			$data['result'] = (new TemplateOperationLockService())->run(
+				'install',
+				'uuid-'.$uuid,
+				static fn(): array => (new TemplateControlledInstallService())->execute($uuid, $evidence)
 			);
 		}
 		catch (Throwable $exception) {
