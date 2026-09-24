@@ -50,6 +50,28 @@ async function api(method, params = {}, auth = undefined) {
 	return data.result;
 }
 
+async function loginApiWithRetry() {
+	let lastError = null;
+
+	for (let attempt = 1; attempt <= 90; attempt++) {
+		try {
+			return await api('user.login', {
+				username: adminUser,
+				password: adminPassword
+			});
+		}
+		catch (error) {
+			lastError = error;
+			await sleep(2000);
+		}
+	}
+
+	throw new Error(
+		'Zabbix API/database initialization did not become ready in time: '
+			+ (lastError?.message || 'unknown error')
+	);
+}
+
 async function ensureModule(auth) {
 	const existing = await api('module.get', {
 		output: ['moduleid', 'id', 'relative_path', 'status'],
@@ -138,10 +160,7 @@ async function assertCatalog(page, label) {
 
 await waitForFrontend();
 
-const auth = await api('user.login', {
-	username: adminUser,
-	password: adminPassword
-});
+const auth = await loginApiWithRetry();
 await ensureModule(auth);
 
 const browser = await chromium.launch({headless: true});
