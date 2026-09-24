@@ -221,10 +221,17 @@ class TemplateList extends CController {
 			$data['templates'] = array_values(array_filter(
 				$data['templates'],
 				static function (array $template) use ($filterName): bool {
-					$name = (string) ($template['name'] ?? '');
+					$name = trim((string) ($template['name'] ?? ''));
+					$technicalName = trim((string) ($template['technical_name'] ?? ''));
+					$visibleName = $name;
+
+					if ($technicalName !== '' && $technicalName !== $name) {
+						$visibleName .= ' ('.$technicalName.')';
+					}
+
 					return function_exists('mb_stripos')
-						? mb_stripos($name, $filterName) !== false
-						: stripos($name, $filterName) !== false;
+						? mb_stripos($visibleName, $filterName) !== false
+						: stripos($visibleName, $filterName) !== false;
 				}
 			));
 		}
