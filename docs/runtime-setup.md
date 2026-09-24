@@ -30,6 +30,6 @@ Default persistent root:
 
 All directories are created as mode `0700` and owned by the resolved runtime account. The script refuses symbolic-link targets and does not edit PHP-FPM configuration.
 
-The controlled-operation lock defaults to a private directory below the PHP temporary directory unless `ZTUM_LOCK_DIR` is configured. The persistent `locks/` directory is created so deployments can explicitly point the lock there if desired.
+The controlled-operation lock defaults to `/var/lib/zabbix-template-update-manager/locks`. `ZTUM_LOCK_DIR` may override that location for deployments that require shared storage with reliable cross-node `flock()` semantics. The runtime helper creates and validates the default private `locks/` directory.
 
 For an air-gapped bundle, copy the verified bundle below `offline/` (or another private directory) and configure the PHP-FPM environment as documented in [offline-mode.md](offline-mode.md).
