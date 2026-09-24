@@ -357,7 +357,7 @@ The newest matching historical candidate is selected deliberately. If several of
 
 A template `vendor.version` is never translated to a guessed Git tag. For example, `7.0-3` means only template metadata; the resolver proves its corresponding source through actual Git history.
 
-A current path may have been renamed in deeper history. `followRenames=true` keeps the commit history traversal authoritative, but the current implementation still fetches historical raw content using the selected current path. If an older commit cannot be retrieved safely at that path, baseline resolution fails closed rather than guessing an old path. Rename-aware historical raw-path resolution remains future work.
+A current path may have been renamed in deeper history. `followRenames=true` keeps commit traversal authoritative; when immutable raw retrieval fails at the tracked path, ZTUM can resolve a prior source path only from authoritative commit-change metadata that proves a rename/move mapping. If that mapping cannot be proven, baseline resolution fails closed rather than guessing an old path.
 
 ### TemplateImportCompareService
 
@@ -552,7 +552,6 @@ Implemented write-path properties include:
 
 ### Remaining comparison/update work
 
-- rename-aware historical raw-path resolution;
 - richer inherited/indirect host impact analysis;
 - more granular semantic decomposition where stable keys are proven safe;
 - filters/drill-down for very large three-way detail sets;
@@ -578,7 +577,7 @@ The bundle contract is intentionally narrow:
 
 The bundle generator consumes a local canonical Zabbix Git checkout and validated upstream index. It verifies current raw YAML bytes against the index before packaging them.
 
-Historical bundle generation deliberately preserves the current rename limitation: if an older commit cannot be read at the current path, generation stops/truncates instead of guessing a renamed historical path.
+Historical bundle generation remains conservative: it may package only historical source paths proven by the same immutable/rename evidence rules; missing rename evidence stops or truncates generation rather than guessing.
 
 ### Controlled-operation serialization
 

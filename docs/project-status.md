@@ -6,7 +6,7 @@ This document is an engineering snapshot, not a release certification. Percentag
 
 ## Overall estimate toward stable 1.0 core scope
 
-**92% complete**
+**93% complete**
 
 The estimate deliberately separates implementation from automation and field validation. Provider expansion (GitHub/GitLab/community/private/custom repositories) remains post-1.0 scope.
 
@@ -19,9 +19,9 @@ The estimate deliberately separates implementation from automation and field val
 | Automated validation/CI | 10% | 98% | CI/UI/security/workflow/offline/runtime/coverage gates implemented; browser E2E and independent security review remain |
 | Runtime resilience | 10% | 94% | Request-bounded flows, immutable history caching, rename-aware paths, initial-release BASE, offline mode and operation lock implemented |
 | Field validation | 10% | 68% | End-to-end Zabbix 7.x evidence is strong; Zabbix 8.x catalog loading and native pager presentation have been field-checked, while the complete 8.x write-path and cross-theme matrix still needs validation |
-| Release engineering | 10% | 82% | Quick install, release workflow/assets/checksums/policy implemented; license decision and first community-test prerelease remain |
+| Release engineering | 10% | 88% | Quick install, release workflow/assets/checksums/policy plus AGPL-3.0-only license/notice implemented; first validated community prerelease remains |
 
-Weighted result: **92%**.
+Weighted result: **93%**.
 
 ## Major improvements through beta.57
 
@@ -45,14 +45,10 @@ The external review's principal technical/process findings were converted into i
 
 ## Remaining high-priority blockers
 
-1. **Project license**
-   - No license has been selected yet.
-   - This remains a governance/legal blocker for stable public adoption and should be an explicit maintainer decision rather than guessed by automation.
-
-2. **Zabbix 8.x field-validation gap**
+1. **Zabbix 8.x field-validation gap**
    - The code supports major versions 7 and 8, but the complete real workflow matrix still needs to be recorded on Zabbix 8.x.
 
-3. **Cross-version UI field validation**
+2. **Cross-version UI field validation**
    - Beta.57 includes the native presentation/copy pass, **Never update / Allow updates** controls, native Templates-page-style Name + Status filtering and `CPagerHelper`-only pagination.
    - Light/dark rendering and all operator flows still need field evidence on supported Zabbix 7.x and 8.x instances before community UI validation is considered complete.
 
@@ -67,7 +63,6 @@ The external review's principal technical/process findings were converted into i
 
 ## Stable 1.0 blockers
 
-- select and publish project license;
 - complete/record Zabbix 7.x and 8.x field-validation matrix;
 - validate fresh install, standard update, reviewed update, local-overwrite acknowledgement, batch stop-on-failure, offline mode, concurrency and rollback on real supported instances;
 - complete the beta.57 cross-version native-UI field pass and record any remaining browser/runtime limitations;

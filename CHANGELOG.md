@@ -4,6 +4,16 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Governance
+
+- Selected and published the GNU Affero General Public License v3.0 only (`AGPL-3.0-only`) and added project/Zabbix attribution notices.
+- Added explicit compatibility and production-readiness documents that separate implementation, automation, field validation and release readiness.
+
+### Documentation
+
+- Removed stale roadmap/architecture statements that still described rename-aware historical source resolution as unfinished after it was implemented.
+- Release policy now treats license/notice as completed governance inputs and keeps cross-version field/runtime validation as the remaining release gate.
+
 ### Security
 
 - Restricted the catalog controller to Zabbix Administrators and Super Admins instead of allowing every authenticated frontend user through the module controller.
