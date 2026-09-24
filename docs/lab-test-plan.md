@@ -244,6 +244,19 @@ Confirm:
 
 The former 25-template update-batch ceiling remains removed. Update selection retains the existing **500-template** sanity ceiling. Selections larger than 25 must reach preparation intact, and preparation must still run one template per HTTP request without silent truncation.
 
+## 3C. Inherited host-impact regression
+
+Choose one template that is directly linked to hosts and, when available, one parent template inherited by another template that is linked to additional hosts.
+
+1. Open the comparison page.
+2. Confirm **Risk and impact** shows direct, indirect, total impacted hosts and dependent-template count.
+3. For a template with no descendants, confirm indirect hosts and dependent templates are zero.
+4. For a parent template with descendants, compare the reported total with the unique hosts linked to the selected template or any descendant template.
+5. Confirm the total never becomes smaller than the direct count.
+6. If the inheritance graph cannot be resolved, confirm ZTUM reports the limitation and does not invent an indirect count.
+
+This analysis is read-only and must not change readiness or write authorization solely because impact metadata is unavailable.
+
 ## 4A. Never update policy regression
 
 As Super Admin, choose one installed official template that is safe to use for a policy-only test.

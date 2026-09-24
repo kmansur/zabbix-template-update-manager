@@ -450,7 +450,7 @@ if (is_array($data['update_risk']) && is_array($data['update_preview'])) {
 			_('Overall review priority'),
 			_('Technical severity'),
 			_('Three-way coverage'),
-			_('Directly linked hosts'),
+			_('Total impacted hosts'),
 			_('Affected entities'),
 			_('Normalized changes')
 		])
@@ -467,7 +467,7 @@ if (is_array($data['update_risk']) && is_array($data['update_preview'])) {
 				$riskCoverageLabels[$coverage] ?? _('Unknown'),
 				$coverage === 'complete' ? FrontendUi::SUCCESS : FrontendUi::WARNING
 			),
-			(int) ($risk['direct_host_count'] ?? 0),
+			(int) ($risk['total_host_count'] ?? $risk['direct_host_count'] ?? 0),
 			(int) ($previewSummary['entities_affected'] ?? 0),
 			(int) ($previewSummary['total'] ?? 0)
 		]);
@@ -491,6 +491,25 @@ if (is_array($data['update_risk']) && is_array($data['update_preview'])) {
 		->addItem($riskTable)
 		->addItem($operationTable);
 
+	if (is_array($data['host_impact']) && ($data['host_impact']['status'] ?? null) === 'complete') {
+		$hostImpact = $data['host_impact'];
+		$page->addItem(
+			(new CTableInfo())
+				->setHeader([
+					_('Directly linked hosts'),
+					_('Indirect hosts'),
+					_('Total impacted hosts'),
+					_('Dependent templates')
+				])
+				->addRow([
+					(int) ($hostImpact['direct_host_count'] ?? 0),
+					(int) ($hostImpact['indirect_host_count'] ?? 0),
+					(int) ($hostImpact['total_host_count'] ?? 0),
+					(int) ($hostImpact['dependent_template_count'] ?? 0)
+				])
+		);
+	}
+
 	if ($riskLevel === 'unknown') {
 		$page->addItem(FrontendUi::message(
 			_('Review priority is unknown because local-overlap analysis is incomplete.'),
@@ -505,8 +524,12 @@ if (is_array($data['update_risk']) && is_array($data['update_preview'])) {
 	}
 
 	$page->addItem(FrontendUi::description(_(
-		'Host impact currently counts only directly linked hosts; inherited or indirect impact is not included.'
+		'Indirect host impact follows the visible template inheritance graph and counts unique hosts reached through dependent templates.'
 	)));
+}
+
+if ($data['host_impact_error'] !== null) {
+	$page->addItem(FrontendUi::message((string) $data['host_impact_error'], FrontendUi::WARNING));
 }
 
 if ($data['update_risk_error'] !== null) {
@@ -582,7 +605,7 @@ if (is_array($data['update_readiness'])
 		->setHeader([
 			_('Readiness state'),
 			_('Required next step'),
-			_('Directly linked hosts'),
+			_('Total impacted hosts'),
 			_('Update writes enabled')
 		])
 		->addRow([
@@ -591,7 +614,7 @@ if (is_array($data['update_readiness'])
 				$readinessTones[$readinessStatus] ?? FrontendUi::MUTED
 			),
 			$readinessNextStepLabels[$nextStep] ?? _('Unknown'),
-			(int) ($readiness['direct_host_count'] ?? 0),
+			(int) ($readiness['total_host_count'] ?? $readiness['direct_host_count'] ?? 0),
 			FrontendUi::yesNo(!empty($readiness['write_enabled']))
 		]);
 

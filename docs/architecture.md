@@ -508,6 +508,19 @@ Only Zabbix administrators and super administrators can open the comparison acti
 
 All views use native Zabbix components and do not add a UI framework. Native UI conventions, status tones, theme behavior and automated UI guards are documented in `docs/ui-style.md`.
 
+### TemplateHostImpactService
+
+For an installed template, ZTUM can build the visible template-inheritance graph from native `template.get` parent-template relationships, traverse descendant templates with a bounded cycle-safe search and ask `host.get` for unique host counts across the affected template set.
+
+The result distinguishes:
+
+- directly linked hosts;
+- additional indirect hosts reached through descendant templates;
+- total unique impacted hosts;
+- dependent-template count.
+
+If the graph or aggregate host query cannot be proven safely, update analysis keeps the existing direct-host context and reports inherited impact as unavailable rather than guessing.
+
 ### Implemented comparison and safety layers
 
 The comparison engine now includes:
@@ -552,7 +565,6 @@ Implemented write-path properties include:
 
 ### Remaining comparison/update work
 
-- richer inherited/indirect host impact analysis;
 - more granular semantic decomposition where stable keys are proven safe;
 - filters/drill-down for very large three-way detail sets;
 - persistent human-readable operation history/audit UI;

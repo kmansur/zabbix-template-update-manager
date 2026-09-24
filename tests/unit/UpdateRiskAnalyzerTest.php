@@ -38,6 +38,21 @@ assertUpdateRisk('high', $risk['technical_level'], 'Item key changes must be tec
 assertUpdateRisk('high', $risk['level'], 'Complete three-way coverage should retain high technical risk.');
 assertUpdateRisk(false, $risk['standard_path_eligible'], 'Item key changes must never enter the standard path.');
 assertUpdateRisk(42, $risk['direct_host_count'], 'Direct host impact must be preserved exactly.');
+assertUpdateRisk(42, $risk['total_host_count'], 'Without inherited-impact evidence, total host impact must conservatively equal the direct count.');
+assertUpdateRisk(false, $risk['host_impact_complete'], 'Missing inherited-impact evidence must remain explicit.');
+
+$impact = [
+	'status' => 'complete',
+	'direct_host_count' => 42,
+	'indirect_host_count' => 18,
+	'total_host_count' => 60,
+	'dependent_template_count' => 3
+];
+$risk = UpdateRiskAnalyzer::assess($preview, $threeWay, 42, $impact);
+assertUpdateRisk(18, $risk['indirect_host_count'], 'Inherited host impact must be preserved.');
+assertUpdateRisk(60, $risk['total_host_count'], 'Risk context must expose the full unique host reach.');
+assertUpdateRisk(3, $risk['dependent_template_count'], 'Risk context must expose descendant template count.');
+assertUpdateRisk(true, $risk['host_impact_complete'], 'Complete inherited-impact evidence must be explicit.');
 
 $preview = ['details' => [previewDetail('/t', 'templates', 'description', 'updated')]];
 $risk = UpdateRiskAnalyzer::assess($preview, $threeWay, 0);

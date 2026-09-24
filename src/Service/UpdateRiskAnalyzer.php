@@ -76,8 +76,18 @@ final class UpdateRiskAnalyzer {
 		'DISCARD_UNCHANGED_HEARTBEAT'
 	];
 
-	public static function assess(array $preview, ?array $threeWayAnalysis, int $directHostCount): array {
+	public static function assess(array $preview, ?array $threeWayAnalysis, int $directHostCount, ?array $hostImpact = null): array {
 		$directHostCount = max(0, $directHostCount);
+		$hostImpactComplete = is_array($hostImpact) && ($hostImpact['status'] ?? null) === 'complete';
+		$totalHostCount = $hostImpactComplete
+			? max($directHostCount, (int) ($hostImpact['total_host_count'] ?? 0))
+			: $directHostCount;
+		$indirectHostCount = $hostImpactComplete
+			? max(0, $totalHostCount - $directHostCount)
+			: 0;
+		$dependentTemplateCount = $hostImpactComplete
+			? max(0, (int) ($hostImpact['dependent_template_count'] ?? 0))
+			: 0;
 		$overlap = self::overlapMap($threeWayAnalysis);
 		$details = [];
 		$counts = [
@@ -161,7 +171,12 @@ final class UpdateRiskAnalyzer {
 			'standard_path_eligible' => $standardPathEligible,
 			'risk_reasons' => array_values(array_keys($riskReasons)),
 			'direct_host_count' => $directHostCount,
+			'indirect_host_count' => $indirectHostCount,
+			'total_host_count' => $totalHostCount,
+			'dependent_template_count' => $dependentTemplateCount,
+			'host_impact_complete' => $hostImpactComplete,
 			'has_direct_host_impact' => $directHostCount > 0,
+			'has_host_impact' => $totalHostCount > 0,
 			'counts' => $counts,
 			'details' => $details,
 			'three_way_summary' => $threeWaySummary

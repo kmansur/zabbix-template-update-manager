@@ -73,7 +73,7 @@ ZTUM currently provides:
 - BASE / LOCAL / UPSTREAM three-way analysis;
 - conflict and local-customization overwrite detection;
 - technical update-risk/review-priority classification;
-- directly linked host impact context;
+- direct plus inherited/indirect host-impact context through the visible template inheritance graph;
 - persistent private rollback backups;
 - rollback-artifact integrity verification against fresh installed-template exports;
 - bounded backup-history inspection;
