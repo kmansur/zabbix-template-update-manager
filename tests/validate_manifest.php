@@ -78,14 +78,22 @@ $expectedActions = [
 ];
 
 $expectedAssets = [
-	'assets/js/ztum-update-batch.js',
-	'assets/js/ztum-install-batch.js'
+	'ztum-update-batch.js',
+	'ztum-install-batch.js'
 ];
 
 if (($manifest['assets']['js'] ?? null) !== $expectedAssets) {
 	fwrite(STDERR, "manifest.json JavaScript assets are not configured as expected.\n");
 	exit(1);
 }
+
+foreach ($expectedAssets as $asset) {
+	if (str_contains($asset, '/') || str_contains($asset, '\\')) {
+		fwrite(STDERR, "manifest.json JavaScript asset names must be relative to the module assets/js directory.\n");
+		exit(1);
+	}
+}
+
 
 foreach ($expectedActions as $actionName => $expectedAction) {
 	$action = $manifest['actions'][$actionName] ?? null;

@@ -8,7 +8,51 @@ permissions:
   contents: write
 
 jobs:
+  runtime-smoke:
+    name: Zabbix ${{ matrix.label }} release runtime smoke
+    runs-on: ubuntu-latest
+    env:
+      POSTGRES_IMAGE: ${{ matrix.postgres_image }}
+      ZABBIX_SERVER_IMAGE: ${{ matrix.server_image }}
+      ZABBIX_WEB_IMAGE: ${{ matrix.web_image }}
+      ZTUM_SMOKE_PORT: '18080'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: '7.0'
+            server_image: 'zabbix/zabbix-server-pgsql:alpine-7.0-latest'
+            web_image: 'zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest'
+            postgres_image: 'postgres:16-alpine'
+          - label: '8.0'
+            server_image: 'zabbix/zabbix-server-pgsql:alpine-trunk'
+            web_image: 'zabbix/zabbix-web-nginx-pgsql:alpine-trunk'
+            postgres_image: 'postgres:18-alpine'
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install browser tooling
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Start disposable Zabbix stack
+        run: docker compose -f tests/runtime-smoke/compose.yaml up -d
+      - name: Run full frontend smoke
+        env:
+          ZTUM_SMOKE_BASE_URL: http://127.0.0.1:18080
+        run: node tests/browser/full-zabbix-smoke.mjs
+      - name: Capture diagnostics
+        if: failure()
+        run: docker compose -f tests/runtime-smoke/compose.yaml logs --no-color --tail=300
+      - name: Stop disposable Zabbix stack
+        if: always()
+        run: docker compose -f tests/runtime-smoke/compose.yaml down -v --remove-orphans
+
   release:
+    needs: runtime-smoke
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -32,9 +76,10 @@ jobs:
       - name: Validate Python tools
         run: |
           python -m pip install --disable-pip-version-check -r requirements-dev.txt
-          python -m py_compile tools/build_upstream_index.py tools/build_offline_bundle.py tools/check_zabbix_frontend_compat.py
+          python -m py_compile tools/build_upstream_index.py tools/build_offline_bundle.py tools/aggregate_coverage.py tools/check_zabbix_frontend_compat.py
           python tests/test_build_upstream_index.py
           python tests/test_build_offline_bundle.py
+          python tests/test_aggregate_coverage.py
           python tests/test_zabbix_frontend_compat.py
           python tests/test_workflows.py
       - name: Build release archives

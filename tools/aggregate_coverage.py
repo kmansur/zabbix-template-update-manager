@@ -11,6 +11,8 @@ def main() -> int:
     parser.add_argument("--repo-root", type=Path, default=Path("."))
     parser.add_argument("--coverage-dir", type=Path, required=True)
     parser.add_argument("--output", type=Path, default=Path("coverage-summary.md"))
+    parser.add_argument("--min-file-percent", type=float, default=None)
+    parser.add_argument("--min-line-percent", type=float, default=None)
     args = parser.parse_args()
 
     root = args.repo_root.resolve()
@@ -53,6 +55,24 @@ def main() -> int:
 """
     args.output.write_text(markdown, encoding="utf-8")
     print(markdown)
+
+    failures = []
+    if args.min_file_percent is not None and file_percent + 1e-9 < args.min_file_percent:
+        failures.append(
+            f"Runtime file reachability {file_percent:.1f}% is below the required "
+            f"{args.min_file_percent:.1f}%."
+        )
+    if args.min_line_percent is not None and line_percent + 1e-9 < args.min_line_percent:
+        failures.append(
+            f"Observed executable-line coverage {line_percent:.1f}% is below the required "
+            f"{args.min_line_percent:.1f}%."
+        )
+
+    if failures:
+        for failure in failures:
+            print(f"ERROR: {failure}")
+        return 1
+
     return 0
 
 

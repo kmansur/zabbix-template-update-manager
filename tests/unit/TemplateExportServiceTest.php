@@ -1,7 +1,6 @@
 <?php
 
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateExportService;
-use RuntimeException;
 
 require_once dirname(__DIR__, 2).'/src/Service/TemplateExportService.php';
 

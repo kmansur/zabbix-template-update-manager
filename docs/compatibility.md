@@ -47,12 +47,13 @@ ZTUM runtime code is expected to work with PHP versions supported by the target 
 
 The cross-Zabbix frontend-symbol gate was added after real Zabbix 8 testing exposed a renamed pager constant that repository-only tests had missed. Guarded optional constants are permitted, while unguarded native class/constant references must exist in both supported frontend source trees.
 
-Chromium smoke tests exercise the extracted update/install batch orchestration assets and accessibility contracts, but do not emulate Zabbix APIs or replace field validation.
+Chromium smoke tests exercise both the extracted update/install batch orchestration assets and disposable official Zabbix 7.x/8.x frontend stacks. The full-stack smoke registers the module through the Zabbix API, logs into the real frontend, renders the catalog in dark and light themes, applies a native Name filter, and opens operation history. It remains read-only and does not replace controlled-write field validation.
 
 ## Known limitations
 
 
 - Full Zabbix 8.x write-path field validation is not yet complete.
+- Disposable full-stack browser smoke proves module registration/rendering against official container images, but it intentionally does not execute configuration writes.
 - Multi-node serialization requires `ZTUM_LOCK_DIR` to point to shared private storage with reliable cross-node `flock()` semantics.
 - Operation impact distinguishes direct and inherited template-to-host reach only when the runtime API can resolve the inheritance graph authoritatively.
 - Production recommendation remains gated by the documented release/field criteria, not by CI alone.
