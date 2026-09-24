@@ -419,6 +419,9 @@ Detailed design and safety documentation is available in:
 - [`docs/runtime-setup.md`](docs/runtime-setup.md)
 - [`docs/test-metrics.md`](docs/test-metrics.md)
 - [`docs/release-policy.md`](docs/release-policy.md)
+- [`docs/compatibility.md`](docs/compatibility.md)
+- [`docs/production-readiness.md`](docs/production-readiness.md)
+- [`docs/pre-rc-audit-beta58.md`](docs/pre-rc-audit-beta58.md)
 
 ## Development validation
 
@@ -432,6 +435,11 @@ controlled-write boundary
 PHP unit/contract tests
 native Zabbix UI guard
 runtime security guard
+native accessibility contracts
+PHP 8.2 / 8.3 / 8.4 compatibility matrix
+Zabbix 7.0 / current 8.0 frontend-symbol compatibility
+Chromium batch-asset smoke regression
+release archive/checksum/content smoke
 runtime setup helper validation
 upstream-index generator validation
 offline-bundle generator validation
