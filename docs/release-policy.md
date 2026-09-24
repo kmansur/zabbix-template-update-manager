@@ -8,7 +8,7 @@ Template Update Manager separates development commits, field-test betas and stab
 
 ## Field-test beta
 
-A new `0.x.y-beta.N` snapshot should group a meaningful set of changes and is published only after automated safety/quality gates are green, documentation is synchronized and the relevant laboratory regression has been exercised. Publicly distributed snapshots use a formal Git tag/GitHub prerelease; permanent per-beta `release/<version>` branches are intentionally not kept.
+A new `0.x.y-beta.N` snapshot should group a meaningful set of changes and is published only after automated safety/quality/runtime gates are green, documentation is synchronized and the relevant laboratory regression has been exercised. Publicly distributed snapshots use a formal Git tag/GitHub prerelease; permanent per-beta `release/<version>` branches are intentionally not kept.
 
 The project should avoid using beta numbers as per-commit build identifiers.
 
@@ -20,6 +20,6 @@ The release workflow verifies that the tag matches `VERSION`, reruns safety/qual
 
 ## Stable release
 
-A stable 1.0 requires the documented Zabbix 7.x and 8.x field matrix, release/security gates, a selected project license, no unresolved high-severity safety issue and a documented compatibility statement.
+A stable 1.0 requires the documented Zabbix 7.x and 8.x field matrix, release/security/runtime gates, the published AGPL-3.0-only license and notice, no unresolved high-severity safety issue and a documented compatibility statement.
 
 Tags/releases are distribution artifacts; they do not replace field validation.
