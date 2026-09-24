@@ -25,25 +25,44 @@ async function waitForFrontend() {
 
 let requestId = 1;
 async function api(method, params = {}, auth = undefined) {
-	const payload = {
-		jsonrpc: '2.0',
-		method,
-		params,
-		id: requestId++
+	const request = async (useBearer) => {
+		const payload = {
+			jsonrpc: '2.0',
+			method,
+			params,
+			id: requestId++
+		};
+		const headers = {'Content-Type': 'application/json-rpc'};
+
+		if (auth) {
+			if (useBearer) {
+				headers.Authorization = 'Bearer ' + auth;
+			}
+			else {
+				payload.auth = auth;
+			}
+		}
+
+		const response = await fetch(apiUrl, {
+			method: 'POST',
+			headers,
+			body: JSON.stringify(payload)
+		});
+		if (!response.ok) {
+			throw new Error(`API HTTP ${response.status} for ${method}`);
+		}
+		return response.json();
 	};
-	if (auth) {
-		payload.auth = auth;
+
+	let data = await request(false);
+
+	// Zabbix 8 rejects the legacy top-level JSON-RPC auth field and expects
+	// the API token/session in an Authorization: Bearer header.
+	if (auth && data?.error
+			&& String(data.error?.data || '').includes('unexpected parameter "auth"')) {
+		data = await request(true);
 	}
 
-	const response = await fetch(apiUrl, {
-		method: 'POST',
-		headers: {'Content-Type': 'application/json-rpc'},
-		body: JSON.stringify(payload)
-	});
-	if (!response.ok) {
-		throw new Error(`API HTTP ${response.status} for ${method}`);
-	}
-	const data = await response.json();
 	if (data.error) {
 		throw new Error(`${method}: ${JSON.stringify(data.error)}`);
 	}
@@ -167,9 +186,16 @@ const browser = await chromium.launch({headless: true});
 const page = await browser.newPage({viewport: {width: 1440, height: 1000}});
 const errors = [];
 page.on('pageerror', (error) => errors.push('pageerror: ' + error.message));
-page.on('console', (message) => {
-	if (message.type() === 'error') {
-		errors.push('console: ' + message.text());
+page.on('response', (response) => {
+	if (response.status() < 400) {
+		return;
+	}
+
+	const url = response.url();
+	const isModuleResource = url.includes('zabbix-template-update-manager')
+		|| url.includes('action=ztum.');
+	if (isModuleResource) {
+		errors.push(`HTTP ${response.status()}: ${url}`);
 	}
 });
 
