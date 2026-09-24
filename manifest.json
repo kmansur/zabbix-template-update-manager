@@ -1,5 +1,5 @@
 {
-    "manifest_version": 2.0,
+    "manifest_version": 2,
     "id": "kmansur_zabbix_template_update_manager",
     "name": "Template Update Manager",
     "namespace": "ZabbixTemplateUpdateManager",
@@ -80,6 +80,10 @@
         "ztum.template.rollback": {
             "class": "TemplateRollback",
             "view": "ztum.template.rollback"
+        },
+        "ztum.operations": {
+            "class": "TemplateOperationHistory",
+            "view": "ztum.operation.history"
         }
     }
 }
