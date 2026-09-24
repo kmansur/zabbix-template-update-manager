@@ -16,6 +16,7 @@ A green workflow does not by itself make the module production-ready.
 - Zabbix 7.x field evidence: substantial but the final consolidated 1.0 matrix is not closed.
 - Zabbix 8.x field evidence: partial; full controlled write/rollback/offline validation remains open.
 - License: AGPL-3.0-only.
+- Formal laboratory prerelease: `v0.1.0-beta.59` published with `.tar.gz`, `.zip` and `SHA256SUMS` after Zabbix 7/8 release-runtime smoke.
 - Production recommendation: not yet.
 
 ## Stable 1.0 gates
