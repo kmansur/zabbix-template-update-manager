@@ -8,8 +8,8 @@
     "description": "Discover, install, compare and safely manage official Zabbix templates.",
     "assets": {
         "js": [
-            "assets/js/ztum-update-batch.js",
-            "assets/js/ztum-install-batch.js"
+            "ztum-update-batch.js",
+            "ztum-install-batch.js"
         ]
     },
     "actions": {
