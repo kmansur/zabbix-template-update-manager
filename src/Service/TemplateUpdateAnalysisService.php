@@ -28,6 +28,7 @@ require_once __DIR__.'/TemplateBackupVerificationService.php';
 require_once __DIR__.'/TemplateExportService.php';
 require_once __DIR__.'/TemplateImportCompareService.php';
 require_once __DIR__.'/TemplateInventoryService.php';
+require_once __DIR__.'/TemplateHostImpactService.php';
 require_once __DIR__.'/TemplateVersionComparator.php';
 require_once __DIR__.'/ThreeWayChangeAnalyzer.php';
 require_once __DIR__.'/UpdatePreviewAnalyzer.php';
@@ -97,6 +98,16 @@ final class TemplateUpdateAnalysisService {
 			$data['template'] = $template;
 			$data['upstream_source'] = $index['source'] ?? null;
 
+			try {
+				$data['host_impact'] = (new TemplateHostImpactService())->analyze($templateId);
+			}
+			catch (Throwable $exception) {
+				$this->logFailure('Host impact analysis', $templateId, $exception);
+				$data['host_impact_error'] = _(
+					'Unable to resolve inherited template-to-host impact. Direct host count remains available.'
+				).' '.$this->diagnosticMessage($exception);
+			}
+
 			if (($template['upstream_status'] ?? null) !== 'official_match'
 					|| !is_array($template['upstream'] ?? null)) {
 				$data['comparison_error'] = _(
@@ -159,7 +170,8 @@ final class TemplateUpdateAnalysisService {
 					$data['update_risk'] = UpdateRiskAnalyzer::assess(
 						$data['update_preview'],
 						$data['three_way_analysis'],
-						(int) ($template['host_count'] ?? 0)
+						(int) ($template['host_count'] ?? 0),
+						$data['host_impact']
 					);
 				}
 				catch (Throwable $exception) {
@@ -181,6 +193,13 @@ final class TemplateUpdateAnalysisService {
 				(string) ($data['update_policy'] ?? 'managed'),
 				$data['policy_error']
 			);
+
+			if (is_array($data['update_readiness']) && is_array($data['host_impact'])) {
+				$data['update_readiness']['direct_host_count'] = (int) ($data['host_impact']['direct_host_count'] ?? 0);
+				$data['update_readiness']['indirect_host_count'] = (int) ($data['host_impact']['indirect_host_count'] ?? 0);
+				$data['update_readiness']['total_host_count'] = (int) ($data['host_impact']['total_host_count'] ?? 0);
+				$data['update_readiness']['dependent_template_count'] = (int) ($data['host_impact']['dependent_template_count'] ?? 0);
+			}
 
 			if (!empty($data['update_readiness']['candidate_for_backup'])) {
 				$data = $this->refreshBackupVerification($data);
@@ -461,6 +480,8 @@ final class TemplateUpdateAnalysisService {
 			'update_preview' => null,
 			'update_risk' => null,
 			'update_risk_error' => null,
+			'host_impact' => null,
+			'host_impact_error' => null,
 			'update_policy' => 'managed',
 			'policy_error' => null,
 			'update_readiness' => null,
