@@ -4,6 +4,19 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Added bounded, cycle-safe inherited template-to-host impact analysis using native Zabbix template and host APIs.
+- Update comparison now distinguishes directly linked hosts, indirect hosts, total unique impacted hosts and dependent templates.
+
+### Safety
+
+- Host-impact analysis is read-only. If inherited impact cannot be resolved, ZTUM keeps direct-host context and reports the limitation instead of guessing or weakening any write gate.
+
+### Tests
+
+- Added deterministic inheritance-graph/host-count tests, including recursive descendants, duplicate-safe aggregate counting and cycle handling.
+
 ### Governance
 
 - Selected and published the GNU Affero General Public License v3.0 only (`AGPL-3.0-only`) and added project/Zabbix attribution notices.
