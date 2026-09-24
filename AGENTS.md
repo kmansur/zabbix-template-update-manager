@@ -2,6 +2,8 @@
 
 ## Project
 
+License: `AGPL-3.0-only`. Preserve `LICENSE` and `NOTICE.md`; do not introduce third-party code/content with incompatible or unclear redistribution terms.
+
 Zabbix Template Update Manager is a native Zabbix frontend module for discovering, installing, comparing and safely updating official Zabbix templates.
 
 Target Zabbix generations:
