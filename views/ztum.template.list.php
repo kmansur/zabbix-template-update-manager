@@ -349,12 +349,13 @@ foreach ($data['templates'] as $template) {
 			$upstreamTones[$template['upstream_status'] ?? 'repository_unavailable'] ?? FrontendUi::MUTED
 		),
 		FrontendUi::status(
-			match ((string) ($template['update_policy'] ?? 'managed')) {
+			match ((string) ($template['update_policy'] ?? 'not_applicable')) {
 				'never_update' => _('Never update'),
+				'managed' => _('Managed'),
 				'unavailable' => _('Unavailable'),
-				default => _('Managed')
+				default => _('Not applicable')
 			},
-			match ((string) ($template['update_policy'] ?? 'managed')) {
+			match ((string) ($template['update_policy'] ?? 'not_applicable')) {
 				'never_update' => FrontendUi::WARNING,
 				'unavailable' => FrontendUi::DANGER,
 				default => FrontendUi::MUTED
