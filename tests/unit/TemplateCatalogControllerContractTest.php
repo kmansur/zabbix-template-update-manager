@@ -19,6 +19,11 @@ foreach (['CPagerHelper', 'CUrl', 'CProfile'] as $class) {
 }
 
 assertCatalogControllerContract(
+	strpos($controller, 'return in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true);') !== false,
+	'Catalog access must be limited to Zabbix administrators and super administrators.'
+);
+
+assertCatalogControllerContract(
 	strpos($controller, 'CPagerHelper::paginate') !== false
 		&& strpos($controller, "CPagerHelper::savePage('ztum.template.catalog'") !== false,
 	'TemplateList must keep native Zabbix pagination wired through CPagerHelper.'
@@ -116,6 +121,13 @@ assertCatalogControllerContract(
 		&& strpos($view, "FrontendUi::section(_('Templates'))") !== false
 		&& strpos($view, 'FrontendUi::status($selectionGuidance, FrontendUi::MUTED)') !== false,
 	'Selection guidance must be concise, visually secondary and hidden when the filtered catalog is empty.'
+);
+
+
+assertCatalogControllerContract(
+	strpos($view, "'managed' => _('Managed')") !== false
+		&& strpos($view, "default => _('Not applicable')") !== false,
+	'Non-official templates must not be presented as managed by the official update policy.'
 );
 
 
