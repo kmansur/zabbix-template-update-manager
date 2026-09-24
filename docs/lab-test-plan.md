@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.57
+# Laboratory test plan — 0.1.0-beta.59
 
 ## Release state
 
@@ -13,7 +13,7 @@ Status at publication:
 
 Use the exact prerelease tag when a public beta has been published. During internal laboratory work before that tag exists, record the exact `main` commit used so the test can be reproduced.
 
-Beta.57 is the current native-UI and update-policy field-test candidate. Field validation must prove the complete catalog/update/install/rollback workflow in both light and dark themes while confirming that the underlying comparison, evidence and controlled-write behavior remains unchanged.
+Beta.59 is the current native-UI and update-policy field-test candidate. Field validation must prove the complete catalog/update/install/rollback workflow in both light and dark themes while confirming that the underlying comparison, evidence and controlled-write behavior remains unchanged.
 
 ## Safety assumptions
 
@@ -68,7 +68,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.57`, enable the module and open:
+Confirm `0.1.0-beta.59`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -143,7 +143,7 @@ The filter layout must visually follow the native Zabbix Templates list pattern:
 
 ## 2D. Request-bounded update regression
 
-For the first beta.57 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.59 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -359,7 +359,7 @@ Expected behavior:
 - a long historical scan may show `history_scan_pending` / continuation progress and issue several bounded requests for the same template before final classification;
 - no single historical continuation request should approach the previous ~30-second gateway failure window;
 - if an HTTP failure still occurs, the Reason should include elapsed time and gateway identity such as `server=cloudflare` / `cf-ray=...` when exposed by the response;
-- if a real 504 still occurs on beta.57, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
+- if a real 504 still occurs on beta.59, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
 - preparation continuation/retry must never call `configuration.import`.
 
 ## 5B. Manual-review continuation regression
@@ -781,9 +781,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.57 laboratory validation
+## 16. Exit criteria for beta.59 laboratory validation
 
-A Zabbix generation passes beta.57 only after evidence demonstrates:
+A Zabbix generation passes beta.59 only after evidence demonstrates:
 
 ```text
 module discovery/enable
