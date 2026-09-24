@@ -54,17 +54,23 @@ $filter = (new CFilter())
 	->setProfile($data['filter_profile'])
 	->setActiveTab($data['filter_active_tab'])
 	->addFilterTab(_('Filter'), [
-		(new CFormList())->addRow(
-			_('Status'),
-			(new CRadioButtonList('filter_status', (string) $data['filter']['status']))
-				->addValue(_('All'), 'all')
-				->addValue(_('Current'), 'current')
-				->addValue(_('Not applicable'), 'not_applicable')
-				->addValue(_('Update available'), 'update_available')
-				->addValue(_('Not installed'), 'not_installed')
-				->addValue(_('Never update'), 'never_update')
-				->setModern(true)
-		)
+		(new CFormList())
+			->addRow(
+				_('Name'),
+				(new CTextBox('filter_name', (string) $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			)
+			->addRow(
+				_('Status'),
+				(new CRadioButtonList('filter_status', (string) $data['filter']['status']))
+					->addValue(_('All'), 'all')
+					->addValue(_('Current'), 'current')
+					->addValue(_('Not applicable'), 'not_applicable')
+					->addValue(_('Update available'), 'update_available')
+					->addValue(_('Not installed'), 'not_installed')
+					->addValue(_('Never update'), 'never_update')
+					->setModern(true)
+			)
 	]);
 
 $localSummary = (new CTableInfo())
@@ -190,14 +196,24 @@ if ($canRenderSelectionForm) {
 	$selectAllHeader = (new CColHeader($selectAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
 }
 
-$noData = match ((string) ($data['filter']['status'] ?? 'all')) {
-	'current' => [_('No current official templates found.'), _('Change the status filter to view other templates.')],
-	'update_available' => [_('No template updates are available.'), _('Installed official templates already match the current upstream catalog.')],
-	'not_installed' => [_('No official templates are missing.'), _('All templates in the current official catalog are already installed.')],
-	'never_update' => [_('No templates are marked Never update.'), _('Templates marked Never update will appear here.')],
-	'not_applicable' => [_('No templates match this status.'), _('Change the status filter to view other templates.')],
-	default => [_('No templates found.'), _('Change the filter or verify upstream catalog availability.')]
-};
+$filterName = trim((string) ($data['filter']['name'] ?? ''));
+
+if ($filterName !== '') {
+	$noData = [
+		_('No templates match the current name filter.'),
+		_('Change or clear the Name filter to view other templates.')
+	];
+}
+else {
+	$noData = match ((string) ($data['filter']['status'] ?? 'all')) {
+		'current' => [_('No current official templates found.'), _('Change the status filter to view other templates.')],
+		'update_available' => [_('No template updates are available.'), _('Installed official templates already match the current upstream catalog.')],
+		'not_installed' => [_('No official templates are missing.'), _('All templates in the current official catalog are already installed.')],
+		'never_update' => [_('No templates are marked Never update.'), _('Templates marked Never update will appear here.')],
+		'not_applicable' => [_('No templates match this status.'), _('Change the status filter to view other templates.')],
+		default => [_('No templates found.'), _('Change the filter or verify upstream catalog availability.')]
+	};
+}
 
 $templateTable = (new CTableInfo())
 	->setNoDataMessage($noData[0], $noData[1])
