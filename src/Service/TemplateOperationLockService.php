@@ -7,6 +7,7 @@ use RuntimeException;
 final class TemplateOperationLockService {
 
 	private const LOCK_FILE = 'configuration-write.lock';
+	private const DEFAULT_LOCK_DIR = '/var/lib/zabbix-template-update-manager/locks';
 
 	private string $lockDir;
 
@@ -14,7 +15,11 @@ final class TemplateOperationLockService {
 		$configured = trim((string) getenv('ZTUM_LOCK_DIR'));
 		$this->lockDir = $lockDir ?? ($configured !== ''
 			? $configured
-			: '/var/lib/zabbix-template-update-manager/locks');
+			: self::DEFAULT_LOCK_DIR);
+	}
+
+	public static function defaultDirectory(): string {
+		return self::DEFAULT_LOCK_DIR;
 	}
 
 	/**
