@@ -10,7 +10,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.57**
+Current version: **0.1.0-beta.58**
 
 This version is intended for **laboratory testing**.
 
@@ -20,9 +20,9 @@ This version is intended for **laboratory testing**.
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
 
-Beta.57 fixes catalog Name search to match the complete visible template name (`name` plus `technical_name` when displayed) using case-insensitive partial matching, and aligns the filter layout with the native Zabbix Templates page using `CFormGrid`, `CLabel`, `CFormField` and the medium native text-field width.
+Beta.58 is a pre-RC hardening snapshot. It adds persistent runtime-lock alignment, administrator-only catalog access, inherited host-impact analysis, bounded private operation history, AGPL-3.0-only licensing, extracted batch JavaScript assets, PHP 8.2/8.3/8.4 CI, Zabbix 7/8 frontend-symbol compatibility checks, and Chromium/accessibility regression gates.
 
-Formal tag/GitHub Release automation exists. The project license is now selected; a community prerelease remains gated by the cross-version runtime/field-validation pass and release-artifact validation.
+Formal tag/GitHub Release automation and release-package smoke validation exist. The project license is selected; a public prerelease remains gated by completing the relevant real Zabbix 7.x/8.x beta.58 field pass and installing a generated release artifact.
 
 For a new laboratory installation, use the quick installer below. For validation work, always record the exact installed version and commit/source ref.
 
@@ -248,7 +248,7 @@ git rev-parse HEAD
 Expected `VERSION` for the current laboratory build:
 
 ```text
-0.1.0-beta.57
+0.1.0-beta.58
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -264,7 +264,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.57**, enable the module and open:
+Confirm version **0.1.0-beta.58**, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -458,6 +458,10 @@ python tests/test_workflows.py
 
 A green CI run proves automated checks only. It does not replace runtime field validation on Zabbix 7.x and 8.x.
 
+## Automated validation
+
+The repository validates PHP 8.2, 8.3 and 8.4, native frontend symbols against Zabbix 7.0 and the current 8.0 source line, security/write-boundary invariants, browser-side batch orchestration in Chromium, and native accessibility contracts. These gates complement but do not replace real Zabbix field validation.
+
 ## License
 
-A project license has not yet been selected. This remains a release/publication item before a stable production release.
+ZTUM is licensed under **AGPL-3.0-only**. See [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).
