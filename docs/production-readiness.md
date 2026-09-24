@@ -12,7 +12,7 @@ A green workflow does not by itself make the module production-ready.
 ## Current posture
 
 - Core implementation: advanced / near feature-complete.
-- Automated validation: strong, including PHP 8.2/8.3/8.4, Zabbix 7/8 frontend-symbol compatibility, Chromium batch-asset smoke and accessibility contracts.
+- Automated validation: strong, including PHP 8.2/8.3/8.4, Zabbix 7/8 frontend-symbol compatibility, disposable official Zabbix 7/8 Chromium frontend smoke, batch-asset smoke, accessibility contracts and minimum coverage/reachability floors.
 - Zabbix 7.x field evidence: substantial but the final consolidated 1.0 matrix is not closed.
 - Zabbix 8.x field evidence: partial; full controlled write/rollback/offline validation remains open.
 - License: AGPL-3.0-only.
@@ -40,7 +40,7 @@ Before stable 1.0:
 
 The following improve maintainability/operations but do not independently prove release safety:
 
-- expand browser coverage from isolated assets to disposable full-Zabbix page/render testing;
+- deepen disposable full-Zabbix smoke beyond read-only catalog/history rendering when a safe deterministic write fixture is available;
 - drill-down/filtering for very large three-way comparisons;
 - independent external security/code review.
 
