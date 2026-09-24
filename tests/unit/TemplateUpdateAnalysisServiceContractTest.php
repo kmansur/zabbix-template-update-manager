@@ -51,6 +51,7 @@ foreach ([
 	'ThreeWayChangeAnalyzer',
 	'UpdatePreviewAnalyzer',
 	'UpdateRiskAnalyzer',
+	'TemplateHostImpactService',
 	'UpdateReadinessEvaluator',
 	'TemplateBackupVerificationService'
 ] as $requiredStage) {
@@ -66,6 +67,14 @@ assertUpdateAnalysisContract(
 	str_contains($service, "throw new RuntimeException('A valid numeric template ID is required for update analysis.')"),
 	'Reusable update analysis must validate its template ID independently of the frontend controller.'
 );
+assertUpdateAnalysisContract(
+	true,
+	str_contains($service, "'host_impact' => null")
+		&& str_contains($service, 'TemplateHostImpactService')
+		&& str_contains($service, "'total_host_count'"),
+	'Reusable update analysis must expose inherited template-to-host impact without creating a write path.'
+);
+
 assertUpdateAnalysisContract(
 	false,
 	str_contains($service, 'API::Configuration()->import('),
