@@ -77,6 +77,16 @@ $expectedActions = [
 	'ztum.template.rollback' => ['class' => 'TemplateRollback', 'view' => 'ztum.template.rollback']
 ];
 
+$expectedAssets = [
+	'assets/js/ztum-update-batch.js',
+	'assets/js/ztum-install-batch.js'
+];
+
+if (($manifest['assets']['js'] ?? null) !== $expectedAssets) {
+	fwrite(STDERR, "manifest.json JavaScript assets are not configured as expected.\n");
+	exit(1);
+}
+
 foreach ($expectedActions as $actionName => $expectedAction) {
 	$action = $manifest['actions'][$actionName] ?? null;
 	if (!is_array($action) || ($action['class'] ?? null) !== $expectedAction['class']) {
@@ -119,12 +129,14 @@ $requiredFiles = [
 	$root.'/actions/TemplateUpdatePolicy.php',
 	$root.'/src/Repository/TemplateUpdatePolicyRepository.php',
 	$root.'/views/ztum.template.batch.prepare.php',
+	$root.'/assets/js/ztum-update-batch.js',
 	$root.'/actions/TemplateBatchPrepareOne.php',
 	$root.'/actions/TemplateBatchUpdateOne.php',
 	$root.'/actions/TemplateBatchUpdate.php',
 	$root.'/views/ztum.template.batch.update.php',
 	$root.'/actions/TemplateInstallBatchPrepare.php',
 	$root.'/views/ztum.template.install.batch.prepare.php',
+	$root.'/assets/js/ztum-install-batch.js',
 	$root.'/actions/TemplateInstallBatchPrepareOne.php',
 	$root.'/actions/TemplateInstallBatchExecuteOne.php',
 	$root.'/actions/TemplateInstallReview.php',
