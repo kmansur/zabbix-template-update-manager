@@ -5,12 +5,15 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
+use CWebUser;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateRollbackService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Service/TemplateRollbackService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
 
 /**
  * Performs one explicitly confirmed template rollback.
@@ -51,6 +54,8 @@ class TemplateRollback extends CController {
 			'operation_error' => null
 		];
 
+		$operationException = null;
+
 		try {
 			$evidence = (string) $this->getInput('evidence_sha256');
 			$data['result'] = (new TemplateOperationLockService())->run(
@@ -64,6 +69,7 @@ class TemplateRollback extends CController {
 			);
 		}
 		catch (Throwable $exception) {
+			$operationException = $exception;
 			error_log(sprintf(
 				'[Zabbix Template Update Manager] Controlled rollback failed for template %s / %s: %s',
 				$templateId,
@@ -74,6 +80,14 @@ class TemplateRollback extends CController {
 				'Rollback could not be completed. Review frontend logs and inspect the template before another write action.'
 			);
 		}
+
+		(new TemplateOperationHistoryService())->recordBestEffort(
+			'rollback',
+			'template-'.$templateId,
+			$data['result'],
+			$operationException,
+			(string) (CWebUser::$data['userid'] ?? '')
+		);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
