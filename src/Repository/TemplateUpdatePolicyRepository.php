@@ -62,9 +62,13 @@ final class TemplateUpdatePolicyRepository {
 			$blocked = ($uuid !== '' && array_key_exists($uuid, $neverUpdate))
 				|| ($templateId !== '' && array_key_exists($templateId, $byTemplateId));
 
+			$officialInstalled = (string) ($template['installation_status'] ?? 'installed') === 'installed'
+				&& (string) ($template['upstream_status'] ?? '') === 'official_match'
+				&& $uuid !== '';
+
 			$template['update_policy'] = $blocked
 				? self::POLICY_NEVER_UPDATE
-				: self::POLICY_MANAGED;
+				: ($officialInstalled ? self::POLICY_MANAGED : 'not_applicable');
 			$template['never_update'] = $blocked;
 
 			if ($blocked) {
