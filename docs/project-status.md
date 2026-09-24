@@ -1,4 +1,4 @@
-# Project status and engineering audit — 0.1.0-beta.53
+# Project status and engineering audit — 0.1.0-beta.54
 
 Date: 2026-09-23
 
@@ -15,19 +15,19 @@ The estimate deliberately separates implementation from automation and field val
 | Discovery/catalog/upstream identity | 10% | 97% | Official catalog/index identity, immutable initial-release baselines and verified offline source mode implemented |
 | Comparison/risk/readiness | 20% | 97% | Historical/initial-release BASE, three-way, risk, readiness, persistent Never update policy and dependency-aware comparison implemented |
 | Update/install/rollback write paths | 20% | 97% | Controlled writes, evidence, post-write validation, reviewed overrides and serialization implemented |
-| Native Zabbix UI/UX | 10% | 97% | Native presentation/copy pass, Never update controls and Zabbix 7.x/8.x pager compatibility implemented; cross-version light/dark field validation remains |
+| Native Zabbix UI/UX | 10% | 97% | Native presentation/copy pass, Never update controls and centralized Zabbix 7.x/8.x UI compatibility implemented; cross-version light/dark field validation remains |
 | Automated validation/CI | 10% | 98% | CI/UI/security/workflow/offline/runtime/coverage gates implemented; browser E2E and independent security review remain |
 | Runtime resilience | 10% | 94% | Request-bounded flows, immutable history caching, rename-aware paths, initial-release BASE, offline mode and operation lock implemented |
-| Field validation | 10% | 65% | End-to-end Zabbix 7.x evidence is strong; Zabbix 8.x field testing exposed and beta.53 fixes a catalog pager compatibility blocker, but the full 8.x/cross-theme matrix still needs retesting |
+| Field validation | 10% | 67% | End-to-end Zabbix 7.x evidence is strong; the Zabbix 8.x catalog now loads after the beta.53 pager fix, while the complete 8.x write-path and cross-theme matrix still needs validation |
 | Release engineering | 10% | 82% | Quick install, release workflow/assets/checksums/policy implemented; license decision and first community-test prerelease remain |
 
 Weighted result: **92%**.
 
-## Major improvements through beta.53
+## Major improvements through beta.54
 
 The external review's principal technical/process findings were converted into implementation work:
 
-- cross-version frontend compatibility: beta.53 adds runtime resolution for the pager constants renamed between Zabbix 7.x and 8.x after a real Zabbix 8 HTTP 500 field finding;
+- cross-version frontend compatibility: beta.54 centralizes the proven Zabbix 7.x/8.x pager difference in `ZabbixUiCompat`, preserving one codebase and one module package after the beta.53 Zabbix 8 HTTP 500 field fix;
 
 - persistent update protection: per-template **Never update** policy with UUID-based private storage, catalog filter, explicit reversal and fail-closed enforcement at preparation/preflight/import gates;
 
@@ -51,7 +51,7 @@ The external review's principal technical/process findings were converted into i
    - The code supports major versions 7 and 8, but the complete real workflow matrix still needs to be recorded on Zabbix 8.x.
 
 3. **Cross-version UI field validation**
-   - Beta.52 includes the beta.50 native Zabbix presentation/copy pass plus the native **Never update / Allow updates** controls, filter and policy status.
+   - Beta.54 includes the native presentation/copy pass, **Never update / Allow updates** controls and the centralized 7.x/8.x pager compatibility layer.
    - Light/dark rendering and all operator flows still need field evidence on supported Zabbix 7.x and 8.x instances before community UI validation is considered complete.
 
 ## Medium-priority work
@@ -68,14 +68,14 @@ The external review's principal technical/process findings were converted into i
 - select and publish project license;
 - complete/record Zabbix 7.x and 8.x field-validation matrix;
 - validate fresh install, standard update, reviewed update, local-overwrite acknowledgement, batch stop-on-failure, offline mode, concurrency and rollback on real supported instances;
-- complete the beta.52 cross-version native-UI field pass and record any remaining browser/runtime limitations;
+- complete the beta.54 cross-version native-UI field pass and record any remaining browser/runtime limitations;
 - complete compatibility/homologation notes;
 - confirm no unresolved high-severity safety/data-loss issue;
 - publish at least one validated formal prerelease using the new release pipeline.
 
 ## Completion interpretation
 
-A green CI/Security run means automation validation passed. It does not make beta.52 production-ready.
+A green CI/Security run means automation validation passed. It does not make beta.54 production-ready.
 
 Track these states independently:
 

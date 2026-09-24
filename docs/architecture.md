@@ -21,6 +21,20 @@ The project is designed as a native Zabbix frontend module.
 13. Never infer a Git tag from template `vendor.version` metadata.
 14. Reuse Zabbix's normalized import-comparison output instead of implementing a second import engine.
 
+## Zabbix compatibility boundary
+
+ZTUM intentionally ships one codebase and one module package for Zabbix 7.x and 8.x.
+
+Proven frontend differences are isolated in:
+
+```text
+src/Support/ZabbixUiCompat.php
+```
+
+Controllers and views consume semantic compatibility methods such as `pagerClass()` and `pagerContainerClass()` instead of knowing which native constant name belongs to which Zabbix generation. The helper resolves current/native names first and then supported older fallbacks. Unsupported or unknown future major versions remain rejected by `ZabbixVersion`; the compatibility layer is not permission to guess future API/UI behavior.
+
+A second complete Zabbix-7/Zabbix-8 code tree is explicitly avoided.
+
 ## Current architecture
 
 ```text

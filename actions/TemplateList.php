@@ -20,6 +20,7 @@ use Modules\ZabbixTemplateUpdateManager\Service\TemplateVersionComparator;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamCatalogService;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamMatcher;
 use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
+use Modules\ZabbixTemplateUpdateManager\Support\ZabbixUiCompat;
 use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use Throwable;
 
@@ -31,6 +32,7 @@ require_once dirname(__DIR__).'/src/Service/TemplateVersionComparator.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamCatalogService.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamMatcher.php';
 require_once dirname(__DIR__).'/src/Support/ProjectVersion.php';
+require_once dirname(__DIR__).'/src/Support/ZabbixUiCompat.php';
 require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
 
 class TemplateList extends CController {
@@ -244,17 +246,8 @@ class TemplateList extends CController {
 
 		$listUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates');
 
-		// Zabbix 8 renamed the native pager CSS constants used by 7.x.
-		// Resolve the native class names at runtime so the same module package
-		// remains compatible with both supported frontend generations.
-		$pagerClass = defined('ZBX_STYLE_PAGER')
-			? (string) constant('ZBX_STYLE_PAGER')
-			: (defined('ZBX_STYLE_TABLE_PAGING') ? (string) constant('ZBX_STYLE_TABLE_PAGING') : '');
-		$pagerContainerClass = defined('ZBX_STYLE_PAGER_CONTAINER')
-			? (string) constant('ZBX_STYLE_PAGER_CONTAINER')
-			: (defined('ZBX_STYLE_PAGING_BTN_CONTAINER')
-				? (string) constant('ZBX_STYLE_PAGING_BTN_CONTAINER')
-				: '');
+		$pagerClass = ZabbixUiCompat::pagerClass();
+		$pagerContainerClass = ZabbixUiCompat::pagerContainerClass();
 
 		if ($data['show_all']) {
 			$pagesUrl = clone $listUrl;

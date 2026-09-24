@@ -46,13 +46,13 @@ assertCatalogControllerContract(
 );
 
 assertCatalogControllerContract(
-	strpos($controller, "defined('ZBX_STYLE_PAGER')") !== false
-		&& strpos($controller, "defined('ZBX_STYLE_TABLE_PAGING')") !== false
-		&& strpos($controller, "defined('ZBX_STYLE_PAGER_CONTAINER')") !== false
-		&& strpos($controller, "defined('ZBX_STYLE_PAGING_BTN_CONTAINER')") !== false
-		&& strpos($controller, '->addClass(ZBX_STYLE_TABLE_PAGING)') === false
-		&& strpos($controller, '->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)') === false,
-	'Catalog pager must resolve the renamed native Zabbix 7.x/8.x pager constants at runtime.'
+	strpos($controller, 'use Modules\\ZabbixTemplateUpdateManager\\Support\\ZabbixUiCompat;') !== false
+		&& strpos($controller, "require_once dirname(__DIR__).'/src/Support/ZabbixUiCompat.php';") !== false
+		&& strpos($controller, 'ZabbixUiCompat::pagerClass()') !== false
+		&& strpos($controller, 'ZabbixUiCompat::pagerContainerClass()') !== false
+		&& strpos($controller, "defined('ZBX_STYLE_PAGER')") === false
+		&& strpos($controller, "defined('ZBX_STYLE_PAGING_BTN_CONTAINER')") === false,
+	'Catalog pager compatibility must be delegated to ZabbixUiCompat instead of being implemented in the controller.'
 );
 
 assertCatalogControllerContract(
