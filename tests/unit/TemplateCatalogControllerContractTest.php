@@ -39,6 +39,35 @@ assertCatalogControllerContract(
 );
 
 assertCatalogControllerContract(
+	strpos($controller, "'filter_name' => 'string'") !== false
+		&& strpos($controller, "'web.ztum.templates.filter.name'") !== false
+		&& strpos($controller, "CProfile::delete('web.ztum.templates.filter.name')") !== false
+		&& strpos($view, "new CTextBox('filter_name'") !== false
+		&& strpos($view, "->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)") !== false,
+	'Catalog name filtering must use the persisted native Zabbix filter textbox pattern.'
+);
+
+assertCatalogControllerContract(
+	strpos($controller, "if (\$filterName !== '')") !== false
+		&& strpos($controller, "mb_stripos(\$name, \$filterName)") !== false
+		&& strpos($controller, "stripos(\$name, \$filterName)") !== false
+		&& strpos($controller, "if (\$filterName !== '')") < strpos($controller, 'CPagerHelper::paginate'),
+	'Catalog name filtering must be case-insensitive and applied before native pagination.'
+);
+
+assertCatalogControllerContract(
+	strpos($controller, "\$this->hasInput('filter_set') || \$this->hasInput('filter_rst')") !== false
+		&& strpos($controller, "? 1") !== false,
+	'Applying or resetting catalog filters must return native pagination to page 1.'
+);
+
+assertCatalogControllerContract(
+	strpos($view, "No templates match the current name filter.") !== false
+		&& strpos($view, "Change or clear the Name filter to view other templates.") !== false,
+	'Catalog name filtering must provide a contextual native no-data message.'
+);
+
+assertCatalogControllerContract(
 	strpos($controller, "'show_all' => 'in 1'") === false
 		&& strpos($controller, "new CLink(_('All')") === false
 		&& strpos($controller, "new CLink(_('Pages')") === false
