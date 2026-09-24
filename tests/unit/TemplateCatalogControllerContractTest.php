@@ -11,7 +11,7 @@ function assertCatalogControllerContract(bool $condition, string $message): void
 	}
 }
 
-foreach (['CPagerHelper', 'CUrl', 'CProfile', 'CDiv', 'CTag', 'CLink', 'CWebUser'] as $class) {
+foreach (['CPagerHelper', 'CUrl', 'CProfile'] as $class) {
 	assertCatalogControllerContract(
 		preg_match('/^use '.preg_quote($class, '/').';$/m', $controller) === 1,
 		'TemplateList must import native global Zabbix class '.$class.'.'
@@ -39,27 +39,13 @@ assertCatalogControllerContract(
 );
 
 assertCatalogControllerContract(
-	strpos($controller, "'show_all' => 'in 1'") !== false
-		&& strpos($controller, "new CLink(_('All')") !== false
-		&& strpos($controller, "new CLink(_('Pages')") !== false,
-	'Catalog pager must provide reversible All/Pages display mode.'
-);
-
-assertCatalogControllerContract(
-	strpos($controller, 'use Modules\\ZabbixTemplateUpdateManager\\Support\\ZabbixUiCompat;') !== false
-		&& strpos($controller, "require_once dirname(__DIR__).'/src/Support/ZabbixUiCompat.php';") !== false
-		&& strpos($controller, 'ZabbixUiCompat::pagerClass()') !== false
-		&& strpos($controller, 'ZabbixUiCompat::pagerContainerClass()') !== false
-		&& strpos($controller, "defined('ZBX_STYLE_PAGER')") === false
-		&& strpos($controller, "defined('ZBX_STYLE_PAGING_BTN_CONTAINER')") === false,
-	'Catalog pager compatibility must be delegated to ZabbixUiCompat instead of being implemented in the controller.'
-);
-
-assertCatalogControllerContract(
-	strpos($controller, "\$needsPagination = \$data['filtered_count'] > \$rowsPerPage;") !== false
-		&& strpos($controller, "if (!\$needsPagination)") !== false
-		&& strpos($controller, "if (\$needsPagination) {") !== false,
-	'Catalog All/Pages controls must be suppressed when the filtered result fits on one native Zabbix page.'
+	strpos($controller, "'show_all' => 'in 1'") === false
+		&& strpos($controller, "new CLink(_('All')") === false
+		&& strpos($controller, "new CLink(_('Pages')") === false
+		&& strpos($controller, 'ZabbixUiCompat') === false
+		&& strpos($controller, 'ZBX_STYLE_TABLE_PAGING') === false
+		&& strpos($controller, 'ZBX_STYLE_PAGING_BTN_CONTAINER') === false,
+	'Catalog pagination must use only the native CPagerHelper output without custom All/Pages controls or pager-style compatibility code.'
 );
 
 assertCatalogControllerContract(
