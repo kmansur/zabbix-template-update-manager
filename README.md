@@ -10,7 +10,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.56**
+Current version: **0.1.0-beta.57**
 
 This version is intended for **laboratory testing**.
 
@@ -20,7 +20,7 @@ This version is intended for **laboratory testing**.
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
 
-Beta.56 adds a native **Name** field to the catalog filter. Name and Status can be combined, the filter is persisted through the standard Zabbix profile mechanism, matching is case-insensitive, and filtering happens before native `CPagerHelper` pagination.
+Beta.57 fixes catalog Name search to match the complete visible template name (`name` plus `technical_name` when displayed) using case-insensitive partial matching, and aligns the filter layout with the native Zabbix Templates page using `CFormGrid`, `CLabel`, `CFormField` and the medium native text-field width.
 
 Formal tag/GitHub Release automation exists, but a community prerelease remains gated by this cross-version UI field pass and the still-unselected project license.
 
@@ -232,7 +232,7 @@ git rev-parse HEAD
 Expected `VERSION` for the current laboratory build:
 
 ```text
-0.1.0-beta.56
+0.1.0-beta.57
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -248,7 +248,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.56**, enable the module and open:
+Confirm version **0.1.0-beta.57**, enable the module and open:
 
 ```text
 Data collection → Template updates
