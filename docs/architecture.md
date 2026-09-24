@@ -540,6 +540,18 @@ Current risk classifications include `none`, `low`, `medium`, `high`, `conflict`
 
 No operational safety decision is made solely from vendor version or the absence of a three-way conflict.
 
+### Supplemental operation history
+
+Controlled updates, installations, rollbacks, update-policy changes and explicit rollback-backup creation emit bounded sanitized records to:
+
+```text
+/var/lib/zabbix-template-update-manager/operation-history.json
+```
+
+The private repository is mode `0600`, atomically rewritten under a local lock and bounded to the most recent 1000 entries. Records contain operation identity, subject, result state, whether a configuration write was reported, actor user ID and a bounded diagnostic detail.
+
+This history is intentionally **supplemental**. It is never consumed by preflight, authorization, rollback selection or write evidence. If history persistence fails after an authoritative operation, ZTUM logs that history failure without rewriting or guessing the actual configuration result.
+
 ### Controlled write engines
 
 Update, installation and rollback writes are implemented.
