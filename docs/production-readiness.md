@@ -12,7 +12,7 @@ A green workflow does not by itself make the module production-ready.
 ## Current posture
 
 - Core implementation: advanced / near feature-complete.
-- Automated validation: strong, with runtime smoke expansion in progress.
+- Automated validation: strong, including PHP 8.2/8.3/8.4, Zabbix 7/8 frontend-symbol compatibility, Chromium batch-asset smoke and accessibility contracts.
 - Zabbix 7.x field evidence: substantial but the final consolidated 1.0 matrix is not closed.
 - Zabbix 8.x field evidence: partial; full controlled write/rollback/offline validation remains open.
 - License: AGPL-3.0-only.
@@ -40,9 +40,8 @@ Before stable 1.0:
 
 The following improve maintainability/operations but do not independently prove release safety:
 
-- browser-level visual/accessibility regression;
-- persistent operation-history UI;
-- richer indirect host-impact presentation;
-- extraction of behavior-heavy inline JavaScript into dedicated assets.
+- expand browser coverage from isolated assets to disposable full-Zabbix page/render testing;
+- drill-down/filtering for very large three-way comparisons;
+- independent external security/code review.
 
-These should be completed before or during the RC cycle where practical, but write-path safety and field evidence take precedence.
+Operation history, inherited host-impact presentation and batch JavaScript extraction are implemented. Write-path safety and real field evidence still take precedence over additional UI automation.
