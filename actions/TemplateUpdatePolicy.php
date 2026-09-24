@@ -13,6 +13,7 @@ use Modules\ZabbixTemplateUpdateManager\Repository\TemplateUpdatePolicyRepositor
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamMatcher;
 use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use RuntimeException;
@@ -23,6 +24,7 @@ require_once dirname(__DIR__).'/src/Repository/TemplateUpdatePolicyRepository.ph
 require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamMatcher.php';
 require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
 
@@ -67,6 +69,9 @@ class TemplateUpdatePolicy extends CController {
 		$response = new CControllerResponseRedirect(
 			(new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates')
 		);
+
+		$historyResult = null;
+		$operationException = null;
 
 		try {
 			$repository = new TemplateRepository();
@@ -115,6 +120,11 @@ class TemplateUpdatePolicy extends CController {
 
 			$response->setFormData(['uncheck' => '1']);
 			$count = count($templates);
+			$historyResult = [
+				'status' => $operation,
+				'write_performed' => false,
+				'detail' => 'changed='.(int) ($result['changed'] ?? 0).', total='.(int) ($result['total'] ?? 0)
+			];
 
 			if ($operation === 'never_update') {
 				CMessageHelper::setSuccessTitle(_n(
@@ -142,6 +152,7 @@ class TemplateUpdatePolicy extends CController {
 			}
 		}
 		catch (Throwable $exception) {
+			$operationException = $exception;
 			error_log(
 				'[Zabbix Template Update Manager] Update-policy change failed: '.$exception->getMessage()
 			);
@@ -150,6 +161,14 @@ class TemplateUpdatePolicy extends CController {
 				'The update policy was not changed. Check frontend logs and the ZTUM runtime directory permissions.'
 			));
 		}
+
+		(new TemplateOperationHistoryService())->recordBestEffort(
+			'policy',
+			'selected-templates',
+			$historyResult,
+			$operationException,
+			(string) (CWebUser::$data['userid'] ?? '')
+		);
 
 		$this->setResponse($response);
 	}

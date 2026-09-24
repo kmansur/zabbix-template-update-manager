@@ -80,6 +80,10 @@
         "ztum.template.rollback": {
             "class": "TemplateRollback",
             "view": "ztum.template.rollback"
+        },
+        "ztum.operations": {
+            "class": "TemplateOperationHistory",
+            "view": "ztum.operation.history"
         }
     }
 }

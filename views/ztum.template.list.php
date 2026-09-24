@@ -431,6 +431,16 @@ if ($selectionForm !== null) {
 
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				new CLink(
+					_('Operation history'),
+					(new CUrl('zabbix.php'))->setArgument('action', 'ztum.operations')
+				)
+			)
+		))->setAttribute('aria-label', _('Content controls'))
+	)
 	->addItem(
 		(new CList())
 			->addClass(ZBX_STYLE_HOR_LIST)

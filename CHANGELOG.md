@@ -6,6 +6,20 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ### Added
 
+- Added private bounded **Operation history** for controlled updates, installations, rollbacks, update-policy changes and explicit rollback-backup creation.
+- Added a native administrator-only operation-history page linked from the template catalog.
+
+### Safety
+
+- Operation history is supplemental only: it is never authorization, preflight evidence or proof of configuration state.
+- History records are bounded/sanitized, stored privately under the ZTUM runtime root and written atomically under a local file lock.
+
+### Tests
+
+- Added repository, recorder and action/view instrumentation regressions for operation history.
+
+### Added
+
 - Added bounded, cycle-safe inherited template-to-host impact analysis using native Zabbix template and host APIs.
 - Update comparison now distinguishes directly linked hosts, indirect hosts, total unique impacted hosts and dependent templates.
 

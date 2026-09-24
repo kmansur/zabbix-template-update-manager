@@ -90,6 +90,7 @@ ZTUM currently provides:
 - global filesystem serialization for update/install/rollback write workflows;
 - explicit individual local-overwrite confirmation in addition to reviewed-risk confirmation;
 - safe runtime-directory setup/check helper;
+- private bounded **Operation history** for controlled updates, installations, rollbacks, policy changes and explicit rollback-backup creation;
 - dedicated security, release and quality-metrics workflows.
 
 Batch execution does not create a second write path. Each executable template is processed through `TemplateControlledUpdateService`, which reruns fresh preflight in the bound standard/reviewed mode, verifies the page evidence has not changed, rebuilds the immutable upstream candidate and then uses the same single configuration-import service already used by individual update/rollback flows.
@@ -171,7 +172,7 @@ Request-bounded controlled batch installation does **not** recursively install m
 
 ## Persistent storage
 
-ZTUM persistent runtime state uses `/var/lib/zabbix-template-update-manager`. The controlled-operation lock defaults to the private `locks/` subdirectory, rollback artifacts use `backups/`, and the Never update policy uses `update-policy.json`.
+ZTUM persistent runtime state uses `/var/lib/zabbix-template-update-manager`. The controlled-operation lock defaults to the private `locks/` subdirectory, rollback artifacts use `backups/`, the Never update policy uses `update-policy.json`, and supplemental operator history uses `operation-history.json`.
 
 Rollback artifacts are stored by default under:
 
@@ -189,6 +190,8 @@ sudo install -d -o www-data -g www-data -m 0700 \
 ```
 
 The module intentionally does not fall back to a world-writable or temporary backup location.
+
+Operation history is supplemental and bounded. It is never used as authorization, update evidence or proof that a Zabbix configuration write succeeded; fresh preflight/post-validation and the actual Zabbix state remain authoritative.
 
 A fail-closed helper can validate or create the private runtime directories after resolving the PHP-FPM account:
 

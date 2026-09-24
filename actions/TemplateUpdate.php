@@ -5,12 +5,15 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
+use CWebUser;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
 
 /**
  * Performs one explicitly confirmed official-template update.
@@ -55,6 +58,8 @@ class TemplateUpdate extends CController {
 			'operation_error' => null
 		];
 
+		$operationException = null;
+
 		try {
 			$evidence = (string) $this->getInput('evidence_sha256');
 			$manualOverride = (string) $this->getInput('manual_override', '') === '1';
@@ -72,6 +77,7 @@ class TemplateUpdate extends CController {
 			);
 		}
 		catch (Throwable $exception) {
+			$operationException = $exception;
 			error_log(sprintf(
 				'[Zabbix Template Update Manager] Controlled update failed for template %s: %s',
 				$templateId,
@@ -81,6 +87,14 @@ class TemplateUpdate extends CController {
 				'Update could not be completed. Review frontend logs and verify the current template state before retrying.'
 			);
 		}
+
+		(new TemplateOperationHistoryService())->recordBestEffort(
+			'update',
+			'template-'.$templateId,
+			$data['result'],
+			$operationException,
+			(string) (CWebUser::$data['userid'] ?? '')
+		);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

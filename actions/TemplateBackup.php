@@ -7,11 +7,13 @@ use CControllerResponseFatal;
 use CControllerResponseRedirect;
 use CMessageHelper;
 use CUrl;
+use CWebUser;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateBackupRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateBackupService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateExportService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use RuntimeException;
 use Throwable;
 
@@ -20,6 +22,7 @@ require_once dirname(__DIR__).'/src/Repository/TemplateRepository.php';
 require_once dirname(__DIR__).'/src/Service/TemplateBackupService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateExportService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
 
 /**
  * Creates a persistent local rollback artifact for one visible template.
@@ -54,6 +57,9 @@ class TemplateBackup extends CController {
 				->setArgument('templateid', $templateId)
 		);
 
+		$historyResult = null;
+		$operationException = null;
+
 		try {
 			$record = (new TemplateRepository())->findById($templateId);
 			if ($record === null) {
@@ -67,6 +73,11 @@ class TemplateBackup extends CController {
 			}
 
 			$artifact = (new TemplateBackupService())->create($template);
+			$historyResult = [
+				'status' => 'created',
+				'write_performed' => false,
+				'detail' => 'sha256='.substr((string) ($artifact['sha256'] ?? ''), 0, 16)
+			];
 
 			CMessageHelper::setSuccessTitle(_('Template rollback backup created'));
 			info(sprintf(
@@ -76,6 +87,7 @@ class TemplateBackup extends CController {
 			));
 		}
 		catch (Throwable $exception) {
+			$operationException = $exception;
 			error_log(sprintf(
 				'[Zabbix Template Update Manager] Template backup failed for template %s: %s',
 				$templateId,
@@ -87,6 +99,14 @@ class TemplateBackup extends CController {
 				TemplateBackupRepository::defaultBackupDirectory()
 			));
 		}
+
+		(new TemplateOperationHistoryService())->recordBestEffort(
+			'backup',
+			'template-'.$templateId,
+			$historyResult,
+			$operationException,
+			(string) (CWebUser::$data['userid'] ?? '')
+		);
 
 		$this->setResponse($response);
 	}
