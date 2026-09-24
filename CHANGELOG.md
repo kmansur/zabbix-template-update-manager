@@ -4,6 +4,19 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Refactored
+
+- Moved the two behavior-heavy request-bounded batch JavaScript implementations into registered module assets.
+- Update/install batch PHP views now retain only native server-rendered controls, JSON configuration/labels and a small document-ready initializer.
+
+### Tests
+
+- Native UI and batch contract guards now validate the registered assets and reject reintroduction of large inline batch scripts.
+
+### Safety
+
+- Browser orchestration only moved location; CSRF, Super-Admin authorization, fresh server-side preflight, evidence validation and the single controlled import boundary are unchanged.
+
 ### Added
 
 - Added private bounded **Operation history** for controlled updates, installations, rollbacks, update-policy changes and explicit rollback-backup creation.

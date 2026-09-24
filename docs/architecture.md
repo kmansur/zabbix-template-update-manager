@@ -481,6 +481,17 @@ Overall status precedence is conservative:
 
 See `docs/three-way-analysis.md` for detailed semantics.
 
+### Frontend JavaScript assets
+
+Behavior-heavy request-bounded batch orchestration is registered through the module manifest and lives in:
+
+```text
+assets/js/ztum-update-batch.js
+assets/js/ztum-install-batch.js
+```
+
+The PHP views retain only native server-rendered controls, bounded JSON configuration/labels and a small `CScriptTag::setOnDocumentReady()` initializer. Security decisions remain server-authoritative; moving browser orchestration into assets does not create a new write path.
+
 ### Frontend
 
 The inventory view is responsible for:
