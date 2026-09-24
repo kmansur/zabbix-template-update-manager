@@ -105,7 +105,6 @@ The project tracks implementation, automated validation and real field validatio
 - Move the two large batch JavaScript bodies into dedicated frontend JS assets while preserving native lifecycle and server-authoritative security gates.
 - Add browser-level UI/accessibility regression tests.
 - Add persistent operation-history/audit presentation.
-- Improve inherited/indirect host impact analysis.
 - Add drill-down/filtering for very large three-way comparisons.
 
 ### Release engineering
