@@ -132,7 +132,7 @@ database_type() {
     /usr/local/share/zabbix/conf/zabbix.conf.php \
     /var/www/zabbix/conf/zabbix.conf.php; do
     [[ -f "$file" ]] || continue
-    line="$(grep -E "\\$DB\[['\"]TYPE['\"]\]" "$file" 2>/dev/null | head -n1 || true)"
+    line="$(grep -E "\[['\"]TYPE['\"]\]" "$file" 2>/dev/null | head -n1 || true)"
     value="$(printf '%s' "$line" | sed -nE "s/.*=[[:space:]]*['\"]([^'\"]+)['\"].*/\1/p")"
     if [[ -n "$value" ]]; then
       printf '%s\n' "$value"
