@@ -95,7 +95,83 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python -m py_compile tools/build_upstream_index.py tools/build_offline_bundle.py tools/aggregate_coverage.py
+          python -m py_compile tools/build_upstream_index.py tools/build_offline_bundle.py tools/aggregate_coverage.py tools/check_zabbix_frontend_compat.py
           python tests/test_build_upstream_index.py
           python tests/test_build_offline_bundle.py
+          python tests/test_zabbix_frontend_compat.py
           python tests/test_workflows.py
+
+  php-runtime-matrix:
+    name: PHP ${{ matrix.php }} runtime
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4']
+    container:
+      image: php:${{ matrix.php }}-cli-bookworm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Runtime version
+        run: php --version
+
+      - name: PHP syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            php -l "$file"
+          done < <(find . -type f -name '*.php' -print0)
+
+      - name: PHP unit tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          for test in tests/unit/*Test.php; do
+            php "$test"
+          done
+
+  zabbix-frontend-compat:
+    name: Frontend symbols / Zabbix ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - label: '7.0'
+            ref: 'release/7.0'
+          - label: '8.0'
+            ref: 'master'
+
+    steps:
+      - name: Checkout ZTUM
+        uses: actions/checkout@v4
+        with:
+          path: ztum
+
+      - name: Checkout Zabbix frontend
+        uses: actions/checkout@v4
+        with:
+          repository: zabbix/zabbix
+          ref: ${{ matrix.ref }}
+          path: zabbix
+          sparse-checkout: |
+            ui
+            include/version.h
+          sparse-checkout-cone-mode: false
+
+      - name: Verify expected Zabbix generation
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -Eq '#define ZABBIX_VERSION_MAJOR[[:space:]]+${{ matrix.label == '7.0' && '7' || '8' }}' zabbix/include/version.h
+
+      - name: Check native frontend symbols
+        run: |
+          python3 ztum/tools/check_zabbix_frontend_compat.py \
+            --module-root ztum \
+            --zabbix-root zabbix \
+            --label "Zabbix ${{ matrix.label }}"
