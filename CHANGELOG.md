@@ -4,6 +4,27 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.54] - 2026-09-23
+
+### Added
+
+- Added `src/Support/ZabbixUiCompat.php` as the single compatibility boundary for proven native frontend differences between supported Zabbix generations.
+
+### Changed
+
+- Catalog pagination now asks `ZabbixUiCompat` for native pager and pager-container classes instead of carrying Zabbix 7.x/8.x constant checks inside the controller.
+- Maintainer guidance and architecture documentation now explicitly require one codebase/package for Zabbix 7.x and 8.x, with proven frontend differences centralized in the compatibility layer.
+- Recorded successful Zabbix 8 catalog loading after the beta.53 pager fix while keeping the full 8.x field matrix open.
+
+### Tests
+
+- Added direct compatibility tests proving Zabbix 7.x fallback behavior and Zabbix 8.x precedence for the renamed pager constants.
+- Catalog controller contracts now reject locally implemented pager-version checks and require delegation to `ZabbixUiCompat`.
+
+### Safety
+
+- Refactor only: no template comparison, backup, preflight, update, installation, rollback, policy or `configuration.import` behavior changed.
+
 ## [0.1.0-beta.53] - 2026-09-23
 
 ### Changed
