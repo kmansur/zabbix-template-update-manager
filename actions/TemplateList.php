@@ -40,6 +40,7 @@ class TemplateList extends CController {
 			'page' => 'ge 1',
 			'filter_set' => 'in 1',
 			'filter_rst' => 'in 1',
+			'filter_name' => 'string',
 			'filter_status' => 'in all,current,not_applicable,update_available,not_installed,never_update'
 		]);
 
@@ -60,15 +61,22 @@ class TemplateList extends CController {
 
 		if ($this->hasInput('filter_set')) {
 			CProfile::update(
+				'web.ztum.templates.filter.name',
+				trim((string) $this->getInput('filter_name', '')),
+				PROFILE_TYPE_STR
+			);
+			CProfile::update(
 				'web.ztum.templates.filter.status',
 				$this->getInput('filter_status', 'all'),
 				PROFILE_TYPE_STR
 			);
 		}
 		elseif ($this->hasInput('filter_rst')) {
+			CProfile::delete('web.ztum.templates.filter.name');
 			CProfile::delete('web.ztum.templates.filter.status');
 		}
 
+		$filterName = trim((string) CProfile::get('web.ztum.templates.filter.name', ''));
 		$filterStatus = (string) CProfile::get('web.ztum.templates.filter.status', 'all');
 		$allowedStatuses = ['all', 'current', 'not_applicable', 'update_available', 'not_installed', 'never_update'];
 		if (!in_array($filterStatus, $allowedStatuses, true)) {
@@ -94,6 +102,7 @@ class TemplateList extends CController {
 			'policy_summary' => ['never_update' => 0],
 			'paging' => null,
 			'filter' => [
+				'name' => $filterName,
 				'status' => $filterStatus
 			],
 			'filter_profile' => 'web.ztum.templates.filter',
@@ -206,6 +215,18 @@ class TemplateList extends CController {
 				$template['never_update'] = false;
 			}
 			unset($template);
+		}
+
+		if ($filterName !== '') {
+			$data['templates'] = array_values(array_filter(
+				$data['templates'],
+				static function (array $template) use ($filterName): bool {
+					$name = (string) ($template['name'] ?? '');
+					return function_exists('mb_stripos')
+						? mb_stripos($name, $filterName) !== false
+						: stripos($name, $filterName) !== false;
+				}
+			));
 		}
 
 		if ($filterStatus === 'never_update') {
