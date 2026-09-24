@@ -10,7 +10,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.54**
+Current version: **0.1.0-beta.55**
 
 This version is intended for **laboratory testing**.
 
@@ -20,7 +20,7 @@ This version is intended for **laboratory testing**.
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
 
-Beta.54 centralizes proven frontend differences between Zabbix 7.x and 8.x in a single compatibility layer instead of scattering version checks through controllers or maintaining separate codebases. It retains the beta.53 pager fix and the persistent per-template **Never update** policy introduced in beta.52.
+Beta.55 removes the custom **All / Pages** catalog mode and now uses only the native Zabbix pager produced by `CPagerHelper`. This restores the standard Zabbix 8 appearance while keeping the same single codebase for Zabbix 7.x and 8.x.
 
 Formal tag/GitHub Release automation exists, but a community prerelease remains gated by this cross-version UI field pass and the still-unselected project license.
 
@@ -35,7 +35,7 @@ See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before testing the beta.
 
 The module detects the frontend `ZABBIX_VERSION` at runtime and fails closed for unsupported/unknown major versions.
 
-Frontend differences that are proven by field testing are isolated in `src/Support/ZabbixUiCompat.php`, keeping one module package for both supported major generations.
+The module keeps one codebase for both supported major generations and prefers native Zabbix abstractions so each frontend generation can apply its own internal UI implementation.
 
 ## What the beta can do
 
@@ -230,7 +230,7 @@ git rev-parse HEAD
 Expected `VERSION` for the current laboratory build:
 
 ```text
-0.1.0-beta.54
+0.1.0-beta.55
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -246,7 +246,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.54**, enable the module and open:
+Confirm version **0.1.0-beta.55**, enable the module and open:
 
 ```text
 Data collection → Template updates

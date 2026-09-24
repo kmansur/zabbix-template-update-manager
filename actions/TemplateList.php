@@ -5,13 +5,9 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
-use CDiv;
-use CLink;
 use CPagerHelper;
 use CProfile;
-use CTag;
 use CUrl;
-use CWebUser;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateUpdatePolicyRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
@@ -20,7 +16,6 @@ use Modules\ZabbixTemplateUpdateManager\Service\TemplateVersionComparator;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamCatalogService;
 use Modules\ZabbixTemplateUpdateManager\Service\UpstreamMatcher;
 use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
-use Modules\ZabbixTemplateUpdateManager\Support\ZabbixUiCompat;
 use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use Throwable;
 
@@ -32,7 +27,6 @@ require_once dirname(__DIR__).'/src/Service/TemplateVersionComparator.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamCatalogService.php';
 require_once dirname(__DIR__).'/src/Service/UpstreamMatcher.php';
 require_once dirname(__DIR__).'/src/Support/ProjectVersion.php';
-require_once dirname(__DIR__).'/src/Support/ZabbixUiCompat.php';
 require_once dirname(__DIR__).'/src/Support/ZabbixVersion.php';
 
 class TemplateList extends CController {
@@ -46,8 +40,7 @@ class TemplateList extends CController {
 			'page' => 'ge 1',
 			'filter_set' => 'in 1',
 			'filter_rst' => 'in 1',
-			'filter_status' => 'in all,current,not_applicable,update_available,not_installed,never_update',
-			'show_all' => 'in 1'
+			'filter_status' => 'in all,current,not_applicable,update_available,not_installed,never_update'
 		]);
 
 		if (!$ret) {
@@ -105,7 +98,6 @@ class TemplateList extends CController {
 			],
 			'filter_profile' => 'web.ztum.templates.filter',
 			'filter_active_tab' => CProfile::get('web.ztum.templates.filter.active', 1),
-			'show_all' => $this->hasInput('show_all'),
 			'filtered_count' => 0,
 			'upstream_source' => null,
 			'upstream_runtime' => null,
@@ -235,76 +227,16 @@ class TemplateList extends CController {
 
 		order_result($data['templates'], 'name', ZBX_SORT_UP);
 		$data['filtered_count'] = count($data['templates']);
-		$rowsPerPage = max(1, (int) (CWebUser::$data['rows_per_page'] ?? 1));
-		$needsPagination = $data['filtered_count'] > $rowsPerPage;
-
-		// Do not expose All/Pages display controls when the complete filtered
-		// result already fits on one native Zabbix page.
-		if (!$needsPagination) {
-			$data['show_all'] = false;
-		}
 
 		$listUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates');
-
-		$pagerClass = ZabbixUiCompat::pagerClass();
-		$pagerContainerClass = ZabbixUiCompat::pagerContainerClass();
-
-		if ($data['show_all']) {
-			$pagesUrl = clone $listUrl;
-			$pagesUrl->removeArgument('show_all');
-
-			$pager = new CDiv();
-			if ($pagerClass !== '') {
-				$pager->addClass($pagerClass);
-			}
-
-			$pagerNav = (new CTag('nav', true))
-				->setAttribute('role', 'navigation')
-				->setAttribute('aria-label', _x('Pager', 'page navigation'))
-				->addItem(
-					(new CLink(_('Pages'), $pagesUrl->getUrl()))
-						->setAttribute('aria-label', _('Return to paginated view'))
-				)
-				->addItem(
-					(new CDiv())
-						->addClass(ZBX_STYLE_TABLE_STATS)
-						->addItem(_s('Displaying all %1$s found', $data['filtered_count']))
-				);
-
-			if ($pagerContainerClass !== '') {
-				$pagerNav->addClass($pagerContainerClass);
-			}
-
-			$data['paging'] = $pager->addItem($pagerNav);
-		}
-		else {
-			$pageNum = $this->getInput('page', 1);
-			CPagerHelper::savePage('ztum.template.catalog', $pageNum);
-			$data['paging'] = CPagerHelper::paginate(
-				$pageNum,
-				$data['templates'],
-				ZBX_SORT_UP,
-				$listUrl
-			);
-
-			if ($needsPagination) {
-				$allUrl = clone $listUrl;
-				$allUrl->setArgument('show_all', '1');
-
-				$displayModeNav = (new CTag('nav', true,
-					(new CLink(_('All'), $allUrl->getUrl()))
-						->setAttribute('aria-label', _('Show all matching templates'))
-				))
-					->setAttribute('role', 'navigation')
-					->setAttribute('aria-label', _('Catalog display mode'));
-
-				if ($pagerContainerClass !== '') {
-					$displayModeNav->addClass($pagerContainerClass);
-				}
-
-				$data['paging']->addItem($displayModeNav);
-			}
-		}
+		$pageNum = $this->getInput('page', 1);
+		CPagerHelper::savePage('ztum.template.catalog', $pageNum);
+		$data['paging'] = CPagerHelper::paginate(
+			$pageNum,
+			$data['templates'],
+			ZBX_SORT_UP,
+			$listUrl
+		);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

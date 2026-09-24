@@ -4,6 +4,28 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.55] - 2026-09-23
+
+### Changed
+
+- Removed the custom catalog **All / Pages** display mode and now delegate pagination entirely to native `CPagerHelper::paginate()`.
+- The catalog no longer creates pager markup or applies pager CSS classes itself; each supported Zabbix frontend generation renders its own native pager.
+- Simplified cross-version guidance to prefer native Zabbix abstractions before introducing compatibility code.
+
+### Removed
+
+- Removed the now-unused `ZabbixUiCompat` pager compatibility helper and its dedicated test after custom pager composition was eliminated.
+- Removed the `show_all` request/input state and the module-specific **All** and **Pages** controls.
+
+### Tests
+
+- Catalog contracts now require native `CPagerHelper` pagination only and reject reintroduction of custom **All / Pages** controls or pager-style compatibility code.
+- Laboratory validation now explicitly checks that Zabbix 7.x and 8.x show only their native pager.
+
+### Safety
+
+- Presentation/navigation change only. Template comparison, backup, preflight, update, installation, rollback, Never update policy and the controlled `configuration.import` boundary are unchanged.
+
 ## [0.1.0-beta.54] - 2026-09-23
 
 ### Added

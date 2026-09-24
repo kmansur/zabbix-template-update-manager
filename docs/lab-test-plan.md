@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.54
+# Laboratory test plan — 0.1.0-beta.55
 
 ## Release state
 
@@ -13,7 +13,7 @@ Status at publication:
 
 Use the exact prerelease tag when a public beta has been published. During internal laboratory work before that tag exists, record the exact `main` commit used so the test can be reproduced.
 
-Beta.54 is the current native-UI and update-policy field-test candidate. Field validation must prove the complete catalog/update/install/rollback workflow in both light and dark themes while confirming that the underlying comparison, evidence and controlled-write behavior remains unchanged.
+Beta.55 is the current native-UI and update-policy field-test candidate. Field validation must prove the complete catalog/update/install/rollback workflow in both light and dark themes while confirming that the underlying comparison, evidence and controlled-write behavior remains unchanged.
 
 ## Safety assumptions
 
@@ -68,7 +68,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.54`, enable the module and open:
+Confirm `0.1.0-beta.55`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -108,22 +108,22 @@ Expected behavior:
 
 Repeat this visual pass on at least one supported Zabbix 7.x lab and one supported Zabbix 8.x lab before calling the UI field-validated.
 
-## 2B. Zabbix 8 pager compatibility regression
+## 2B. Native catalog pagination regression
 
-On a Zabbix 8.x frontend with more catalog entries than the configured rows-per-page value:
+On both Zabbix 7.x and 8.x frontends with more catalog entries than the configured rows-per-page value:
 
 1. Open **Data collection → Template updates** and confirm the catalog renders without HTTP 500/PHP fatal errors.
-2. Confirm native page links render and navigate correctly.
-3. Click **All** and confirm the complete filtered catalog renders.
-4. Click **Pages** and confirm the paginated view returns.
-5. Repeat with at least one filtered status such as **Update available** or **Not installed**.
-6. Confirm the frontend/Nginx/PHP logs contain no undefined `ZBX_STYLE_*` pager constant errors.
+2. Confirm the pager matches the native Zabbix pagination used by built-in pages.
+3. Navigate through several pages and return to page 1.
+4. Repeat with at least one filtered status such as **Update available** or **Not installed**.
+5. Confirm there is no module-specific **All** or **Pages** control below the native pager.
+6. Confirm the frontend/Nginx/PHP logs contain no pager-related PHP errors.
 
-The module must resolve the Zabbix 8 native `ZBX_STYLE_PAGER` / `ZBX_STYLE_PAGER_CONTAINER` names and the Zabbix 7.x `ZBX_STYLE_TABLE_PAGING` / `ZBX_STYLE_PAGING_BTN_CONTAINER` names through `ZabbixUiCompat`. Controllers/views must not implement their own version-specific pager checks or hard-code either generation's CSS class names.
+Catalog pagination must be provided only by `CPagerHelper::paginate()`. Do not recreate native pager markup or add module-specific display modes around it.
 
 ## 2C. Request-bounded update regression
 
-For the first beta.54 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.55 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -326,7 +326,7 @@ Expected behavior:
 - a long historical scan may show `history_scan_pending` / continuation progress and issue several bounded requests for the same template before final classification;
 - no single historical continuation request should approach the previous ~30-second gateway failure window;
 - if an HTTP failure still occurs, the Reason should include elapsed time and gateway identity such as `server=cloudflare` / `cf-ray=...` when exposed by the response;
-- if a real 504 still occurs on beta.54, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
+- if a real 504 still occurs on beta.55, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
 - preparation continuation/retry must never call `configuration.import`.
 
 ## 5B. Manual-review continuation regression
@@ -748,9 +748,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.54 laboratory validation
+## 16. Exit criteria for beta.55 laboratory validation
 
-A Zabbix generation passes beta.54 only after evidence demonstrates:
+A Zabbix generation passes beta.55 only after evidence demonstrates:
 
 ```text
 module discovery/enable

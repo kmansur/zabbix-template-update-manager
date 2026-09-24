@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.54`.
+Current test version: `0.1.0-beta.55`.
 
 ## Non-negotiable rules
 
@@ -73,7 +73,7 @@ Supported major versions are explicit and currently limited to 7 and 8. Do not s
 
 Use the detected `major.minor` release line for upstream-index selection.
 
-Avoid duplicating the entire codebase into Zabbix 7 and Zabbix 8 variants. Proven frontend differences must be centralized in `src/Support/ZabbixUiCompat.php` instead of being scattered through controllers/views. Add other version-specific compatibility classes only when a real incompatibility cannot be represented safely there.
+Avoid duplicating the entire codebase into Zabbix 7 and Zabbix 8 variants. Prefer native Zabbix abstractions that already adapt to the running frontend generation. Introduce a dedicated compatibility layer only when a real incompatibility cannot be handled safely by the native API/component itself.
 
 ## Upstream identity
 
