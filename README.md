@@ -10,7 +10,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.58**
+Current version: **0.1.0-beta.59**
 
 This version is intended for **laboratory testing**.
 
@@ -20,9 +20,9 @@ This version is intended for **laboratory testing**.
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
 
-Beta.58 is a pre-RC hardening snapshot. It adds persistent runtime-lock alignment, administrator-only catalog access, inherited host-impact analysis, bounded private operation history, AGPL-3.0-only licensing, extracted batch JavaScript assets, PHP 8.2/8.3/8.4 CI, Zabbix 7/8 frontend-symbol compatibility checks, and Chromium/accessibility regression gates.
+Beta.59 extends the pre-RC hardening work with disposable full-Zabbix 7.x/8.x frontend smoke tests in Chromium, light/dark catalog rendering checks, operation-history rendering, and enforced minimum coverage/reachability floors. It retains the beta.58 runtime-lock, permissions, inherited-impact, operation-history, licensing, JavaScript extraction and compatibility hardening.
 
-Formal tag/GitHub Release automation and release-package smoke validation exist. The project license is selected; a public prerelease remains gated by completing the relevant real Zabbix 7.x/8.x beta.58 field pass and installing a generated release artifact.
+Formal tag/GitHub Release automation and release-package smoke validation exist. The project license is selected; a public prerelease remains gated by completing the relevant real Zabbix 7.x/8.x beta.59 controlled-write field pass and installing a generated release artifact.
 
 For a new laboratory installation, use the quick installer below. For validation work, always record the exact installed version and commit/source ref.
 
@@ -248,7 +248,7 @@ git rev-parse HEAD
 Expected `VERSION` for the current laboratory build:
 
 ```text
-0.1.0-beta.58
+0.1.0-beta.59
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -264,7 +264,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.58**, enable the module and open:
+Confirm version **0.1.0-beta.59**, enable the module and open:
 
 ```text
 Data collection → Template updates
