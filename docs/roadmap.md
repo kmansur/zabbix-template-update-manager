@@ -116,7 +116,7 @@ The project tracks implementation, automated validation and real field validatio
 
 ### Release engineering
 
-- Publish the first community-test prerelease tag after license and public-test documentation are finalized.
+- Keep the published `v0.1.0-beta.59` laboratory prerelease as the immutable baseline for the consolidated Zabbix 7.x/8.x field matrix.
 - Keep the compatibility matrix current and close the Zabbix 7.x/8.x 1.0 readiness evidence.
 - Finish publication/homologation documentation.
 - Arrange independent security/code review before production recommendation.
