@@ -4,6 +4,16 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Security
+
+- Restricted the catalog controller to Zabbix Administrators and Super Admins instead of allowing every authenticated frontend user through the module controller.
+- Aligned the default controlled-operation lock with the private persistent runtime root at `/var/lib/zabbix-template-update-manager/locks`.
+
+### Changed
+
+- Installed templates without an authoritative official UUID match now show update policy as **Not applicable** instead of **Managed**.
+- Runtime setup tests now validate private permissions/ownership for backups, offline and locks directories.
+
 ## [0.1.0-beta.57] - 2026-09-23
 
 ### Fixed
