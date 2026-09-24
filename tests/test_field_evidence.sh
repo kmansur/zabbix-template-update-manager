@@ -26,7 +26,7 @@ output="$(bash tools/ztum-field-evidence.sh \
   --artifact "$tmp/release.tar.gz" \
   --expected-sha256 "$expected")"
 
-grep -Fq '# ZTUM beta.59 field evidence' <<<"$output"
+grep -Fq '# ZTUM field evidence' <<<"$output"
 grep -Fq 'Manifest version: `0.1.0-beta.59`' <<<"$output"
 grep -Fq 'VERSION file: `0.1.0-beta.59`' <<<"$output"
 grep -Fq 'Release artifact checksum match: `YES`' <<<"$output"
