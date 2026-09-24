@@ -41,8 +41,14 @@ def module_requirements(root: Path):
         text = path.read_text(encoding="utf-8", errors="replace")
         rel = str(path.relative_to(root))
 
-        for name in CONST_RE.findall(text):
-            constants.setdefault(name, set()).add(rel)
+        for line in text.splitlines():
+            for name in CONST_RE.findall(line):
+                guarded = (
+                    f"defined('{name}')" in line
+                    or f'defined("{name}")' in line
+                )
+                if not guarded:
+                    constants.setdefault(name, set()).add(rel)
 
         for pattern in CLASS_PATTERNS:
             for name in pattern.findall(text):
