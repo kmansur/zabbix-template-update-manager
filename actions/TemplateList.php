@@ -250,7 +250,9 @@ class TemplateList extends CController {
 		$data['filtered_count'] = count($data['templates']);
 
 		$listUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates');
-		$pageNum = $this->getInput('page', 1);
+		$pageNum = ($this->hasInput('filter_set') || $this->hasInput('filter_rst'))
+			? 1
+			: $this->getInput('page', 1);
 		CPagerHelper::savePage('ztum.template.catalog', $pageNum);
 		$data['paging'] = CPagerHelper::paginate(
 			$pageNum,
