@@ -52,6 +52,14 @@ def main() -> int:
 
         write(
             module / "views" / "test.php",
+            "<?php\nuse CFilter;\nnew CFilter();\n"
+            "echo defined('ZBX_STYLE_OPTIONAL') ? ZBX_STYLE_OPTIONAL : '';\n",
+        )
+        guarded = run(checker, module, zabbix)
+        assert guarded.returncode == 0, guarded.stdout + guarded.stderr
+
+        write(
+            module / "views" / "test.php",
             "<?php\nuse CFilter;\nnew CFilter();\necho ZBX_STYLE_REMOVED;\n",
         )
         bad = run(checker, module, zabbix)
