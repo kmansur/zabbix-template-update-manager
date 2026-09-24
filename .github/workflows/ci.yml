@@ -25,7 +25,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Ensure PHP CLI
         shell: bash
@@ -116,7 +116,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Runtime version
         run: php --version
@@ -151,12 +151,12 @@ jobs:
 
     steps:
       - name: Checkout ZTUM
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           path: ztum
 
       - name: Checkout Zabbix frontend
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: zabbix/zabbix
           ref: ${{ matrix.ref }}
@@ -186,7 +186,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -209,7 +209,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
