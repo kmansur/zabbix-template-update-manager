@@ -5,6 +5,8 @@ $prepare = (string) file_get_contents($root.'/actions/TemplateInstallBatchPrepar
 $prepareOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchPrepareOne.php');
 $executeOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchExecuteOne.php');
 $prepareView = (string) file_get_contents($root.'/views/ztum.template.install.batch.prepare.php');
+$prepareAsset = (string) file_get_contents($root.'/assets/js/ztum-install-batch.js');
+$prepareBehavior = $prepareView.$prepareAsset;
 $listView = (string) file_get_contents($root.'/views/ztum.template.list.php');
 $manifest = (string) file_get_contents($root.'/manifest.json');
 
@@ -39,49 +41,49 @@ assertInstallBatchContract(
 );
 
 assertInstallBatchContract(
-	strpos($prepareView, "CCsrfTokenHelper::get('ztum.templates.install_prepare_one')") !== false
-		&& strpos($prepareView, 'fetch(config.prepareOneUrl') !== false
-		&& strpos($prepareView, 'for (let index = 0; index < config.uuids.length; index++)') !== false,
+	strpos($prepareBehavior, "CCsrfTokenHelper::get('ztum.templates.install_prepare_one')") !== false
+		&& strpos($prepareBehavior, 'fetch(config.prepareOneUrl') !== false
+		&& strpos($prepareBehavior, 'for (let index = 0; index < config.uuids.length; index++)') !== false,
 	'Batch install preparation must use one bounded HTTP request per UUID.'
 );
 
 assertInstallBatchContract(
-	strpos($prepareView, "CCsrfTokenHelper::get('ztum.templates.install_execute_one')") !== false
-		&& strpos($prepareView, 'fetch(config.executeOneUrl') !== false
-		&& strpos($prepareView, 'for (let index = 0; index < entries.length; index++)') !== false,
+	strpos($prepareBehavior, "CCsrfTokenHelper::get('ztum.templates.install_execute_one')") !== false
+		&& strpos($prepareBehavior, 'fetch(config.executeOneUrl') !== false
+		&& strpos($prepareBehavior, 'for (let index = 0; index < entries.length; index++)') !== false,
 	'Batch install execution must use one bounded HTTP request per Ready UUID.'
 );
 
-assertInstallBatchContract(strpos($prepareView, 'Stop after current template') !== false,
+assertInstallBatchContract(strpos($prepareBehavior, 'Stop after current template') !== false,
 	'Batch install preparation must be cancellable between candidates.');
-assertInstallBatchContract(strpos($prepareView, 'Install ready templates') !== false,
+assertInstallBatchContract(strpos($prepareBehavior, 'Install ready templates') !== false,
 	'Batch install execution must require an explicit Ready-only action.');
 
 assertInstallBatchContract(
-	strpos($prepareView, 'No templates are eligible for installation.') !== false
-		&& strpos($prepareView, 'Unavailable — no Ready templates') !== false
-		&& strpos($prepareView, "readyEvidence.size === 0") !== false,
+	strpos($prepareBehavior, 'No templates are eligible for installation.') !== false
+		&& strpos($prepareBehavior, 'Unavailable — no Ready templates') !== false
+		&& strpos($prepareBehavior, "readyEvidence.size === 0") !== false,
 	'Zero-Ready batch plans must explain why confirmation/execution remains unavailable.'
 );
 
 assertInstallBatchContract(
-	strpos($prepareView, 'reference_issues') !== false,
+	strpos($prepareBehavior, 'reference_issues') !== false,
 	'Batch preparation must display bounded structural-reference issues when present.'
 );
-assertInstallBatchContract(strpos($prepareView, 'stops on the first failure') !== false,
+assertInstallBatchContract(strpos($prepareBehavior, 'stops on the first failure') !== false,
 	'Request-bounded execution must preserve stop-on-first-failure behavior.');
 assertInstallBatchContract(
-	strpos($prepareView, 'Confirmed configuration write') !== false
-		&& strpos($prepareView, 'Uncertain import') !== false
-		&& strpos($prepareView, "result.status === 'import_failed'") !== false
-		&& strpos($prepareView, 'failure_inspection') !== false
-		&& strpos($prepareView, 'request_failure_notice') !== false,
+	strpos($prepareBehavior, 'Confirmed configuration write') !== false
+		&& strpos($prepareBehavior, 'Uncertain import') !== false
+		&& strpos($prepareBehavior, "result.status === 'import_failed'") !== false
+		&& strpos($prepareBehavior, 'failure_inspection') !== false
+		&& strpos($prepareBehavior, 'request_failure_notice') !== false,
 	'Batch execution must distinguish confirmed writes, import rejection and browser-request outcome uncertainty.'
 );
 assertInstallBatchContract(
-	strpos($prepareView, 'validationDetail') !== false
-		&& strpos($prepareView, 'ignored_shared_changes') !== false
-		&& strpos($prepareView, 'raw_remaining_changes') !== false,
+	strpos($prepareBehavior, 'validationDetail') !== false
+		&& strpos($prepareBehavior, 'ignored_shared_changes') !== false
+		&& strpos($prepareBehavior, 'raw_remaining_changes') !== false,
 	'Batch installation must expose detailed post-install validation evidence instead of only a generic failure reason.'
 );
 
@@ -100,7 +102,7 @@ assertInstallBatchContract(
 	'Not installed catalog mode must expose active multi-select/select-all installation review.'
 );
 
-$combined = $prepare.$prepareOne.$executeOne.$prepareView;
+$combined = $prepare.$prepareOne.$executeOne.$prepareView.$prepareAsset;
 foreach ([
 	'API::Configuration()->import(',
 	'API::Template()->create(',
