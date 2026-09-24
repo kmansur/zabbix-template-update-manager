@@ -23,6 +23,37 @@ For the first write-path pass, select only a small number (2–3) of official te
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. Medium/high and local-overwrite candidates may use the explicit reviewed batch path only after verified rollback evidence, per-row selection and the required acknowledgements. Conflict and unresolved templates remain hard blocked.
 
+## 0. Pin the immutable beta.59 artifact and capture environment evidence
+
+Use the formal prerelease artifact, not a moving `main` checkout, for the remaining beta.59 field matrix.
+
+Release identity:
+
+```text
+Tag:        v0.1.0-beta.59
+Tag commit: 3694ab0ce4a687399e186ec9cde2774d0209c434
+tar.gz:     4eb075bc70d666ccb226f6c949ae96a732494566ea3b23a2396e3ae8ca7f6d6d
+zip:        889d96bc5cc88d3b35585f68a214e7c454a754d24fbe1f186ed326f7b24a9748
+```
+
+Verify the downloaded archive against the published `SHA256SUMS` before installation. Do not substitute a later `main` snapshot and still record the run as beta.59 evidence.
+
+After installation, capture the environment with the read-only helper from a maintenance checkout:
+
+```bash
+bash tools/ztum-field-evidence.sh \
+  --module-dir /usr/share/zabbix/modules/zabbix-template-update-manager \
+  --browser "Chrome/Chromium <version>" \
+  --theme "dark" \
+  --artifact /path/to/zabbix-template-update-manager-0.1.0-beta.59.tar.gz \
+  --expected-sha256 4eb075bc70d666ccb226f6c949ae96a732494566ea3b23a2396e3ae8ca7f6d6d \
+  > /tmp/ztum-beta59-field-evidence.md
+```
+
+Run it once per theme/browser pass when operator metadata changes. The helper performs no Zabbix configuration write and intentionally excludes IP addresses, database host/name/user/password, secrets, tokens, configuration contents and log contents. Review the generated Markdown before posting it publicly because filesystem paths and local runtime account names are still operational metadata.
+
+The helper may come from a later maintenance checkout; the **module under test must remain the immutable beta.59 release artifact**.
+
 ## 1. Confirm frontend module and backup directory
 
 Locate the actual modules directory:
