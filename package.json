@@ -1,0 +1,12 @@
+{
+  "name": "zabbix-template-update-manager-dev",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Development-only browser regression tooling for ZTUM.",
+  "scripts": {
+    "test:browser": "node tests/browser/batch-assets-smoke.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
