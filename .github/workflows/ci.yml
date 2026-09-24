@@ -79,12 +79,17 @@ jobs:
         run: |
           set -euo pipefail
           bash -n tools/ztum-runtime-setup.sh
+          bash -n tools/ztum-field-evidence.sh
           bash -n tools/quickinstall.sh
           bash -n tools/quickinstall-pt-br.sh
           bash -n tests/test_runtime_setup.sh
+          bash -n tests/test_field_evidence.sh
 
       - name: Validate runtime setup helper
         run: tests/test_runtime_setup.sh
+
+      - name: Validate field evidence helper
+        run: tests/test_field_evidence.sh
 
       - name: Set up Python
         uses: actions/setup-python@v7
