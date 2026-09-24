@@ -37,6 +37,8 @@ The module detects the frontend `ZABBIX_VERSION` at runtime and fails closed for
 
 The module keeps one codebase for both supported major generations and prefers native Zabbix abstractions so each frontend generation can apply its own internal UI implementation.
 
+The catalog and read-only review surfaces are available to Zabbix Administrators and Super Admins. Configuration-changing operations and update-policy changes remain Super-Admin-only.
+
 The catalog filter follows the native Zabbix list pattern with **Name** and **Status** fields, **Apply / Reset** actions and automatic return to page 1 whenever filtering changes.
 
 ## What the beta can do
@@ -160,6 +162,8 @@ After import, ZTUM resolves the new template by UUID and performs a fresh curren
 Request-bounded controlled batch installation does **not** recursively install missing dependencies. Install required dependencies first, then prepare dependent templates again.
 
 ## Persistent storage
+
+ZTUM persistent runtime state uses `/var/lib/zabbix-template-update-manager`. The controlled-operation lock defaults to the private `locks/` subdirectory, rollback artifacts use `backups/`, and the Never update policy uses `update-policy.json`.
 
 Rollback artifacts are stored by default under:
 
