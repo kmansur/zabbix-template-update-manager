@@ -21,7 +21,7 @@ The project tracks implementation, automated validation and real field validatio
 - BASE / LOCAL / UPSTREAM three-way analysis.
 - Conflict, unresolved and local-overwrite classification.
 - Technical-risk analysis.
-- Direct linked-host impact count.
+- Direct plus inherited/indirect unique host-impact analysis through the visible template inheritance graph.
 - Readiness gate.
 - Persistent rollback backup creation and verification.
 - Fresh preflight evidence bound to immutable upstream source identity/hashes.
@@ -76,6 +76,11 @@ The project tracks implementation, automated validation and real field validatio
 ### Production-readiness infrastructure
 
 - Private bounded operation-history/audit presentation for controlled/local write operations.
+- PHP 8.2/8.3/8.4 syntax and unit-test compatibility matrix.
+- Zabbix 7.0/current 8.0 native frontend symbol compatibility matrix.
+- Chromium smoke regression for extracted batch orchestration assets.
+- Native accessibility contract guard for navigation/filter/confirmation controls.
+- Dedicated registered JavaScript assets for update/install batch orchestration.
 
 - Verified air-gapped/offline upstream bundle mode.
 - Fail-closed offline-only policy.
@@ -104,7 +109,7 @@ The project tracks implementation, automated validation and real field validatio
 
 ### Maintainability
 
-- Add browser-level UI/accessibility regression tests.
+- Expand browser-level regression to disposable full-Zabbix page rendering when practical.
 - Add drill-down/filtering for very large three-way comparisons.
 
 ### Release engineering
