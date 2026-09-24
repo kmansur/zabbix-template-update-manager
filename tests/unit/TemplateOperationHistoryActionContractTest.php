@@ -29,7 +29,7 @@ assertOperationHistoryContract(
 assertOperationHistoryContract(
 	strpos($historyView, 'new CHtmlPage()') !== false
 		&& strpos($historyView, 'FrontendUi') !== false
-		&& strpos($historyView, "Supplemental local operator history") !== false,
+		&& stripos($historyView, 'supplemental local operator history') !== false,
 	'Operation-history view must remain native and clearly non-authoritative.'
 );
 
