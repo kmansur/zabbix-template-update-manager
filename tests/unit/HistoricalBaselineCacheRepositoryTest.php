@@ -1,7 +1,6 @@
 <?php
 
 use Modules\ZabbixTemplateUpdateManager\Repository\HistoricalBaselineCacheRepository;
-use RuntimeException;
 
 require_once dirname(__DIR__, 2).'/src/Repository/UpstreamIndexRepository.php';
 require_once dirname(__DIR__, 2).'/src/Repository/HistoricalBaselineCacheRepository.php';
