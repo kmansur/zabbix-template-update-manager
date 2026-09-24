@@ -1,6 +1,6 @@
 # Project status and engineering audit — 0.1.0-beta.59
 
-Date: 2026-09-23
+Date: 2026-09-24
 
 This document is an engineering snapshot, not a release certification. Percentages are planning estimates based on implemented scope, automated validation and remaining field/release work.
 
@@ -18,7 +18,7 @@ The estimate deliberately separates implementation from automation and field val
 | Native Zabbix UI/UX | 10% | 98% | Native presentation/copy pass, Never update controls, CPagerHelper-only pagination and Templates-page-style Name + Status filtering implemented; cross-version light/dark field validation remains |
 | Automated validation/CI | 10% | 99% | CI/UI/security/workflow/offline/runtime gates plus PHP 8.2/8.3/8.4, Zabbix 7/8 symbol checks, disposable full-Zabbix Chromium light/dark smoke, accessibility and enforced coverage floors implemented; independent external review remains |
 | Runtime resilience | 10% | 96% | Request-bounded flows, immutable history caching, rename-aware paths, initial-release BASE, offline mode, persistent private lock defaults and bounded operation history implemented |
-| Field validation | 10% | 70% | Zabbix 7.x has substantial write-path evidence and beta.57 catalog/filter dark-theme evidence; Zabbix 8.x catalog/pager loading is confirmed after the compatibility fix, while the complete beta.58 write-path and cross-theme matrix remains open |
+| Field validation | 10% | 70% | Zabbix 7.x has substantial write-path evidence and beta.57 catalog/filter dark-theme evidence; Zabbix 8.x catalog/pager loading is confirmed after the compatibility fix, while the complete beta.59 write-path and cross-theme matrix remains open |
 | Release engineering | 10% | 98% | Quick install, release workflow/assets/checksums/policy, AGPL-3.0-only license/notice, package/runtime-smoke gates and the first formal beta.59 prerelease are in place |
 
 Weighted result: **95%**.
