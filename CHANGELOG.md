@@ -4,6 +4,27 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.57] - 2026-09-23
+
+### Fixed
+
+- Fixed catalog Name search so partial matching checks the complete visible template name, including `technical_name` when it is displayed in parentheses.
+- Short queries such as `Adv` no longer require an exact template name match.
+
+### Changed
+
+- Rebuilt the catalog filter layout to follow the native Zabbix Templates page pattern with `CFormGrid`, `CLabel`, `CFormField` and `ZBX_TEXTAREA_MEDIUM_WIDTH`.
+- Name + Status filtering, profile persistence, page-1 reset and native `CPagerHelper` pagination remain unchanged.
+
+### Tests
+
+- Catalog contracts now require partial matching against the full visible name and the native Zabbix Templates filter-grid structure.
+- Laboratory validation now explicitly covers short substrings, technical-name-only matches and the native filter layout on Zabbix 7.x and 8.x.
+
+### Safety
+
+- Read-only catalog search/presentation change only. Template comparison, backup, preflight, update, installation, rollback, Never update policy and the controlled `configuration.import` boundary are unchanged.
+
 ## [0.1.0-beta.56] - 2026-09-23
 
 ### Added
