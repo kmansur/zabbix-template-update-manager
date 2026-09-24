@@ -48,9 +48,9 @@ The external review's principal technical/process findings were converted into i
 1. **Zabbix 8.x field-validation gap**
    - The code supports major versions 7 and 8, but the complete real workflow matrix still needs to be recorded on Zabbix 8.x.
 
-2. **Cross-version UI field validation**
-   - Beta.57 includes the native presentation/copy pass, **Never update / Allow updates** controls, native Templates-page-style Name + Status filtering and `CPagerHelper`-only pagination.
-   - Light/dark rendering and all operator flows still need field evidence on supported Zabbix 7.x and 8.x instances before community UI validation is considered complete.
+2. **Cross-version real-operator validation**
+   - Beta.59 now has disposable full-Zabbix 7.x/8.x Chromium evidence for module registration, native catalog rendering, Name filtering, operation history and both light/dark themes.
+   - The remaining gap is real operator evidence for the complete comparison/update/install/rollback/offline flows on supported Zabbix 7.x and 8.x instances; automated read-only rendering is not treated as controlled-write field evidence.
 
 ## Medium-priority work
 
