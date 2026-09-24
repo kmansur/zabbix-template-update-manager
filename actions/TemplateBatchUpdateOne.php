@@ -4,12 +4,15 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 
 use CController;
 use CControllerResponseData;
+use CWebUser;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
 
 /**
  * Executes exactly one previously prepared Ready template.
@@ -64,6 +67,8 @@ class TemplateBatchUpdateOne extends CController {
 		$evidence = strtolower(trim((string) $this->getInput('evidence_sha256')));
 		$output = ['ok' => false, 'result' => null, 'error' => null];
 
+		$operationException = null;
+
 		try {
 			$manualOverride = (string) $this->getInput('manual_override', '') === '1';
 			$localOverwriteConfirmed = (string) $this->getInput('confirm_local_overwrite', '') === '1';
@@ -81,6 +86,7 @@ class TemplateBatchUpdateOne extends CController {
 			$output['result'] = $result;
 		}
 		catch (Throwable $exception) {
+			$operationException = $exception;
 			error_log(sprintf(
 				'[Zabbix Template Update Manager] Request-bounded batch update failed for template %s: %s',
 				$templateId,
@@ -91,6 +97,14 @@ class TemplateBatchUpdateOne extends CController {
 				? $exception->getMessage()
 				: _('Unable to complete this controlled update request. Inspect the local template state before retrying.');
 		}
+
+		(new TemplateOperationHistoryService())->recordBestEffort(
+			'update',
+			'template-'.$templateId,
+			$output['result'],
+			$operationException,
+			(string) (CWebUser::$data['userid'] ?? '')
+		);
 
 		$this->setResponse(
 			(new CControllerResponseData([
