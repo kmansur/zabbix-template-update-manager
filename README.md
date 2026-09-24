@@ -22,11 +22,19 @@ This version is intended for **laboratory testing**.
 
 Beta.57 fixes catalog Name search to match the complete visible template name (`name` plus `technical_name` when displayed) using case-insensitive partial matching, and aligns the filter layout with the native Zabbix Templates page using `CFormGrid`, `CLabel`, `CFormField` and the medium native text-field width.
 
-Formal tag/GitHub Release automation exists, but a community prerelease remains gated by this cross-version UI field pass and the still-unselected project license.
+Formal tag/GitHub Release automation exists. The project license is now selected; a community prerelease remains gated by the cross-version runtime/field-validation pass and release-artifact validation.
 
 For a new laboratory installation, use the quick installer below. For validation work, always record the exact installed version and commit/source ref.
 
 See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before testing the beta.
+
+Compatibility and release posture are tracked in [`docs/compatibility.md`](docs/compatibility.md) and [`docs/production-readiness.md`](docs/production-readiness.md).
+
+## License
+
+ZTUM is licensed under the **GNU Affero General Public License v3.0 only (AGPL-3.0-only)**. See [LICENSE](LICENSE) and [NOTICE.md](NOTICE.md).
+
+The license choice deliberately aligns with the AGPLv3 licensing of Zabbix 7.0 and later and with Zabbix's published guidance for third-party modules/plugins using AGPLv3-compatible licenses.
 
 ## Supported Zabbix generations
 
