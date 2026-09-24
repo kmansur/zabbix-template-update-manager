@@ -89,7 +89,7 @@ jobs:
         run: tests/test_runtime_setup.sh
 
       - name: Validate field evidence helper
-        run: tests/test_field_evidence.sh
+        run: bash tests/test_field_evidence.sh
 
       - name: Set up Python
         uses: actions/setup-python@v7
