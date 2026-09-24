@@ -39,20 +39,31 @@ assertCatalogControllerContract(
 );
 
 assertCatalogControllerContract(
+	strpos($view, "new CLabel(_('Status'), 'filter_status')") !== false
+		&& substr_count($view, 'new CFormField(') >= 2,
+	'Catalog Name and Status controls must use the native Zabbix CFormGrid label/field layout.'
+);
+
+assertCatalogControllerContract(
 	strpos($controller, "'filter_name' => 'string'") !== false
 		&& strpos($controller, "'web.ztum.templates.filter.name'") !== false
 		&& strpos($controller, "CProfile::delete('web.ztum.templates.filter.name')") !== false
+		&& strpos($view, 'new CFormGrid()') !== false
+		&& strpos($view, 'CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE') !== false
+		&& strpos($view, "new CLabel(_('Name'), 'filter_name')") !== false
 		&& strpos($view, "new CTextBox('filter_name'") !== false
-		&& strpos($view, "->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)") !== false,
-	'Catalog name filtering must use the persisted native Zabbix filter textbox pattern.'
+		&& strpos($view, "->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)") !== false,
+	'Catalog name filtering must match the native Zabbix template-list filter layout.'
 );
 
 assertCatalogControllerContract(
 	strpos($controller, "if (\$filterName !== '')") !== false
-		&& strpos($controller, "mb_stripos(\$name, \$filterName)") !== false
-		&& strpos($controller, "stripos(\$name, \$filterName)") !== false
+		&& strpos($controller, "\$technicalName = trim((string) (\$template['technical_name'] ?? ''));") !== false
+		&& strpos($controller, "\$visibleName .= ' ('.\$technicalName.')';") !== false
+		&& strpos($controller, "mb_stripos(\$visibleName, \$filterName)") !== false
+		&& strpos($controller, "stripos(\$visibleName, \$filterName)") !== false
 		&& strpos($controller, "if (\$filterName !== '')") < strpos($controller, 'CPagerHelper::paginate'),
-	'Catalog name filtering must be case-insensitive and applied before native pagination.'
+	'Catalog name filtering must use case-insensitive partial matching against the complete visible template name before pagination.'
 );
 
 assertCatalogControllerContract(
