@@ -14,9 +14,7 @@ final class TemplateOperationLockService {
 		$configured = trim((string) getenv('ZTUM_LOCK_DIR'));
 		$this->lockDir = $lockDir ?? ($configured !== ''
 			? $configured
-			: rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
-				.DIRECTORY_SEPARATOR.'zabbix-template-update-manager'
-				.DIRECTORY_SEPARATOR.'locks');
+			: '/var/lib/zabbix-template-update-manager/locks');
 	}
 
 	/**
