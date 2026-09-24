@@ -4,7 +4,8 @@ $root = dirname(__DIR__, 2);
 $service = (string) file_get_contents($root.'/src/Service/TemplateConfigurationImportService.php');
 $executeOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchExecuteOne.php');
 $controlledInstall = (string) file_get_contents($root.'/src/Service/TemplateControlledInstallService.php');
-$batchView = (string) file_get_contents($root.'/views/ztum.template.install.batch.prepare.php');
+$batchView = (string) file_get_contents($root.'/views/ztum.template.install.batch.prepare.php')
+	.(string) file_get_contents($root.'/assets/js/ztum-install-batch.js');
 $preflight = (string) file_get_contents($root.'/src/Service/TemplateInstallPreflightService.php');
 
 function assertImportDiagnosticContract(bool $condition, string $message): void {
@@ -53,7 +54,7 @@ assertImportDiagnosticContract(
 assertImportDiagnosticContract(
 	strpos($preflight, 'catch (TemplateIsolationSafetyException $exception)') !== false
 		&& strpos($preflight, "'blocked_isolation'") !== false
-		&& strpos($preflight, "'candidate' => $candidate") !== false,
+		&& strpos($preflight, "'candidate' => \$candidate") !== false,
 	'Known isolation safety failures must remain named, explicit blocked preflight states.'
 );
 
