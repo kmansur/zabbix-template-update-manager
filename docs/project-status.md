@@ -1,4 +1,4 @@
-# Project status and engineering audit — 0.1.0-beta.57
+# Project status and engineering audit — 0.1.0-beta.58
 
 Date: 2026-09-23
 
@@ -6,24 +6,24 @@ This document is an engineering snapshot, not a release certification. Percentag
 
 ## Overall estimate toward stable 1.0 core scope
 
-**93% complete**
+**94% complete**
 
 The estimate deliberately separates implementation from automation and field validation. Provider expansion (GitHub/GitLab/community/private/custom repositories) remains post-1.0 scope.
 
 | Area | Weight | Estimated completion | Notes |
 |---|---:|---:|---|
 | Discovery/catalog/upstream identity | 10% | 97% | Official catalog/index identity, immutable initial-release baselines and verified offline source mode implemented |
-| Comparison/risk/readiness | 20% | 97% | Historical/initial-release BASE, three-way, risk, readiness, persistent Never update policy and dependency-aware comparison implemented |
-| Update/install/rollback write paths | 20% | 97% | Controlled writes, evidence, post-write validation, reviewed overrides and serialization implemented |
+| Comparison/risk/readiness | 20% | 98% | Historical/initial-release BASE, rename-aware history, three-way analysis, persistent Never update policy, dependency-aware comparison and inherited host-impact analysis implemented |
+| Update/install/rollback write paths | 20% | 98% | Controlled writes, evidence, post-write validation, reviewed overrides, persistent serialization and supplemental operation-history instrumentation implemented |
 | Native Zabbix UI/UX | 10% | 98% | Native presentation/copy pass, Never update controls, CPagerHelper-only pagination and Templates-page-style Name + Status filtering implemented; cross-version light/dark field validation remains |
-| Automated validation/CI | 10% | 98% | CI/UI/security/workflow/offline/runtime/coverage gates implemented; browser E2E and independent security review remain |
-| Runtime resilience | 10% | 94% | Request-bounded flows, immutable history caching, rename-aware paths, initial-release BASE, offline mode and operation lock implemented |
-| Field validation | 10% | 68% | End-to-end Zabbix 7.x evidence is strong; Zabbix 8.x catalog loading and native pager presentation have been field-checked, while the complete 8.x write-path and cross-theme matrix still needs validation |
-| Release engineering | 10% | 88% | Quick install, release workflow/assets/checksums/policy plus AGPL-3.0-only license/notice implemented; first validated community prerelease remains |
+| Automated validation/CI | 10% | 99% | CI/UI/security/workflow/offline/runtime/coverage gates plus PHP 8.2/8.3/8.4, Zabbix 7/8 frontend-symbol and Chromium/accessibility regressions implemented; independent external review remains |
+| Runtime resilience | 10% | 96% | Request-bounded flows, immutable history caching, rename-aware paths, initial-release BASE, offline mode, persistent private lock defaults and bounded operation history implemented |
+| Field validation | 10% | 70% | Zabbix 7.x has substantial write-path evidence and beta.57 catalog/filter dark-theme evidence; Zabbix 8.x catalog/pager loading is confirmed after the compatibility fix, while the complete beta.58 write-path and cross-theme matrix remains open |
+| Release engineering | 10% | 92% | Quick install, release workflow/assets/checksums/policy, AGPL-3.0-only license/notice and release-package smoke gates implemented; first validated public prerelease remains |
 
-Weighted result: **93%**.
+Weighted result: **94%**.
 
-## Major improvements through beta.57
+## Major improvements through beta.58
 
 The external review's principal technical/process findings were converted into implementation work:
 
@@ -54,25 +54,23 @@ The external review's principal technical/process findings were converted into i
 
 ## Medium-priority work
 
-- browser/E2E visual/accessibility regression suite;
-- dedicated operation-history/audit UI;
-- inherited/indirect host impact analysis;
-- move large batch JavaScript to dedicated assets without weakening server-authoritative controls;
+- expand browser regression from isolated batch assets to a full disposable Zabbix page/render smoke when a stable automated environment is available;
+- add drill-down/filtering for very large three-way comparisons;
 - independent security/code review before any production recommendation;
-- first community-test prerelease tag/GitHub Release after the license decision and final public-test documentation pass.
+- first validated public prerelease tag/GitHub Release after the beta.58 real field pass.
 
 ## Stable 1.0 blockers
 
 - complete/record Zabbix 7.x and 8.x field-validation matrix;
 - validate fresh install, standard update, reviewed update, local-overwrite acknowledgement, batch stop-on-failure, offline mode, concurrency and rollback on real supported instances;
-- complete the beta.57 cross-version native-UI field pass and record any remaining browser/runtime limitations;
+- complete the beta.58 cross-version native-UI field pass and record any remaining browser/runtime limitations;
 - complete compatibility/homologation notes;
 - confirm no unresolved high-severity safety/data-loss issue;
 - publish at least one validated formal prerelease using the new release pipeline.
 
 ## Completion interpretation
 
-A green CI/Security run means automation validation passed. It does not make beta.57 production-ready.
+A green CI/Security/browser compatibility run means automation validation passed. It does not make beta.58 production-ready.
 
 Track these states independently:
 
