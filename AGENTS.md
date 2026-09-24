@@ -9,7 +9,7 @@ Target Zabbix generations:
 - Zabbix 7.x
 - Zabbix 8.x
 
-Current test version: `0.1.0-beta.56`.
+Current test version: `0.1.0-beta.57`.
 
 ## Non-negotiable rules
 
