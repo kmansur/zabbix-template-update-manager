@@ -10,7 +10,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.55**
+Current version: **0.1.0-beta.56**
 
 This version is intended for **laboratory testing**.
 
@@ -20,7 +20,7 @@ This version is intended for **laboratory testing**.
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
 
-Beta.55 removes the custom **All / Pages** catalog mode and now uses only the native Zabbix pager produced by `CPagerHelper`. This restores the standard Zabbix 8 appearance while keeping the same single codebase for Zabbix 7.x and 8.x.
+Beta.56 adds a native **Name** field to the catalog filter. Name and Status can be combined, the filter is persisted through the standard Zabbix profile mechanism, matching is case-insensitive, and filtering happens before native `CPagerHelper` pagination.
 
 Formal tag/GitHub Release automation exists, but a community prerelease remains gated by this cross-version UI field pass and the still-unselected project license.
 
@@ -36,6 +36,8 @@ See [`docs/lab-test-plan.md`](docs/lab-test-plan.md) before testing the beta.
 The module detects the frontend `ZABBIX_VERSION` at runtime and fails closed for unsupported/unknown major versions.
 
 The module keeps one codebase for both supported major generations and prefers native Zabbix abstractions so each frontend generation can apply its own internal UI implementation.
+
+The catalog filter follows the native Zabbix list pattern with **Name** and **Status** fields, **Apply / Reset** actions and automatic return to page 1 whenever filtering changes.
 
 ## What the beta can do
 
@@ -230,7 +232,7 @@ git rev-parse HEAD
 Expected `VERSION` for the current laboratory build:
 
 ```text
-0.1.0-beta.55
+0.1.0-beta.56
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -246,7 +248,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.55**, enable the module and open:
+Confirm version **0.1.0-beta.56**, enable the module and open:
 
 ```text
 Data collection → Template updates
