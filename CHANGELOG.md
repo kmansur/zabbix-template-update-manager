@@ -4,6 +4,14 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Added a privacy-conscious read-only field-evidence collector for the remaining beta.59 Zabbix 7.x/8.x laboratory matrix, including module identity, release checksum verification, runtime-directory metadata and operator browser/theme metadata without collecting secrets or network/database identifiers.
+
+### Changed
+
+- Laboratory validation now pins the immutable `v0.1.0-beta.59` release artifact explicitly, and roadmap/audit links reflect the published prerelease state.
+
 ## [0.1.0-beta.59] - 2026-09-24
 
 ### Added
