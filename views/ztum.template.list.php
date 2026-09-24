@@ -54,23 +54,28 @@ $filter = (new CFilter())
 	->setProfile($data['filter_profile'])
 	->setActiveTab($data['filter_active_tab'])
 	->addFilterTab(_('Filter'), [
-		(new CFormList())
-			->addRow(
-				_('Name'),
-				(new CTextBox('filter_name', (string) $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-			)
-			->addRow(
-				_('Status'),
-				(new CRadioButtonList('filter_status', (string) $data['filter']['status']))
-					->addValue(_('All'), 'all')
-					->addValue(_('Current'), 'current')
-					->addValue(_('Not applicable'), 'not_applicable')
-					->addValue(_('Update available'), 'update_available')
-					->addValue(_('Not installed'), 'not_installed')
-					->addValue(_('Never update'), 'never_update')
-					->setModern(true)
-			)
+		(new CFormGrid())
+			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+			->addItem([
+				new CLabel(_('Name'), 'filter_name'),
+				new CFormField(
+					(new CTextBox('filter_name', (string) $data['filter']['name']))
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+			])
+			->addItem([
+				new CLabel(_('Status'), 'filter_status'),
+				new CFormField(
+					(new CRadioButtonList('filter_status', (string) $data['filter']['status']))
+						->addValue(_('All'), 'all')
+						->addValue(_('Current'), 'current')
+						->addValue(_('Not applicable'), 'not_applicable')
+						->addValue(_('Update available'), 'update_available')
+						->addValue(_('Not installed'), 'not_installed')
+						->addValue(_('Never update'), 'never_update')
+						->setModern(true)
+				)
+			])
 	]);
 
 $localSummary = (new CTableInfo())
