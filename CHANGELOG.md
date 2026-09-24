@@ -4,6 +4,28 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.59] - 2026-09-24
+
+### Added
+
+- Added disposable official Zabbix 7.x and 8.x full-stack browser smoke environments using PostgreSQL, Zabbix server and Zabbix web containers.
+- Added Chromium smoke coverage for real module registration, Super Admin login, catalog rendering, native Name filtering, operation-history rendering and both dark/light themes.
+- Added minimum automated coverage floors for runtime-file reachability and observed executable-line coverage.
+
+### Changed
+
+- Release/production-readiness/compatibility documentation now distinguishes full-stack read-only browser evidence from real controlled-write field validation.
+- The laboratory test plan is synchronized to beta.59.
+- Coverage metrics are now a regression gate instead of report-only telemetry.
+
+### Fixed
+
+- Removed ineffective global `RuntimeException` imports from standalone tests to keep PHP 8.2/8.3/8.4 output warning-free.
+
+### Safety
+
+- The disposable full-stack smoke remains read-only. It does not execute update/install/rollback configuration writes and therefore does not replace the real Zabbix 7.x/8.x controlled-write field matrix.
+
 ## [0.1.0-beta.58] - 2026-09-24
 
 ### Security / runtime hardening
