@@ -20,6 +20,7 @@ All notable changes to Template Update Manager will be documented in this file.
 - Added native frontend symbol compatibility checks against Zabbix 7.0 and current Zabbix 8.0 sources.
 - Added Chromium smoke tests for update/install batch orchestration assets.
 - Added native accessibility contracts for navigation, filter labels and confirmation controls.
+- Refreshed first-party GitHub Actions majors for checkout, Python setup and artifact upload workflows.
 
 ### Refactored
 
