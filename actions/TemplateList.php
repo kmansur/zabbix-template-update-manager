@@ -52,7 +52,7 @@ class TemplateList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return true;
+		return in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true);
 	}
 
 	protected function doAction(): void {
