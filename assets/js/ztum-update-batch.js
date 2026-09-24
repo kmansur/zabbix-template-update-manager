@@ -1,0 +1,654 @@
+'use strict';
+
+window.ZTUMUpdateBatchInit = (config, labels) => {
+	const counts = {ready: 0, review: 0, conflict: 0, blocked: 0};
+	const readyEvidence = new Map();
+	const reviewEvidence = new Map();
+	const requestFailures = new Set();
+	let completed = 0;
+	let stopRequested = false;
+	let fullyPrepared = false;
+	let executionStarted = false;
+	let retryInProgress = false;
+	let autoSelectReviewed = false;
+
+	const byId = (id) => document.getElementById(id);
+	const setText = (id, value) => {
+		const element = byId(id);
+		if (element !== null) {
+			element.textContent = value;
+		}
+	};
+
+	const setStateText = (id, value, tone = 'muted') => {
+		const element = byId(id);
+		if (element === null) {
+			return;
+		}
+
+		element.textContent = value;
+		for (const className of Object.values(config.statusClasses || {})) {
+			if (className) {
+				element.classList.remove(className);
+			}
+		}
+		const className = config.statusClasses?.[tone] || '';
+		if (className) {
+			element.classList.add(className);
+		}
+	};
+
+	const setReviewedSelection = (templateId, category, manual = null) => {
+		const checkbox = byId('ztum-review-select-' + templateId);
+		if (checkbox === null) {
+			return;
+		}
+
+		const eligible = category === 'review'
+			&& manual?.eligible === true
+			&& isValidEvidence(manual.evidence || '');
+
+		checkbox.disabled = !eligible || executionStarted || retryInProgress;
+		checkbox.title = eligible ? labels.select_reviewed : labels.review_individual_only;
+
+		if (eligible) {
+			checkbox.checked = autoSelectReviewed;
+		}
+		else {
+			checkbox.checked = false;
+		}
+	};
+
+	const setExecutionState = (templateId, category, text = null, manual = null) => {
+		const element = byId('ztum-execution-' + templateId);
+		if (element === null) {
+			return;
+		}
+
+		element.replaceChildren();
+		if (category === 'review') {
+			const note = document.createElement('span');
+			note.textContent = manual?.eligible === true
+				? ((manual?.requiresLocalOverwriteAck === true
+					? labels.review_overwrite_eligible
+					: labels.review_batch_eligible) + ' · ')
+				: labels.review_individual_only + ' · ';
+			element.appendChild(note);
+
+			const link = document.createElement('a');
+			link.href = config.compareUrl + '&templateid=' + encodeURIComponent(templateId);
+			link.textContent = labels.review_details;
+			element.appendChild(link);
+			return;
+		}
+
+		element.textContent = text ?? (labels[category] || labels.blocked);
+	};
+
+	const updateSummary = () => {
+		setText('ztum-summary-completed', String(completed));
+		for (const category of ['ready', 'review', 'conflict', 'blocked']) {
+			setText('ztum-summary-' + category, String(counts[category]));
+		}
+	};
+
+	const progress = (current, text = null) => {
+		const message = text ?? labels.progress
+			.replace('{current}', String(current))
+			.replace('{total}', String(config.templateIds.length));
+		setText('ztum-batch-progress-text', message);
+	};
+
+	const normalizeEvidence = (value) => typeof value === 'string'
+		? value.trim().toLowerCase()
+		: '';
+
+	const formatCode = (value) => {
+		if (typeof value !== 'string' || value.trim() === '') {
+			return '—';
+		}
+		const key = value.trim();
+		const translated = labels['reason_' + key];
+		if (translated) {
+			return translated;
+		}
+		return key.replaceAll('_', ' ').replaceAll('-', ' ')
+			.replace(/^./, (first) => first.toUpperCase());
+	};
+
+	const isValidEvidence = (value) => /^[a-f0-9]{64}$/.test(value);
+
+	const applyItem = (templateId, item) => {
+		let category = ['ready', 'review', 'conflict', 'blocked'].includes(item.category)
+			? item.category
+			: 'blocked';
+		let readinessStatus = item.readiness_status || '—';
+		let reason = item.reason || '—';
+		const evidence = normalizeEvidence(item.evidence_sha256 || '');
+		const manualEvidence = normalizeEvidence(item.manual_evidence_sha256 || '');
+		const manualEligible = item.batch_manual_eligible === true && isValidEvidence(manualEvidence);
+		const requiresLocalOverwriteAck = item.batch_manual_requires_local_overwrite_ack === true;
+
+		if (category === 'ready' && !isValidEvidence(evidence)) {
+			category = 'blocked';
+			readinessStatus = 'blocked_invalid_evidence';
+			reason = 'invalid_preflight_evidence';
+		}
+
+		counts[category]++;
+		setText('ztum-available-' + templateId, item.available_version || '—');
+		const categoryTone = category === 'ready'
+			? 'success'
+			: (category === 'review' ? 'warning' : 'danger');
+		const readinessTone = readinessStatus.includes('blocked') || readinessStatus === 'request_failed'
+			? 'danger'
+			: (readinessStatus.includes('review') ? 'warning'
+				: (readinessStatus.includes('verified') || readinessStatus.includes('passed') ? 'success' : 'muted'));
+		setStateText('ztum-readiness-' + templateId, formatCode(readinessStatus), readinessTone);
+		setStateText('ztum-category-' + templateId, labels[category] || labels.blocked, categoryTone);
+		setText('ztum-reason-' + templateId, formatCode(reason));
+		const manualState = {
+			eligible: manualEligible,
+			evidence: manualEvidence,
+			requiresLocalOverwriteAck
+		};
+		setReviewedSelection(templateId, category, manualState);
+		setExecutionState(
+			templateId,
+			category,
+			category === 'ready' ? labels.execution_ready : (labels[category] || labels.blocked),
+			manualState
+		);
+
+		requestFailures.delete(templateId);
+		reviewEvidence.delete(templateId);
+		if (category === 'ready') {
+			readyEvidence.set(templateId, evidence);
+		}
+		else {
+			readyEvidence.delete(templateId);
+		}
+		if (category === 'review' && manualEligible) {
+			reviewEvidence.set(templateId, {
+				evidence: manualEvidence,
+				reasons: Array.isArray(item.manual_reasons) ? item.manual_reasons : [],
+				requiresLocalOverwriteAck
+			});
+		}
+		updateReviewedSelectAll();
+	};
+
+	const applyRequestFailure = (templateId, error) => {
+		counts.blocked++;
+		requestFailures.add(templateId);
+		readyEvidence.delete(templateId);
+		reviewEvidence.delete(templateId);
+		setStateText('ztum-readiness-' + templateId, labels.request_failed, 'danger');
+		setStateText('ztum-category-' + templateId, labels.blocked, 'danger');
+		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
+		setReviewedSelection(templateId, 'blocked');
+		setExecutionState(templateId, 'blocked', labels.blocked);
+		updateReviewedSelectAll();
+	};
+
+	const prepareOne = async (templateId) => {
+		const body = new FormData();
+		body.append(config.csrfName, config.prepareCsrfToken);
+		body.append('templateid', templateId);
+		const startedAt = performance.now();
+
+		const response = await fetch(config.prepareOneUrl, {
+			method: 'POST',
+			body,
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'}
+		});
+
+		if (!response.ok) {
+			const elapsedSeconds = ((performance.now() - startedAt) / 1000).toFixed(1);
+			const server = (response.headers.get('server') || '').trim();
+			const cfRay = (response.headers.get('cf-ray') || '').trim();
+			const transport = [
+				server !== '' ? 'server=' + server.slice(0, 80) : '',
+				cfRay !== '' ? 'cf-ray=' + cfRay.slice(0, 80) : ''
+			].filter((value) => value !== '').join(', ');
+			throw new Error(
+				'HTTP ' + response.status + ' after ' + elapsedSeconds + 's'
+				+ (transport !== '' ? ' (' + transport + ')' : '')
+			);
+		}
+
+		const payload = await response.json();
+		if (!payload || payload.ok !== true || !payload.item) {
+			throw new Error(payload?.error || labels.request_failed);
+		}
+
+		return payload.item;
+	};
+
+	const isHistoricalContinuation = (item) =>
+		item?.reason === 'historical_baseline_time_budget_reached';
+
+	const prepareUntilSettled = async (templateId) => {
+		const maxAttempts = Math.max(1, Number(config.maxHistoricalContinuationRequests || 1));
+
+		for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+			const item = await prepareOne(templateId);
+			if (!isHistoricalContinuation(item)) {
+				return item;
+			}
+
+			setStateText('ztum-readiness-' + templateId, 'history_scan_pending', 'warning');
+			setStateText('ztum-category-' + templateId, labels.processing, 'warning');
+			setText(
+				'ztum-reason-' + templateId,
+				labels.history_continuing
+					.replace('{attempt}', String(attempt))
+					.replace('{max}', String(maxAttempts))
+			);
+
+			if (stopRequested || attempt === maxAttempts) {
+				return {
+					...item,
+					readiness_status: 'blocked_history_continuation_limit',
+					reason: attempt === maxAttempts
+						? 'historical_baseline_continuation_limit_reached'
+						: item.reason
+				};
+			}
+		}
+
+		throw new Error(labels.request_failed);
+	};
+
+	const executeOne = async (templateId, evidence, manualOverride = false, confirmLocalOverwrite = false) => {
+		const body = new FormData();
+		body.append(config.csrfName, config.executeCsrfToken);
+		body.append('templateid', templateId);
+		body.append('evidence_sha256', evidence);
+		body.append('confirm', '1');
+		if (manualOverride) {
+			body.append('manual_override', '1');
+			body.append('confirm_manual_override', '1');
+			if (confirmLocalOverwrite) {
+				body.append('confirm_local_overwrite', '1');
+			}
+		}
+
+		const response = await fetch(config.executeOneUrl, {
+			method: 'POST',
+			body,
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'}
+		});
+
+		if (!response.ok) {
+			throw new Error('HTTP ' + response.status);
+		}
+
+		const payload = await response.json();
+		if (!payload || payload.ok !== true || !payload.result) {
+			throw new Error(payload?.error || labels.request_failed);
+		}
+
+		return payload.result;
+	};
+
+	const updateReviewedSelectAll = () => {
+		const selectAll = byId('ztum-reviewed-select-all');
+		const clearAll = byId('ztum-reviewed-clear-all');
+		if (selectAll === null || clearAll === null) {
+			return;
+		}
+
+		const eligible = Array.from(reviewEvidence.keys())
+			.map((templateId) => byId('ztum-review-select-' + templateId))
+			.filter((checkbox) => checkbox !== null && !checkbox.disabled);
+		const selected = eligible.filter((checkbox) => checkbox.checked).length;
+
+		selectAll.disabled = executionStarted || retryInProgress || (fullyPrepared && eligible.length === 0);
+		clearAll.disabled = executionStarted || retryInProgress || (selected === 0 && !autoSelectReviewed);
+		selectAll.textContent = labels.select_all_reviewed + ' (' + eligible.length + ')';
+		clearAll.textContent = labels.clear_all_reviewed + ' (' + selected + ')';
+	};
+
+	const selectedReviewedEntries = () => {
+		const entries = [];
+		for (const [templateId, review] of reviewEvidence.entries()) {
+			const checkbox = byId('ztum-review-select-' + templateId);
+			if (checkbox !== null && checkbox.checked) {
+				entries.push({
+					templateId,
+					evidence: review.evidence,
+					manualOverride: true,
+					requiresLocalOverwriteAck: review.requiresLocalOverwriteAck === true
+				});
+			}
+		}
+		return entries;
+	};
+
+	const executionEntries = () => {
+		const reviewed = new Map(selectedReviewedEntries().map((entry) => [entry.templateId, entry]));
+		const entries = [];
+		for (const templateId of config.templateIds) {
+			if (readyEvidence.has(templateId)) {
+				entries.push({
+					templateId,
+					evidence: readyEvidence.get(templateId),
+					manualOverride: false
+				});
+			}
+			else if (reviewed.has(templateId)) {
+				entries.push(reviewed.get(templateId));
+			}
+		}
+		return entries;
+	};
+
+	const updateExecutionState = () => {
+		const confirm = byId('ztum-batch-confirm');
+		const confirmLocalOverwrite = byId('ztum-batch-confirm-local-overwrite');
+		const submit = byId('ztum-batch-update-submit');
+		const retry = byId('ztum-batch-retry-failed');
+		const reviewedEntries = selectedReviewedEntries();
+		const selectedReviewed = reviewedEntries.length;
+		const selectedLocalOverwrite = reviewedEntries.filter((entry) => entry.requiresLocalOverwriteAck).length;
+		const executionCount = readyEvidence.size + selectedReviewed;
+		const canExecute = fullyPrepared && executionCount > 0 && !executionStarted && !retryInProgress;
+		const canRetry = fullyPrepared && requestFailures.size > 0 && !executionStarted && !retryInProgress;
+
+		if (!executionStarted) {
+			if (retryInProgress) {
+				setStateText('ztum-batch-execution-state', labels.retrying_failed, 'info');
+				setStateText('ztum-batch-exec-status', labels.retrying_failed, 'info');
+			}
+			else if (!fullyPrepared) {
+				const state = stopRequested
+					? labels.execution_stopped
+					: labels.execution_waiting_progress
+						.replace('{completed}', String(completed))
+						.replace('{total}', String(config.templateIds.length));
+				setStateText(
+					'ztum-batch-execution-state',
+					state,
+					stopRequested ? 'danger' : 'muted'
+				);
+				setStateText(
+					'ztum-batch-exec-status',
+					state,
+					stopRequested ? 'danger' : 'muted'
+				);
+			}
+			else if (executionCount > 0) {
+				const state = labels.execution_available
+					.replace('{ready}', String(readyEvidence.size))
+					.replace('{review}', String(selectedReviewed));
+				setStateText('ztum-batch-execution-state', state, 'success');
+				setStateText('ztum-batch-exec-status', labels.execution_ready, 'success');
+				setText('ztum-batch-exec-not-attempted', String(executionCount));
+			}
+			else if (counts.review > 0) {
+				setStateText('ztum-batch-execution-state', labels.execution_review_only, 'warning');
+				setStateText('ztum-batch-exec-status', labels.execution_review_only, 'warning');
+				setText('ztum-batch-exec-not-attempted', '0');
+			}
+			else {
+				setStateText('ztum-batch-execution-state', labels.execution_none, 'muted');
+				setStateText('ztum-batch-exec-status', labels.execution_none, 'muted');
+				setText('ztum-batch-exec-not-attempted', '0');
+			}
+		}
+
+		confirm.disabled = !canExecute;
+		if (!canExecute && !executionStarted) {
+			confirm.checked = false;
+		}
+		confirmLocalOverwrite.disabled = !canExecute || selectedLocalOverwrite === 0;
+		if (selectedLocalOverwrite === 0 || !canExecute) {
+			confirmLocalOverwrite.checked = false;
+		}
+		const overwriteAccepted = selectedLocalOverwrite === 0 || confirmLocalOverwrite.checked;
+		submit.disabled = !(canExecute && confirm.checked && overwriteAccepted);
+		retry.disabled = !canRetry;
+		updateReviewedSelectAll();
+	};
+
+	const runExecution = async () => {
+		const entries = executionEntries();
+		const selectedLocalOverwrite = entries.filter((entry) => entry.requiresLocalOverwriteAck).length;
+		if (executionStarted || !fullyPrepared || entries.length === 0
+				|| !byId('ztum-batch-confirm').checked
+				|| (selectedLocalOverwrite > 0 && !byId('ztum-batch-confirm-local-overwrite').checked)) {
+			return;
+		}
+
+		executionStarted = true;
+		byId('ztum-batch-confirm').disabled = true;
+		byId('ztum-batch-confirm-local-overwrite').disabled = true;
+		byId('ztum-batch-update-submit').disabled = true;
+		for (const templateId of reviewEvidence.keys()) {
+			const checkbox = byId('ztum-review-select-' + templateId);
+			if (checkbox !== null) {
+				checkbox.disabled = true;
+			}
+		}
+		updateReviewedSelectAll();
+		let updated = 0;
+		let failed = 0;
+		let notAttempted = entries.length;
+		let anyWrite = false;
+		let stopped = false;
+
+		setStateText('ztum-batch-execution-state', labels.execution_running, 'info');
+		setStateText('ztum-batch-exec-status', labels.execution_running, 'info');
+		setText('ztum-batch-exec-updated', '0');
+		setText('ztum-batch-exec-failed', '0');
+		setText('ztum-batch-exec-not-attempted', String(notAttempted));
+		setText('ztum-batch-exec-write', labels.no);
+
+		for (let index = 0; index < entries.length; index++) {
+			const {templateId, evidence, manualOverride, requiresLocalOverwriteAck = false} = entries[index];
+			setText('ztum-execution-' + templateId, labels.executing);
+
+			try {
+				const result = await executeOne(
+					templateId,
+					evidence,
+					manualOverride,
+					requiresLocalOverwriteAck
+				);
+
+				if (result.write_performed) {
+					anyWrite = true;
+					setText('ztum-batch-exec-write', labels.yes);
+				}
+
+				if (result.status !== 'updated') {
+					failed++;
+					notAttempted = entries.length - index - 1;
+					const detail = result.reason ? ': ' + result.reason : '';
+					setText('ztum-execution-' + templateId,
+						labels.failed + (result.status ? ' (' + result.status + ')' : '') + detail);
+
+					for (let pending = index + 1; pending < entries.length; pending++) {
+						setText('ztum-execution-' + entries[pending].templateId, labels.not_attempted);
+					}
+
+					stopped = true;
+					break;
+				}
+
+				updated++;
+				notAttempted = entries.length - index - 1;
+				const version = result.candidate?.vendor_version || '';
+				const validation = result.validation?.status || 'validated';
+				setText('ztum-execution-' + templateId,
+					labels.updated
+						+ (version !== '' ? ' (' + version + ')' : '')
+						+ (validation !== '' ? ' [' + validation + ']' : ''));
+			}
+			catch (error) {
+				failed++;
+				notAttempted = entries.length - index - 1;
+				setText('ztum-execution-' + templateId,
+					labels.request_failed + (error?.message ? ': ' + error.message : ''));
+
+				for (let pending = index + 1; pending < entries.length; pending++) {
+					setText('ztum-execution-' + entries[pending].templateId, labels.not_attempted);
+				}
+
+				stopped = true;
+				break;
+			}
+
+			setText('ztum-batch-exec-updated', String(updated));
+			setText('ztum-batch-exec-failed', String(failed));
+			setText('ztum-batch-exec-not-attempted', String(notAttempted));
+		}
+
+		setText('ztum-batch-exec-updated', String(updated));
+		setText('ztum-batch-exec-failed', String(failed));
+		setText('ztum-batch-exec-not-attempted', String(notAttempted));
+		setText('ztum-batch-exec-write', anyWrite ? labels.yes : labels.no);
+		setStateText(
+			'ztum-batch-exec-status',
+			stopped ? labels.execution_failed : labels.execution_completed,
+			stopped ? 'danger' : 'success'
+		);
+		setStateText(
+			'ztum-batch-execution-state',
+			stopped ? labels.execution_failed : labels.execution_completed,
+			stopped ? 'danger' : 'success'
+		);
+	};
+
+	const retryFailedPreparation = async () => {
+		if (retryInProgress || executionStarted || !fullyPrepared || requestFailures.size === 0) {
+			return;
+		}
+
+		retryInProgress = true;
+		updateExecutionState();
+
+		const failedIds = Array.from(requestFailures);
+		for (const templateId of failedIds) {
+			if (!requestFailures.has(templateId)) {
+				continue;
+			}
+
+			requestFailures.delete(templateId);
+			counts.blocked = Math.max(0, counts.blocked - 1);
+			setText('ztum-readiness-' + templateId, labels.processing);
+			setText('ztum-category-' + templateId, labels.processing);
+			setText('ztum-reason-' + templateId, '—');
+			setText('ztum-execution-' + templateId, labels.pending);
+			updateSummary();
+
+			try {
+				applyItem(templateId, await prepareUntilSettled(templateId));
+			}
+			catch (error) {
+				applyRequestFailure(templateId, error);
+			}
+
+			updateSummary();
+		}
+
+		retryInProgress = false;
+		progress(completed, labels.retry_complete);
+		updateExecutionState();
+	};
+
+	byId('ztum-reviewed-select-all').addEventListener('click', (event) => {
+		event.preventDefault();
+		autoSelectReviewed = true;
+		for (const templateId of reviewEvidence.keys()) {
+			const checkbox = byId('ztum-review-select-' + templateId);
+			if (checkbox !== null && !checkbox.disabled) {
+				checkbox.checked = true;
+			}
+		}
+		updateReviewedSelectAll();
+		updateExecutionState();
+	});
+
+	byId('ztum-reviewed-clear-all').addEventListener('click', (event) => {
+		event.preventDefault();
+		autoSelectReviewed = false;
+		for (const templateId of reviewEvidence.keys()) {
+			const checkbox = byId('ztum-review-select-' + templateId);
+			if (checkbox !== null && !checkbox.disabled) {
+				checkbox.checked = false;
+			}
+		}
+		updateReviewedSelectAll();
+		updateExecutionState();
+	});
+
+	byId('ztum-batch-confirm').addEventListener('change', updateExecutionState);
+	byId('ztum-batch-confirm-local-overwrite').addEventListener('change', updateExecutionState);
+	byId('ztum-batch-update-submit').addEventListener('click', (event) => {
+		event.preventDefault();
+		runExecution();
+	});
+	byId('ztum-batch-retry-failed').addEventListener('click', (event) => {
+		event.preventDefault();
+		retryFailedPreparation();
+	});
+
+	const stopButton = byId('ztum-batch-stop');
+	stopButton.addEventListener('click', () => {
+		stopRequested = true;
+		stopButton.disabled = true;
+		progress(completed, labels.stopping);
+	});
+
+	for (const templateId of config.templateIds) {
+		const checkbox = byId('ztum-review-select-' + templateId);
+		if (checkbox !== null) {
+			checkbox.addEventListener('change', () => {
+				if (!checkbox.checked) {
+					autoSelectReviewed = false;
+				}
+				updateReviewedSelectAll();
+				updateExecutionState();
+			});
+		}
+	}
+
+	const run = async () => {
+		updateSummary();
+		updateReviewedSelectAll();
+
+		for (let index = 0; index < config.templateIds.length; index++) {
+			if (stopRequested) {
+				break;
+			}
+
+			const templateId = config.templateIds[index];
+			progress(index + 1);
+			setText('ztum-readiness-' + templateId, labels.processing);
+			setText('ztum-category-' + templateId, labels.processing);
+			setText('ztum-reason-' + templateId, '—');
+			setText('ztum-execution-' + templateId, labels.pending);
+
+			try {
+				applyItem(templateId, await prepareUntilSettled(templateId));
+			}
+			catch (error) {
+				applyRequestFailure(templateId, error);
+			}
+
+			completed++;
+			updateSummary();
+		}
+
+		stopButton.disabled = true;
+		fullyPrepared = !stopRequested && completed === config.templateIds.length;
+		progress(completed, fullyPrepared ? labels.complete : labels.stopped);
+		updateExecutionState();
+	};
+
+	run();
+};
