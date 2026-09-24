@@ -4,6 +4,7 @@ const baseUrl = process.env.ZTUM_SMOKE_BASE_URL || 'http://127.0.0.1:18080';
 const apiUrl = baseUrl + '/api_jsonrpc.php';
 const adminUser = process.env.ZTUM_SMOKE_USER || 'Admin';
 const adminPassword = process.env.ZTUM_SMOKE_PASSWORD || 'zabbix';
+const expectedMajor = String(process.env.ZTUM_SMOKE_EXPECT_MAJOR || '').trim();
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -184,6 +185,13 @@ async function assertCatalog(page, label) {
 await waitForFrontend();
 
 const auth = await loginApiWithRetry();
+const runtimeVersion = String(await api('apiinfo.version', []));
+if (expectedMajor !== '' && runtimeVersion.split('.')[0] !== expectedMajor) {
+	throw new Error(
+		`Expected Zabbix major ${expectedMajor}, but disposable runtime reports ${runtimeVersion}.`
+	);
+}
+console.log(`Disposable runtime reports Zabbix ${runtimeVersion}.`);
 await ensureModule(auth);
 
 const browser = await chromium.launch({headless: true});

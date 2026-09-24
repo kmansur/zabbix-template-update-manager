@@ -212,15 +212,18 @@ jobs:
       ZABBIX_SERVER_IMAGE: ${{ matrix.server_image }}
       ZABBIX_WEB_IMAGE: ${{ matrix.web_image }}
       ZTUM_SMOKE_PORT: '18080'
+      ZTUM_SMOKE_EXPECT_MAJOR: ${{ matrix.expected_major }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - label: '7.0'
+            expected_major: '7'
             server_image: 'zabbix/zabbix-server-pgsql:alpine-7.0-latest'
             web_image: 'zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest'
             postgres_image: 'postgres:16-alpine'
           - label: '8.0'
+            expected_major: '8'
             server_image: 'zabbix/zabbix-server-pgsql:alpine-trunk'
             web_image: 'zabbix/zabbix-web-nginx-pgsql:alpine-trunk'
             postgres_image: 'postgres:18-alpine'

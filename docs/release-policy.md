@@ -8,7 +8,9 @@ Template Update Manager separates development commits, field-test betas and stab
 
 ## Field-test beta
 
-A new `0.x.y-beta.N` snapshot should group a meaningful set of changes and is published only after automated safety/quality/runtime gates are green, documentation is synchronized and the relevant laboratory regression has been exercised. Publicly distributed snapshots use a formal Git tag/GitHub prerelease; permanent per-beta `release/<version>` branches are intentionally not kept.
+A new `0.x.y-beta.N` snapshot should group a meaningful set of changes and is published only after automated safety/quality/runtime gates are green, documentation is synchronized and the relevant non-destructive laboratory regression has been exercised. Publicly distributed snapshots use a formal Git tag/GitHub prerelease; permanent per-beta `release/<version>` branches are intentionally not kept.
+
+A beta prerelease is allowed to be the immutable artifact used to complete the remaining real controlled-write field matrix. Publishing a beta **does not** assert production readiness or satisfy the RC/stable field-validation gates.
 
 The project should avoid using beta numbers as per-commit build identifiers.
 

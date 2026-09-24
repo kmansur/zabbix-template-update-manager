@@ -9,7 +9,7 @@ All notable changes to Template Update Manager will be documented in this file.
 ### Added
 
 - Added disposable official Zabbix 7.x and 8.x full-stack browser smoke environments using PostgreSQL, Zabbix server and Zabbix web containers.
-- Added Chromium smoke coverage for real module registration, Super Admin login, catalog rendering, native Name filtering, operation-history rendering and both dark/light themes.
+- Added Chromium smoke coverage for real module registration, Super Admin login, catalog rendering, native Name filtering, operation-history rendering and both dark/light themes, with an explicit runtime-major assertion so the rolling Zabbix 8 image cannot silently drift to an unsupported future major.
 - Added minimum automated coverage floors for runtime-file reachability and observed executable-line coverage.
 
 ### Changed

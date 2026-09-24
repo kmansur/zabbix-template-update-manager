@@ -22,7 +22,7 @@ This version is intended for **laboratory testing**.
 
 Beta.59 extends the pre-RC hardening work with disposable full-Zabbix 7.x/8.x frontend smoke tests in Chromium, light/dark catalog rendering checks, operation-history rendering, and enforced minimum coverage/reachability floors. It retains the beta.58 runtime-lock, permissions, inherited-impact, operation-history, licensing, JavaScript extraction and compatibility hardening.
 
-Formal tag/GitHub Release automation and release-package smoke validation exist. The project license is selected; a public prerelease remains gated by completing the relevant real Zabbix 7.x/8.x beta.59 controlled-write field pass and installing a generated release artifact.
+Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.59 is the first formal laboratory prerelease** and is intended to provide one immutable artifact for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
 
 For a new laboratory installation, use the quick installer below. For validation work, always record the exact installed version and commit/source ref.
 

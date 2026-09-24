@@ -3,6 +3,12 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing immutable tag to validate/release (for example v0.1.0-beta.59)
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -16,21 +22,26 @@ jobs:
       ZABBIX_SERVER_IMAGE: ${{ matrix.server_image }}
       ZABBIX_WEB_IMAGE: ${{ matrix.web_image }}
       ZTUM_SMOKE_PORT: '18080'
+      ZTUM_SMOKE_EXPECT_MAJOR: ${{ matrix.expected_major }}
     strategy:
       fail-fast: false
       matrix:
         include:
           - label: '7.0'
+            expected_major: '7'
             server_image: 'zabbix/zabbix-server-pgsql:alpine-7.0-latest'
             web_image: 'zabbix/zabbix-web-nginx-pgsql:alpine-7.0-latest'
             postgres_image: 'postgres:16-alpine'
           - label: '8.0'
+            expected_major: '8'
             server_image: 'zabbix/zabbix-server-pgsql:alpine-trunk'
             web_image: 'zabbix/zabbix-web-nginx-pgsql:alpine-trunk'
             postgres_image: 'postgres:18-alpine'
 
     steps:
       - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -58,13 +69,16 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
       - name: Validate tag and project
         shell: bash
         run: |
           set -euo pipefail
           version="$(tr -d '\r\n' < VERSION)"
-          tag="${GITHUB_REF_NAME#v}"
+          release_tag="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
+          tag="${release_tag#v}"
           test "$version" = "$tag"
+          git rev-parse --verify "$release_tag^{commit}" >/dev/null
           php tests/validate_manifest.php
           php tests/module_view_namespace_guard.php
           php tests/validate_version.php
@@ -103,6 +117,19 @@ jobs:
         run: |
           set -euo pipefail
           version="$(tr -d '\r\n' < VERSION)"
+          release_tag="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
           prerelease=()
           [[ "$version" == *-* ]] && prerelease=(--prerelease)
-          gh release create "$GITHUB_REF_NAME"             "dist/zabbix-template-update-manager-$version.tar.gz"             "dist/zabbix-template-update-manager-$version.zip"             "dist/SHA256SUMS"             --title "Template Update Manager $version"             --generate-notes             "${prerelease[@]}"
+
+          if gh release view "$release_tag" >/dev/null 2>&1; then
+            echo "Release $release_tag already exists; nothing to publish."
+            exit 0
+          fi
+
+          gh release create "$release_tag" \
+            "dist/zabbix-template-update-manager-$version.tar.gz" \
+            "dist/zabbix-template-update-manager-$version.zip" \
+            "dist/SHA256SUMS" \
+            --title "Template Update Manager $version" \
+            --generate-notes \
+            "${prerelease[@]}"
