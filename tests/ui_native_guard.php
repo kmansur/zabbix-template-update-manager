@@ -56,13 +56,42 @@ foreach ($views as $file) {
 	}
 }
 
-foreach ([
-	$root.'/views/ztum.template.batch.prepare.php',
-	$root.'/views/ztum.template.install.batch.prepare.php'
-] as $batchView) {
+$batchAssets = [
+	$root.'/views/ztum.template.batch.prepare.php' => [
+		'asset' => $root.'/assets/js/ztum-update-batch.js',
+		'initializer' => 'ZTUMUpdateBatchInit'
+	],
+	$root.'/views/ztum.template.install.batch.prepare.php' => [
+		'asset' => $root.'/assets/js/ztum-install-batch.js',
+		'initializer' => 'ZTUMInstallBatchInit'
+	]
+];
+
+foreach ($batchAssets as $batchView => $assetContract) {
 	$content = (string) file_get_contents($batchView);
 	if (strpos($content, 'setOnDocumentReady()') === false) {
 		$fail('Batch JavaScript must use CScriptTag::setOnDocumentReady(): '.basename($batchView));
+	}
+	if (strpos($content, "<<<'JS'") !== false) {
+		$fail('Behavior-heavy batch JavaScript must live in registered module assets: '.basename($batchView));
+	}
+	if (strpos($content, $assetContract['initializer']) === false) {
+		$fail('Batch view must initialize its registered JavaScript asset: '.basename($batchView));
+	}
+
+	$asset = is_file($assetContract['asset'])
+		? (string) file_get_contents($assetContract['asset'])
+		: '';
+	if ($asset === '' || strpos($asset, 'window.'.$assetContract['initializer']) === false) {
+		$fail('Batch JavaScript asset is missing or does not expose its initializer: '.$assetContract['asset']);
+	}
+	foreach ($forbiddenFragments as $fragment => $message) {
+		if (stripos($asset, $fragment) !== false) {
+			$fail($message.' Asset: '.basename($assetContract['asset']));
+		}
+	}
+	if (preg_match('/#[0-9a-fA-F]{6}\b/', $asset)) {
+		$fail('Hard-coded theme color found in '.basename($assetContract['asset']).'. Use native ZBX_STYLE_* classes from server config.');
 	}
 }
 
