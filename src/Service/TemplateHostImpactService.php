@@ -82,7 +82,7 @@ final class TemplateHostImpactService {
 		$queue = array_keys($children[$templateId] ?? []);
 
 		while ($queue !== []) {
-			$current = array_shift($queue);
+			$current = (string) array_shift($queue);
 			if ($current === $templateId || isset($descendants[$current])) {
 				continue;
 			}
