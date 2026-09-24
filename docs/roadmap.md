@@ -79,6 +79,8 @@ The project tracks implementation, automated validation and real field validatio
 - PHP 8.2/8.3/8.4 syntax and unit-test compatibility matrix.
 - Zabbix 7.0/current 8.0 native frontend symbol compatibility matrix.
 - Chromium smoke regression for extracted batch orchestration assets.
+- Disposable official Zabbix 7.x/8.x full-frontend smoke with module registration, light/dark catalog render, native filtering and operation-history render.
+- Minimum automated coverage/reachability regression floors.
 - Native accessibility contract guard for navigation/filter/confirmation controls.
 - Dedicated registered JavaScript assets for update/install batch orchestration.
 
@@ -109,7 +111,7 @@ The project tracks implementation, automated validation and real field validatio
 
 ### Maintainability
 
-- Expand browser-level regression to disposable full-Zabbix page rendering when practical.
+- Deepen disposable full-Zabbix browser regression with deterministic safe write fixtures when practical.
 - Add drill-down/filtering for very large three-way comparisons.
 
 ### Release engineering
