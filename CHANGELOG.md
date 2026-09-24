@@ -20,6 +20,7 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ### Fixed
 
+- Fixed module JavaScript asset registration to use filenames relative to Zabbix's native `assets/js` module directory; the previous prefixed paths produced duplicated `assets/js/assets/js/...` URLs and real Zabbix 7 frontend 404s.
 - Removed ineffective global `RuntimeException` imports from standalone tests to keep PHP 8.2/8.3/8.4 output warning-free.
 
 ### Safety
