@@ -56,6 +56,12 @@ assertCatalogControllerContract(
 );
 
 assertCatalogControllerContract(
+	strpos($controller, "\$this->hasInput('filter_set') || \$this->hasInput('filter_rst')") !== false
+		&& strpos($controller, "? 1") !== false,
+	'Applying or resetting catalog filters must return native pagination to page 1.'
+);
+
+assertCatalogControllerContract(
 	strpos($view, "No templates match the current name filter.") !== false
 		&& strpos($view, "Change or clear the Name filter to view other templates.") !== false,
 	'Catalog name filtering must provide a contextual native no-data message.'
