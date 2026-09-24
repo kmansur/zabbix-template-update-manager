@@ -11,6 +11,11 @@ jobs:
   runtime-smoke:
     name: Zabbix ${{ matrix.label }} release runtime smoke
     runs-on: ubuntu-latest
+    env:
+      POSTGRES_IMAGE: ${{ matrix.postgres_image }}
+      ZABBIX_SERVER_IMAGE: ${{ matrix.server_image }}
+      ZABBIX_WEB_IMAGE: ${{ matrix.web_image }}
+      ZTUM_SMOKE_PORT: '18080'
     strategy:
       fail-fast: false
       matrix:
@@ -34,11 +39,6 @@ jobs:
           npm install --ignore-scripts --no-audit --no-fund
           npx playwright install --with-deps chromium
       - name: Start disposable Zabbix stack
-        env:
-          POSTGRES_IMAGE: ${{ matrix.postgres_image }}
-          ZABBIX_SERVER_IMAGE: ${{ matrix.server_image }}
-          ZABBIX_WEB_IMAGE: ${{ matrix.web_image }}
-          ZTUM_SMOKE_PORT: '18080'
         run: docker compose -f tests/runtime-smoke/compose.yaml up -d
       - name: Run full frontend smoke
         env:
