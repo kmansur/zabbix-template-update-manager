@@ -100,7 +100,7 @@ final class TemplateHostImpactService {
 		}
 
 		$directHosts = max(0, (int) ($this->hostCounter)([$templateId]));
-		$impactedTemplateIds = array_values(array_unique(array_merge([$templateId], array_keys($descendants))));
+		$impactedTemplateIds = array_values(array_unique(array_merge([$templateId], array_map('strval', array_keys($descendants)))));
 		sort($impactedTemplateIds, SORT_STRING);
 		$totalHosts = max(0, (int) ($this->hostCounter)($impactedTemplateIds));
 
