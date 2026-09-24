@@ -63,6 +63,7 @@ ZTUM currently provides:
 - native Zabbix checkbox/select-all selection of specific update candidates;
 - persistent **Never update** protection for selected installed official templates, with a dedicated catalog filter and explicit **Allow updates** reversal;
 - direct catalog-to-preparation bulk update flow for explicitly selected official update candidates, without a redundant scope-only review page;
+- dedicated registered JavaScript assets for request-bounded update/install batch orchestration, keeping native PHP views compact;
 - request-bounded update-batch safety preparation for the full selected update set (up to the existing 500-template selection safety ceiling), executed one candidate per HTTP request with visible progress;
 - automatic creation/refresh of rollback artifacts for standard-path candidates (none/low plus narrowly recognized bounded-medium changes) and explicitly reviewed manual-update candidates;
 - batch classification into Ready, Manual review, Conflict and Blocked; reviewed candidates use native leading per-row checkboxes plus explicit Select all eligible / Clear selection controls, but never become unattended Ready;
