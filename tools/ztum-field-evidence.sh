@@ -199,7 +199,7 @@ if [[ -n "$RUNTIME_USER" ]] && id "$RUNTIME_USER" >/dev/null 2>&1; then
   runtime_user_status="$RUNTIME_USER:$runtime_group"
 fi
 
-printf '# ZTUM beta.59 field evidence\n\n'
+printf '# ZTUM field evidence\n\n'
 printf -- '- Collected at (UTC): `%s`\n' "$(date -u '+%Y-%m-%dT%H:%M:%SZ')"
 printf -- '- Collector: `tools/ztum-field-evidence.sh`\n'
 printf -- '- Privacy mode: `safe metadata only`\n\n'
