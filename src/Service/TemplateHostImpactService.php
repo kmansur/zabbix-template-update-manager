@@ -83,7 +83,7 @@ final class TemplateHostImpactService {
 
 		while ($queue !== []) {
 			$current = array_shift($queue);
-			if (isset($descendants[$current])) {
+			if ($current === $templateId || isset($descendants[$current])) {
 				continue;
 			}
 
@@ -101,6 +101,7 @@ final class TemplateHostImpactService {
 
 		$directHosts = max(0, (int) ($this->hostCounter)([$templateId]));
 		$impactedTemplateIds = array_values(array_unique(array_merge([$templateId], array_keys($descendants))));
+		sort($impactedTemplateIds, SORT_STRING);
 		$totalHosts = max(0, (int) ($this->hostCounter)($impactedTemplateIds));
 
 		if ($totalHosts < $directHosts) {
