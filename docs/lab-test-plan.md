@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.56
+# Laboratory test plan — 0.1.0-beta.57
 
 ## Release state
 
@@ -13,7 +13,7 @@ Status at publication:
 
 Use the exact prerelease tag when a public beta has been published. During internal laboratory work before that tag exists, record the exact `main` commit used so the test can be reproduced.
 
-Beta.56 is the current native-UI and update-policy field-test candidate. Field validation must prove the complete catalog/update/install/rollback workflow in both light and dark themes while confirming that the underlying comparison, evidence and controlled-write behavior remains unchanged.
+Beta.57 is the current native-UI and update-policy field-test candidate. Field validation must prove the complete catalog/update/install/rollback workflow in both light and dark themes while confirming that the underlying comparison, evidence and controlled-write behavior remains unchanged.
 
 ## Safety assumptions
 
@@ -68,7 +68,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.56`, enable the module and open:
+Confirm `0.1.0-beta.57`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -128,18 +128,22 @@ On both Zabbix 7.x and 8.x:
 1. Open **Data collection → Template updates** and expand **Filter**.
 2. Confirm a native **Name** text box appears above **Status**.
 3. Enter a partial template name such as `Acronis`, apply the filter and confirm only matching visible template names remain.
-4. Repeat with different letter case and confirm matching is case-insensitive.
-5. Combine **Name** with a non-default **Status** and confirm both conditions are applied.
-6. Navigate away from the first result page when possible, change the filter and confirm the catalog returns to page 1.
-7. Click **Reset** and confirm both Name and Status return to their defaults.
-8. Enter a value that matches no template and confirm the native no-data message explains that the Name filter can be changed or cleared.
-9. Confirm the catalog still uses only native `CPagerHelper` pagination and no custom **All / Pages** control reappears.
+4. Repeat with a short substring such as `Adv` against a template whose displayed name contains that substring; exact-name matching must not be required.
+5. If a row displays a technical name in parentheses, search by a substring found only in that technical name and confirm the row is returned.
+6. Repeat with different letter case and confirm matching is case-insensitive.
+7. Combine **Name** with a non-default **Status** and confirm both conditions are applied.
+8. Navigate away from the first result page when possible, change the filter and confirm the catalog returns to page 1.
+9. Click **Reset** and confirm both Name and Status return to their defaults.
+10. Enter a value that matches no template and confirm the native no-data message explains that the Name filter can be changed or cleared.
+11. Confirm the catalog still uses only native `CPagerHelper` pagination and no custom **All / Pages** control reappears.
 
 Name filtering must be applied before pagination and must not change catalog summary counts, update eligibility, Never update policy or any write-path behavior.
 
+The filter layout must visually follow the native Zabbix Templates list pattern: `CFormGrid` with native label/field alignment and `ZBX_TEXTAREA_MEDIUM_WIDTH` for Name.
+
 ## 2D. Request-bounded update regression
 
-For the first beta.56 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.57 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -342,7 +346,7 @@ Expected behavior:
 - a long historical scan may show `history_scan_pending` / continuation progress and issue several bounded requests for the same template before final classification;
 - no single historical continuation request should approach the previous ~30-second gateway failure window;
 - if an HTTP failure still occurs, the Reason should include elapsed time and gateway identity such as `server=cloudflare` / `cf-ray=...` when exposed by the response;
-- if a real 504 still occurs on beta.56, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
+- if a real 504 still occurs on beta.57, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
 - preparation continuation/retry must never call `configuration.import`.
 
 ## 5B. Manual-review continuation regression
@@ -764,9 +768,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.56 laboratory validation
+## 16. Exit criteria for beta.57 laboratory validation
 
-A Zabbix generation passes beta.56 only after evidence demonstrates:
+A Zabbix generation passes beta.57 only after evidence demonstrates:
 
 ```text
 module discovery/enable
