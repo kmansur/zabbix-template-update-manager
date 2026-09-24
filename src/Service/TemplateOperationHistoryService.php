@@ -16,6 +16,12 @@ require_once dirname(__DIR__).'/Repository/TemplateOperationHistoryRepository.ph
  */
 final class TemplateOperationHistoryService {
 
+	private TemplateOperationHistoryRepository $repository;
+
+	public function __construct(?TemplateOperationHistoryRepository $repository = null) {
+		$this->repository = $repository ?? new TemplateOperationHistoryRepository();
+	}
+
 	public function record(
 		string $operation,
 		string $subject,
@@ -49,7 +55,7 @@ final class TemplateOperationHistoryService {
 			}
 		}
 
-		return (new TemplateOperationHistoryRepository())->append([
+		return $this->repository->append([
 			'id' => bin2hex(random_bytes(16)),
 			'created_at' => gmdate('c'),
 			'operation' => $operation,
