@@ -4,6 +4,28 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.56] - 2026-09-23
+
+### Added
+
+- Added a native **Name** text field to the catalog filter using the standard Zabbix `CFilter` / `CTextBox` pattern.
+- Name filtering is persisted in the existing ZTUM filter profile and can be combined with the Status filter.
+
+### Changed
+
+- Template-name matching is case-insensitive and is applied before native `CPagerHelper` pagination.
+- Applying or resetting the catalog filter returns the result set to page 1.
+- Empty name-filter results now show a contextual native no-data message.
+
+### Tests
+
+- Catalog contracts now require the native Name textbox, profile persistence/reset, case-insensitive pre-pagination filtering and page-1 reset behavior.
+- Laboratory validation now includes Name-only, Name + Status, case-insensitive, reset and zero-result checks on Zabbix 7.x and 8.x.
+
+### Safety
+
+- Read-only catalog filtering only. Template comparison, backup, preflight, update, installation, rollback, Never update policy and the controlled `configuration.import` boundary are unchanged.
+
 ## [0.1.0-beta.55] - 2026-09-23
 
 ### Changed
