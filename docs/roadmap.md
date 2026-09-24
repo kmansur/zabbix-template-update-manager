@@ -89,9 +89,9 @@ The project tracks implementation, automated validation and real field validatio
 
 ### Runtime resilience
 
-- Investigate repeated per-template upstream/preparation HTTP timeouts (field examples near 30 seconds).
+- Continue field measurement of request-bounded historical preparation on cold and warm caches.
 - Improve diagnostics and transport resilience without hiding uncertain states.
-- Resolve remaining historical-baseline gaps, including rename-aware historical raw-path resolution.
+- Keep rename-aware historical raw-path resolution and immutable initial-release baselines covered by regression tests.
 
 ### Field validation
 
@@ -110,9 +110,8 @@ The project tracks implementation, automated validation and real field validatio
 
 ### Release engineering
 
-- Select and publish a project license.
 - Publish the first community-test prerelease tag after license and public-test documentation are finalized.
-- Produce the final compatibility matrix.
+- Keep the compatibility matrix current and close the Zabbix 7.x/8.x 1.0 readiness evidence.
 - Finish publication/homologation documentation.
 - Arrange independent security/code review before production recommendation.
 
