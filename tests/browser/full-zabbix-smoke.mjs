@@ -116,20 +116,24 @@ async function ensureModule(auth) {
 }
 
 async function setTheme(auth, theme) {
+	// Username field naming changed from alias -> username across Zabbix
+	// generations. Request the native full user records and resolve the
+	// disposable Admin account client-side instead of sending a
+	// version-specific API filter.
 	const users = await api('user.get', {
-		output: ['userid', 'username', 'alias', 'theme'],
-		filter: {username: [adminUser]}
-	}, auth).catch(async () => api('user.get', {
-		output: ['userid', 'alias', 'theme'],
-		filter: {alias: [adminUser]}
-	}, auth));
+		output: 'extend'
+	}, auth);
 
-	if (!Array.isArray(users) || users.length !== 1) {
+	const matches = Array.isArray(users)
+		? users.filter((user) => String(user.username ?? user.alias ?? '') === adminUser)
+		: [];
+
+	if (matches.length !== 1) {
 		throw new Error('Unable to resolve the smoke-test Super Admin user.');
 	}
 
 	await api('user.update', {
-		userid: users[0].userid,
+		userid: matches[0].userid,
 		theme
 	}, auth);
 }
