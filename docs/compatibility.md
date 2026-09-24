@@ -41,9 +41,16 @@ See [lab-test-plan.md](lab-test-plan.md) and the current GitHub 1.0 readiness is
 
 ## PHP
 
-ZTUM runtime code is expected to work with PHP versions supported by the target Zabbix frontend. Repository CI exercises a defined PHP compatibility matrix; real field evidence remains tied to the exact Zabbix/PHP pair recorded during validation.
+ZTUM runtime code is expected to work with PHP versions supported by the target Zabbix frontend. Repository CI executes syntax and unit tests on PHP 8.2, 8.3 and 8.4. It also checks ZTUM native frontend classes/constants against the Zabbix 7.0 source tree and the current Zabbix 8.0 source line. Real field evidence remains tied to the exact Zabbix/PHP pair recorded during validation.
+
+## Automated compatibility evidence
+
+The cross-Zabbix frontend-symbol gate was added after real Zabbix 8 testing exposed a renamed pager constant that repository-only tests had missed. Guarded optional constants are permitted, while unguarded native class/constant references must exist in both supported frontend source trees.
+
+Chromium smoke tests exercise the extracted update/install batch orchestration assets and accessibility contracts, but do not emulate Zabbix APIs or replace field validation.
 
 ## Known limitations
+
 
 - Full Zabbix 8.x write-path field validation is not yet complete.
 - Multi-node serialization requires `ZTUM_LOCK_DIR` to point to shared private storage with reliable cross-node `flock()` semantics.

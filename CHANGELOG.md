@@ -4,66 +4,43 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.58] - 2026-09-24
+
+### Security / runtime hardening
+
+- Restricted catalog/read-only module access to Zabbix Administrators and Super Admins; configuration writes remain Super-Admin-only.
+- Moved the default global operation lock to the persistent private runtime root at `/var/lib/zabbix-template-update-manager/locks`.
+- Added AGPL-3.0-only licensing plus explicit Zabbix/project attribution notices.
+
+### Added
+
+- Added direct + inherited/indirect host-impact analysis through the visible template inheritance graph.
+- Added private bounded supplemental operation history and an administrator-only native history page.
+- Added PHP 8.2 / 8.3 / 8.4 syntax + unit-test CI matrix.
+- Added native frontend symbol compatibility checks against Zabbix 7.0 and current Zabbix 8.0 sources.
+- Added Chromium smoke tests for update/install batch orchestration assets.
+- Added native accessibility contracts for navigation, filter labels and confirmation controls.
+
 ### Refactored
 
-- Moved the two behavior-heavy request-bounded batch JavaScript implementations into registered module assets.
-- Update/install batch PHP views now retain only native server-rendered controls, JSON configuration/labels and a small document-ready initializer.
-
-### Tests
-
-- Native UI and batch contract guards now validate the registered assets and reject reintroduction of large inline batch scripts.
-
-### Safety
-
-- Browser orchestration only moved location; CSRF, Super-Admin authorization, fresh server-side preflight, evidence validation and the single controlled import boundary are unchanged.
-
-### Added
-
-- Added private bounded **Operation history** for controlled updates, installations, rollbacks, update-policy changes and explicit rollback-backup creation.
-- Added a native administrator-only operation-history page linked from the template catalog.
-
-### Safety
-
-- Operation history is supplemental only: it is never authorization, preflight evidence or proof of configuration state.
-- History records are bounded/sanitized, stored privately under the ZTUM runtime root and written atomically under a local file lock.
-
-### Tests
-
-- Added repository, recorder and action/view instrumentation regressions for operation history.
-
-### Added
-
-- Added bounded, cycle-safe inherited template-to-host impact analysis using native Zabbix template and host APIs.
-- Update comparison now distinguishes directly linked hosts, indirect hosts, total unique impacted hosts and dependent templates.
-
-### Safety
-
-- Host-impact analysis is read-only. If inherited impact cannot be resolved, ZTUM keeps direct-host context and reports the limitation instead of guessing or weakening any write gate.
-
-### Tests
-
-- Added deterministic inheritance-graph/host-count tests, including recursive descendants, duplicate-safe aggregate counting and cycle handling.
-
-### Governance
-
-- Selected and published the GNU Affero General Public License v3.0 only (`AGPL-3.0-only`) and added project/Zabbix attribution notices.
-- Added explicit compatibility and production-readiness documents that separate implementation, automation, field validation and release readiness.
-
-### Documentation
-
-- Removed stale roadmap/architecture statements that still described rename-aware historical source resolution as unfinished after it was implemented.
-- Release policy now treats license/notice as completed governance inputs and keeps cross-version field/runtime validation as the remaining release gate.
-
-### Security
-
-- Restricted the catalog controller to Zabbix Administrators and Super Admins instead of allowing every authenticated frontend user through the module controller.
-- Aligned the default controlled-operation lock with the private persistent runtime root at `/var/lib/zabbix-template-update-manager/locks`.
+- Extracted the two large request-bounded batch JavaScript implementations into registered module assets.
+- Batch PHP views now retain server-rendered native controls, JSON configuration/labels and only a minimal document-ready initializer.
 
 ### Changed
 
-- Installed templates without an authoritative official UUID match now show update policy as **Not applicable** instead of **Managed**.
-- Runtime setup tests now validate private permissions/ownership for backups, offline and locks directories.
+- Non-official templates display update policy as **Not applicable** instead of **Managed**.
+- Documentation, compatibility notes, 1.0 readiness criteria and the consolidated field-validation issue were synchronized with implemented behavior.
 
+### Field evidence
+
+- Zabbix 7.0.31 dark-theme catalog + partial Name search (`Adv`) were confirmed on beta.57.
+- Zabbix 8.0.0beta2 + PHP 8.4.24 catalog loading was confirmed after the pager compatibility fix; the complete Zabbix 8 write-path matrix remains open.
+
+### Safety
+
+- Configuration writes still converge on the single `TemplateConfigurationImportService` boundary.
+- Browser/JavaScript tests do not replace server-side CSRF, permission, evidence, fresh-preflight or post-validation checks.
+- Operation history is supplemental only and is never authorization/evidence.
 ## [0.1.0-beta.57] - 2026-09-23
 
 ### Fixed
