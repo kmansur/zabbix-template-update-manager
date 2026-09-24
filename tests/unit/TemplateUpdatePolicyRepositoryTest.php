@@ -30,13 +30,17 @@ try {
 			'templateid' => '10001',
 			'uuid' => 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
 			'name' => 'Template A',
-			'technical_name' => 'Template A'
+			'technical_name' => 'Template A',
+			'installation_status' => 'installed',
+			'upstream_status' => 'official_match'
 		],
 		[
 			'templateid' => '10002',
 			'uuid' => 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
 			'name' => 'Template B',
-			'technical_name' => 'Template B'
+			'technical_name' => 'Template B',
+			'installation_status' => 'installed',
+			'upstream_status' => 'official_match'
 		]
 	];
 
@@ -64,7 +68,9 @@ try {
 			'templateid' => '10003',
 			'uuid' => 'cccccccccccccccccccccccccccccccc',
 			'name' => 'Template C',
-			'technical_name' => 'Template C'
+			'technical_name' => 'Template C',
+			'installation_status' => 'installed',
+			'upstream_status' => 'official_match'
 		]
 	]);
 
@@ -75,6 +81,20 @@ try {
 	assertPolicyRepository(
 		($annotated[1]['update_policy'] ?? null) === TemplateUpdatePolicyRepository::POLICY_MANAGED,
 		'Unstored template must remain Managed.'
+	);
+
+	$nonOfficial = $repository->annotate([[
+		'templateid' => '10004',
+		'uuid' => 'dddddddddddddddddddddddddddddddd',
+		'name' => 'Local Template',
+		'technical_name' => 'Local Template',
+		'installation_status' => 'installed',
+		'upstream_status' => 'not_found'
+	]]);
+	assertPolicyRepository(
+		($nonOfficial[0]['update_policy'] ?? null) === 'not_applicable'
+			&& empty($nonOfficial[0]['never_update']),
+		'Installed templates without an official UUID match must expose update policy as Not applicable.'
 	);
 
 	$repository->allowUpdates([$templates[0]], '42');

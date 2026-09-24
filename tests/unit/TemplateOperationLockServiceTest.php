@@ -11,6 +11,12 @@ function assertOperationLock($expected, $actual, string $message): void {
 	}
 }
 
+assertOperationLock(
+	'/var/lib/zabbix-template-update-manager/locks',
+	TemplateOperationLockService::defaultDirectory(),
+	'The default controlled-operation lock must live in the persistent private ZTUM runtime root.'
+);
+
 $dir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'ztum-lock-test-'.bin2hex(random_bytes(6));
 $outer = new TemplateOperationLockService($dir);
 $inner = new TemplateOperationLockService($dir);

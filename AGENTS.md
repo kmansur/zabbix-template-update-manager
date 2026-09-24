@@ -37,7 +37,7 @@ Current test version: `0.1.0-beta.57`.
 22. Batch installation must execute one Ready UUID per HTTP request, reuse TemplateControlledInstallService per candidate and stop on the first non-success. Never bypass the existing single configuration-import boundary.
 23. Installation preflight must run the structural reference audit before import comparison. Proven unresolved internal references must fail closed and be bound into preflight evidence; do not use the audit to relax Zabbix's own import validation.
 24. Missing-template installation must use the reviewed create-only import rule profile. It may create missing groups/template content but must not update or delete pre-existing configuration objects.
-25. Global controlled-operation serialization is mandatory for update, installation and rollback write controllers. Acquire the ZTUM operation lock before fresh preflight and hold it through post-write validation; do not add an unlocked configuration-write route.
+25. Global controlled-operation serialization is mandatory for update, installation and rollback write controllers. Acquire the ZTUM operation lock before fresh preflight and hold it through post-write validation; do not add an unlocked configuration-write route. The default lock directory is `/var/lib/zabbix-template-update-manager/locks`; an override must remain private and, for multi-node frontends, provide reliable shared `flock()` semantics.
 26. Offline/air-gapped mode may use only admin-configured local bundle directories with manifest/hash verification. Missing/tampered offline evidence must fail closed, and offline-only mode must never silently fall back to network access.
 27. A template marked `Never update` is a hard global ZTUM policy gate. Catalog preparation, fresh preflight and controlled import must all respect it. Policy-store read failures must never result in an update write.
 
@@ -112,7 +112,7 @@ The immutable source is re-fetched immediately before update import and the SHA-
 
 ## UI/UX
 
-The module should look and behave like Zabbix itself.
+The module should look and behave like Zabbix itself. Catalog/read-only module access is limited to Zabbix Administrators and Super Admins; configuration writes and update-policy mutation remain Super-Admin-only.
 
 - Reuse native Zabbix classes and components.
 - Prefer existing tables, filters, forms, tabs, buttons, messages and dialogs.

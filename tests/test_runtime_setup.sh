@@ -9,7 +9,9 @@ bash -n tools/ztum-runtime-setup.sh
 sudo tools/ztum-runtime-setup.sh --apply --user "$user" --base "$tmp/state"
 tools/ztum-runtime-setup.sh --check --user "$user" --base "$tmp/state"
 
-test "$(stat -c '%a' "$tmp/state/backups")" = "700"
-test "$(stat -c '%U' "$tmp/state/backups")" = "$user"
+for dir in backups offline locks; do
+  test "$(stat -c '%a' "$tmp/state/$dir")" = "700"
+  test "$(stat -c '%U' "$tmp/state/$dir")" = "$user"
+done
 
 echo "Runtime setup helper tests passed."
