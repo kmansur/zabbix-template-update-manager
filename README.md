@@ -19,6 +19,7 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
+- Formal laboratory prerelease: **v0.1.0-beta.59** is published with checksummed `.tar.gz` and `.zip` assets.
 
 Beta.59 extends the pre-RC hardening work with disposable full-Zabbix 7.x/8.x frontend smoke tests in Chromium, light/dark catalog rendering checks, operation-history rendering, and enforced minimum coverage/reachability floors. It retains the beta.58 runtime-lock, permissions, inherited-impact, operation-history, licensing, JavaScript extraction and compatibility hardening.
 
