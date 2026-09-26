@@ -3,8 +3,8 @@
   "source": {
     "line": "7.4",
     "ref": "release/7.4",
-    "commit": "74bceb1fdc5ad9a2d6eb555986581679855148aa",
-    "commit_date": "2026-09-25T10:28:22+03:00",
+    "commit": "028d6d01d6d3d60839fb1019f68adccbc83b00dc",
+    "commit_date": "2026-09-25T20:55:51+03:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
@@ -1273,17 +1273,17 @@
       "name": "Veeam Backup Enterprise Manager by HTTP",
       "technical_name": "Veeam Backup Enterprise Manager by HTTP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-3",
+      "vendor_version": "7.4-4",
       "paths": [
         "templates/app/veeam/enterprise_manager_http/template_veeam_enterprise_manager_http.yaml"
       ],
       "content_sha256s": [
-        "7b9551d0a93c9ee09ea59ab065645c4ad1f30b90e65cf1853b01c5f4021b58fd"
+        "aed458a72e36f4f8926a575e888fff8c2c7f7176315ca14efeeea3234fa1794d"
       ],
       "sources": [
         {
           "path": "templates/app/veeam/enterprise_manager_http/template_veeam_enterprise_manager_http.yaml",
-          "sha256": "98658b7dd98deacde3ef4ba5a2337d0c273a95154af4c938eba5e6f2f1e8ec61"
+          "sha256": "4e6915aacd90d9ce8999b55acf805fd50c89f1b432b39a26563041a604784c5e"
         }
       ]
     },
@@ -3175,20 +3175,20 @@
     },
     "738085dde4e749d49199e5e6fd4d56ab": {
       "uuid": "738085dde4e749d49199e5e6fd4d56ab",
-      "name": "Veeam Backup and Replication by HTTP",
+      "name": "Veeam Backup & Replication by HTTP",
       "technical_name": "Veeam Backup and Replication by HTTP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-5",
+      "vendor_version": "7.4-6",
       "paths": [
         "templates/app/veeam/backup_replication_http/template_veeam_backup_replication_http.yaml"
       ],
       "content_sha256s": [
-        "d117fd5a9ee49f176d245ab20c547384a172607db5845e13dd63412b75bf413f"
+        "093d6bee9482730e029704c12d8a1b0c907bf67714f628b56cfb5fea14feac9f"
       ],
       "sources": [
         {
           "path": "templates/app/veeam/backup_replication_http/template_veeam_backup_replication_http.yaml",
-          "sha256": "81c3a21b54a9bea9ef040d7c5caac1a1987b89bfab726be0370d16a779f95564"
+          "sha256": "8b10fdcd10154940d033c9bca3baa7bda6752a2a081b1cf2252c219f8a6e7661"
         }
       ]
     },
