@@ -4,6 +4,10 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Documentation
+
+- Recorded the 2026-09-29 engineering-readiness handoff: repository-side implementation is complete for the declared core scope, while RC promotion remains explicitly gated by the real Zabbix 7.x/8.x validation matrix.
+
 ### Added
 
 - Added a privacy-conscious read-only field-evidence collector for the remaining beta.59 Zabbix 7.x/8.x laboratory matrix, including module identity, release checksum verification, runtime-directory metadata and operator browser/theme metadata without collecting secrets or network/database identifiers.

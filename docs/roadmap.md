@@ -94,13 +94,11 @@ The project tracks implementation, automated validation and real field validatio
 - Structured external bug/field-validation/feature-request/PR templates.
 - Release policy separating development commits from field-test beta snapshots.
 
-## In progress before 1.0
+## Engineering complete — validation pending before RC / 1.0
 
 ### Runtime resilience
 
-- Continue field measurement of request-bounded historical preparation on cold and warm caches.
-- Improve diagnostics and transport resilience without hiding uncertain states.
-- Keep rename-aware historical raw-path resolution and immutable initial-release baselines covered by regression tests.
+Repository-side runtime-resilience implementation is complete for the declared core scope. Remaining work in this area is field measurement during the RC validation cycle; any defect found there returns to implementation with a regression guard where practical.
 
 ### Field validation
 

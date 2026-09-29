@@ -423,6 +423,7 @@ Detailed design and safety documentation is available in:
 - [`docs/compatibility.md`](docs/compatibility.md)
 - [`docs/production-readiness.md`](docs/production-readiness.md)
 - [`docs/audits/2026-09-24-beta59-pre-rc-audit.md`](docs/audits/2026-09-24-beta59-pre-rc-audit.md)
+- [`docs/audits/2026-09-29-engineering-readiness-handoff.md`](docs/audits/2026-09-29-engineering-readiness-handoff.md)
 
 ## Development validation
 
