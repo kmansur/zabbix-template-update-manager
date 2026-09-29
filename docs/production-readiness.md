@@ -11,12 +11,14 @@ A green workflow does not by itself make the module production-ready.
 
 ## Current posture
 
-- Core implementation: advanced / near feature-complete.
+- Core implementation: **100% engineering-complete for the declared scope**; no known repository-side implementation blocker remains.
 - Automated validation: strong, including PHP 8.2/8.3/8.4, Zabbix 7/8 frontend-symbol compatibility, disposable official Zabbix 7/8 Chromium frontend smoke, batch-asset smoke, accessibility contracts and minimum coverage/reachability floors.
 - Zabbix 7.x field evidence: substantial but the final consolidated 1.0 matrix is not closed.
 - Zabbix 8.x field evidence: partial; full controlled write/rollback/offline validation remains open.
 - License: AGPL-3.0-only.
 - Formal laboratory prerelease: `v0.1.0-beta.59` published with `.tar.gz`, `.zip` and `SHA256SUMS` after Zabbix 7/8 release-runtime smoke.
+- Engineering readiness handoff: [`audits/2026-09-29-engineering-readiness-handoff.md`](audits/2026-09-29-engineering-readiness-handoff.md).
+- RC validation: pending by design; tracked separately from implementation readiness.
 - Production recommendation: not yet.
 
 ## Stable 1.0 gates
