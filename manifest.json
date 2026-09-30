@@ -90,6 +90,16 @@
         "ztum.operations": {
             "class": "TemplateOperationHistory",
             "view": "ztum.operation.history"
+        },
+        "ztum.batch.create": {
+            "class": "BatchOperationCreate",
+            "layout": "layout.json",
+            "view": null
+        },
+        "ztum.batch.state": {
+            "class": "BatchOperationState",
+            "layout": "layout.json",
+            "view": null
         }
     }
 }

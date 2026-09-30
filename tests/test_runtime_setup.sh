@@ -9,7 +9,7 @@ bash -n tools/ztum-runtime-setup.sh
 sudo tools/ztum-runtime-setup.sh --apply --user "$user" --base "$tmp/state"
 tools/ztum-runtime-setup.sh --check --user "$user" --base "$tmp/state"
 
-for dir in backups offline locks; do
+for dir in backups offline locks batches; do
   test "$(stat -c '%a' "$tmp/state/$dir")" = "700"
   test "$(stat -c '%U' "$tmp/state/$dir")" = "$user"
 done

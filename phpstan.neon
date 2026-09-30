@@ -2,6 +2,8 @@ parameters:
 	level: 6
 	paths:
 		- src/Exception
+		- src/Repository/BatchOperationRepository.php
+		- src/Service/UpstreamSignatureVerifier.php
 		- src/Service/ContentComparisonClassifier.php
 		- src/Service/ImportCompareEntityExtractor.php
 		- src/Service/ImportCompareSummary.php

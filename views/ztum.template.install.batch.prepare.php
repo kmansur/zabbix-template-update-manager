@@ -133,13 +133,25 @@ $executeOneUrl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'ztum.templates.install_execute_one')
 	->getUrl();
 
+$batchCreateUrl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'ztum.batch.create')
+	->getUrl();
+
+$batchStateUrl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'ztum.batch.state')
+	->getUrl();
+
 $jsConfig = json_encode([
 	'uuids' => array_values(array_map('strval', $data['uuids'])),
 	'prepareOneUrl' => $prepareOneUrl,
 	'executeOneUrl' => $executeOneUrl,
+	'batchCreateUrl' => $batchCreateUrl,
+	'batchStateUrl' => $batchStateUrl,
 	'csrfName' => CSRF_TOKEN_NAME,
 	'prepareCsrfToken' => CCsrfTokenHelper::get('ztum.templates.install_prepare_one'),
 	'executeCsrfToken' => CCsrfTokenHelper::get('ztum.templates.install_execute_one'),
+	'batchCreateCsrfToken' => CCsrfTokenHelper::get('ztum.batch.create'),
+	'batchStateCsrfToken' => CCsrfTokenHelper::get('ztum.batch.state'),
 	'statusClasses' => [
 		'success' => ZBX_STYLE_GREEN,
 		'warning' => ZBX_STYLE_ORANGE,

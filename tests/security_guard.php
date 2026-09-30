@@ -28,7 +28,7 @@ $rules = [
 		=> 'Stream TLS peer verification must not be disabled.',
 	'/[\'"]verify_peer_name[\'"]\s*=>\s*false/i'
 		=> 'Stream TLS hostname verification must not be disabled.',
-	'/\b(?:chmod|mkdir)\s*\([^\n;]*\b0?777\b/i'
+	'/\\b(?:chmod|mkdir)\\s*\\(\\s*[^,\\n]+,\\s*0?777\\s*(?:,|\\))/i'
 		=> 'World-writable runtime permissions are prohibited.',
 	'/\bDBexecute\s*\(/i'
 		=> 'Direct database writes are prohibited.',

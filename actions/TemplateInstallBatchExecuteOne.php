@@ -5,6 +5,7 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CWebUser;
+use Modules\ZabbixTemplateUpdateManager\Repository\BatchOperationRepository;
 use Modules\ZabbixTemplateUpdateManager\Exception\ZtumException;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledInstallService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
@@ -12,6 +13,7 @@ use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Exception/ZtumException.php';
+require_once dirname(__DIR__).'/src/Repository/BatchOperationRepository.php';
 require_once dirname(__DIR__).'/src/Service/TemplateControlledInstallService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
@@ -22,15 +24,18 @@ class TemplateInstallBatchExecuteOne extends CController {
 		$ret = $this->validateInput([
 			'uuid' => 'required|string',
 			'evidence_sha256' => 'required|string',
-			'confirm' => 'required|in 1'
+			'confirm' => 'required|in 1',
+			'operation_id' => 'required|string'
 		]);
 
 		if ($ret) {
 			$uuid = strtolower(str_replace('-', '', trim((string) $this->getInput('uuid'))));
 			$evidence = strtolower(trim((string) $this->getInput('evidence_sha256')));
+			$operationId = strtolower(trim((string) $this->getInput('operation_id')));
 
 			$ret = preg_match('/^[a-f0-9]{32}$/', $uuid) === 1
-				&& preg_match('/^[a-f0-9]{64}$/', $evidence) === 1;
+				&& preg_match('/^[a-f0-9]{64}$/', $evidence) === 1
+				&& preg_match('/^[a-f0-9]{32}$/', $operationId) === 1;
 		}
 
 		if (!$ret) {
@@ -55,22 +60,32 @@ class TemplateInstallBatchExecuteOne extends CController {
 
 	protected function doAction(): void {
 		$uuid = strtolower(str_replace('-', '', trim((string) $this->getInput('uuid'))));
+		$operationId = strtolower(trim((string) $this->getInput('operation_id')));
 		$output = ['ok' => false, 'result' => null, 'error_code' => null, 'error' => null];
 
 		$operationException = null;
 
+		$batchRepo = new BatchOperationRepository();
+		$batchStarted = false;
+
 		try {
 			$evidence = (string) $this->getInput('evidence_sha256');
+			$batchRepo->begin($operationId, 'uuid-'.$uuid, $evidence, 'install', (string) (CWebUser::$data['userid'] ?? ''));
+			$batchStarted = true;
 			$result = (new TemplateOperationLockService())->run(
 				'install',
 				'uuid-'.$uuid,
 				static fn(): array => (new TemplateControlledInstallService())->execute($uuid, $evidence)
 			);
 
-			$output['ok'] = true;
 			$output['result'] = $result;
+			$terminal = ($result['status'] ?? null) === 'installed' ? 'succeeded'
+				: (($result['write_outcome'] ?? null) === 'uncertain' || !empty($result['write_performed']) ? 'uncertain' : 'failed');
+			$batchRepo->finish($operationId, 'uuid-'.$uuid, $terminal, (string) ($result['status'] ?? ''), null);
+			$output['ok'] = true;
 		}
 		catch (Throwable $exception) {
+			$output['ok'] = false;
 			$operationException = $exception;
 			error_log(sprintf(
 				'[Zabbix Template Update Manager] Request-bounded batch install failed for UUID %s: %s',
@@ -81,6 +96,16 @@ class TemplateInstallBatchExecuteOne extends CController {
 			$output['error_code'] = $exception instanceof ZtumException
 				? $exception->getMachineCode()
 				: 'unexpected_error';
+			if ($batchStarted) {
+				try {
+					$terminal = $output['error_code'] === 'lock_contended' ? 'failed' : 'uncertain';
+					$batchRepo->finish($operationId, 'uuid-'.$uuid, $terminal, null, $output['error_code']);
+				}
+				catch (Throwable $batchException) {
+					error_log('[Zabbix Template Update Manager] Unable to finalize persisted install batch state: '.$batchException->getMessage());
+				}
+			}
+
 			$output['error'] = $exception->getMessage() !== ''
 				? $exception->getMessage()
 				: _(

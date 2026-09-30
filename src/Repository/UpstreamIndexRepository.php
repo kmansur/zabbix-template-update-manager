@@ -2,11 +2,13 @@
 
 namespace Modules\ZabbixTemplateUpdateManager\Repository;
 
+use Modules\ZabbixTemplateUpdateManager\Service\UpstreamSignatureVerifier;
 use Modules\ZabbixTemplateUpdateManager\Support\ProjectVersion;
 use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use RuntimeException;
 use Throwable;
 
+require_once dirname(__DIR__).'/Service/UpstreamSignatureVerifier.php';
 require_once dirname(__DIR__).'/Support/ProjectVersion.php';
 require_once dirname(__DIR__).'/Support/ZabbixVersion.php';
 require_once __DIR__.'/OfflineBundleRepository.php';
@@ -21,11 +23,13 @@ final class UpstreamIndexRepository {
 
 	private string $cacheDir;
 	private OfflineBundleRepository $offlineBundle;
+	private UpstreamSignatureVerifier $signatureVerifier;
 
-	public function __construct(?string $cacheDir = null, ?OfflineBundleRepository $offlineBundle = null) {
+	public function __construct(?string $cacheDir = null, ?OfflineBundleRepository $offlineBundle = null, ?UpstreamSignatureVerifier $signatureVerifier = null) {
 		$this->cacheDir = $cacheDir ?? rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
 			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager';
 		$this->offlineBundle = $offlineBundle ?? new OfflineBundleRepository();
+		$this->signatureVerifier = $signatureVerifier ?? new UpstreamSignatureVerifier();
 	}
 
 	public static function endpointForVersion(string $zabbixVersion): ?string {
@@ -45,7 +49,10 @@ final class UpstreamIndexRepository {
 			'allow_url_fopen' => filter_var((string) ini_get('allow_url_fopen'), FILTER_VALIDATE_BOOLEAN),
 			'openssl' => extension_loaded('openssl'),
 			'offline_bundle' => $offline->isConfigured(),
-			'offline_only' => $offline->isOfflineOnly()
+			'offline_only' => $offline->isOfflineOnly(),
+			'sodium' => function_exists('sodium_crypto_sign_verify_detached'),
+			'signed_index_trust_configured' => (new UpstreamSignatureVerifier())->isConfigured(),
+			'signed_index_required' => (new UpstreamSignatureVerifier())->isRequired()
 		];
 	}
 
@@ -57,11 +64,13 @@ final class UpstreamIndexRepository {
 
 		$offlineContent = $this->offlineBundle->readIndex($line);
 		if ($offlineContent !== null) {
+			$trust = $this->verifyTrust($offlineContent, $this->offlineBundle->readIndexSignature($line));
 			$index = self::decodeIndex($offlineContent, $line);
 			$index['runtime'] = [
 				'cache_status' => 'offline',
 				'cache_age_seconds' => 0,
-				'offline_only' => $this->offlineBundle->isOfflineOnly()
+				'offline_only' => $this->offlineBundle->isOfflineOnly(),
+				'upstream_trust' => $trust
 			];
 			return $index;
 		}
@@ -75,10 +84,12 @@ final class UpstreamIndexRepository {
 		$cached = $this->readCache($cacheFile);
 
 		if ($cached !== null && $cached['age'] <= self::CACHE_TTL) {
+			$trust = $this->verifyTrust($cached['content'], $this->readCachedSignature($cacheFile));
 			$index = self::decodeIndex($cached['content'], $line);
 			$index['runtime'] = [
 				'cache_status' => 'fresh',
-				'cache_age_seconds' => $cached['age']
+				'cache_age_seconds' => $cached['age'],
+				'upstream_trust' => $trust
 			];
 			return $index;
 		}
@@ -90,21 +101,29 @@ final class UpstreamIndexRepository {
 			}
 
 			$content = $this->fetch($endpoint);
+			$signature = $this->fetchSignatureIfNeeded($endpoint);
+			$trust = $this->verifyTrust($content, $signature);
 			$index = self::decodeIndex($content, $line);
 			$this->writeCache($cacheFile, $content);
+			if ($signature !== null) {
+				$this->writeCache($cacheFile.'.sig.json', $signature);
+			}
 			$index['runtime'] = [
 				'cache_status' => 'remote',
-				'cache_age_seconds' => 0
+				'cache_age_seconds' => 0,
+				'upstream_trust' => $trust
 			];
 			return $index;
 		}
 		catch (Throwable $exception) {
 			if ($cached !== null) {
+				$trust = $this->verifyTrust($cached['content'], $this->readCachedSignature($cacheFile));
 				$index = self::decodeIndex($cached['content'], $line);
 				$index['runtime'] = [
 					'cache_status' => 'stale',
 					'cache_age_seconds' => $cached['age'],
-					'refresh_error' => true
+					'refresh_error' => true,
+					'upstream_trust' => $trust
 				];
 				return $index;
 			}
@@ -145,10 +164,12 @@ final class UpstreamIndexRepository {
 		// Initial-release indexes are immutable by tag/commit. Once a valid copy
 		// is cached there is no need for a TTL refresh.
 		if ($cached !== null) {
+			$trust = $this->verifyTrust($cached['content'], $this->readCachedSignature($cacheFile));
 			$index = self::decodeIndex($cached['content'], $line);
 			$index['runtime'] = [
 				'cache_status' => 'immutable',
-				'cache_age_seconds' => $cached['age']
+				'cache_age_seconds' => $cached['age'],
+				'upstream_trust' => $trust
 			];
 			return $index;
 		}
@@ -159,6 +180,8 @@ final class UpstreamIndexRepository {
 		}
 
 		$content = $this->fetch($endpoint);
+		$signature = $this->fetchSignatureIfNeeded($endpoint);
+		$trust = $this->verifyTrust($content, $signature);
 		$index = self::decodeIndex($content, $line);
 		$expectedRef = $line.'.0';
 		if ((string) ($index['source']['ref'] ?? '') !== $expectedRef) {
@@ -166,9 +189,13 @@ final class UpstreamIndexRepository {
 		}
 
 		$this->writeCache($cacheFile, $content);
+		if ($signature !== null) {
+			$this->writeCache($cacheFile.'.sig.json', $signature);
+		}
 		$index['runtime'] = [
 			'cache_status' => 'remote',
-			'cache_age_seconds' => 0
+			'cache_age_seconds' => 0,
+			'upstream_trust' => $trust
 		];
 		return $index;
 	}
@@ -289,6 +316,41 @@ final class UpstreamIndexRepository {
 
 		$path = preg_replace('/[\x00-\x1F\x7F]+/', '?', $path) ?? '';
 		return strlen($path) > 220 ? substr($path, 0, 220).'…' : $path;
+	}
+
+
+	private function verifyTrust(string $content, ?string $signature): array {
+		if ($this->signatureVerifier->isRequired() && !$this->signatureVerifier->isConfigured()) {
+			throw new RuntimeException('Signed upstream indexes are required but no trusted Ed25519 public key is configured.');
+		}
+
+		if (!$this->signatureVerifier->isConfigured()) {
+			return ['status' => 'legacy_unsigned', 'verified' => false, 'key_id' => null];
+		}
+
+		if ($signature === null || trim($signature) === '') {
+			throw new RuntimeException('A trusted upstream key is configured but the detached index signature is unavailable.');
+		}
+
+		$verified = $this->signatureVerifier->verify($content, $signature);
+		return [
+			'status' => 'verified',
+			'verified' => true,
+			'key_id' => $verified['key_id'],
+			'content_sha256' => $verified['content_sha256']
+		];
+	}
+
+	private function fetchSignatureIfNeeded(string $endpoint): ?string {
+		if (!$this->signatureVerifier->isConfigured() && !$this->signatureVerifier->isRequired()) {
+			return null;
+		}
+		return $this->fetch($endpoint.'.sig.json');
+	}
+
+	private function readCachedSignature(string $cacheFile): ?string {
+		$cached = $this->readCache($cacheFile.'.sig.json');
+		return $cached !== null ? $cached['content'] : null;
 	}
 
 	private function cacheFile(string $line): string {

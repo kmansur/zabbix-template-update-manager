@@ -89,6 +89,12 @@ assertInstallBatchContract(
 
 assertInstallBatchContract(strpos($executeOne, "'confirm' => 'required|in 1'") !== false,
 	'Each request-bounded installation write must require explicit confirmation.');
+assertInstallBatchContract(strpos($executeOne, "'operation_id' => 'required|string'") !== false
+		&& strpos($prepareBehavior, "body.append('operation_id', operationId)") !== false
+		&& strpos($prepareBehavior, 'fetch(config.batchCreateUrl') !== false
+		&& strpos($prepareBehavior, 'fetch(config.batchStateUrl') !== false,
+	'Batch installation writes must be bound to a durable server-side reviewed batch plan.');
+
 assertInstallBatchContract(strpos($executeOne, 'TemplateControlledInstallService') !== false,
 	'Each request-bounded execution must reuse the authoritative controlled install service.');
 assertInstallBatchContract(strpos($executeOne, 'disableView()') !== false,

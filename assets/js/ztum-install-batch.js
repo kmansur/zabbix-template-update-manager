@@ -7,6 +7,7 @@ window.ZTUMInstallBatchInit = (config, labels) => {
 	let stopRequested = false;
 	let fullyPrepared = false;
 	let executionStarted = false;
+	let persistedOperationId = null;
 
 	const byId = (id) => document.getElementById(id);
 	const setText = (id, value) => {
@@ -173,12 +174,13 @@ window.ZTUMInstallBatchInit = (config, labels) => {
 		return payload.item;
 	};
 
-	const executeOne = async (uuid, evidence) => {
+	const executeOne = async (operationId, uuid, evidence) => {
 		const body = new FormData();
 		body.append(config.csrfName, config.executeCsrfToken);
 		body.append('uuid', uuid);
 		body.append('evidence_sha256', evidence);
 		body.append('confirm', '1');
+		body.append('operation_id', operationId);
 
 		const response = await fetch(config.executeOneUrl, {
 			method: 'POST',
@@ -197,6 +199,92 @@ window.ZTUMInstallBatchInit = (config, labels) => {
 		}
 
 		return payload.result;
+	};
+
+	const persistedEntries = (entries) => entries.map(([uuid, evidence]) => ({
+		subject: 'uuid-' + uuid,
+		evidence_sha256: evidence,
+		manual_override: false
+	}));
+
+	const requestBatchState = async (operationId) => {
+		const body = new FormData();
+		body.append(config.csrfName, config.batchStateCsrfToken);
+		body.append('operation_id', operationId);
+		body.append('recover_stale', '1');
+		const response = await fetch(config.batchStateUrl, {
+			method: 'POST',
+			body,
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'}
+		});
+		if (!response.ok) {
+			throw new Error('HTTP ' + response.status);
+		}
+		const payload = await response.json();
+		if (!payload || payload.ok !== true || !payload.operation) {
+			throw new Error(payload?.error || labels.request_failed);
+		}
+		return payload.operation;
+	};
+
+	const samePersistedPlan = (operation, entries) => {
+		if (operation?.type !== 'install' || !Array.isArray(operation.entries)
+				|| operation.entries.length !== entries.length) {
+			return false;
+		}
+		const expected = persistedEntries(entries);
+		return expected.every((entry, index) => {
+			const persisted = operation.entries[index] || {};
+			return persisted.subject === entry.subject
+				&& persisted.evidence_sha256 === entry.evidence_sha256;
+		});
+	};
+
+	const createOrResumeOperation = async (entries) => {
+		const storageKey = 'ztum.persisted.install.batch';
+		const stored = window.localStorage?.getItem(storageKey) || '';
+		if (/^[a-f0-9]{32}$/.test(stored)) {
+			try {
+				const existing = await requestBatchState(stored);
+				if (samePersistedPlan(existing, entries)) {
+					if (existing.status === 'failed' || existing.status === 'uncertain') {
+						throw new Error(labels.execution_persisted_blocked);
+					}
+					if ((existing.entries || []).some((entry) => entry?.state === 'running')) {
+						throw new Error(labels.execution_persisted_running);
+					}
+					persistedOperationId = stored;
+					return existing;
+				}
+			}
+			catch (error) {
+				if (error?.message === labels.execution_persisted_blocked) {
+					throw error;
+				}
+			}
+		}
+
+		const body = new FormData();
+		body.append(config.csrfName, config.batchCreateCsrfToken);
+		body.append('type', 'install');
+		body.append('entries', JSON.stringify(persistedEntries(entries)));
+		const response = await fetch(config.batchCreateUrl, {
+			method: 'POST',
+			body,
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'}
+		});
+		if (!response.ok) {
+			throw new Error('HTTP ' + response.status);
+		}
+		const payload = await response.json();
+		if (!payload || payload.ok !== true || !payload.operation?.id) {
+			throw new Error(payload?.error || labels.request_failed);
+		}
+		persistedOperationId = payload.operation.id;
+		window.localStorage?.setItem(storageKey, persistedOperationId);
+		return payload.operation;
 	};
 
 	const updateExecutionState = () => {
@@ -231,11 +319,20 @@ window.ZTUMInstallBatchInit = (config, labels) => {
 			return;
 		}
 
+		const entries = Array.from(readyEvidence.entries());
+		let persisted;
+		try {
+			persisted = await createOrResumeOperation(entries);
+		}
+		catch (error) {
+			setStateText('ztum-install-exec-status', error?.message || labels.request_failed, 'danger');
+			setText('ztum-install-exec-notice', error?.message || labels.request_failed);
+			return;
+		}
+
 		executionStarted = true;
 		byId('ztum-install-batch-confirm').disabled = true;
 		byId('ztum-install-batch-submit').disabled = true;
-
-		const entries = Array.from(readyEvidence.entries());
 		let installed = 0;
 		let failed = 0;
 		let notAttempted = entries.length;
@@ -252,12 +349,20 @@ window.ZTUMInstallBatchInit = (config, labels) => {
 		setText('ztum-install-exec-uncertain', '0');
 		setText('ztum-install-exec-notice', '');
 
+		const persistedBySubject = new Map((persisted.entries || []).map((entry) => [entry.subject, entry]));
 		for (let index = 0; index < entries.length; index++) {
 			const [uuid, evidence] = entries[index];
+			const persistedEntry = persistedBySubject.get('uuid-' + uuid);
+			if (persistedEntry?.state === 'succeeded') {
+				installed++;
+				notAttempted = entries.length - index - 1;
+				setStateText('ztum-install-execution-' + uuid, labels.installed + ' [' + labels.resumed_success + ']', 'success');
+				continue;
+			}
 			setText('ztum-install-execution-' + uuid, labels.executing);
 
 			try {
-				const result = await executeOne(uuid, evidence);
+				const result = await executeOne(persistedOperationId, uuid, evidence);
 
 				if (result.write_performed) {
 					anyWrite = true;

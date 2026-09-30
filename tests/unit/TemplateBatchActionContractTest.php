@@ -151,6 +151,12 @@ assertBatchContract(strpos($updateOne, "'evidence_sha256' => 'required|string'")
 		&& strpos($updateOne, "'confirm_manual_override' => 'in 1'") === false
 		&& strpos($updateOne, "'confirm_local_overwrite' => 'in 1'") === false,
 	'Request-bounded execution must require bound evidence plus one explicit confirmation while retaining reviewed-mode binding.');
+assertBatchContract(strpos($updateOne, "'operation_id' => 'required|string'") !== false
+		&& strpos($prepareBehavior, "body.append('operation_id', operationId)") !== false
+		&& strpos($prepareBehavior, 'fetch(config.batchCreateUrl') !== false
+		&& strpos($prepareBehavior, 'fetch(config.batchStateUrl') !== false,
+	'Request-bounded update execution must be bound to a durable server-side reviewed batch plan.');
+
 assertBatchContract(strpos($updateOne, 'TemplateControlledUpdateService') !== false,
 	'Request-bounded execution must reuse TemplateControlledUpdateService.');
 assertBatchContract(strpos($manifest, '"ztum.templates.batch_update_one"') !== false

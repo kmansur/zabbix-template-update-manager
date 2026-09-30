@@ -37,7 +37,10 @@ Before stable 1.0:
 - compatibility documentation current;
 - license/notice present;
 - a formal prerelease built and installed from its generated release artifacts;
-- checksums verified.
+- checksums verified;
+- upstream index/offline-bundle Ed25519 trust configured and tamper-negative tests recorded;
+- interrupted/resumed batch behavior validated;
+- an independent reviewer has returned a reproducible validation bundle for the candidate.
 
 ## Non-blocking enhancements
 
@@ -45,6 +48,6 @@ The following improve maintainability/operations but do not independently prove 
 
 - deepen disposable full-Zabbix smoke beyond read-only catalog/history rendering when a safe deterministic write fixture is available;
 - drill-down/filtering for very large three-way comparisons;
-- independent external security/code review.
+- deeper second-party/third-party penetration review beyond the reproducible independent validation gate.
 
 Operation history, inherited host-impact presentation and batch JavaScript extraction are implemented. Write-path safety and real field evidence still take precedence over additional UI automation.
