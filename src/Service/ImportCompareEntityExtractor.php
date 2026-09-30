@@ -222,7 +222,7 @@ final class ImportCompareEntityExtractor {
 		return false;
 	}
 
-	private static function snapshot($value): array {
+	private static function snapshot(mixed $value): array {
 		if (!is_array($value)) {
 			throw new RuntimeException('The import comparison contains a non-array entity snapshot.');
 		}
@@ -337,7 +337,7 @@ final class ImportCompareEntityExtractor {
 		return $fallback;
 	}
 
-	private static function normalize($value) {
+	private static function normalize(mixed $value): mixed {
 		if (!is_array($value)) {
 			return $value;
 		}
@@ -354,7 +354,7 @@ final class ImportCompareEntityExtractor {
 		return $value;
 	}
 
-	private static function canonicalJson($value): string {
+	private static function canonicalJson(mixed $value): string {
 		$encoded = json_encode(self::normalize($value), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		return is_string($encoded) ? $encoded : '';
 	}
