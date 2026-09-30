@@ -140,11 +140,6 @@ $confirm = (new CCheckBox('confirm', '1'))
 	->setLabel(_('I reviewed the completed plan and accept the Manual review reasons for the selected templates.'))
 	->setEnabled(false);
 
-$confirmLocalOverwrite = (new CCheckBox('confirm_local_overwrite', '1'))
-	->setId('ztum-batch-confirm-local-overwrite')
-	->setLabel(_('I accept overwriting the identified local customizations for the selected templates.'))
-	->setEnabled(false);
-
 $submit = (new CButton('ztum-batch-update-submit', _('Update eligible templates')))
 	->setId('ztum-batch-update-submit')
 	->setEnabled(false);
@@ -166,7 +161,6 @@ $page
 	)))
 	->addItem(FrontendUi::description($executionState))
 	->addItem(new CDiv([$confirm]))
-	->addItem(new CDiv([$confirmLocalOverwrite]))
 	->addItem(new CDiv([$submit]))
 	->addItem($executionSummary);
 
@@ -226,8 +220,7 @@ $jsLabels = json_encode([
 	'select_all_reviewed' => _('Select all eligible reviewed updates'),
 	'clear_all_reviewed' => _('Clear reviewed selection'),
 	'review_batch_eligible' => _('Reviewed batch eligible'),
-	'review_overwrite_eligible' => _('Reviewed overwrite eligible'),
-	'review_details' => _('Review details'),
+		'review_details' => _('Review details'),
 	'review_individual_only' => _('Individual review required'),
 	'execution_running' => _('Running'),
 	'execution_completed' => _('Completed'),
