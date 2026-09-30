@@ -113,4 +113,45 @@ $result = ThreeWayChangeAnalyzer::analyze($historical, $current);
 assertThreeWay(1, $result['summary']['local_only_overwrite'], 'A non-default LOCAL value must still be treated as a real local overwrite risk.');
 assertThreeWay('local_overwrite_risk', $result['status'], 'Real local customization must remain fail-closed.');
 
+
+/*
+ * Zabbix also materializes discovery_rules.lifetime as 30d when the official
+ * YAML omits it. Treat only that proven default as semantically equivalent.
+ */
+$localRule = [
+	'uuid' => str_repeat('d', 32),
+	'name' => 'Rule',
+	'key' => 'rule.key',
+	'lifetime' => '30d'
+];
+$officialRule = [
+	'uuid' => str_repeat('d', 32),
+	'name' => 'Rule',
+	'key' => 'rule.key'
+];
+$historical = ['discovery_rules' => ['updated' => [[
+	'before' => $localRule,
+	'after' => $officialRule
+]]]];
+$current = ['discovery_rules' => ['updated' => [[
+	'before' => $localRule,
+	'after' => $officialRule
+]]]];
+$result = ThreeWayChangeAnalyzer::analyze($historical, $current);
+assertThreeWay(0, $result['summary']['local_only_overwrite'], 'The materialized 30d discovery-rule lifetime must not be treated as a local change.');
+assertThreeWay(0, $result['summary']['conflict'], 'The materialized 30d discovery-rule lifetime must not create a false conflict.');
+
+// A non-default lifetime remains a real local customization.
+$localRule['lifetime'] = '7d';
+$historical = ['discovery_rules' => ['updated' => [[
+	'before' => $localRule,
+	'after' => $officialRule
+]]]];
+$current = ['discovery_rules' => ['updated' => [[
+	'before' => $localRule,
+	'after' => $officialRule
+]]]];
+$result = ThreeWayChangeAnalyzer::analyze($historical, $current);
+assertThreeWay(1, $result['summary']['local_only_overwrite'], 'A non-default discovery-rule lifetime must remain visible as local customization.');
+
 echo "ThreeWayChangeAnalyzer tests passed.\n";
