@@ -1,0 +1,13 @@
+parameters:
+	level: 6
+	paths:
+		- src/Exception
+		- src/Service/ContentComparisonClassifier.php
+		- src/Service/ImportCompareEntityExtractor.php
+		- src/Service/ImportCompareSummary.php
+		- src/Service/ThreeWayChangeAnalyzer.php
+		- src/Service/UpdatePreviewAnalyzer.php
+		- src/Service/UpdateRiskAnalyzer.php
+	ignoreErrors:
+		-
+			identifier: missingType.iterableValue
