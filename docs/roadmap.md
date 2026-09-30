@@ -114,7 +114,7 @@ Repository-side runtime-resilience implementation is complete for the declared c
 
 ### Release engineering
 
-- Keep the published `v0.1.0-beta.59` laboratory prerelease as the immutable baseline for the consolidated Zabbix 7.x/8.x field matrix.
+- Use the published `v0.1.0-beta.60` prerelease as the current immutable baseline for the consolidated Zabbix 7.x/8.x field matrix; preserve beta.59 evidence as historical context only.
 - Keep the compatibility matrix current and close the Zabbix 7.x/8.x 1.0 readiness evidence.
 - Finish publication/homologation documentation.
 - Arrange independent security/code review before production recommendation.
