@@ -68,4 +68,49 @@ $result = ThreeWayChangeAnalyzer::analyze($historical, $current);
 assertThreeWay(1, $result['summary']['unresolved'], 'Different LOCAL pivots must be unresolved rather than guessed.');
 assertThreeWay('needs_review', $result['status'], 'Unresolved state must require review.');
 
+
+/*
+ * Zabbix 7 may materialize discovery_rules.enabled_lifetime_type as
+ * DISABLE_NEVER in the LOCAL snapshot even when the official YAML omits the
+ * field. That implicit default must not be reported as a local customization.
+ */
+$uuid = str_repeat('c', 32);
+$localRule = [
+	'uuid' => $uuid,
+	'name' => 'Rule',
+	'key' => 'rule.key',
+	'enabled_lifetime_type' => 'DISABLE_NEVER'
+];
+$officialRule = [
+	'uuid' => $uuid,
+	'name' => 'Rule',
+	'key' => 'rule.key'
+];
+$historical = ['discovery_rules' => ['updated' => [[
+	'before' => $localRule,
+	'after' => $officialRule
+]]]];
+$current = ['discovery_rules' => ['updated' => [[
+	'before' => $localRule,
+	'after' => $officialRule
+]]]];
+$result = ThreeWayChangeAnalyzer::analyze($historical, $current);
+assertThreeWay(0, $result['summary']['local_only_overwrite'], 'A proven materialized Zabbix default must not be treated as a local overwrite risk.');
+assertThreeWay(0, $result['summary']['conflict'], 'A proven materialized Zabbix default must not create a false conflict.');
+assertThreeWay('no_changes', $result['status'], 'Semantically equivalent implicit/default states must compare equal.');
+
+// A real non-default LOCAL value must remain visible as an overwrite risk.
+$localRule['enabled_lifetime_type'] = 'DISABLE_AFTER';
+$historical = ['discovery_rules' => ['updated' => [[
+	'before' => $localRule,
+	'after' => $officialRule
+]]]];
+$current = ['discovery_rules' => ['updated' => [[
+	'before' => $localRule,
+	'after' => $officialRule
+]]]];
+$result = ThreeWayChangeAnalyzer::analyze($historical, $current);
+assertThreeWay(1, $result['summary']['local_only_overwrite'], 'A non-default LOCAL value must still be treated as a real local overwrite risk.');
+assertThreeWay('local_overwrite_risk', $result['status'], 'Real local customization must remain fail-closed.');
+
 echo "ThreeWayChangeAnalyzer tests passed.\n";
