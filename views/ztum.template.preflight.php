@@ -171,7 +171,7 @@ if ($status === 'passed') {
 			->addRow(
 				_('Confirmation'),
 				(new CCheckBox('confirm', '1'))->setLabel(_(
-					'I reviewed the candidate and verified rollback evidence and want to update this template.'
+					'I reviewed the risks shown above, verified rollback evidence, and accept applying the official upstream template.'
 				))
 			);
 
@@ -183,30 +183,6 @@ if ($status === 'passed') {
 
 		if ($manualOverride) {
 			$hiddenItems[] = (new CVar('manual_override', '1'))->removeId();
-			$confirmationList->addRow(
-				_('Reviewed override'),
-				(new CCheckBox('confirm_manual_override', '1'))->setLabel(_(
-					'I explicitly accept the reviewed technical-risk conditions above.'
-				))
-			);
-
-			if (in_array('confirmed_three_way_conflict', $manualReasons, true)) {
-				$confirmationList->addRow(
-					_('Confirmed conflicts'),
-					(new CCheckBox('confirm_conflicts', '1'))->setLabel(_(
-						'I reviewed the BASE / LOCAL / UPSTREAM conflicts and accept replacing the affected LOCAL values with the reviewed official UPSTREAM values.'
-					))
-				);
-			}
-
-			if (in_array('local_customization_overwrite', $manualReasons, true)) {
-				$confirmationList->addRow(
-					_('Local customization overwrite'),
-					(new CCheckBox('confirm_local_overwrite', '1'))->setLabel(_(
-						'I explicitly accept overwriting or removing the local customizations identified above.'
-					))
-				);
-			}
 		}
 
 		$updateForm = (new CForm('post'))
@@ -216,11 +192,7 @@ if ($status === 'passed') {
 			->addItem($hiddenItems)
 			->addItem($confirmationList)
 			->addItem(makeFormFooter(
-				new CSubmitButton(
-					$manualOverride
-						? _('Update official template with reviewed override')
-						: _('Update official template')
-				)
+				new CSubmitButton(_('Update official template'))
 			));
 
 		$page
