@@ -6,11 +6,13 @@ use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
 use CWebUser;
+use Modules\ZabbixTemplateUpdateManager\Exception\ZtumException;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Throwable;
 
+require_once dirname(__DIR__).'/src/Exception/ZtumException.php';
 require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
@@ -49,6 +51,7 @@ class TemplateUpdate extends CController {
 			'title' => _('Template update result'),
 			'templateid' => $templateId,
 			'result' => null,
+			'operation_error_code' => null,
 			'operation_error' => null
 		];
 
@@ -77,6 +80,9 @@ class TemplateUpdate extends CController {
 				$templateId,
 				$exception->getMessage()
 			));
+			$data['operation_error_code'] = $exception instanceof ZtumException
+				? $exception->getMachineCode()
+				: 'unexpected_error';
 			$data['operation_error'] = _(
 				'Update could not be completed. Review frontend logs and verify the current template state before retrying.'
 			);
