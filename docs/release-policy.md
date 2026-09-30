@@ -14,6 +14,10 @@ A beta prerelease is allowed to be the immutable artifact used to complete the r
 
 The project should avoid using beta numbers as per-commit build identifiers.
 
+### Security-semantics freeze
+
+Once a beta is designated as the immutable field-test candidate, update eligibility, conflict handling, evidence requirements and any other write-safety semantics are frozen for that candidate. A change that relaxes or materially changes a safety decision requires a new beta candidate and restarts the affected field-validation matrix. Diagnostic hardening, tests and documentation corrections may continue on `main`, but they must not be represented as evidence for the already published immutable beta.
+
 ## Git tags and GitHub Releases
 
 Formal tags use `v0.1.0-beta.40` / `v1.0.0`.
