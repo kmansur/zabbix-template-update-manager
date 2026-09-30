@@ -5,11 +5,13 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CWebUser;
+use Modules\ZabbixTemplateUpdateManager\Exception\ZtumException;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledInstallService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Throwable;
 
+require_once dirname(__DIR__).'/src/Exception/ZtumException.php';
 require_once dirname(__DIR__).'/src/Service/TemplateControlledInstallService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
@@ -37,6 +39,7 @@ class TemplateInstallBatchExecuteOne extends CController {
 					'main_block' => json_encode([
 						'ok' => false,
 						'result' => null,
+						'error_code' => 'invalid_request',
 						'error' => _('Invalid single-template installation execution request.')
 					], JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE)
 				]))->disableView()
@@ -52,7 +55,7 @@ class TemplateInstallBatchExecuteOne extends CController {
 
 	protected function doAction(): void {
 		$uuid = strtolower(str_replace('-', '', trim((string) $this->getInput('uuid'))));
-		$output = ['ok' => false, 'result' => null, 'error' => null];
+		$output = ['ok' => false, 'result' => null, 'error_code' => null, 'error' => null];
 
 		$operationException = null;
 
@@ -75,6 +78,9 @@ class TemplateInstallBatchExecuteOne extends CController {
 				$exception->getMessage()
 			));
 
+			$output['error_code'] = $exception instanceof ZtumException
+				? $exception->getMachineCode()
+				: 'unexpected_error';
 			$output['error'] = $exception->getMessage() !== ''
 				? $exception->getMessage()
 				: _(
