@@ -16,7 +16,7 @@ This is **not** an RC or production-readiness declaration. Real controlled-write
 |---|---|---|
 | Implementation ready | **Complete** | No known repository-side implementation blocker remains for the declared official-Zabbix-repository scope. |
 | Automation infrastructure | **Complete** | CI, security guards, PHP matrix, Zabbix 7/8 frontend checks, Chromium/full-stack read-only smoke, accessibility, coverage floors and release-package gates are implemented. |
-| Release engineering | **Complete** | Formal prerelease/tag workflow, runtime smoke, archives and SHA256SUMS are implemented; `v0.1.0-beta.61` is the immutable laboratory artifact. |
+| Release engineering | **Complete** | Formal prerelease/tag workflow, runtime smoke, archives and SHA256SUMS are implemented; `v0.1.0-beta.61` is the next immutable laboratory artifact for the remaining RC matrix. |
 | Field validation | **In progress** | Zabbix 7.0.31 has recorded read-only/UI, policy/history, BASE/three-way analysis, reviewed update, install, rollback/recovery backup, post-write validation and successful reviewed multi-template batch execution. Stop-on-first-failure, resilience/offline/serialization and negative-security paths remain open, followed by the corresponding Zabbix 8 matrix. |
 | RC status | **Not declared** | Promotion occurs only after the validation matrix is reviewed. |
 | Production recommendation | **Not declared** | Requires successful RC validation and final security/release review. |
