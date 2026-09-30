@@ -229,7 +229,7 @@ final class BatchOperationRepository {
 		}
 
 		$tmp = tempnam($this->dir, '.ztum-batch-');
-		if (!is_string($tmp) || $tmp === '') {
+		if (!is_string($tmp)) {
 			throw new RuntimeException('Unable to create temporary batch operation state.');
 		}
 		try {
@@ -266,7 +266,7 @@ final class BatchOperationRepository {
 		}
 	}
 
-	private function validate($state, string $id): array {
+	private function validate(mixed $state, string $id): array {
 		if (!is_array($state) || ($state['schema_version'] ?? null) !== self::SCHEMA_VERSION
 				|| ($state['id'] ?? null) !== $id
 				|| !in_array($state['type'] ?? null, ['update', 'install'], true)
