@@ -2,7 +2,7 @@
 set -Eeuo pipefail
 
 REPOSITORY="kmansur/zabbix-template-update-manager"
-REF="${ZTUM_REF:-main}"
+REF="${ZTUM_REF:-v0.1.0-beta.61}"
 MODULES_DIR=""
 PHP_USER=""
 ASSUME_YES=0
@@ -21,7 +21,7 @@ Uso:
   sudo bash tools/quickinstall-pt-br.sh [opções]
 
 Opções:
-  --ref REF             Branch/tag/commit Git a instalar (padrão: main)
+  --ref REF             Branch/tag/commit Git a instalar (padrão: v0.1.0-beta.61)
   --modules-dir DIR     Diretório de módulos do frontend Zabbix
   --php-user USER       Usuário de execução do PHP-FPM/web
   --yes                 Modo não interativo
