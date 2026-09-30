@@ -61,8 +61,8 @@ cat > "$OUTPUT_DIR/environment.md" <<EOF
 This bundle contains no credentials by design. Review every file before publishing.
 EOF
 
-if [[ -x "$MODULE_DIR/tools/ztum-field-evidence.sh" ]]; then
-  "$MODULE_DIR/tools/ztum-field-evidence.sh" \
+if [[ -f "$MODULE_DIR/tools/ztum-field-evidence.sh" ]]; then
+  bash "$MODULE_DIR/tools/ztum-field-evidence.sh" \
     --module-dir "$MODULE_DIR" \
     --browser "$BROWSER" \
     --theme "$THEME" \
