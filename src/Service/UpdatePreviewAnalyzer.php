@@ -116,8 +116,8 @@ final class UpdatePreviewAnalyzer {
 		array $entity,
 		string $field,
 		string $changeType,
-		$before,
-		$after
+		mixed $before,
+		mixed $after
 	): void {
 		if ($changeType === 'added') {
 			$summary['added']++;
@@ -180,7 +180,7 @@ final class UpdatePreviewAnalyzer {
 		return self::canonicalize($left['value']) === self::canonicalize($right['value']);
 	}
 
-	private static function canonicalize($value) {
+	private static function canonicalize(mixed $value): mixed {
 		if (!is_array($value)) {
 			return $value;
 		}
@@ -195,7 +195,7 @@ final class UpdatePreviewAnalyzer {
 		return $value;
 	}
 
-	private static function displayState(array $state) {
+	private static function displayState(array $state): mixed {
 		return $state['exists'] ? $state['value'] : ['__state' => 'missing'];
 	}
 }
