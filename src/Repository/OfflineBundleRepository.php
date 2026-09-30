@@ -79,18 +79,6 @@ final class OfflineBundleRepository {
 			return null;
 		}
 
-		if ($this->signatureVerifier->isRequired() || $this->signatureVerifier->isConfigured()) {
-			$signaturePath = $this->rootDir.DIRECTORY_SEPARATOR.'manifest.sig.json';
-			if (is_link($signaturePath) || !is_file($signaturePath) || !is_readable($signaturePath)) {
-				throw new RuntimeException('The signed offline bundle manifest signature is missing or unsafe.');
-			}
-			$signature = file_get_contents($signaturePath);
-			if (!is_string($signature) || $signature === '' || strlen($signature) > 65536) {
-				throw new RuntimeException('The signed offline bundle manifest signature is unreadable.');
-			}
-			$this->signatureVerifier->verify($content, $signature);
-		}
-
 		try {
 			$data = json_decode($content, true, 128, JSON_THROW_ON_ERROR);
 		}
@@ -195,6 +183,18 @@ final class OfflineBundleRepository {
 		if ($size === false || $size < 2 || $size > self::MAX_MANIFEST_BYTES
 				|| !is_string($content) || strlen($content) > self::MAX_MANIFEST_BYTES) {
 			throw new RuntimeException('The offline bundle manifest is unreadable or exceeds the size limit.');
+		}
+
+		if ($this->signatureVerifier->isRequired() || $this->signatureVerifier->isConfigured()) {
+			$signaturePath = $this->rootDir.DIRECTORY_SEPARATOR.'manifest.sig.json';
+			if (is_link($signaturePath) || !is_file($signaturePath) || !is_readable($signaturePath)) {
+				throw new RuntimeException('The signed offline bundle manifest signature is missing or unsafe.');
+			}
+			$signature = file_get_contents($signaturePath);
+			if (!is_string($signature) || $signature === '' || strlen($signature) > 65536) {
+				throw new RuntimeException('The signed offline bundle manifest signature is unreadable.');
+			}
+			$this->signatureVerifier->verify($content, $signature);
 		}
 
 		try {
