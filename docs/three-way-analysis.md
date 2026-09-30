@@ -146,6 +146,15 @@ It does not:
 
 A conflict or overwrite-risk result is evidence for administrator review. Operational risk classification, affected-host impact and controlled update workflows remain separate stages.
 
+## Materialized Zabbix defaults
+
+Real Zabbix 7.0.31 field validation demonstrated that `configuration.importcompare` may expose selected discovery-rule defaults in LOCAL even when the canonical official YAML omits those fields. ZTUM therefore treats only source-proven, entity-scoped defaults as semantically equivalent to omission:
+
+- `discovery_rules.lifetime = 30d`;
+- `discovery_rules.enabled_lifetime_type = DISABLE_NEVER`.
+
+The allow-list is intentionally narrow. Any non-default local value remains a real local change and continues to participate in local-overwrite/conflict classification.
+
 ## Current limitations
 
 - Nested non-structured arrays such as macro/tag/preprocessing collections can appear as one normalized field value when Zabbix returns them inside an entity snapshot. More granular semantic decomposition can be added later without changing the three-way model.
