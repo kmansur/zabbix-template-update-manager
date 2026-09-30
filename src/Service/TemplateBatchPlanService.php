@@ -225,7 +225,7 @@ final class TemplateBatchPlanService {
 			return false;
 		}
 
-		$allowed = ['medium_technical_risk', 'high_technical_risk', 'local_customization_overwrite'];
+		$allowed = ['confirmed_three_way_conflict', 'medium_technical_risk', 'high_technical_risk', 'local_customization_overwrite'];
 		foreach ($manualReasons as $reason) {
 			if (!in_array($reason, $allowed, true)) {
 				return false;

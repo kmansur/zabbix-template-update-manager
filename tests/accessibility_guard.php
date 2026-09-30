@@ -27,8 +27,7 @@ foreach ([
 
 $confirmationContracts = [
 	'views/ztum.template.batch.prepare.php' => [
-		'ztum-batch-confirm',
-		'ztum-batch-confirm-local-overwrite'
+		'ztum-batch-confirm'
 	],
 	'views/ztum.template.install.batch.prepare.php' => [
 		'ztum-install-batch-confirm'

@@ -4,6 +4,12 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Reviewed batch preparation now treats `confirmed_three_way_conflict` as a known manual-review reason when identities/coverage are complete, instead of forcing individual-only handling.
+- Request-bounded batch execution now uses the same single explicit acknowledgement model as individual reviewed updates.
+- The legacy batch controller now accepts the configured bounded multi-template cardinality instead of rejecting any selection larger than one template.
+
 ### Changed
 
 - Confirmed BASE / LOCAL / UPSTREAM conflicts with complete identity/coverage evidence now enter the explicit reviewed-update path instead of being an absolute blocker.

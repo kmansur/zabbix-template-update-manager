@@ -149,6 +149,44 @@ assertBatchPlan(true, $localPlan['items'][0]['batch_manual_requires_local_overwr
 assertBatchPlan(hash('sha256', 'local-overwrite-105'), $localPlan['items'][0]['manual_evidence_sha256'],
 	'Local-overwrite reviewed batch candidate must retain manual preflight evidence.');
 
+$knownConflictService = new TemplateBatchPlanService(
+	static fn(string $templateId): array => [
+		'template' => [
+			'templateid' => $templateId,
+			'name' => 'Template '.$templateId,
+			'vendor_version' => '7.0-1',
+			'upstream_vendor_version' => '7.0-2',
+			'host_count' => 0
+		],
+		'update_readiness' => [
+			'status' => 'review_backup_verified',
+			'next_step' => 'run_manual_preflight',
+			'candidate_for_backup' => false,
+			'backup_verified' => true,
+			'manual_confirmation_required' => true,
+			'manual_reasons' => ['confirmed_three_way_conflict', 'local_customization_overwrite'],
+			'blockers' => [],
+			'review_flags' => ['confirmed_three_way_conflict', 'local_customization_overwrite']
+		],
+		'backup_verification' => ['status' => 'current_match'],
+		'comparison_error' => null
+	],
+	null,
+	static fn(string $templateId, bool $manualOverride = false): array => [
+		'status' => 'passed',
+		'manual_override' => $manualOverride,
+		'evidence_sha256' => hash('sha256', 'known-conflict-'.$templateId)
+	]
+);
+$knownConflictPlan = $knownConflictService->build(['108'], false);
+assertBatchPlan(true, $knownConflictPlan['items'][0]['batch_manual_eligible'],
+	'Confirmed known conflicts with complete reviewed evidence must be eligible for explicitly selected reviewed batch execution.');
+assertBatchPlan(
+	hash('sha256', 'known-conflict-108'),
+	$knownConflictPlan['items'][0]['manual_evidence_sha256'],
+	'Known-conflict reviewed batch candidate must retain manual preflight evidence.'
+);
+
 $unknownManualService = new TemplateBatchPlanService(
 	static fn(string $templateId): array => [
 		'template' => [
