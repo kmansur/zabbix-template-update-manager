@@ -8,6 +8,10 @@ require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
 
 $directory = $argv[1] ?? dirname(__DIR__).'/build/upstream';
 $files = glob(rtrim($directory, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.'*.json');
+if (is_array($files)) {
+	$files = array_values(array_filter($files, static fn(string $file): bool
+		=> preg_match('/^\\d+\\.\\d+\\.json$/', basename($file)) === 1));
+}
 if ($files === false || $files === []) {
 	fwrite(STDERR, "No generated upstream indexes found in {$directory}.\n");
 	exit(1);
