@@ -24,20 +24,37 @@ $state = $repo->create('update', [
 assertBatch('pending', $state['status'], 'New persisted batch must be pending.');
 assertBatch(2, count($state['entries']), 'Persisted batch must preserve reviewed entry order.');
 
-$repo->begin($state['id'], 'template-101', $e1);
+$repo->begin($state['id'], 'template-101', $e1, 'update', '1');
 $afterFirst = $repo->finish($state['id'], 'template-101', 'succeeded', 'updated', null);
 assertBatch('succeeded', $afterFirst['entries'][0]['state'], 'Completed first entry must persist success.');
 assertBatch('pending', $afterFirst['entries'][1]['state'], 'Next entry must remain pending.');
 
+
 try {
-	$repo->begin($state['id'], 'template-102', hash('sha256', 'tampered'));
+	$repo->begin($state['id'], 'template-102', $e2, 'install', '1');
+	assertBatch(true, false, 'Wrong operation type must be rejected.');
+}
+catch (RuntimeException $exception) {
+	assertBatch(true, str_contains($exception->getMessage(), 'type'), 'Wrong operation type must fail explicitly.');
+}
+
+try {
+	$repo->begin($state['id'], 'template-102', $e2, 'update', '2');
+	assertBatch(true, false, 'Different operator must not execute another operator batch.');
+}
+catch (RuntimeException $exception) {
+	assertBatch(true, str_contains($exception->getMessage(), 'different operator'), 'Operator binding must fail explicitly.');
+}
+
+try {
+	$repo->begin($state['id'], 'template-102', hash('sha256', 'tampered'), 'update', '1');
 	assertBatch(true, false, 'Changed evidence must not start a persisted batch entry.');
 }
 catch (RuntimeException $exception) {
 	assertBatch(true, str_contains($exception->getMessage(), 'evidence'), 'Evidence mismatch must fail explicitly.');
 }
 
-$repo->begin($state['id'], 'template-102', $e2);
+$repo->begin($state['id'], 'template-102', $e2, 'update', '1');
 $file = $dir.DIRECTORY_SEPARATOR.$state['id'].'.json';
 $data = json_decode((string) file_get_contents($file), true, 128, JSON_THROW_ON_ERROR);
 $data['entries'][1]['started_at'] = gmdate('c', time() - 3600);
@@ -47,7 +64,7 @@ assertBatch('uncertain', $recovered['status'], 'Interrupted stale running batch 
 assertBatch('uncertain', $recovered['entries'][1]['state'], 'Interrupted entry must never return to pending automatically.');
 
 try {
-	$repo->begin($state['id'], 'template-102', $e2);
+	$repo->begin($state['id'], 'template-102', $e2, 'update', '1');
 	assertBatch(true, false, 'Uncertain entry must not be retried automatically.');
 }
 catch (RuntimeException $exception) {
