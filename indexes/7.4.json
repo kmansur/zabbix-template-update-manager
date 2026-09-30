@@ -3,8 +3,8 @@
   "source": {
     "line": "7.4",
     "ref": "release/7.4",
-    "commit": "d1bb54337cf77bdbb3a9276eb2c3ccce7073e628",
-    "commit_date": "2026-09-30T08:30:52+03:00",
+    "commit": "ddcb0c4a5bb1876cfc76c1b65ba4178ac47d8d5c",
+    "commit_date": "2026-09-30T16:17:59+03:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
@@ -713,7 +713,7 @@
       "sources": [
         {
           "path": "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml",
-          "sha256": "c7769beecf47b625db3ed1b65d305882dd8ce740cd6e0e9414e11bfe1f95a7ef"
+          "sha256": "3c660b4a6674fcc5626050730fd9254d739bbc968e5291adb1b9bdd02a438012"
         }
       ]
     },
@@ -874,17 +874,17 @@
       "name": "QTech QSW by SNMP",
       "technical_name": "QTech QSW by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/qtech_snmp/template_net_qtech_snmp.yaml"
       ],
       "content_sha256s": [
-        "c1462cfbe7e45a269f21dcf252b73564c1412eeaaa71994c68e452cfd5e75128"
+        "d1af9bc262c30285a76e780786e7e3ceb5e2b5391568ec34898d4db41298fb6f"
       ],
       "sources": [
         {
           "path": "templates/net/qtech_snmp/template_net_qtech_snmp.yaml",
-          "sha256": "179b2aacf9047f0e62f34786534fcc5946a1cdf623dd0ab36e5ecf11256f237e"
+          "sha256": "04311b729f5dda7a369ac13d6979d7e2a717ef3eacd0e0614be958b468c2cc77"
         }
       ]
     },
@@ -1064,17 +1064,17 @@
       "name": "Arista by SNMP",
       "technical_name": "Arista by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/arista_snmp/template_net_arista_snmp.yaml"
       ],
       "content_sha256s": [
-        "ad2af4a1906680a61ca855e8525f6526c760d2802adb324f7f3e5eadf7995be2"
+        "daa52c7637230481733279b1c07c99fb238d7f4286f86fe67773c4595fd9f4ae"
       ],
       "sources": [
         {
           "path": "templates/net/arista_snmp/template_net_arista_snmp.yaml",
-          "sha256": "d663dde32e2f51db4e5048e85711961f37215cc98e70b70a5938c449ccfce10a"
+          "sha256": "1365692f518d2d7082e05eb46118545027a4826bde577d78ef40c7819064a7c9"
         }
       ]
     },
@@ -1986,7 +1986,7 @@
       "sources": [
         {
           "path": "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml",
-          "sha256": "c7769beecf47b625db3ed1b65d305882dd8ce740cd6e0e9414e11bfe1f95a7ef"
+          "sha256": "3c660b4a6674fcc5626050730fd9254d739bbc968e5291adb1b9bdd02a438012"
         }
       ]
     },
@@ -2489,17 +2489,17 @@
       "name": "Alcatel Timetra TiMOS by SNMP",
       "technical_name": "Alcatel Timetra TiMOS by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/alcatel_timetra_snmp/template_net_alcatel_timetra_snmp.yaml"
       ],
       "content_sha256s": [
-        "94b085ec4acf6baccc9abc7e088d69861947f04a5b93a976349396c3a0725acd"
+        "5d69c8f500d3b9f8a45b128741ce5af8ee2616b0981057ecfefa4d53f54e254e"
       ],
       "sources": [
         {
           "path": "templates/net/alcatel_timetra_snmp/template_net_alcatel_timetra_snmp.yaml",
-          "sha256": "3637cc30f8ae3c2d5bbf9278866547289c4859ed40d079e9dead07c84f8ca981"
+          "sha256": "630d8ba6e355e86deb0ce035d3fb0b988b0cf62c864e58afbb5ae81a36fe83a2"
         }
       ]
     },
@@ -2603,17 +2603,17 @@
       "name": "HP Comware HH3C by SNMP",
       "technical_name": "HP Comware HH3C by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/hp_hh3c_snmp/template_net_hp_hh3c_snmp.yaml"
       ],
       "content_sha256s": [
-        "bf1ad17f499b1502900d12236333d9cf946b613897cf838716718905f5f3bf1f"
+        "f4f0373600d0bae197d282d26f89b40da20488128fbbb0068817ca730740589b"
       ],
       "sources": [
         {
           "path": "templates/net/hp_hh3c_snmp/template_net_hp_hh3c_snmp.yaml",
-          "sha256": "b32a7b44bd2877e24342c894fcc009f1c00c56c93c40cdd29b44465ffd7a1901"
+          "sha256": "ece1f79c1062d0d9ce5d359f8cae37edd727ed789c32c7c4099c56dde192a45c"
         }
       ]
     },
@@ -2893,17 +2893,17 @@
       "name": "Network Generic Device by SNMP",
       "technical_name": "Network Generic Device by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/generic_snmp/template_net_generic_snmp.yaml"
       ],
       "content_sha256s": [
-        "0a4a532fd7f87e0855dc363e311f2d9d17290f75d44269bc5d55838f287b87f6"
+        "a3aa8ba1185ed9ef3fffa20adf208730bffa820f61dba556a1b1c0ab76e3d0f7"
       ],
       "sources": [
         {
           "path": "templates/net/generic_snmp/template_net_generic_snmp.yaml",
-          "sha256": "ce26311c7100359bcb3bb5406033cca28460b2ad21ebd6f7098c24110458654c"
+          "sha256": "fc8851aa34269ba6d9502b25b534468977d8d1ffd68482e0f25170485792c75b"
         }
       ]
     },
@@ -3677,17 +3677,17 @@
       "name": "Extreme EXOS by SNMP",
       "technical_name": "Extreme EXOS by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/extreme_snmp/template_net_extreme_snmp.yaml"
       ],
       "content_sha256s": [
-        "0bc0b4807d3322bf78e4549daeb50e04482d323c429e0024e572ee2cd529b766"
+        "d70aeb9c0750984e9f18e0e92d51ff6a297bcb01ebad678f2216808559062696"
       ],
       "sources": [
         {
           "path": "templates/net/extreme_snmp/template_net_extreme_snmp.yaml",
-          "sha256": "288a9fb356c8114e443764248e8b5e19300d97c216a5761080fe0f9bd60dbe60"
+          "sha256": "45019f448d9f948d81d6a974ddb4b57297829838919ae3b9f4a9bff96f30bc10"
         }
       ]
     },
@@ -4304,17 +4304,17 @@
       "name": "Juniper by SNMP",
       "technical_name": "Juniper by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/juniper_snmp/template_net_juniper_snmp.yaml"
       ],
       "content_sha256s": [
-        "65097666da1005ab08dcc72eef72b2fcc7acf74fe680522660ac8f577ab8666d"
+        "d40d49d18505f919242cce426b8c29040a5854b1797e6c615ec0fe4c45537b27"
       ],
       "sources": [
         {
           "path": "templates/net/juniper_snmp/template_net_juniper_snmp.yaml",
-          "sha256": "3e179e8f6bde727eed7c9dd74ff906d292f1053065552dc04f9f3cb5b009ecc0"
+          "sha256": "e93c584fe14d8914965f74316acb498e81022473f8dea91350d2971e5c3ed80e"
         }
       ]
     },
@@ -4513,17 +4513,17 @@
       "name": "Cisco IOS by SNMP",
       "technical_name": "Cisco IOS by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-4",
+      "vendor_version": "7.4-5",
       "paths": [
         "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml"
       ],
       "content_sha256s": [
-        "03670714a85abfbd2efa8f98be79a5cfc36e2abf1865826ef29db515b5ce1121"
+        "cd1928cda825e0086f4c755174bc58702f1c4a80b25934ec43e69b5ce20350d5"
       ],
       "sources": [
         {
           "path": "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml",
-          "sha256": "c7769beecf47b625db3ed1b65d305882dd8ce740cd6e0e9414e11bfe1f95a7ef"
+          "sha256": "3c660b4a6674fcc5626050730fd9254d739bbc968e5291adb1b9bdd02a438012"
         }
       ]
     },
@@ -4608,17 +4608,17 @@
       "name": "Huawei VRP by SNMP",
       "technical_name": "Huawei VRP by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/huawei_snmp/template_net_huawei_snmp.yaml"
       ],
       "content_sha256s": [
-        "544e6ccd5b0643358bf8c3ccb81c169a7af79dc7fa9fcf3888e607e29c99abb0"
+        "11ba6d724b6cc4e47233f8c4c0ecf9208eb88d96f9351be80720ace8b62bb7dd"
       ],
       "sources": [
         {
           "path": "templates/net/huawei_snmp/template_net_huawei_snmp.yaml",
-          "sha256": "4a55df2d66ef47f76de06e6e29b0daa52d2308003a7161eb8ca10ca3dad79ea0"
+          "sha256": "385d04ecf6bd251d3c0e0f983cb10e318b90f3e0498b80cb5b70b85db1894813"
         }
       ]
     },
@@ -5406,17 +5406,17 @@
       "name": "HP Enterprise Switch by SNMP",
       "technical_name": "HP Enterprise Switch by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/hp_hpn_snmp/template_net_hp_hpn_snmp.yaml"
       ],
       "content_sha256s": [
-        "ef98ad871d3ab62966aac2af237815d7701b4557b6cba7e5e44a170cf57aeac9"
+        "4c3f71bee6b6edfe00c13bd97b78d5f7e4cfb486e33af81699f5d8f3451c388b"
       ],
       "sources": [
         {
           "path": "templates/net/hp_hpn_snmp/template_net_hp_hpn_snmp.yaml",
-          "sha256": "8c0b0e6b9defa2a8edfad3545677de7d1c6f69698638c207aad356a39f3bfde7"
+          "sha256": "abb10884a856b022dc288e7331d83fa4363907028a20717786365f6fe9ad784b"
         }
       ]
     },
@@ -5577,17 +5577,17 @@
       "name": "D-Link DES_DGS Switch by SNMP",
       "technical_name": "D-Link DES_DGS Switch by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/dlink_des_snmp/template_net_dlink_des_snmp.yaml"
       ],
       "content_sha256s": [
-        "19b8fa31368c25f664c35c8e1900a4b843bfac5f305214e8678b3da83394a449"
+        "9c37d9b095c2a029bd08cc8a57e4eb2ebcb8db2f83a44a2421ce613d7cbd5726"
       ],
       "sources": [
         {
           "path": "templates/net/dlink_des_snmp/template_net_dlink_des_snmp.yaml",
-          "sha256": "a4543c081752f80767082ce993b8537357f02475d6b3170a4769073a47bdaa38"
+          "sha256": "58e5347d04d895c0d4a95ad044bf9452530217d1d0013ed51460d9fd788d57c9"
         }
       ]
     },
@@ -6090,17 +6090,17 @@
       "name": "Dell Force S-Series by SNMP",
       "technical_name": "Dell Force S-Series by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-2",
+      "vendor_version": "7.4-3",
       "paths": [
         "templates/net/dell_force_s_series_snmp/template_net_dell_force_s_series_snmp.yaml"
       ],
       "content_sha256s": [
-        "cf8c643baf55e929f63bff0f4ea0dd1fd9b3c1a76df19f5675c4359632ab099f"
+        "5acfb72cd27142dc373491ad72df0dceab5d94d43605224b463b2f01c5c391f9"
       ],
       "sources": [
         {
           "path": "templates/net/dell_force_s_series_snmp/template_net_dell_force_s_series_snmp.yaml",
-          "sha256": "d70a446ee54e98077fb40a1f2e323fe43277625e4df321ec294b6b3b682123d9"
+          "sha256": "7f8a1c6c064c5e2206d0011319df7406bfeefed96fb0cc24af599d9bf3260c2e"
         }
       ]
     },
