@@ -5,12 +5,9 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import tempfile
-import sys
 from pathlib import Path
 
-TOOLS_DIR = Path(__file__).resolve().parents[1] / "tools"
-sys.path.insert(0, str(TOOLS_DIR))
-MODULE_PATH = TOOLS_DIR / "build_upstream_index.py"
+MODULE_PATH = Path(__file__).resolve().parents[1] / "tools" / "build_upstream_index.py"
 spec = importlib.util.spec_from_file_location("build_upstream_index", MODULE_PATH)
 module = importlib.util.module_from_spec(spec)
 assert spec.loader is not None

@@ -4,12 +4,6 @@ on:
   schedule:
     - cron: '17 3 * * *'
   workflow_dispatch:
-    inputs:
-      require_signature:
-        description: 'Fail unless indexes are signed with the configured Ed25519 secret'
-        required: false
-        default: false
-        type: boolean
   push:
     branches:
       - main
@@ -51,9 +45,6 @@ jobs:
 
       - name: Build indexes
         shell: bash
-        env:
-          ZTUM_INDEX_SIGNING_SECRET_KEY_B64: ${{ secrets.ZTUM_INDEX_SIGNING_SECRET_KEY_B64 }}
-          ZTUM_REQUIRE_WORKFLOW_SIGNATURE: ${{ inputs.require_signature || 'false' }}
         run: |
           set -euo pipefail
 
@@ -177,22 +168,13 @@ jobs:
             commit="$(git -C "$source_dir" rev-parse HEAD)"
             commit_date="$(git -C "$source_dir" show -s --format=%cI HEAD)"
 
-            signing_args=()
-            if [[ -n "${ZTUM_INDEX_SIGNING_SECRET_KEY_B64:-}" ]]; then
-              signing_args+=(--signature-output "build/upstream/${line}.json.sig.json")
-            elif [[ "${ZTUM_REQUIRE_WORKFLOW_SIGNATURE}" == "true" ]]; then
-              echo "Ed25519 signing is required but ZTUM_INDEX_SIGNING_SECRET_KEY_B64 is not configured." >&2
-              exit 1
-            fi
-
             python tools/build_upstream_index.py \
               --source-dir "$source_dir" \
               --line "$line" \
               --source-ref "$ref" \
               --source-commit "$commit" \
               --source-commit-date "$commit_date" \
-              --output "build/upstream/${line}.json" \
-              "${signing_args[@]}"
+              --output "build/upstream/${line}.json"
           }
 
           build_initial_line() {
@@ -217,22 +199,13 @@ jobs:
             commit="$(git -C "$source_dir" rev-parse HEAD)"
             commit_date="$(git -C "$source_dir" show -s --format=%cI HEAD)"
 
-            signing_args=()
-            if [[ -n "${ZTUM_INDEX_SIGNING_SECRET_KEY_B64:-}" ]]; then
-              signing_args+=(--signature-output "build/upstream-initial/${line}.json.sig.json")
-            elif [[ "${ZTUM_REQUIRE_WORKFLOW_SIGNATURE}" == "true" ]]; then
-              echo "Ed25519 signing is required but ZTUM_INDEX_SIGNING_SECRET_KEY_B64 is not configured." >&2
-              exit 1
-            fi
-
             python tools/build_upstream_index.py \
               --source-dir "$source_dir" \
               --line "$line" \
               --source-ref "$ref" \
               --source-commit "$commit" \
               --source-commit-date "$commit_date" \
-              --output "build/upstream-initial/${line}.json" \
-              "${signing_args[@]}"
+              --output "build/upstream-initial/${line}.json"
           }
 
           build_line '7.0'
@@ -382,7 +355,7 @@ jobs:
           git switch -C upstream-index
 
           mkdir -p indexes initial
-          rm -f indexes/*.json indexes/*.sig.json initial/*.json initial/*.sig.json
+          rm -f indexes/*.json initial/*.json
           cp "$GITHUB_WORKSPACE"/build/upstream/*.json indexes/
           cp "$GITHUB_WORKSPACE"/build/upstream-initial/*.json initial/
 

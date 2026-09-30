@@ -12,8 +12,6 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
-from ed25519_signing import signing_secret_from_env, write_signature
-
 COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 PATH_RE = re.compile(r"^templates/(?:[A-Za-z0-9._+\-]+/)*[A-Za-z0-9._+\-]+\.yaml$")
 MAX_HISTORY = 75
@@ -138,7 +136,6 @@ def main() -> int:
     parser.add_argument("--index", required=True, action="append", type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--history-limit", type=int, default=MAX_HISTORY)
-    parser.add_argument("--require-signature", action="store_true")
     args = parser.parse_args()
 
     if args.history_limit < 1 or args.history_limit > MAX_HISTORY:
@@ -166,17 +163,6 @@ def main() -> int:
         commit = str(index["source"]["commit"]).lower()
         write_file(output, f"indexes/{line}.json", raw, manifest_files)
 
-        signature_path = index_path.with_name(index_path.name + ".sig.json")
-        if signature_path.is_file():
-            write_file(
-                output,
-                f"indexes/{line}.json.sig.json",
-                signature_path.read_bytes(),
-                manifest_files,
-            )
-        elif args.require_signature:
-            raise RuntimeError(f"{index_path}: signed bundle requires index signature {signature_path.name}")
-
         for path, expected_sha in current_sources(index).items():
             source = run_git(repo, "show", f"{commit}:{path}")
             actual = hashlib.sha256(source).hexdigest()
@@ -197,17 +183,10 @@ def main() -> int:
         "generator": "tools/build_offline_bundle.py",
         "files": dict(sorted(manifest_files.items())),
     }
-    manifest_bytes = (json.dumps(manifest, indent=2, sort_keys=True) + "\n").encode("utf-8")
-    (output / "manifest.json").write_bytes(manifest_bytes)
-
-    secret = signing_secret_from_env()
-    if args.require_signature and secret is None:
-        raise RuntimeError("signed bundle requires ZTUM_INDEX_SIGNING_SECRET_KEY_B64")
-    if secret is not None:
-        signature = write_signature(output / "manifest.sig.json", manifest_bytes, secret)
-        print(f"Signed offline manifest with {signature['key_id']}")
-    elif args.require_signature:
-        raise RuntimeError("signed bundle manifest could not be produced")
+    (output / "manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
 
     print(f"Offline bundle created: {output}")
     print(f"Verified files: {len(manifest_files)}")
