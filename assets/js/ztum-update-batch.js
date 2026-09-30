@@ -343,6 +343,9 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 					if (existing.status === 'failed' || existing.status === 'uncertain') {
 						throw new Error(labels.execution_persisted_blocked);
 					}
+					if ((existing.entries || []).some((entry) => entry?.state === 'running')) {
+						throw new Error(labels.execution_persisted_running);
+					}
 					persistedOperationId = stored;
 					return existing;
 				}
