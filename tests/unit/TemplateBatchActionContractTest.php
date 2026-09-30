@@ -104,8 +104,8 @@ assertBatchContract(strpos($prepareBehavior, 'No unattended Ready templates. Sel
 		&& strpos($prepareBehavior, 'else if (counts.review > 0)') !== false,
 	'Review-only plans must explain how to continue with explicit reviewed selection.');
 assertBatchContract(strpos($prepareBehavior, "body.append('manual_override', '1')") !== false
-		&& strpos($prepareBehavior, "body.append('confirm_manual_override', '1')") !== false,
-	'Reviewed batch execution must send both explicit manual-override signals.');
+		&& strpos($prepareBehavior, "body.append('confirm_manual_override', '1')") === false,
+	'Reviewed batch execution must bind manual-review mode while using the single batch acknowledgement.');
 assertBatchContract(strpos($prepareBehavior, 'const reviewed = new Map(selectedReviewedEntries()') !== false,
 	'Ready and explicitly selected reviewed rows must be merged into one ordered request-bounded execution queue.');
 assertBatchContract(strpos($prepareBehavior, "new CButton('ztum-reviewed-select-all', _('Select all eligible'))") !== false
@@ -131,28 +131,26 @@ assertBatchContract(strpos($prepareBehavior, "'success' => ZBX_STYLE_GREEN") !==
 		&& strpos($prepareBehavior, "'danger' => ZBX_STYLE_RED") !== false,
 	'Dynamic batch statuses must use native Zabbix style constants rather than custom colors.');
 assertBatchContract(strpos($prepareBehavior, 'labels.review_batch_eligible') !== false
-		&& strpos($prepareBehavior, 'labels.review_overwrite_eligible') !== false
-		&& strpos($prepareBehavior, 'labels.review_individual_only') !== false,
-	'Execution state must distinguish technical reviewed, local-overwrite reviewed and individual-review-only rows.');
-assertBatchContract(strpos($prepareBehavior, "new CCheckBox('confirm_local_overwrite', '1')") !== false
-		&& strpos($prepareBehavior, "setId('ztum-batch-confirm-local-overwrite')") !== false
-		&& strpos($prepareBehavior, 'selectedLocalOverwrite > 0') !== false,
-	'Local-overwrite reviewed selection must require a second explicit batch acknowledgement.');
-assertBatchContract(strpos($prepareBehavior, "body.append('confirm_local_overwrite', '1')") !== false,
-	'Local-overwrite reviewed execution must transmit the additional acknowledgement only for those rows.');
+		&& strpos($prepareBehavior, 'labels.review_individual_only') !== false
+		&& strpos($prepareBehavior, 'labels.review_overwrite_eligible') === false,
+	'Execution state must distinguish batch-eligible reviewed rows from individual-review-only rows without extra acknowledgement classes.');
+assertBatchContract(strpos($prepareBehavior, "new CCheckBox('confirm_local_overwrite', '1')") === false
+		&& strpos($prepareBehavior, "setId('ztum-batch-confirm-local-overwrite')") === false
+		&& strpos($prepareBehavior, "body.append('confirm_local_overwrite', '1')") === false,
+	'Reviewed batch execution must use the same single acknowledgement model as individual reviewed updates.');
 
 assertBatchContract(strpos($update, "'templateids' => 'required|array_id'") !== false,
 	'Legacy batch execution must validate selected template IDs.');
-assertBatchContract(strpos($update, '$count === 1') !== false,
-	'Legacy synchronous batch execution must fail fast for more than one template.');
+assertBatchContract(strpos($update, '$count >= 1 && $count <= TemplateBatchPlanService::MAX_TEMPLATES') !== false,
+	'Legacy batch execution must accept the same bounded multi-template cardinality as preparation.');
 assertBatchContract(strpos($updateOne, "'templateid' => 'required|id'") !== false,
 	'Request-bounded execution must validate exactly one template ID.');
 assertBatchContract(strpos($updateOne, "'evidence_sha256' => 'required|string'") !== false
 		&& strpos($updateOne, "'confirm' => 'required|in 1'") !== false
 		&& strpos($updateOne, "'manual_override' => 'in 1'") !== false
-		&& strpos($updateOne, "'confirm_manual_override' => 'in 1'") !== false
-		&& strpos($updateOne, "'confirm_local_overwrite' => 'in 1'") !== false,
-	'Request-bounded execution must require bound evidence and explicit confirmations, including local-overwrite acknowledgement when applicable.');
+		&& strpos($updateOne, "'confirm_manual_override' => 'in 1'") === false
+		&& strpos($updateOne, "'confirm_local_overwrite' => 'in 1'") === false,
+	'Request-bounded execution must require bound evidence plus one explicit confirmation while retaining reviewed-mode binding.');
 assertBatchContract(strpos($updateOne, 'TemplateControlledUpdateService') !== false,
 	'Request-bounded execution must reuse TemplateControlledUpdateService.');
 assertBatchContract(strpos($manifest, '"ztum.templates.batch_update_one"') !== false
