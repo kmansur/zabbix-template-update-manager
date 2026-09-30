@@ -228,4 +228,34 @@ assertControlledUpdate(true, $manualSeen, 'Controlled update must rerun fresh pr
 assertControlledUpdate(true, $result['manual_override'], 'Controlled update result must retain reviewed-override mode.');
 assertControlledUpdate(['local_customization_overwrite'], $result['manual_reasons'], 'Controlled update result must retain reviewed reasons.');
 
+
+$conflictPreflight = $preflight;
+$conflictPreflight['manual_override'] = true;
+$conflictPreflight['manual_reasons'] = ['confirmed_three_way_conflict'];
+$conflictImported = false;
+$conflictService = new TemplateControlledUpdateService(
+	static fn(string $templateId, bool $manualOverride = false): array => $conflictPreflight,
+	static fn(array $freshPreflight): array => $builtCandidate,
+	static function (array $candidateToImport) use (&$conflictImported): void {
+		$conflictImported = true;
+	},
+	static fn(string $templateId, array $candidateToValidate): array => [
+		'status' => 'validated',
+		'valid' => true
+	]
+);
+$blockedConflict = $conflictService->execute('12345', $evidence, true, true, false);
+assertControlledUpdate('blocked_manual_confirmation', $blockedConflict['status'],
+	'Known three-way conflict must require its own explicit acknowledgement before import.');
+assertControlledUpdate('conflict_confirmation_required', $blockedConflict['reason'],
+	'Missing conflict acknowledgement must be explicit.');
+assertControlledUpdate(false, $conflictImported,
+	'Missing conflict acknowledgement must not invoke importer.');
+
+$allowedConflict = $conflictService->execute('12345', $evidence, true, true, true);
+assertControlledUpdate('updated', $allowedConflict['status'],
+	'Explicitly acknowledged known conflict may reach the controlled import path.');
+assertControlledUpdate(true, $conflictImported,
+	'Acknowledged known conflict may invoke the single controlled importer.');
+
 echo "TemplateControlledUpdateService tests passed.\n";
