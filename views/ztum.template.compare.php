@@ -66,13 +66,13 @@ $readinessStatusLabels = [
 	'not_applicable' => _('Not applicable'),
 	'blocked_baseline' => _('Blocked — historical baseline required'),
 	'blocked_unresolved' => _('Blocked — analysis unresolved'),
-	'blocked_conflict' => _('Blocked — conflict detected'),
+	'blocked_conflict' => _('Blocked — conflict detected (legacy state)'),
 	'blocked_local_overwrite' => _('Blocked — local customization overwrite risk'),
 	'blocked_update_policy' => _('Blocked — Never update policy'),
 	'review_high' => _('Manual high-risk review required'),
 	'review_medium' => _('Manual review required'),
-	'review_required' => _('Manual review path — rollback backup required'),
-	'review_backup_verified' => _('Manual review path — rollback backup verified'),
+	'review_required' => _('Review required — rollback backup required'),
+	'review_backup_verified' => _('Review required — rollback backup verified'),
 	'candidate_for_backup' => _('Candidate for backup and continued review'),
 	'backup_verified' => _('Rollback backup verified')
 ];
@@ -82,7 +82,7 @@ $readinessNextStepLabels = [
 	'resolve_update_preview' => _('Resolve update-preview identities'),
 	'resolve_historical_baseline' => _('Resolve historical official baseline'),
 	'resolve_three_way_analysis' => _('Resolve three-way comparison'),
-	'resolve_conflicts' => _('Resolve BASE / LOCAL / UPSTREAM conflicts'),
+	'resolve_conflicts' => _('Review BASE / LOCAL / UPSTREAM conflicts'),
 	'protect_local_customizations' => _('Protect or reconcile local customizations'),
 	'resolve_risk_analysis' => _('Resolve risk analysis'),
 	'manual_high_risk_review' => _('Perform manual high-risk change review'),
@@ -637,13 +637,13 @@ if (is_array($data['update_readiness'])
 
 		case 'review_required':
 			$readinessText = _(
-				'The comparison is authoritative and has no unresolved identities or three-way conflicts, but one or more known local-overwrite and/or medium/high technical-risk conditions require explicit manual review. A rollback backup may be created next; no configuration write is authorized yet.'
+				'The comparison is authoritative and has no unresolved identities. One or more known conflicts, local-overwrite conditions and/or medium/high technical-risk conditions require explicit administrator review. A rollback backup may be created next; no configuration write is authorized yet.'
 			);
 			break;
 
 		case 'review_backup_verified':
 			$readinessText = _(
-				'The reviewed manual-update path has an exact rollback backup matching the current installed template. The next step is a fresh reviewed preflight; the final import still requires a second explicit super-administrator acknowledgement of the reported overwrite/risk conditions.'
+				'The reviewed update path has an exact rollback backup matching the current installed template. The next step is a fresh reviewed preflight; the final import still requires explicit super-administrator acknowledgement of the reported conflict, overwrite and/or technical-risk conditions.'
 			);
 			break;
 
