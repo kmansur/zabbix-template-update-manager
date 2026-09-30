@@ -38,7 +38,6 @@ Before stable 1.0:
 - license/notice present;
 - a formal prerelease built and installed from its generated release artifacts;
 - checksums verified;
-- upstream index/offline-bundle Ed25519 trust configured and tamper-negative tests recorded;
 - interrupted/resumed batch behavior validated;
 - an independent reviewer has returned a reproducible validation bundle for the candidate.
 
