@@ -51,15 +51,18 @@ No optimistic fallback is used.
 
 ### `blocked_conflict`
 
-At least one normalized field/entity has a confirmed BASE / LOCAL / UPSTREAM conflict. Conflict resolution is an explicit human-review task and is outside automatic update flow.
+Legacy compatibility state retained for older evidence/UI mappings. Current authoritative three-way conflicts with complete identities are routed to `review_required`, not treated as an absolute blocker.
 
 ### `review_required`
 
-Authoritative baseline, identity coverage and three-way comparison are complete and there is no true BASE / LOCAL / UPSTREAM conflict, but at least one condition requires explicit human acceptance:
+Authoritative baseline, identity coverage and three-way comparison are complete, and at least one known condition requires explicit human acceptance:
 
+- a confirmed BASE / LOCAL / UPSTREAM conflict exists but every affected identity/value is known;
 - a known LOCAL-only difference would be overwritten or removed by current upstream;
 - technical review priority is `medium`;
 - technical review priority is `high`.
+
+Known conflict is not the same as unresolved state. A known conflict may proceed only through rollback backup, reviewed preflight and explicit conflict acknowledgement. Unknown/unresolved identity, provenance, integrity or security failures remain hard blockers.
 
 This state may advance only to rollback-backup creation. It is never an unattended batch-ready state.
 
@@ -78,12 +81,12 @@ All of the following are true:
 - current update preview is normalized without unresolved identities;
 - historical official baseline is proven;
 - three-way analysis is complete;
-- no conflict exists;
+- no manual-review reason exists (including confirmed conflicts or local overwrite);
 - risk coverage is complete;
 - overall technical review priority is `none` or `low`;
 - no manual-review reason is present.
 
-If local overwrite or medium/high technical risk is known but all hard evidence is resolved, the template uses `review_required` instead of standard `candidate_for_backup`.
+If a confirmed conflict, local overwrite or medium/high technical risk is known but all hard evidence is resolved, the template uses `review_required` instead of standard `candidate_for_backup`.
 
 This means only that the next allowed workflow step is:
 
@@ -130,8 +133,7 @@ UpdateReadinessEvaluator
         |
         +-- blocked_baseline
         +-- blocked_unresolved
-        +-- blocked_conflict
-        +-- blocked_conflict
+        +-- blocked_conflict (legacy / compatibility)
         +-- review_required
         |          |
         |          v
