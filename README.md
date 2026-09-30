@@ -10,7 +10,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.59**
+Current version: **0.1.0-beta.60**
 
 This version is intended for **laboratory testing**.
 
@@ -19,11 +19,11 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
-- Formal laboratory prerelease: **v0.1.0-beta.59** is published with checksummed `.tar.gz` and `.zip` assets.
+- Formal laboratory prerelease: **v0.1.0-beta.60** is published with checksummed `.tar.gz` and `.zip` assets.
 
-Beta.59 extends the pre-RC hardening work with disposable full-Zabbix 7.x/8.x frontend smoke tests in Chromium, light/dark catalog rendering checks, operation-history rendering, and enforced minimum coverage/reachability floors. It retains the beta.58 runtime-lock, permissions, inherited-impact, operation-history, licensing, JavaScript extraction and compatibility hardening.
+Beta.60 is the current pre-RC laboratory candidate. It retains the beta.59 disposable full-Zabbix 7.x/8.x frontend smoke, light/dark catalog checks, operation-history rendering and enforced coverage/reachability floors, and adds field-driven three-way normalization for proven Zabbix discovery-rule defaults without weakening fail-closed conflict handling.
 
-Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.59 is the first formal laboratory prerelease** and is intended to provide one immutable artifact for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
+Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.60 is the current immutable laboratory prerelease** for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
 
 For a new laboratory installation, use the quick installer below. For validation work, always record the exact installed version and commit/source ref.
 
@@ -249,7 +249,7 @@ git rev-parse HEAD
 Expected `VERSION` for the current laboratory build:
 
 ```text
-0.1.0-beta.59
+0.1.0-beta.60
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -265,7 +265,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.59**, enable the module and open:
+Confirm version **0.1.0-beta.60**, enable the module and open:
 
 ```text
 Data collection → Template updates
