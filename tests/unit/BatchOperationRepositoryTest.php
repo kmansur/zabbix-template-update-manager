@@ -71,6 +71,28 @@ catch (RuntimeException $exception) {
 	assertBatch(true, str_contains($exception->getMessage(), 'not pending'), 'Uncertain retry must fail closed.');
 }
 
+
+$terminal = $repo->create('install', [
+	['subject' => 'uuid-'.str_repeat('a', 32), 'evidence_sha256' => hash('sha256', 'terminal'), 'manual_override' => false]
+], '1');
+$repo->begin($terminal['id'], 'uuid-'.str_repeat('a', 32), hash('sha256', 'terminal'), 'install', '1');
+$repo->finish($terminal['id'], 'uuid-'.str_repeat('a', 32), 'failed', 'blocked', 'fixture');
+$terminalPath = $dir.DIRECTORY_SEPARATOR.$terminal['id'].'.json';
+touch($terminalPath, time() - 2592001);
+
+$active = $repo->create('update', [
+	['subject' => 'template-999', 'evidence_sha256' => hash('sha256', 'active'), 'manual_override' => false]
+], '1');
+$activePath = $dir.DIRECTORY_SEPARATOR.$active['id'].'.json';
+touch($activePath, time() - 2592001);
+
+$repo->create('update', [
+	['subject' => 'template-1000', 'evidence_sha256' => hash('sha256', 'trigger-prune'), 'manual_override' => false]
+], '1');
+
+assertBatch(false, file_exists($terminalPath), 'Expired terminal batch evidence may be pruned.');
+assertBatch(true, file_exists($activePath), 'Expired-looking active batch evidence must never be pruned automatically.');
+
 foreach (glob($dir.DIRECTORY_SEPARATOR.'*') ?: [] as $path) {
 	@unlink($path);
 }
