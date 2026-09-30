@@ -70,7 +70,7 @@ class TemplateInstallBatchExecuteOne extends CController {
 
 		try {
 			$evidence = (string) $this->getInput('evidence_sha256');
-			$batchRepo->begin($operationId, 'uuid-'.$uuid, $evidence);
+			$batchRepo->begin($operationId, 'uuid-'.$uuid, $evidence, 'install', (string) (CWebUser::$data['userid'] ?? ''));
 			$batchStarted = true;
 			$result = (new TemplateOperationLockService())->run(
 				'install',
@@ -78,13 +78,14 @@ class TemplateInstallBatchExecuteOne extends CController {
 				static fn(): array => (new TemplateControlledInstallService())->execute($uuid, $evidence)
 			);
 
-			$output['ok'] = true;
 			$output['result'] = $result;
 			$terminal = ($result['status'] ?? null) === 'installed' ? 'succeeded'
 				: (($result['write_outcome'] ?? null) === 'uncertain' || !empty($result['write_performed']) ? 'uncertain' : 'failed');
 			$batchRepo->finish($operationId, 'uuid-'.$uuid, $terminal, (string) ($result['status'] ?? ''), null);
+			$output['ok'] = true;
 		}
 		catch (Throwable $exception) {
+			$output['ok'] = false;
 			$operationException = $exception;
 			error_log(sprintf(
 				'[Zabbix Template Update Manager] Request-bounded batch install failed for UUID %s: %s',
