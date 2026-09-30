@@ -24,4 +24,4 @@ Evidence is considered external only when the person or organization executing a
 
 ## Stop condition
 
-If a controlled write is uncertain, post-validation is not proven, a signature/tamper check fails unexpectedly, or an entry remains `running` after interruption, stop. Do not retry automatically. Preserve the evidence bundle and inspect the current Zabbix state first.
+If a controlled write is uncertain, post-validation is not proven, an integrity/tamper check fails unexpectedly, or an entry remains `running` after interruption, stop. Do not retry automatically. Preserve the evidence bundle and inspect the current Zabbix state first.
