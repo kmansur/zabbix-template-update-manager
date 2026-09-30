@@ -4,6 +4,16 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- Confirmed BASE / LOCAL / UPSTREAM conflicts with complete identity/coverage evidence now enter the explicit reviewed-update path instead of being an absolute blocker.
+- Reviewed conflict updates require a verified rollback backup, fresh reviewed preflight, TOCTOU evidence match and a dedicated Super Admin conflict acknowledgement before the single controlled import boundary.
+- Unknown/unresolved identity, provenance, integrity, security and uncertain-write conditions remain hard blockers and cannot be overridden.
+
+### Tests
+
+- Added regressions proving known conflicts remain excluded from unattended standard flow, cannot import without dedicated acknowledgement, and may reach the controlled importer only after explicit acceptance.
+
 ### Documentation
 
 - Synchronized README, maintainer guidance, laboratory plan, roadmap and security posture with the published `v0.1.0-beta.60` prerelease and current field-validation state.
