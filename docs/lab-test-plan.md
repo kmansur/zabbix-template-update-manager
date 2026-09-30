@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.59
+# Laboratory test plan — 0.1.0-beta.60
 
 ## Release state
 
@@ -23,20 +23,20 @@ For the first write-path pass, select only a small number (2–3) of official te
 
 Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. Medium/high and local-overwrite candidates may use the explicit reviewed batch path only after verified rollback evidence, per-row selection and the required acknowledgements. Conflict and unresolved templates remain hard blocked.
 
-## 0. Pin the immutable beta.59 artifact and capture environment evidence
+## 0. Pin the immutable beta.60 artifact and capture environment evidence
 
-Use the formal prerelease artifact, not a moving `main` checkout, for the remaining beta.59 field matrix.
+Use the formal prerelease artifact, not a moving `main` checkout, for the remaining beta.60 field matrix.
 
 Release identity:
 
 ```text
-Tag:        v0.1.0-beta.59
+Tag:        v0.1.0-beta.60
 Tag commit: 3694ab0ce4a687399e186ec9cde2774d0209c434
 tar.gz:     4eb075bc70d666ccb226f6c949ae96a732494566ea3b23a2396e3ae8ca7f6d6d
 zip:        889d96bc5cc88d3b35585f68a214e7c454a754d24fbe1f186ed326f7b24a9748
 ```
 
-Verify the downloaded archive against the published `SHA256SUMS` before installation. Do not substitute a later `main` snapshot and still record the run as beta.59 evidence.
+Verify the downloaded archive against the published `SHA256SUMS` before installation. Do not substitute a later `main` snapshot and still record the run as beta.60 evidence.
 
 After installation, capture the environment with the read-only helper from a maintenance checkout:
 
@@ -45,14 +45,13 @@ bash tools/ztum-field-evidence.sh \
   --module-dir /usr/share/zabbix/modules/zabbix-template-update-manager \
   --browser "Chrome/Chromium <version>" \
   --theme "dark" \
-  --artifact /path/to/zabbix-template-update-manager-0.1.0-beta.59.tar.gz \
-  --expected-sha256 4eb075bc70d666ccb226f6c949ae96a732494566ea3b23a2396e3ae8ca7f6d6d \
-  > /tmp/ztum-beta59-field-evidence.md
+  --artifact /path/to/zabbix-template-update-manager-0.1.0-beta.60.tar.gz \
+  > /tmp/ztum-beta60-field-evidence.md
 ```
 
 Run it once per theme/browser pass when operator metadata changes. The helper performs no Zabbix configuration write and intentionally excludes IP addresses, database host/name/user/password, secrets, tokens, configuration contents and log contents. Review the generated Markdown before posting it publicly because filesystem paths and local runtime account names are still operational metadata.
 
-The helper may come from a later maintenance checkout; the **module under test must remain the immutable beta.59 release artifact**.
+The helper may come from a later maintenance checkout; the **module under test must remain the immutable beta.60 release artifact**.
 
 ## 1. Confirm frontend module and backup directory
 
@@ -99,7 +98,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.59`, enable the module and open:
+Confirm `0.1.0-beta.60`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -174,7 +173,7 @@ The filter layout must visually follow the native Zabbix Templates list pattern:
 
 ## 2D. Request-bounded update regression
 
-For the first beta.59 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.60 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -390,7 +389,7 @@ Expected behavior:
 - a long historical scan may show `history_scan_pending` / continuation progress and issue several bounded requests for the same template before final classification;
 - no single historical continuation request should approach the previous ~30-second gateway failure window;
 - if an HTTP failure still occurs, the Reason should include elapsed time and gateway identity such as `server=cloudflare` / `cf-ray=...` when exposed by the response;
-- if a real 504 still occurs on beta.59, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
+- if a real 504 still occurs on beta.60, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
 - preparation continuation/retry must never call `configuration.import`.
 
 ## 5B. Manual-review continuation regression
@@ -812,9 +811,9 @@ Stop all further writes if any occurs:
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.59 laboratory validation
+## 16. Exit criteria for beta.60 laboratory validation
 
-A Zabbix generation passes beta.59 only after evidence demonstrates:
+A Zabbix generation passes beta.60 only after evidence demonstrates:
 
 ```text
 module discovery/enable
