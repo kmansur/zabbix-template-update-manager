@@ -75,7 +75,7 @@ BASE_DIR="${BASE_DIR%/}"
   exit 2
 }
 
-DIRS=("$BASE_DIR" "$BASE_DIR/backups" "$BASE_DIR/offline" "$BASE_DIR/locks")
+DIRS=("$BASE_DIR" "$BASE_DIR/backups" "$BASE_DIR/offline" "$BASE_DIR/locks" "$BASE_DIR/batches")
 
 if [[ "$MODE" == "apply" ]]; then
   [[ "$(id -u)" -eq 0 ]] || {
