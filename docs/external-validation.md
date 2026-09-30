@@ -7,7 +7,7 @@ ZTUM distinguishes repository automation from independent field evidence. A CI r
 On the system under review, run:
 
 ```bash
-tools/ztum-validation-bundle.sh \
+bash tools/ztum-validation-bundle.sh \
   --module-dir /usr/share/zabbix/modules/zabbix-template-update-manager \
   --output /tmp/ztum-validation \
   --browser "Chromium <version>" \
