@@ -62,7 +62,7 @@ Authoritative baseline, identity coverage and three-way comparison are complete,
 - technical review priority is `medium`;
 - technical review priority is `high`.
 
-Known conflict is not the same as unresolved state. A known conflict may proceed only through rollback backup, reviewed preflight and explicit conflict acknowledgement. Unknown/unresolved identity, provenance, integrity or security failures remain hard blockers.
+Known conflict is not the same as unresolved state. A known conflict may proceed only through rollback backup, reviewed preflight and one explicit acknowledgement covering the visibly listed known risks. Unknown/unresolved identity, provenance, integrity or security failures remain hard blockers.
 
 This state may advance only to rollback-backup creation. It is never an unattended batch-ready state.
 
