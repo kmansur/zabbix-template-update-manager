@@ -1,5 +1,16 @@
 # Backup and rollback foundation
 
+## Rollback scope and non-restorable state
+
+A ZTUM rollback artifact is a configuration export of the selected template, not a full Zabbix backup. Restoring it does **not** rewind:
+
+- event, problem, history or trend data;
+- host-level changes made after the artifact was created;
+- runtime values learned or generated outside the template export;
+- side effects that may already have occurred after an LLD or inheritance change.
+
+LLD and inheritance changes are not guaranteed to be perfectly bidirectional simply because an older template can be imported. Operators must inspect the current template and affected hosts after any ambiguous write or post-validation failure. ZTUM deliberately never performs automatic rollback.
+
 ## Purpose
 
 Any future write-enabled template update must have a verified copy of the currently installed template before a configuration write is ever allowed.
