@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import base64
 import hashlib
 import json
 import subprocess
 import sys
 import tempfile
+import os
 from pathlib import Path
+
+from nacl.signing import SigningKey
 
 
 def run(*args: str, cwd: Path | None = None) -> subprocess.CompletedProcess:
@@ -53,10 +57,22 @@ def main() -> int:
             },
         }
         index_file = tmp / "7.0.json"
-        index_file.write_text(json.dumps(index), encoding="utf-8")
+        index_bytes = json.dumps(index).encode("utf-8")
+        index_file.write_bytes(index_bytes)
+
+        signing_key = SigningKey.generate()
+        secret64 = signing_key._seed + bytes(signing_key.verify_key)
+        env = os.environ.copy()
+        env["ZTUM_INDEX_SIGNING_SECRET_KEY_B64"] = base64.b64encode(secret64).decode("ascii")
+
+        signer = root / "tools" / "ed25519_signing.py"
+        sys.path.insert(0, str(root / "tools"))
+        from ed25519_signing import write_signature
+        write_signature(index_file.with_name(index_file.name + ".sig.json"), index_bytes, signing_key._seed)
+
         output = tmp / "bundle"
 
-        run(
+        subprocess.run(
             sys.executable,
             str(tool),
             "--zabbix-repo",
@@ -65,11 +81,18 @@ def main() -> int:
             str(index_file),
             "--output",
             str(output),
+            "--require-signature",
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            env=env,
         )
 
         manifest = json.loads((output / "manifest.json").read_text())
         assert manifest["schema_version"] == 1
         assert f"indexes/7.0.json" in manifest["files"]
+        assert f"indexes/7.0.json.sig.json" in manifest["files"]
+        assert (output / "manifest.sig.json").is_file()
         assert f"sources/{commit}/{source_path.as_posix()}" in manifest["files"]
         history_key = hashlib.sha256(source_path.as_posix().encode()).hexdigest()
         history_file = output / "history" / commit / f"{history_key}.json"
