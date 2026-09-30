@@ -37,7 +37,9 @@ assertTemplateUpdateContract(
 assertTemplateUpdateContract(
 	strpos($action, "'manual_override' => 'in 1'") !== false
 		&& strpos($action, "'confirm_manual_override' => 'in 1'") !== false
-		&& strpos($preflightView, "new CCheckBox('confirm_manual_override', '1')") !== false,
+		&& strpos($action, "'confirm_conflicts' => 'in 1'") !== false
+		&& strpos($preflightView, "new CCheckBox('confirm_manual_override', '1')") !== false
+		&& strpos($preflightView, "new CCheckBox('confirm_conflicts', '1')") !== false,
 	'Reviewed update path must require a second explicit acknowledgement and bind manual override through POST.'
 );
 assertTemplateUpdateContract(
