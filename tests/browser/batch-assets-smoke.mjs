@@ -145,7 +145,6 @@ async function testUpdateEmptyFlow() {
     <button id="ztum-reviewed-select-all"></button>
     <button id="ztum-reviewed-clear-all"></button>
     <input id="ztum-batch-confirm" type="checkbox" disabled>
-    <input id="ztum-batch-confirm-local-overwrite" type="checkbox" disabled>
     <button id="ztum-batch-update-submit" disabled>Update</button>
     <button id="ztum-batch-retry-failed" disabled>Retry</button>
     <button id="ztum-batch-stop">Stop</button>
@@ -181,7 +180,6 @@ async function testUpdateEmptyFlow() {
       select_all_reviewed: 'Select all reviewed',
       clear_all_reviewed: 'Clear reviewed',
       review_batch_eligible: 'Reviewed eligible',
-      review_overwrite_eligible: 'Overwrite eligible',
       review_details: 'Review details',
       review_individual_only: 'Individual only',
       execution_running: 'Running',
