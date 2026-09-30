@@ -1,6 +1,6 @@
 # Project status — engineering handoff before RC validation
 
-Date: 2026-09-29
+Date: 2026-09-30
 
 This document separates repository-side engineering completion from field validation and RC promotion.
 
@@ -17,7 +17,7 @@ This is **not** an RC or production-readiness declaration. Real controlled-write
 | Implementation ready | **Complete** | No known repository-side implementation blocker remains for the declared official-Zabbix-repository scope. |
 | Automation infrastructure | **Complete** | CI, security guards, PHP matrix, Zabbix 7/8 frontend checks, Chromium/full-stack read-only smoke, accessibility, coverage floors and release-package gates are implemented. |
 | Release engineering | **Complete** | Formal prerelease/tag workflow, runtime smoke, archives and SHA256SUMS are implemented; `v0.1.0-beta.60` is the immutable laboratory artifact. |
-| Field validation | **Pending RC gate** | Complete Zabbix 7.x/8.x controlled-write matrix remains to be executed and recorded. |
+| Field validation | **In progress** | Zabbix 7.0.31 read-only/UI, policy lifecycle, operation-history persistence, historical BASE, three-way conflict/local-overwrite detection and fail-closed blocking are recorded on beta.60. Zabbix 7 controlled-write/resilience/negative paths and the corresponding Zabbix 8 matrix remain open. |
 | RC status | **Not declared** | Promotion occurs only after the validation matrix is reviewed. |
 | Production recommendation | **Not declared** | Requires successful RC validation and final security/release review. |
 
@@ -57,7 +57,7 @@ The following must now be validated against the immutable field-test artifact an
 7. offline-only bundle behavior;
 8. operation serialization;
 9. permission, CSRF, stale/tampered evidence and tampered-backup negative paths;
-10. real operator light/dark workflow on both supported generations;
+10. real operator light/dark workflow on Zabbix 8.x (Zabbix 7.0.31 is already recorded on beta.60);
 11. fresh module installation and in-place upgrade;
 12. final independent security/code review before any production recommendation.
 
