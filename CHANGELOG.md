@@ -4,21 +4,26 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
-### Documentation
-
-- Recorded the 2026-09-29 engineering-readiness handoff: repository-side implementation is complete for the declared core scope, while RC promotion remains explicitly gated by the real Zabbix 7.x/8.x validation matrix.
-
-### Added
-
-- Added a privacy-conscious read-only field-evidence collector for the remaining beta.59 Zabbix 7.x/8.x laboratory matrix, including module identity, release checksum verification, runtime-directory metadata and operator browser/theme metadata without collecting secrets or network/database identifiers.
-
-### Changed
-
-- Laboratory validation now pins the immutable `v0.1.0-beta.59` release artifact explicitly, and roadmap/audit links reflect the published prerelease state.
+## [0.1.0-beta.60] - 2026-09-30
 
 ### Fixed
 
-- Three-way analysis now treats the proven Zabbix 7 `discovery_rules.enabled_lifetime_type=DISABLE_NEVER` materialized default as semantically equivalent to an omitted official YAML field, preventing false local-change/conflict reports while preserving fail-closed behavior for non-default local values.
+- Three-way analysis now treats the proven Zabbix 7 discovery-rule defaults `enabled_lifetime_type=DISABLE_NEVER` and `lifetime=30d` as semantically equivalent to omitted official YAML fields when Zabbix materializes those defaults in the LOCAL snapshot.
+- The normalization is deliberately narrow and entity-scoped: non-default LOCAL values continue to be classified as real local overwrite risk or conflict.
+
+### Tests / field evidence
+
+- Added regression coverage proving the two materialized defaults do not create false local-change/conflict findings while non-default values remain fail-closed.
+- Zabbix 7.0.31 field validation on Apache Kafka by JMX reduced local-overwrite findings from 68 to 62 while preserving all 16 independent conflicts, confirming the normalization removes proven false positives without suppressing real conflicts.
+
+### Documentation
+
+- Recorded the 2026-09-29 engineering-readiness handoff: repository-side implementation is complete for the declared core scope, while RC promotion remains explicitly gated by the real Zabbix 7.x/8.x validation matrix.
+- Added a privacy-conscious read-only field-evidence collector for the remaining Zabbix 7.x/8.x laboratory matrix.
+
+### Changed
+
+- Laboratory validation now advances from the immutable `v0.1.0-beta.59` baseline to `v0.1.0-beta.60` after the field-discovered three-way normalization fix.
 
 ## [0.1.0-beta.59] - 2026-09-24
 
