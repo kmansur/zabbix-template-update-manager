@@ -13,7 +13,7 @@ Status at publication:
 
 Use the exact prerelease tag when a public beta has been published. During internal laboratory work before that tag exists, record the exact `main` commit used so the test can be reproduced.
 
-Beta.59 is the current native-UI and update-policy field-test candidate. Field validation must prove the complete catalog/update/install/rollback workflow in both light and dark themes while confirming that the underlying comparison, evidence and controlled-write behavior remains unchanged.
+Beta.60 is the current field-test candidate. Zabbix 7.0.31 has already confirmed the read-only catalog/UI path, light/dark rendering, policy lifecycle, operation-history persistence, historical BASE resolution, three-way conflict/local-overwrite detection and fail-closed write blocking. The remaining field matrix must prove the controlled update/install/rollback, batch, resilience and negative-security paths on Zabbix 7.x, then repeat the required matrix on Zabbix 8.x.
 
 ## Safety assumptions
 

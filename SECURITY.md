@@ -13,7 +13,7 @@ Current beta scope:
 - no direct database writes;
 - fail-closed identity, source, baseline, backup and evidence handling.
 
-Production use is not yet recommended while field validation and licensing remain incomplete.
+Production use is not yet recommended while the real Zabbix 7.x/8.x controlled-write field-validation matrix and final pre-production security review remain incomplete. Project licensing is established as AGPL-3.0-only with NOTICE attribution.
 
 ## Core invariants
 

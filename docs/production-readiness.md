@@ -13,7 +13,7 @@ A green workflow does not by itself make the module production-ready.
 
 - Core implementation: **100% engineering-complete for the declared scope**; no known repository-side implementation blocker remains.
 - Automated validation: strong, including PHP 8.2/8.3/8.4, Zabbix 7/8 frontend-symbol compatibility, disposable official Zabbix 7/8 Chromium frontend smoke, batch-asset smoke, accessibility contracts and minimum coverage/reachability floors.
-- Zabbix 7.x field evidence: substantial but the final consolidated 1.0 matrix is not closed.
+- Zabbix 7.x field evidence: beta.60 has recorded the read-only/UI path, light/dark themes, policy lifecycle, operation-history persistence, historical BASE, three-way conflict/local-overwrite detection and fail-closed conflict blocking; controlled update/install/rollback, batch, resilience and negative-security paths remain open.
 - Zabbix 8.x field evidence: partial; full controlled write/rollback/offline validation remains open.
 - License: AGPL-3.0-only.
 - Formal laboratory prerelease: `v0.1.0-beta.60` published with `.tar.gz`, `.zip` and `SHA256SUMS` after Zabbix 7/8 release-runtime smoke.
