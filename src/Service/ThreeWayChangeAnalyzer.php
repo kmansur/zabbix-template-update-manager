@@ -29,6 +29,7 @@ final class ThreeWayChangeAnalyzer {
 	 */
 	private const MATERIALIZED_FIELD_DEFAULTS = [
 		'discovery_rules' => [
+			'lifetime' => '30d',
 			'enabled_lifetime_type' => 'DISABLE_NEVER'
 		]
 	];
