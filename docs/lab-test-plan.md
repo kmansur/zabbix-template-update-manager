@@ -1,4 +1,4 @@
-# Laboratory test plan — 0.1.0-beta.60
+# Laboratory test plan — 0.1.0-beta.61
 
 ## Release state
 
@@ -13,7 +13,7 @@ Status at publication:
 
 Use the exact prerelease tag when a public beta has been published. During internal laboratory work before that tag exists, record the exact `main` commit used so the test can be reproduced.
 
-Beta.60 is the current field-test candidate. Zabbix 7.0.31 has already confirmed the read-only catalog/UI path, light/dark rendering, policy lifecycle, operation-history persistence, historical BASE resolution, three-way conflict/local-overwrite detection and fail-closed write blocking. The remaining field matrix must prove the controlled update/install/rollback, batch, resilience and negative-security paths on Zabbix 7.x, then repeat the required matrix on Zabbix 8.x.
+Beta.61 is the current field-test candidate. Zabbix 7.0.31 has already confirmed the read-only catalog/UI path, policy lifecycle, operation-history persistence, historical BASE resolution, three-way analysis, reviewed controlled update, controlled install, rollback/recovery backup, post-write validation and successful reviewed multi-template batch execution. Remaining Zabbix 7 work is concentrated in stop-on-first-failure, resilience/offline/serialization and negative-security paths before repeating the required matrix on Zabbix 8.x.
 
 ## Safety assumptions
 
@@ -21,22 +21,21 @@ Use a disposable or otherwise non-production Zabbix environment.
 
 For the first write-path pass, select only a small number (2–3) of official templates with updates available. Prefer templates with no detected local modifications and complete historical/three-way analysis. `none`/`low` risk is standard-path eligible; only explicitly recognized bounded-medium changes such as discard-only preprocessing maintenance may remain on the standard path.
 
-Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. Medium/high and local-overwrite candidates may use the explicit reviewed batch path only after verified rollback evidence, per-row selection and the required acknowledgements. Conflict and unresolved templates remain hard blocked.
+Do not begin with a business-critical template or host. Medium impact remains manual unless the risk analyzer explicitly marks the exact known change class `standard_path_eligible`. Known conflict/local-overwrite and medium/high technical-risk candidates may use the explicit reviewed path only after complete identity/coverage evidence, verified rollback protection, fresh reviewed preflight and one explicit acknowledgement. Unknown/unresolved identity, provenance, integrity, security and uncertain-write conditions remain hard blocked.
 
-## 0. Pin the immutable beta.60 artifact and capture environment evidence
+## 0. Pin the immutable beta.61 artifact and capture environment evidence
 
-Use the formal prerelease artifact, not a moving `main` checkout, for the remaining beta.60 field matrix.
+Use the formal prerelease artifact, not a moving `main` checkout, for the remaining beta.61 field matrix.
 
 Release identity:
 
 ```text
-Tag:        v0.1.0-beta.60
-Tag commit: 3694ab0ce4a687399e186ec9cde2774d0209c434
-tar.gz:     4eb075bc70d666ccb226f6c949ae96a732494566ea3b23a2396e3ae8ca7f6d6d
-zip:        889d96bc5cc88d3b35585f68a214e7c454a754d24fbe1f186ed326f7b24a9748
+Tag:        v0.1.0-beta.61
+Tag commit: verify against the published GitHub Release
+Archives:   verify against the published SHA256SUMS
 ```
 
-Verify the downloaded archive against the published `SHA256SUMS` before installation. Do not substitute a later `main` snapshot and still record the run as beta.60 evidence.
+Verify the downloaded archive against the published `SHA256SUMS` before installation. Do not substitute a later `main` snapshot and still record the run as beta.61 evidence.
 
 After installation, capture the environment with the read-only helper from a maintenance checkout:
 
@@ -45,13 +44,13 @@ bash tools/ztum-field-evidence.sh \
   --module-dir /usr/share/zabbix/modules/zabbix-template-update-manager \
   --browser "Chrome/Chromium <version>" \
   --theme "dark" \
-  --artifact /path/to/zabbix-template-update-manager-0.1.0-beta.60.tar.gz \
+  --artifact /path/to/zabbix-template-update-manager-0.1.0-beta.61.tar.gz \
   > /tmp/ztum-beta60-field-evidence.md
 ```
 
 Run it once per theme/browser pass when operator metadata changes. The helper performs no Zabbix configuration write and intentionally excludes IP addresses, database host/name/user/password, secrets, tokens, configuration contents and log contents. Review the generated Markdown before posting it publicly because filesystem paths and local runtime account names are still operational metadata.
 
-The helper may come from a later maintenance checkout; the **module under test must remain the immutable beta.60 release artifact**.
+The helper may come from a later maintenance checkout; the **module under test must remain the immutable beta.61 release artifact**.
 
 ## 1. Confirm frontend module and backup directory
 
@@ -98,7 +97,7 @@ Record the exact commit SHA. Install the complete module directory below the Zab
 Administration → General → Modules → Scan directory
 ```
 
-Confirm `0.1.0-beta.60`, enable the module and open:
+Confirm `0.1.0-beta.61`, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -173,7 +172,7 @@ The filter layout must visually follow the native Zabbix Templates list pattern:
 
 ## 2D. Request-bounded update regression
 
-For the first beta.60 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
+For the first beta.61 write-path test, prepare several update candidates but keep the Ready subset small enough to inspect easily.
 
 Expected behavior after confirmation:
 
@@ -389,7 +388,7 @@ Expected behavior:
 - a long historical scan may show `history_scan_pending` / continuation progress and issue several bounded requests for the same template before final classification;
 - no single historical continuation request should approach the previous ~30-second gateway failure window;
 - if an HTTP failure still occurs, the Reason should include elapsed time and gateway identity such as `server=cloudflare` / `cf-ray=...` when exposed by the response;
-- if a real 504 still occurs on beta.60, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
+- if a real 504 still occurs on beta.61, capture that reason plus frontend/PHP logs; it is then an infrastructure/transport failure rather than the expected historical continuation path;
 - preparation continuation/retry must never call `configuration.import`.
 
 ## 5B. Manual-review continuation regression
@@ -403,7 +402,7 @@ Expected behavior:
 - a review-only plan with `Ready = 0` explains that unattended batch execution is unavailable and directs the operator to `Review details`;
 - the comparison page retains the detailed BASE / LOCAL / UPSTREAM, risk and rollback evidence;
 - when readiness is `review_backup_verified`, the next action is `Run reviewed controlled preflight`;
-- the reviewed preflight must bind the manual-review reasons and still require the additional explicit Super Admin acknowledgement before `configuration.import`;
+- the reviewed preflight must bind the manual-review reasons and require one explicit Super Admin acknowledgement before `configuration.import`;
 - opening `Review details` itself performs no configuration write.
 
 ## 5C. Explicit reviewed batch override regression
@@ -419,10 +418,10 @@ Expected behavior:
 - the main batch confirmation stays disabled until at least one Ready row exists or one eligible Manual review checkbox is selected;
 - selecting reviewed rows enables the confirmation path and the status reports Ready plus selected-reviewed counts separately;
 - after the global confirmation is checked, `Update eligible templates` executes Ready rows plus explicitly selected reviewed rows in original selection order;
-- reviewed rows POST both manual-override acknowledgement fields and rerun fresh reviewed preflight before import;
+- reviewed rows bind manual-review mode, send the single batch acknowledgement, and rerun fresh reviewed preflight before import;
 - successful reviewed rows finish as `Updated and validated`;
 - stop-on-first-failure still applies across the combined queue;
-- a row containing `local_customization_overwrite` has an active reviewed checkbox only when rollback and manual preflight evidence are valid; Execution shows `Reviewed overwrite eligible · Review details`;
+- a row containing `local_customization_overwrite` or `confirmed_three_way_conflict` has an active reviewed checkbox only when rollback and manual preflight evidence are valid; Execution shows `Reviewed batch eligible · Review details`;
 - Conflict, Blocked, unresolved and request-failed rows must never be selectable or executable.
 
 ## 5D. Sticky select-all during preparation
@@ -451,7 +450,7 @@ Expected behavior:
 - Execution shows `Reviewed overwrite eligible · Review details`;
 - selecting any local-overwrite row enables the additional acknowledgement:
   `I explicitly accept overwriting local customizations for the selected templates.`;
-- `Update eligible templates` remains disabled until both the normal reviewed acknowledgement and the local-overwrite acknowledgement are checked;
+- `Update eligible templates` remains disabled until the single reviewed batch acknowledgement is checked;
 - the per-template request carries `manual_override=1`, `confirm_manual_override=1` and `confirm_local_overwrite=1`;
 - omitting the local-overwrite acknowledgement must return a no-write blocked result before import;
 - successful acknowledged rows still rerun fresh reviewed preflight, verify evidence, import through the single approved write boundary and validate afterward;
@@ -501,8 +500,8 @@ Expected behavior:
 Before any write, inspect at least one item from each category that naturally occurs:
 
 - **Ready**: eligible for controlled sequential execution;
-- **Manual review**: high or unrecognized-medium technical review state, or local-overwrite reviewed path;
-- **Conflict**: must never be executed; authoritative local-overwrite without conflict remains Manual review only;
+- **Manual review**: known conflict/local-overwrite or medium/high technical review state with complete authoritative evidence;
+- **Conflict**: legacy/compatibility classification only; current fully identified conflicts are Manual review, while unresolved/unknown evidence remains Blocked;
 - **Blocked**: incomplete/unresolved/not-applicable evidence.
 
 If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
@@ -634,7 +633,7 @@ Confirm:
 - direct POST without the valid action-specific CSRF token is rejected by native Zabbix handling;
 - tampering a reviewed evidence fingerprint prevents that template from being written;
 - submitting more than the 500-template selected-update sanity ceiling fails closed;
-- conflict/manual-review/blocked items are absent from the hidden Ready execution set;
+- unattended Ready evidence excludes manual-review/blocked items; explicitly selected reviewed items use separate reviewed evidence;
 - a preflight built from a legacy index without a raw source fingerprint remains blocked until the refreshed index is available.
 
 ## 13. Filesystem tamper test (optional, disposable lab only)
@@ -716,7 +715,7 @@ Exercise the individual reviewed update path for a candidate whose manual reason
 
 Expected behavior:
 
-- the normal reviewed-risk acknowledgement remains required;
+- the single reviewed-risk acknowledgement remains required;
 - a separate `Local customization overwrite` checkbox is rendered;
 - omitting that specific acknowledgement blocks before `configuration.import`;
 - accepting both acknowledgements allows only the existing fresh-preflight/evidence-controlled path.
@@ -804,16 +803,16 @@ Stop all further writes if any occurs:
 - duplicate template objects appear;
 - backup integrity fails unexpectedly;
 - recovery backup does not match the current export;
-- a conflict/manual-review/unresolved item is offered as Ready;
+- a manual-review/unresolved item is offered as unattended Ready;
 - a template protected by **Never update** is offered for update preparation or execution;
 - selected review contains IDs that were not selected;
 - frontend logs indicate an ambiguous `configuration.import` result.
 
 In a write-performed-but-unvalidated state, inspect the current Zabbix template manually before choosing the next operation.
 
-## 16. Exit criteria for beta.60 laboratory validation
+## 16. Exit criteria for beta.61 laboratory validation
 
-A Zabbix generation passes beta.60 only after evidence demonstrates:
+A Zabbix generation passes beta.61 only after evidence demonstrates:
 
 ```text
 module discovery/enable

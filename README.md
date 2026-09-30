@@ -10,7 +10,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.60**
+Current version: **0.1.0-beta.61**
 
 This version is intended for **laboratory testing**.
 
@@ -19,11 +19,11 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
-- Formal laboratory prerelease: **v0.1.0-beta.60** is published with checksummed `.tar.gz` and `.zip` assets.
+- Formal laboratory prerelease: **v0.1.0-beta.61** is published with checksummed `.tar.gz` and `.zip` assets.
 
-Beta.60 is the current pre-RC laboratory candidate. It retains the beta.59 disposable full-Zabbix 7.x/8.x frontend smoke, light/dark catalog checks, operation-history rendering and enforced coverage/reachability floors, and adds field-driven three-way normalization for proven Zabbix discovery-rule defaults without weakening fail-closed conflict handling.
+Beta.61 is the current pre-RC laboratory candidate. It keeps the beta.60 three-way normalization and changes known-risk handling so complete, fully identified conflicts/local-overwrite conditions use an explicit reviewed path instead of an absolute block. Reviewed single and batch updates use one acknowledgement while unknown/unresolved, integrity, security and uncertain-write conditions remain hard blockers.
 
-Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.60 is the current immutable laboratory prerelease** for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
+Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.61 is the current immutable laboratory prerelease** for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
 
 For a new laboratory installation, use the quick installer below. For validation work, always record the exact installed version and commit/source ref.
 
@@ -90,7 +90,7 @@ ZTUM currently provides:
 - administrator-only diagnostics for upstream index endpoint, PHP HTTP transport capabilities and configured offline mode;
 - verified air-gapped/offline upstream bundles with fail-closed `ZTUM_OFFLINE_ONLY=1`;
 - global filesystem serialization for update/install/rollback write workflows;
-- explicit individual local-overwrite confirmation in addition to reviewed-risk confirmation;
+- a single explicit reviewed-risk acknowledgement covering the visibly listed known conflicts/local-overwrite conditions;
 - safe runtime-directory setup/check helper;
 - private bounded **Operation history** for controlled updates, installations, rollbacks, policy changes and explicit rollback-backup creation;
 - dedicated security, release and quality-metrics workflows.
@@ -101,7 +101,7 @@ Batch execution does not create a second write path. Each executable template is
 
 Official identity is based on template UUID, never on vendor metadata alone. Version comparison, content comparison and update eligibility are separate stages.
 
-For an outdated official template, the standard unattended path still requires a proven historical baseline, complete three-way analysis, no conflict, no local-overwrite risk, and a persistent rollback artifact that exactly matches a fresh export of the installed template. `none`/`low` technical risk is standard-path eligible. Medium impact remains manual by default, except for narrowly recognized bounded changes explicitly marked `standard_path_eligible` by the risk analyzer. Manual-review candidates can enter the reviewed batch only after verified rollback evidence and a passing manual-mode preflight. A `local_customization_overwrite` reason additionally requires a second explicit acknowledgement before the write; conflict/unresolved evidence remains blocked.
+For an outdated official template, the standard unattended path still requires a proven historical baseline, complete three-way analysis, no conflict, no local-overwrite risk, and a persistent rollback artifact that exactly matches a fresh export of the installed template. `none`/`low` technical risk is standard-path eligible. Medium impact remains manual by default, except for narrowly recognized bounded changes explicitly marked `standard_path_eligible` by the risk analyzer. Manual-review candidates can enter the reviewed batch only after complete authoritative evidence, verified rollback protection and a passing reviewed preflight. Known conflict/local-overwrite reasons are covered by one explicit acknowledgement before write; unresolved/unknown identity, provenance, integrity, security or uncertain-write evidence remains blocked.
 
 Immediately before an update, ZTUM reruns the authoritative preflight, compares the explicit confirmation evidence with fresh server-side evidence, re-fetches the official template from the exact immutable upstream commit/path, verifies the raw YAML SHA-256 against the path-specific upstream index fingerprint, preserves the separate canonical template-content fingerprint in the evidence, and revalidates template identity. The selected source is isolated to one official template plus required group definitions. Cross-template trigger/graph/dashboard references may remain only as references to already installed templates; their external-template name set is bound into preflight evidence and must match again when the immutable candidate is rebuilt. Sibling templates are never imported implicitly.
 
@@ -249,7 +249,7 @@ git rev-parse HEAD
 Expected `VERSION` for the current laboratory build:
 
 ```text
-0.1.0-beta.60
+0.1.0-beta.61
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -265,7 +265,7 @@ Install the complete ZTUM directory below the correct `modules` directory. Then 
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.60**, enable the module and open:
+Confirm version **0.1.0-beta.61**, enable the module and open:
 
 ```text
 Data collection → Template updates

@@ -4,6 +4,8 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+## [0.1.0-beta.61] - 2026-09-30
+
 ### Fixed
 
 - Reviewed batch preparation now treats `confirmed_three_way_conflict` as a known manual-review reason when identities/coverage are complete, instead of forcing individual-only handling.
