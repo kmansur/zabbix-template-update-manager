@@ -11,8 +11,6 @@ from typing import Any
 
 import yaml
 
-from ed25519_signing import signing_secret_from_env, write_signature
-
 UUID_RE = re.compile(r"^[a-f0-9]{32}$")
 IDENTITY_FIELDS = (
     "name",
@@ -190,8 +188,6 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--source-commit", required=True)
     parser.add_argument("--source-commit-date", required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--signature-output", type=Path)
-    parser.add_argument("--require-signature", action="store_true")
     return parser.parse_args()
 
 
@@ -206,17 +202,10 @@ def main() -> int:
     )
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
-    encoded = (json.dumps(index, indent=2, sort_keys=False, ensure_ascii=False) + "\n").encode("utf-8")
-    args.output.write_bytes(encoded)
-
-    secret = signing_secret_from_env()
-    if args.require_signature and secret is None:
-        raise RuntimeError("signature is required but ZTUM_INDEX_SIGNING_SECRET_KEY_B64 is not configured")
-    if args.signature_output is not None:
-        if secret is None:
-            raise RuntimeError("--signature-output requires ZTUM_INDEX_SIGNING_SECRET_KEY_B64")
-        signature = write_signature(args.signature_output, encoded, secret)
-        print(f"Signed {args.output} with {signature['key_id']}")
+    args.output.write_text(
+        json.dumps(index, indent=2, sort_keys=False, ensure_ascii=False) + "\n",
+        encoding="utf-8",
+    )
     print(
         f"Built {args.output} with {len(index['templates'])} unique template UUIDs "
         f"from {args.source_ref}@{args.source_commit[:12]} "
