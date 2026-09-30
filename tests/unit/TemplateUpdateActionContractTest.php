@@ -36,17 +36,11 @@ assertTemplateUpdateContract(
 );
 assertTemplateUpdateContract(
 	strpos($action, "'manual_override' => 'in 1'") !== false
-		&& strpos($action, "'confirm_manual_override' => 'in 1'") !== false
-		&& strpos($action, "'confirm_conflicts' => 'in 1'") !== false
-		&& strpos($preflightView, "new CCheckBox('confirm_manual_override', '1')") !== false
-		&& strpos($preflightView, "new CCheckBox('confirm_conflicts', '1')") !== false,
-	'Reviewed update path must require a second explicit acknowledgement and bind manual override through POST.'
-);
-assertTemplateUpdateContract(
-	strpos($action, "'confirm_local_overwrite' => 'in 1'") !== false
-		&& strpos($preflightView, "new CCheckBox('confirm_local_overwrite', '1')") !== false
-		&& strpos($action, '$localOverwriteConfirmed') !== false,
-	'Individual local-customization overwrite must require its own explicit acknowledgement and pass it to the controlled service.'
+		&& strpos($preflightView, "new CCheckBox('confirm', '1')") !== false
+		&& strpos($preflightView, "new CCheckBox('confirm_manual_override', '1')") === false
+		&& strpos($preflightView, "new CCheckBox('confirm_conflicts', '1')") === false
+		&& strpos($preflightView, "new CCheckBox('confirm_local_overwrite', '1')") === false,
+	'Reviewed update path must use one explicit acknowledgement while binding reviewed mode through POST.'
 );
 assertTemplateUpdateContract(
 	strpos($action, 'TemplateOperationLockService') !== false
