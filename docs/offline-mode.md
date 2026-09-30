@@ -6,13 +6,12 @@ Template Update Manager can run without internet egress from the Zabbix frontend
 
 Offline mode does not relax identity or write gates.
 
-- the bundle has a SHA-256 manifest; when signed trust is configured, the manifest itself is authenticated with Ed25519 before its hash map is trusted;
+- the bundle has a SHA-256 manifest;
 - the upstream index is still schema/UUID/path/hash validated;
 - current source bytes are still checked against the per-path upstream index fingerprint;
 - history/source records are read only from internally constructed safe paths;
 - `ZTUM_OFFLINE_ONLY=1` prevents network fallback when a required bundle artifact is missing;
-- missing or tampered offline evidence fails closed;
-- with `ZTUM_TRUSTED_INDEX_PUBLIC_KEY_B64` configured, detached index signatures are mandatory; `ZTUM_REQUIRE_SIGNED_INDEX=1` also requires an explicit trust anchor.
+- missing or tampered offline evidence fails closed.
 
 ## Build a bundle on a connected system
 
@@ -25,22 +24,18 @@ Requirements:
 Example:
 
 ```bash
-export ZTUM_INDEX_SIGNING_SECRET_KEY_B64='<protected secret>'
 python tools/build_offline_bundle.py \
   --zabbix-repo /srv/git/zabbix \
   --index /tmp/indexes/7.0.json \
   --index /tmp/indexes/8.0.json \
-  --output /tmp/ztum-offline \
-  --require-signature
+  --output /tmp/ztum-offline
 ```
 
 The output contains:
 
 ```text
 manifest.json
-manifest.sig.json
 indexes/<line>.json
-indexes/<line>.json.sig.json
 sources/<commit>/templates/.../*.yaml
 history/<commit>/<sha256(path)>.json
 ```
@@ -79,6 +74,3 @@ With offline-only mode enabled, an absent index/source/history record produces a
 Set only `ZTUM_OFFLINE_BUNDLE_DIR` and omit `ZTUM_OFFLINE_ONLY` to prefer verified local bundle data while allowing remote fallback for artifacts that are not in the bundle.
 
 For production-isolated networks, offline-only mode is recommended because it proves that no runtime egress is required.
-
-
-See [signed-upstream.md](signed-upstream.md) for key generation, trust configuration and rotation.
