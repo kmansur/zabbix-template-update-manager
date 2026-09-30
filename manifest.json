@@ -1,5 +1,5 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 2.0,
     "id": "kmansur_zabbix_template_update_manager",
     "name": "Template Update Manager",
     "namespace": "ZabbixTemplateUpdateManager",
