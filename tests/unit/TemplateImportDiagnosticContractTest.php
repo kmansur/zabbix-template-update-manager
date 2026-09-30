@@ -16,20 +16,31 @@ function assertImportDiagnosticContract(bool $condition, string $message): void 
 }
 
 assertImportDiagnosticContract(
+	strpos($service, 'API::getWrapper()') !== false
+		&& strpos($service, "callMethod('configuration', 'import'") !== false
+		&& strpos($service, 'errorCode') !== false
+		&& strpos($service, 'errorMessage') !== false,
+	'Configuration import must use the native API client response as the primary diagnostic source.'
+);
+
+assertImportDiagnosticContract(
+	strpos($service, 'API::setWrapper();') !== false
+		&& strpos($service, 'API::setWrapper($wrapper);') !== false
+		&& strpos($service, 'finally') !== false,
+	'Configuration import must restore the frontend API wrapper after the direct client call.'
+);
+
+assertImportDiagnosticContract(
 	strpos($service, 'use CMessageHelper;') !== false
-		&& substr_count($service, 'CMessageHelper::getMessages()') >= 2,
-	'Configuration import must inspect native frontend API messages when import returns false.'
+		&& substr_count($service, 'CMessageHelper::getMessages()') >= 2
+		&& strpos($service, 'array_slice($messagesAfter, count($messagesBefore))') !== false
+		&& strpos($service, 'MESSAGE_TYPE_ERROR') !== false,
+	'CMessageHelper must remain only as a scoped compatibility fallback for unsupported wrapper shapes.'
 );
 
 assertImportDiagnosticContract(
-	strpos($service, 'array_slice($messagesAfter, count($messagesBefore))') !== false,
-	'Configuration import diagnostics must isolate messages created by the current API call.'
-);
-
-assertImportDiagnosticContract(
-	strpos($service, 'MESSAGE_TYPE_ERROR') !== false
-		&& strpos($service, "implode(' | '") !== false,
-	'Configuration import failure must preserve native Zabbix error detail.'
+	strpos($service, 'ConfigurationImportException') !== false,
+	'Configuration import failures must use the stable typed ZTUM exception contract.'
 );
 
 assertImportDiagnosticContract(

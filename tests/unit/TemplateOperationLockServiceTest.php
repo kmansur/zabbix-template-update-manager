@@ -1,5 +1,6 @@
 <?php
 
+use Modules\ZabbixTemplateUpdateManager\Exception\LockContendedException;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
 
 require_once dirname(__DIR__, 2).'/src/Service/TemplateOperationLockService.php';
@@ -26,14 +27,21 @@ $result = $outer->run('update', 'template-123', function () use ($inner, &$neste
 	try {
 		$inner->run('rollback', 'template-123', static fn() => 'unexpected');
 	}
-	catch (RuntimeException $exception) {
-		$nestedBlocked = str_contains($exception->getMessage(), 'already in progress');
+	catch (LockContendedException $exception) {
+		$nestedBlocked = $exception->getMachineCode() === 'lock_contended'
+			&& str_contains($exception->getMessage(), 'already in progress');
 	}
 
 	return 'outer-ok';
 });
 
 assertOperationLock('outer-ok', $result, 'The holder of the global operation lock must execute normally.');
+
+$metadataPath = $dir.DIRECTORY_SEPARATOR.'configuration-write.lock';
+$metadata = json_decode((string) file_get_contents($metadataPath), true);
+assertOperationLock(true, is_array($metadata), 'The global lock must persist valid metadata while/after the operation.');
+assertOperationLock('update', (string) ($metadata['operation'] ?? ''), 'Lock metadata must identify the controlled operation.');
+assertOperationLock('template-123', (string) ($metadata['subject'] ?? ''), 'Lock metadata must identify the controlled subject.');
 assertOperationLock(true, $nestedBlocked, 'A second concurrent controlled operation must fail closed.');
 
 $afterRelease = $inner->run('install', 'uuid-abcdef', static fn() => 'released-ok');

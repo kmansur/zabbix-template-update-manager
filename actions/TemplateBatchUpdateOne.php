@@ -5,11 +5,13 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CWebUser;
+use Modules\ZabbixTemplateUpdateManager\Exception\ZtumException;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Throwable;
 
+require_once dirname(__DIR__).'/src/Exception/ZtumException.php';
 require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
@@ -43,6 +45,7 @@ class TemplateBatchUpdateOne extends CController {
 					'main_block' => json_encode([
 						'ok' => false,
 						'result' => null,
+						'error_code' => 'invalid_request',
 						'error' => _('Invalid single-template update execution request.')
 					], JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE)
 				]))->disableView()
@@ -59,7 +62,7 @@ class TemplateBatchUpdateOne extends CController {
 	protected function doAction(): void {
 		$templateId = (string) $this->getInput('templateid');
 		$evidence = strtolower(trim((string) $this->getInput('evidence_sha256')));
-		$output = ['ok' => false, 'result' => null, 'error' => null];
+		$output = ['ok' => false, 'result' => null, 'error_code' => null, 'error' => null];
 
 		$operationException = null;
 
@@ -87,6 +90,9 @@ class TemplateBatchUpdateOne extends CController {
 				$exception->getMessage()
 			));
 
+			$output['error_code'] = $exception instanceof ZtumException
+				? $exception->getMachineCode()
+				: 'unexpected_error';
 			$output['error'] = $exception->getMessage() !== ''
 				? $exception->getMessage()
 				: _('Unable to complete this controlled update request. Inspect the local template state before retrying.');

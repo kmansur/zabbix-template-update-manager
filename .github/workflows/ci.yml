@@ -15,6 +15,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -45,6 +49,13 @@ jobs:
             php -l "$file"
           done < <(find . -type f -name '*.php' -print0)
 
+      - name: PHPStan level 6 — high-risk logic
+        shell: bash
+        run: |
+          set -euo pipefail
+          composer global require --no-interaction --no-progress phpstan/phpstan:2.2.14
+          "$(composer global config bin-dir --absolute)/phpstan" analyse --configuration=phpstan.neon --no-progress
+
       - name: Validate manifest
         run: php tests/validate_manifest.php
 
@@ -53,6 +64,9 @@ jobs:
 
       - name: Validate version
         run: php tests/validate_version.php
+
+      - name: Validate immutable lab release metadata
+        run: php tests/validate_lab_release_metadata.php
 
       - name: Enforce controlled-write boundary
         run: php tests/read_only_guard.php

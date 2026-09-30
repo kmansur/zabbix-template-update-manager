@@ -169,7 +169,7 @@ final class UpdateRiskAnalyzer {
 			'technical_level' => $technicalLevel,
 			'coverage' => $coverage,
 			'standard_path_eligible' => $standardPathEligible,
-			'risk_reasons' => array_values(array_keys($riskReasons)),
+			'risk_reasons' => array_keys($riskReasons),
 			'direct_host_count' => $directHostCount,
 			'indirect_host_count' => $indirectHostCount,
 			'total_host_count' => $totalHostCount,
@@ -278,7 +278,7 @@ final class UpdateRiskAnalyzer {
 		];
 	}
 
-	private static function isBoundedPreprocessingChange($before, $after): bool {
+	private static function isBoundedPreprocessingChange(mixed $before, mixed $after): bool {
 		$beforeSteps = self::preprocessingSteps($before);
 		$afterSteps = self::preprocessingSteps($after);
 
@@ -313,7 +313,7 @@ final class UpdateRiskAnalyzer {
 		return $changed;
 	}
 
-	private static function preprocessingSteps($value): ?array {
+	private static function preprocessingSteps(mixed $value): ?array {
 		if (is_array($value) && ($value['__state'] ?? null) === 'missing') {
 			return [];
 		}
@@ -360,7 +360,7 @@ final class UpdateRiskAnalyzer {
 		return $result;
 	}
 
-	private static function canonicalize($value) {
+	private static function canonicalize(mixed $value): mixed {
 		if (!is_array($value)) {
 			return $value;
 		}

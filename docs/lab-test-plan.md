@@ -31,8 +31,11 @@ Release identity:
 
 ```text
 Tag:        v0.1.0-beta.61
-Tag commit: verify against the published GitHub Release
-Archives:   verify against the published SHA256SUMS
+Tag commit: 59254a61f87e93fb8f897c949ba0ea43d0d77b25
+Tar SHA-256: 129e69e9dbf151f774e46549d9512769411d769219ac73425b9cdd8bd04904d4
+ZIP SHA-256: 39e647d1c0405bb655293e0038c050695e7a64c13d092f03bcbbcd97068ab3bd
+
+The published `SHA256SUMS` asset remains the canonical checksum source. The values above are pinned here so the field plan itself contains no moving release placeholder.
 ```
 
 Verify the downloaded archive against the published `SHA256SUMS` before installation. Do not substitute a later `main` snapshot and still record the run as beta.61 evidence.
@@ -45,7 +48,7 @@ bash tools/ztum-field-evidence.sh \
   --browser "Chrome/Chromium <version>" \
   --theme "dark" \
   --artifact /path/to/zabbix-template-update-manager-0.1.0-beta.61.tar.gz \
-  > /tmp/ztum-beta60-field-evidence.md
+  > /tmp/ztum-beta61-field-evidence.md
 ```
 
 Run it once per theme/browser pass when operator metadata changes. The helper performs no Zabbix configuration write and intentionally excludes IP addresses, database host/name/user/password, secrets, tokens, configuration contents and log contents. Review the generated Markdown before posting it publicly because filesystem paths and local runtime account names are still operational metadata.
@@ -84,14 +87,13 @@ Expected artifact permissions: template directories `0700`, YAML/JSON files `060
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git checkout main
+git checkout v0.1.0-beta.61
 cat VERSION
 git rev-parse HEAD
+test "$(git rev-parse HEAD)" = "59254a61f87e93fb8f897c949ba0ea43d0d77b25"
 ```
 
-Record the exact project version and commit before starting the test.
-
-Record the exact commit SHA. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
+Record the exact project version and commit before starting the test. Do not substitute `main` or another branch for beta.61 evidence. Install the complete module directory below the Zabbix frontend `modules` directory, then run:
 
 ```text
 Administration → General → Modules → Scan directory

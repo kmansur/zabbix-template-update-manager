@@ -2,7 +2,12 @@
 
 namespace Modules\ZabbixTemplateUpdateManager\Service;
 
+use Modules\ZabbixTemplateUpdateManager\Exception\LockContendedException;
+use Modules\ZabbixTemplateUpdateManager\Exception\RuntimeStorageException;
 use RuntimeException;
+
+require_once dirname(__DIR__).'/Exception/LockContendedException.php';
+require_once dirname(__DIR__).'/Exception/RuntimeStorageException.php';
 
 final class TemplateOperationLockService {
 
@@ -44,20 +49,29 @@ final class TemplateOperationLockService {
 
 		$lockPath = $this->lockDir.DIRECTORY_SEPARATOR.self::LOCK_FILE;
 		if (is_link($lockPath)) {
-			throw new RuntimeException('The controlled-operation lock path is unsafe.');
+			throw new RuntimeStorageException('The controlled-operation lock path is unsafe.');
 		}
 
+		// Suppress the PHP warning because the exception below is the bounded UI/log diagnostic.
 		$handle = @fopen($lockPath, 'c+');
 		if (!is_resource($handle)) {
-			throw new RuntimeException('Unable to open the controlled-operation lock file.');
+			throw new RuntimeStorageException('Unable to open the controlled-operation lock file.');
 		}
 
 		try {
-			@chmod($lockPath, 0600);
-			if (!@flock($handle, LOCK_EX | LOCK_NB)) {
-				throw new RuntimeException(
-					'Another Template Update Manager configuration operation is already in progress.'
-				);
+			if (DIRECTORY_SEPARATOR === '/') {
+				if (!chmod($lockPath, 0600)) {
+					throw new RuntimeStorageException('Unable to secure the controlled-operation lock file permissions.');
+				}
+
+				$permissions = fileperms($lockPath);
+				if ($permissions === false || (($permissions & 0777) !== 0600)) {
+					throw new RuntimeStorageException('The controlled-operation lock file permissions are not private.');
+				}
+			}
+
+			if (!flock($handle, LOCK_EX | LOCK_NB)) {
+				throw new LockContendedException();
 			}
 
 			$metadata = json_encode([
@@ -67,42 +81,53 @@ final class TemplateOperationLockService {
 				'acquired_at' => gmdate('c')
 			], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-			if (is_string($metadata)) {
-				@ftruncate($handle, 0);
-				@rewind($handle);
-				@fwrite($handle, $metadata."\n");
-				@fflush($handle);
+			if (!is_string($metadata)) {
+				throw new RuntimeStorageException('Unable to encode controlled-operation lock metadata.');
+			}
+
+			if (!ftruncate($handle, 0) || !rewind($handle)) {
+				throw new RuntimeStorageException('Unable to prepare the controlled-operation lock metadata file.');
+			}
+
+			$payload = $metadata."\n";
+			$written = fwrite($handle, $payload);
+			if ($written === false || $written !== strlen($payload) || !fflush($handle)) {
+				throw new RuntimeStorageException('Unable to persist controlled-operation lock metadata.');
 			}
 
 			return $callback();
 		}
 		finally {
-			@flock($handle, LOCK_UN);
-			@fclose($handle);
+			flock($handle, LOCK_UN);
+			fclose($handle);
 		}
 	}
 
 	private function ensurePrivateDirectory(): void {
 		if (is_link($this->lockDir)) {
-			throw new RuntimeException('The controlled-operation lock directory is unsafe.');
+			throw new RuntimeStorageException('The controlled-operation lock directory is unsafe.');
 		}
 
+		// mkdir races are expected; only the final state is authoritative.
 		if (!is_dir($this->lockDir)
 				&& !@mkdir($this->lockDir, 0700, true)
 				&& !is_dir($this->lockDir)) {
-			throw new RuntimeException('Unable to create the controlled-operation lock directory.');
+			throw new RuntimeStorageException('Unable to create the controlled-operation lock directory.');
 		}
 
 		if (DIRECTORY_SEPARATOR === '/') {
-			@chmod($this->lockDir, 0700);
-			$permissions = @fileperms($this->lockDir);
+			if (!chmod($this->lockDir, 0700)) {
+				throw new RuntimeStorageException('Unable to secure the controlled-operation lock directory permissions.');
+			}
+
+			$permissions = fileperms($this->lockDir);
 			if ($permissions === false || (($permissions & 0777) !== 0700)) {
-				throw new RuntimeException('The controlled-operation lock directory permissions are not private.');
+				throw new RuntimeStorageException('The controlled-operation lock directory permissions are not private.');
 			}
 		}
 
 		if (!is_writable($this->lockDir)) {
-			throw new RuntimeException('The controlled-operation lock directory is not writable.');
+			throw new RuntimeStorageException('The controlled-operation lock directory is not writable.');
 		}
 	}
 }

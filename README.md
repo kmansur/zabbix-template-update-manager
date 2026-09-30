@@ -216,7 +216,7 @@ English:
 
 ```bash
 curl -fsSL \
-  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/main/tools/quickinstall.sh \
+  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/v0.1.0-beta.61/tools/quickinstall.sh \
   -o /tmp/ztum-quickinstall.sh
 
 sudo bash /tmp/ztum-quickinstall.sh
@@ -226,7 +226,7 @@ Português do Brasil:
 
 ```bash
 curl -fsSL \
-  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/main/tools/quickinstall-pt-br.sh \
+  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/v0.1.0-beta.61/tools/quickinstall-pt-br.sh \
   -o /tmp/ztum-quickinstall-pt-br.sh
 
 sudo bash /tmp/ztum-quickinstall-pt-br.sh
@@ -431,8 +431,10 @@ The CI pipeline currently checks:
 
 ```text
 PHP syntax
+PHPStan level 6 on high-risk pure/domain logic
 manifest/action contract
 VERSION ↔ manifest version consistency
+immutable laboratory release metadata guard
 controlled-write boundary
 PHP unit/contract tests
 native Zabbix UI guard

@@ -6,11 +6,13 @@ use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
 use CWebUser;
+use Modules\ZabbixTemplateUpdateManager\Exception\ZtumException;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateRollbackService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Throwable;
 
+require_once dirname(__DIR__).'/src/Exception/ZtumException.php';
 require_once dirname(__DIR__).'/src/Service/TemplateRollbackService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
@@ -51,6 +53,7 @@ class TemplateRollback extends CController {
 			'templateid' => $templateId,
 			'manifest_file' => $manifestFile,
 			'result' => null,
+			'operation_error_code' => null,
 			'operation_error' => null
 		];
 
@@ -76,6 +79,9 @@ class TemplateRollback extends CController {
 				$manifestFile,
 				$exception->getMessage()
 			));
+			$data['operation_error_code'] = $exception instanceof ZtumException
+				? $exception->getMachineCode()
+				: 'unexpected_error';
 			$data['operation_error'] = _(
 				'Rollback could not be completed. Review frontend logs and inspect the template before another write action.'
 			);

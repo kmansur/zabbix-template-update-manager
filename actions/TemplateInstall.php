@@ -6,11 +6,13 @@ use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
 use CWebUser;
+use Modules\ZabbixTemplateUpdateManager\Exception\ZtumException;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledInstallService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Throwable;
 
+require_once dirname(__DIR__).'/src/Exception/ZtumException.php';
 require_once dirname(__DIR__).'/src/Service/TemplateControlledInstallService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
@@ -48,6 +50,7 @@ class TemplateInstall extends CController {
 			'title' => _('Template installation result'),
 			'uuid' => $uuid,
 			'result' => null,
+			'operation_error_code' => null,
 			'operation_error' => null
 		];
 
@@ -68,6 +71,9 @@ class TemplateInstall extends CController {
 				$uuid,
 				$exception->getMessage()
 			));
+			$data['operation_error_code'] = $exception instanceof ZtumException
+				? $exception->getMachineCode()
+				: 'unexpected_error';
 			$data['operation_error'] = _(
 				'Installation could not be completed. Inspect the local template inventory before retrying. Automatic uninstall is never performed.'
 			);
