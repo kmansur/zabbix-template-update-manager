@@ -246,7 +246,10 @@ final class ThreeWayChangeAnalyzer {
 		if (!$baseLocal && $localUpstream) {
 			return 'converged';
 		}
-		if (!$baseLocal && !$baseUpstream && !$localUpstream) {
+		// After the three branches above, a non-matching BASE/LOCAL pair can
+		// only remain when BASE/UPSTREAM and LOCAL/UPSTREAM are also different.
+		// Express that invariant directly so static analysis can prove it.
+		if (!$baseLocal) {
 			return 'conflict';
 		}
 
@@ -263,7 +266,7 @@ final class ThreeWayChangeAnalyzer {
 		return self::canonicalize($left['value']) === self::canonicalize($right['value']);
 	}
 
-	private static function canonicalize($value) {
+	private static function canonicalize(mixed $value): mixed {
 		if (!is_array($value)) {
 			return $value;
 		}
@@ -278,7 +281,7 @@ final class ThreeWayChangeAnalyzer {
 		return $value;
 	}
 
-	private static function displayState(array $state) {
+	private static function displayState(array $state): mixed {
 		return $state['exists'] ? $state['value'] : ['__state' => 'missing'];
 	}
 
@@ -287,9 +290,9 @@ final class ThreeWayChangeAnalyzer {
 		?array $entity,
 		string $field,
 		string $classification,
-		$base,
-		$local,
-		$upstream
+		mixed $base,
+		mixed $local,
+		mixed $upstream
 	): array {
 		return [
 			'path' => $path,
