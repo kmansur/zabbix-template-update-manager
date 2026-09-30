@@ -4,8 +4,10 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
 
 use API;
 use CMessageHelper;
-use RuntimeException;
+use Modules\ZabbixTemplateUpdateManager\Exception\ConfigurationImportException;
+use Throwable;
 
+require_once dirname(__DIR__).'/Exception/ConfigurationImportException.php';
 require_once __DIR__.'/TemplateImportCompareService.php';
 
 /**
@@ -24,44 +26,117 @@ final class TemplateConfigurationImportService {
 		string $ruleProfile = TemplateImportCompareService::PROFILE_UPDATE
 	): void {
 		if ($source === '') {
-			throw new RuntimeException('The controlled template import source is empty.');
+			throw new ConfigurationImportException('The controlled template import source is empty.');
 		}
 		if (!in_array($format, ['json', 'yaml'], true)) {
-			throw new RuntimeException('The controlled template import format is not supported.');
+			throw new ConfigurationImportException('The controlled template import format is not supported.');
 		}
 
-		$messagesBefore = CMessageHelper::getMessages();
-
-		$result = API::Configuration()->import([
+		$params = [
 			'format' => $format,
 			'source' => $source,
 			'rules' => TemplateImportCompareService::rules($ruleProfile)
-		]);
+		];
 
-		if ($result !== true) {
-			$messagesAfter = CMessageHelper::getMessages();
-			$newMessages = array_slice($messagesAfter, count($messagesBefore));
-			$details = [];
+		/*
+		 * Prefer the native API client response when the frontend wrapper exposes
+		 * it. CFrontendApiWrapper normally converts an API error into global
+		 * CMessageHelper state plus false; using the underlying response here keeps
+		 * this write boundary diagnostic independent of that global side effect.
+		 *
+		 * API::setWrapper(null) mirrors CFrontendApiWrapper::callMethod(): nested
+		 * service calls must execute as local API services during the client call.
+		 * The original wrapper is always restored.
+		 */
+		$wrapper = API::getWrapper();
+		if (is_object($wrapper) && method_exists($wrapper, 'getClient')
+				&& isset($wrapper->auth) && is_array($wrapper->auth)) {
+			$client = $wrapper->getClient();
 
-			foreach ($newMessages as $message) {
-				if (!is_array($message) || ($message['type'] ?? null) !== CMessageHelper::MESSAGE_TYPE_ERROR) {
-					continue;
+			if (is_object($client) && method_exists($client, 'callMethod')) {
+				try {
+					API::setWrapper();
+					$response = $client->callMethod('configuration', 'import', $params, $wrapper->auth);
+				}
+				catch (Throwable $exception) {
+					throw new ConfigurationImportException(
+						'Zabbix configuration import raised an API client exception: '.$exception->getMessage(),
+						$exception
+					);
+				}
+				finally {
+					API::setWrapper($wrapper);
 				}
 
-				$text = trim((string) ($message['message'] ?? ''));
-				if ($text !== '') {
-					$details[] = $text;
+				if (!is_object($response)) {
+					throw new ConfigurationImportException(
+						'Zabbix configuration import returned an invalid API client response.'
+					);
 				}
+
+				$errorCode = (int) ($response->errorCode ?? 0);
+				if ($errorCode !== 0) {
+					$detail = trim((string) ($response->errorMessage ?? ''));
+					throw new ConfigurationImportException(
+						$detail !== ''
+							? 'Zabbix configuration import failed: '.$detail
+							: 'Zabbix configuration import failed with API error code '.$errorCode.'.'
+					);
+				}
+
+				if (($response->data ?? null) !== true) {
+					throw new ConfigurationImportException(
+						'Zabbix configuration import did not report success.'
+					);
+				}
+
+				return;
 			}
-
-			$details = array_values(array_unique($details));
-			$message = 'Zabbix configuration import did not report success.';
-
-			if ($details !== []) {
-				$message .= ' '.implode(' | ', array_slice($details, -3));
-			}
-
-			throw new RuntimeException($message);
 		}
+
+		/*
+		 * Compatibility fallback for an unexpected frontend wrapper shape.
+		 * Messages are scoped to this API call and are never the primary diagnostic
+		 * path on supported Zabbix 7.x/8.x frontend wrappers.
+		 */
+		$messagesBefore = CMessageHelper::getMessages();
+
+		try {
+			$result = API::Configuration()->import($params);
+		}
+		catch (Throwable $exception) {
+			throw new ConfigurationImportException(
+				'Zabbix configuration import raised an exception: '.$exception->getMessage(),
+				$exception
+			);
+		}
+
+		if ($result === true) {
+			return;
+		}
+
+		$messagesAfter = CMessageHelper::getMessages();
+		$newMessages = array_slice($messagesAfter, count($messagesBefore));
+		$details = [];
+
+		foreach ($newMessages as $message) {
+			if (!is_array($message) || ($message['type'] ?? null) !== CMessageHelper::MESSAGE_TYPE_ERROR) {
+				continue;
+			}
+
+			$text = trim((string) ($message['message'] ?? ''));
+			if ($text !== '') {
+				$details[] = $text;
+			}
+		}
+
+		$details = array_values(array_unique($details));
+		$message = 'Zabbix configuration import did not report success.';
+
+		if ($details !== []) {
+			$message .= ' '.implode(' | ', array_slice($details, -3));
+		}
+
+		throw new ConfigurationImportException($message);
 	}
 }
