@@ -22,7 +22,7 @@ No second preflight or configuration write is started while the lock is held.
 
 ## Scope
 
-The default lock lives in a private ZTUM directory below the PHP temporary directory. An administrator may set:
+The default lock lives in the persistent private runtime directory `/var/lib/zabbix-template-update-manager/locks`. An administrator may override it with:
 
 ```text
 ZTUM_LOCK_DIR=/var/lib/zabbix-template-update-manager/locks
@@ -30,6 +30,8 @@ ZTUM_LOCK_DIR=/var/lib/zabbix-template-update-manager/locks
 
 The directory must be private and writable by the PHP runtime account.
 
-The current mechanism serializes processes that see the same filesystem lock. In a multi-node/HA frontend deployment, administrators must point every node to storage that provides reliable cross-node `flock()` semantics, or treat cross-node serialization as not yet proven. ZTUM does not claim a distributed database/Redis lock in the current beta.
+The current mechanism serializes processes that see the same filesystem lock. ZTUM treats local POSIX storage as the supported baseline. In a multi-node/HA frontend deployment, do **not** assume that merely sharing `/var/lib` proves serialization: the filesystem and mount options must provide reliable cross-node `flock()` behavior and that behavior must be tested in the actual deployment. NFS/CIFS or other remote filesystems are therefore not automatically considered a validated lock backend.
+
+If reliable cross-node locking has not been demonstrated, keep configuration-changing ZTUM operations on one frontend node and record HA serialization as not validated. ZTUM does not claim a distributed database/Redis lock in the current beta.
 
 The server-side evidence/preflight model remains authoritative even with the lock; the lock is defense in depth against concurrent operator workflows, not a replacement for stale-evidence checks.
