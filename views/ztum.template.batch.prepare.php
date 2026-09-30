@@ -172,6 +172,14 @@ $executeOneUrl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'ztum.templates.batch_update_one')
 	->getUrl();
 
+$batchCreateUrl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'ztum.batch.create')
+	->getUrl();
+
+$batchStateUrl = (new CUrl('zabbix.php'))
+	->setArgument('action', 'ztum.batch.state')
+	->getUrl();
+
 $compareUrl = (new CUrl('zabbix.php'))
 	->setArgument('action', 'ztum.template.compare')
 	->getUrl();
@@ -184,6 +192,8 @@ $jsConfig = json_encode([
 	'csrfName' => CSRF_TOKEN_NAME,
 	'prepareCsrfToken' => CCsrfTokenHelper::get('ztum.templates.prepare_one'),
 	'executeCsrfToken' => CCsrfTokenHelper::get('ztum.templates.batch_update_one'),
+	'batchCreateCsrfToken' => CCsrfTokenHelper::get('ztum.batch.create'),
+	'batchStateCsrfToken' => CCsrfTokenHelper::get('ztum.batch.state'),
 	'maxHistoricalContinuationRequests' => 12,
 	'statusClasses' => [
 		'success' => ZBX_STYLE_GREEN,
