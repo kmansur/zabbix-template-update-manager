@@ -5,7 +5,7 @@ tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 
 bash -n tools/ztum-validation-bundle.sh
-tools/ztum-validation-bundle.sh   --module-dir "$(pwd)"   --output "$tmp/evidence"   --browser "CI Chromium"   --theme "dark"
+bash tools/ztum-validation-bundle.sh   --module-dir "$(pwd)"   --output "$tmp/evidence"   --browser "CI Chromium"   --theme "dark"
 
 for required in environment.md reviewer-checklist.md module-files.sha256 SHA256SUMS; do
   test -s "$tmp/evidence/$required"
