@@ -24,7 +24,8 @@ class TemplateInstallBatchExecuteOne extends CController {
 		$ret = $this->validateInput([
 			'uuid' => 'required|string',
 			'evidence_sha256' => 'required|string',
-			'confirm' => 'required|in 1'
+			'confirm' => 'required|in 1',
+			'operation_id' => 'required|string'
 		]);
 
 		if ($ret) {
