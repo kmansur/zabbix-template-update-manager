@@ -11,6 +11,7 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 	let executionStarted = false;
 	let retryInProgress = false;
 	let autoSelectReviewed = false;
+	let persistedOperationId = null;
 
 	const byId = (id) => document.getElementById(id);
 	const setText = (id, value) => {
@@ -259,12 +260,13 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		throw new Error(labels.request_failed);
 	};
 
-	const executeOne = async (templateId, evidence, manualOverride = false) => {
+	const executeOne = async (operationId, templateId, evidence, manualOverride = false) => {
 		const body = new FormData();
 		body.append(config.csrfName, config.executeCsrfToken);
 		body.append('templateid', templateId);
 		body.append('evidence_sha256', evidence);
 		body.append('confirm', '1');
+		body.append('operation_id', operationId);
 		if (manualOverride) {
 			body.append('manual_override', '1');
 		}
@@ -286,6 +288,92 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		}
 
 		return payload.result;
+	};
+
+	const persistedEntries = (entries) => entries.map((entry) => ({
+		subject: 'template-' + entry.templateId,
+		evidence_sha256: entry.evidence,
+		manual_override: entry.manualOverride === true
+	}));
+
+	const requestBatchState = async (operationId) => {
+		const body = new FormData();
+		body.append(config.csrfName, config.batchStateCsrfToken);
+		body.append('operation_id', operationId);
+		body.append('recover_stale', '1');
+
+		const response = await fetch(config.batchStateUrl, {
+			method: 'POST',
+			body,
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'}
+		});
+		if (!response.ok) {
+			throw new Error('HTTP ' + response.status);
+		}
+		const payload = await response.json();
+		if (!payload || payload.ok !== true || !payload.operation) {
+			throw new Error(payload?.error || labels.request_failed);
+		}
+		return payload.operation;
+	};
+
+	const samePersistedPlan = (operation, entries) => {
+		if (operation?.type !== 'update' || !Array.isArray(operation.entries)
+				|| operation.entries.length !== entries.length) {
+			return false;
+		}
+		const expected = persistedEntries(entries);
+		return expected.every((entry, index) => {
+			const persisted = operation.entries[index] || {};
+			return persisted.subject === entry.subject
+				&& persisted.evidence_sha256 === entry.evidence_sha256
+				&& Boolean(persisted.manual_override) === Boolean(entry.manual_override);
+		});
+	};
+
+	const createOrResumeOperation = async (entries) => {
+		const storageKey = 'ztum.persisted.update.batch';
+		const stored = window.localStorage?.getItem(storageKey) || '';
+
+		if (/^[a-f0-9]{32}$/.test(stored)) {
+			try {
+				const existing = await requestBatchState(stored);
+				if (samePersistedPlan(existing, entries)) {
+					if (existing.status === 'failed' || existing.status === 'uncertain') {
+						throw new Error(labels.execution_persisted_blocked);
+					}
+					persistedOperationId = stored;
+					return existing;
+				}
+			}
+			catch (error) {
+				if (error?.message === labels.execution_persisted_blocked) {
+					throw error;
+				}
+			}
+		}
+
+		const body = new FormData();
+		body.append(config.csrfName, config.batchCreateCsrfToken);
+		body.append('type', 'update');
+		body.append('entries', JSON.stringify(persistedEntries(entries)));
+		const response = await fetch(config.batchCreateUrl, {
+			method: 'POST',
+			body,
+			credentials: 'same-origin',
+			headers: {'X-Requested-With': 'XMLHttpRequest'}
+		});
+		if (!response.ok) {
+			throw new Error('HTTP ' + response.status);
+		}
+		const payload = await response.json();
+		if (!payload || payload.ok !== true || !payload.operation?.id) {
+			throw new Error(payload?.error || labels.request_failed);
+		}
+		persistedOperationId = payload.operation.id;
+		window.localStorage?.setItem(storageKey, persistedOperationId);
+		return payload.operation;
 	};
 
 	const updateReviewedSelectAll = () => {
@@ -407,6 +495,16 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 			return;
 		}
 
+		let persisted;
+		try {
+			persisted = await createOrResumeOperation(entries);
+		}
+		catch (error) {
+			setStateText('ztum-batch-exec-status', error?.message || labels.request_failed, 'danger');
+			setStateText('ztum-batch-execution-state', error?.message || labels.request_failed, 'danger');
+			return;
+		}
+
 		executionStarted = true;
 		byId('ztum-batch-confirm').disabled = true;
 		byId('ztum-batch-update-submit').disabled = true;
@@ -430,12 +528,21 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		setText('ztum-batch-exec-not-attempted', String(notAttempted));
 		setText('ztum-batch-exec-write', labels.no);
 
+		const persistedBySubject = new Map((persisted.entries || []).map((entry) => [entry.subject, entry]));
 		for (let index = 0; index < entries.length; index++) {
 			const {templateId, evidence, manualOverride} = entries[index];
+			const persistedEntry = persistedBySubject.get('template-' + templateId);
+			if (persistedEntry?.state === 'succeeded') {
+				updated++;
+				notAttempted = entries.length - index - 1;
+				setText('ztum-execution-' + templateId, labels.updated + ' [' + labels.resumed_success + ']');
+				continue;
+			}
 			setText('ztum-execution-' + templateId, labels.executing);
 
 			try {
 				const result = await executeOne(
+					persistedOperationId,
 					templateId,
 					evidence,
 					manualOverride
