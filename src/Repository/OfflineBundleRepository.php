@@ -3,10 +3,7 @@
 namespace Modules\ZabbixTemplateUpdateManager\Repository;
 
 use JsonException;
-use Modules\ZabbixTemplateUpdateManager\Service\UpstreamSignatureVerifier;
 use RuntimeException;
-
-require_once dirname(__DIR__).'/Service/UpstreamSignatureVerifier.php';
 
 final class OfflineBundleRepository {
 
@@ -19,16 +16,14 @@ final class OfflineBundleRepository {
 	private ?string $rootDir;
 	private bool $offlineOnly;
 	private ?array $manifest = null;
-	private UpstreamSignatureVerifier $signatureVerifier;
 
-	public function __construct(?string $rootDir = null, ?bool $offlineOnly = null, ?UpstreamSignatureVerifier $signatureVerifier = null) {
+	public function __construct(?string $rootDir = null, ?bool $offlineOnly = null) {
 		$configuredRoot = trim((string) getenv('ZTUM_OFFLINE_BUNDLE_DIR'));
 		$this->rootDir = $rootDir !== null
 			? rtrim($rootDir, DIRECTORY_SEPARATOR)
 			: ($configuredRoot !== '' ? rtrim($configuredRoot, DIRECTORY_SEPARATOR) : null);
 
 		$this->offlineOnly = $offlineOnly ?? self::envFlag('ZTUM_OFFLINE_ONLY');
-		$this->signatureVerifier = $signatureVerifier ?? new UpstreamSignatureVerifier();
 	}
 
 	public function isConfigured(): bool {
@@ -44,13 +39,6 @@ final class OfflineBundleRepository {
 			throw new RuntimeException('The offline upstream index line is invalid.');
 		}
 		return $this->readVerified('indexes/'.$line.'.json', self::MAX_INDEX_BYTES);
-	}
-
-	public function readIndexSignature(string $line): ?string {
-		if (preg_match('/^\d+\.\d+$/', $line) !== 1) {
-			throw new RuntimeException('The offline upstream index signature line is invalid.');
-		}
-		return $this->readVerified('indexes/'.$line.'.json.sig.json', 65536);
 	}
 
 	public function readSource(string $commit, string $path): ?string {
@@ -183,18 +171,6 @@ final class OfflineBundleRepository {
 		if ($size === false || $size < 2 || $size > self::MAX_MANIFEST_BYTES
 				|| !is_string($content) || strlen($content) > self::MAX_MANIFEST_BYTES) {
 			throw new RuntimeException('The offline bundle manifest is unreadable or exceeds the size limit.');
-		}
-
-		if ($this->signatureVerifier->isRequired() || $this->signatureVerifier->isConfigured()) {
-			$signaturePath = $this->rootDir.DIRECTORY_SEPARATOR.'manifest.sig.json';
-			if (is_link($signaturePath) || !is_file($signaturePath) || !is_readable($signaturePath)) {
-				throw new RuntimeException('The signed offline bundle manifest signature is missing or unsafe.');
-			}
-			$signature = file_get_contents($signaturePath);
-			if (!is_string($signature) || $signature === '' || strlen($signature) > 65536) {
-				throw new RuntimeException('The signed offline bundle manifest signature is unreadable.');
-			}
-			$this->signatureVerifier->verify($content, $signature);
 		}
 
 		try {
