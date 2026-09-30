@@ -24,7 +24,7 @@ A template reaches the controlled update path only after all of these gates succ
 
 The standard path still requires no local-overwrite condition and `none`/`low` technical risk.
 
-The **explicit reviewed path** is used when all identities, provenance and baseline evidence are authoritative but a confirmed three-way conflict exists, a known LOCAL-only difference would be overwritten/removed and/or technical risk is `medium`/`high`. The exact reviewed reasons are bound into the preflight evidence. Confirmed conflicts and local overwrite each require their own explicit super-administrator acknowledgement immediately before import. This path is never promoted to unattended batch `Ready`.
+The **explicit reviewed path** is used when all identities, provenance and baseline evidence are authoritative but a confirmed three-way conflict exists, a known LOCAL-only difference would be overwritten/removed and/or technical risk is `medium`/`high`. The exact reviewed reasons are bound into the preflight evidence. The reviewed path uses one explicit Super Admin acknowledgement immediately before import; the exact known risk reasons are displayed and bound into the reviewed preflight evidence. This path is never promoted to unattended batch `Ready`.
 
 The policy is intentionally simple: **known risk may be acknowledged; unknown risk remains blocked**. Unresolved identities, incomplete coverage, stale/tampered evidence, source-fingerprint mismatch, invalid backup, unsupported runtime, authorization/CSRF failure and uncertain write state cannot be overridden.
 
@@ -43,7 +43,7 @@ Requirements:
 - `USER_TYPE_SUPER_ADMIN` only;
 - numeric `templateid`;
 - explicit confirmation checkbox;
-- for reviewed override mode, explicit acknowledgement of the bound review reasons, with dedicated confirmation for known conflicts and local overwrite;
+- for reviewed override mode, one explicit acknowledgement accepting the bound and visibly listed review reasons;
 - evidence SHA-256 from the immediately preceding reviewed preflight page.
 
 The frontend controller does not call the Zabbix import API directly. It delegates to `TemplateControlledUpdateService`.
