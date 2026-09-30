@@ -5,6 +5,7 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CWebUser;
+use Modules\ZabbixTemplateUpdateManager\Repository\BatchOperationRepository;
 use Modules\ZabbixTemplateUpdateManager\Exception\ZtumException;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateControlledUpdateService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationLockService;
@@ -12,6 +13,7 @@ use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Exception/ZtumException.php';
+require_once dirname(__DIR__).'/src/Repository/BatchOperationRepository.php';
 require_once dirname(__DIR__).'/src/Service/TemplateControlledUpdateService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationLockService.php';
 require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
@@ -31,6 +33,7 @@ class TemplateBatchUpdateOne extends CController {
 			'templateid' => 'required|id',
 			'evidence_sha256' => 'required|string',
 			'confirm' => 'required|in 1',
+			'operation_id' => 'required|string',
 			'manual_override' => 'in 1'
 		]);
 
@@ -62,11 +65,17 @@ class TemplateBatchUpdateOne extends CController {
 	protected function doAction(): void {
 		$templateId = (string) $this->getInput('templateid');
 		$evidence = strtolower(trim((string) $this->getInput('evidence_sha256')));
+		$operationId = strtolower(trim((string) $this->getInput('operation_id')));
 		$output = ['ok' => false, 'result' => null, 'error_code' => null, 'error' => null];
 
 		$operationException = null;
 
+		$batchRepo = new BatchOperationRepository();
+		$batchStarted = false;
+
 		try {
+			$batchRepo->begin($operationId, 'template-'.$templateId, $evidence);
+			$batchStarted = true;
 			$manualOverride = (string) $this->getInput('manual_override', '') === '1';
 			$result = (new TemplateOperationLockService())->run(
 				'update',
@@ -81,6 +90,9 @@ class TemplateBatchUpdateOne extends CController {
 			);
 			$output['ok'] = true;
 			$output['result'] = $result;
+			$terminal = ($result['status'] ?? null) === 'updated' ? 'succeeded'
+				: (!empty($result['write_performed']) ? 'uncertain' : 'failed');
+			$batchRepo->finish($operationId, 'template-'.$templateId, $terminal, (string) ($result['status'] ?? ''), null);
 		}
 		catch (Throwable $exception) {
 			$operationException = $exception;
@@ -93,6 +105,16 @@ class TemplateBatchUpdateOne extends CController {
 			$output['error_code'] = $exception instanceof ZtumException
 				? $exception->getMachineCode()
 				: 'unexpected_error';
+			if ($batchStarted) {
+				try {
+					$terminal = $output['error_code'] === 'lock_contended' ? 'failed' : 'uncertain';
+					$batchRepo->finish($operationId, 'template-'.$templateId, $terminal, null, $output['error_code']);
+				}
+				catch (Throwable $batchException) {
+					error_log('[Zabbix Template Update Manager] Unable to finalize persisted update batch state: '.$batchException->getMessage());
+				}
+			}
+
 			$output['error'] = $exception->getMessage() !== ''
 				? $exception->getMessage()
 				: _('Unable to complete this controlled update request. Inspect the local template state before retrying.');
