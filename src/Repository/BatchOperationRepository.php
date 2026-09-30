@@ -95,8 +95,15 @@ final class BatchOperationRepository {
 		return $this->validate($data, $id);
 	}
 
-	public function begin(string $id, string $subject, string $evidence): array {
-		return $this->mutate($id, function (array $state) use ($subject, $evidence): array {
+	public function begin(string $id, string $subject, string $evidence, string $expectedType, string $actorUserId): array {
+		return $this->mutate($id, function (array $state) use ($subject, $evidence, $expectedType, $actorUserId): array {
+			if (($state['type'] ?? null) !== $expectedType) {
+				throw new RuntimeException('Batch operation type does not match the requested write path.');
+			}
+			$owner = trim((string) ($state['actor_userid'] ?? ''));
+			if ($owner !== '' && (!ctype_digit($actorUserId) || !hash_equals($owner, $actorUserId))) {
+				throw new RuntimeException('Batch operation belongs to a different operator.');
+			}
 			$index = $this->findEntry($state, $subject);
 			$entry = $state['entries'][$index];
 
