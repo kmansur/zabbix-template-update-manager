@@ -39,7 +39,9 @@ class TemplateBatchUpdateOne extends CController {
 
 		if ($ret) {
 			$evidence = strtolower(trim((string) $this->getInput('evidence_sha256')));
-			$ret = preg_match('/^[a-f0-9]{64}$/', $evidence) === 1;
+			$operationId = strtolower(trim((string) $this->getInput('operation_id')));
+			$ret = preg_match('/^[a-f0-9]{64}$/', $evidence) === 1
+				&& preg_match('/^[a-f0-9]{32}$/', $operationId) === 1;
 		}
 
 		if (!$ret) {
