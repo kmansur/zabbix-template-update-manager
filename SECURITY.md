@@ -28,7 +28,7 @@ Production use is not yet recommended while the real Zabbix 7.x/8.x controlled-w
 - Ambiguous imports are never retried automatically.
 - Reviewed batch plans are persisted server-side and bind entry order, evidence, operation type and operator identity; interrupted running entries become uncertain rather than retryable.
 - Rollback is explicit and never automatic.
-- Air-gapped bundles are accepted only after manifest/hash verification; signed deployments authenticate the manifest and indexes with Ed25519 before trusting their hashes; offline-only mode never falls back to network access.
+- Air-gapped bundles are accepted only after manifest/hash verification; offline-only mode never falls back to network access.
 - Credentials, tokens, private keys and customer-sensitive data must never be committed or included in public field reports.
 
 ## Automated security gates
@@ -41,7 +41,7 @@ CI includes:
 - deterministic runtime security guard;
 - dependency audit for the pinned Python development dependency;
 - workflow structure/action-pin validation;
-- unit/regression tests for offline integrity, Ed25519 tamper rejection, durable batch interruption and controlled-operation serialization.
+- unit/regression tests for offline integrity, durable batch interruption and controlled-operation serialization.
 
 Automated checks do not replace code review, penetration testing or real Zabbix field validation.
 
