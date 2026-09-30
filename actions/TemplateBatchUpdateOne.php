@@ -76,7 +76,7 @@ class TemplateBatchUpdateOne extends CController {
 		$batchStarted = false;
 
 		try {
-			$batchRepo->begin($operationId, 'template-'.$templateId, $evidence);
+			$batchRepo->begin($operationId, 'template-'.$templateId, $evidence, 'update', (string) (CWebUser::$data['userid'] ?? ''));
 			$batchStarted = true;
 			$manualOverride = (string) $this->getInput('manual_override', '') === '1';
 			$result = (new TemplateOperationLockService())->run(
@@ -90,13 +90,14 @@ class TemplateBatchUpdateOne extends CController {
 					true
 				)
 			);
-			$output['ok'] = true;
 			$output['result'] = $result;
 			$terminal = ($result['status'] ?? null) === 'updated' ? 'succeeded'
 				: (!empty($result['write_performed']) ? 'uncertain' : 'failed');
 			$batchRepo->finish($operationId, 'template-'.$templateId, $terminal, (string) ($result['status'] ?? ''), null);
+			$output['ok'] = true;
 		}
 		catch (Throwable $exception) {
+			$output['ok'] = false;
 			$operationException = $exception;
 			error_log(sprintf(
 				'[Zabbix Template Update Manager] Request-bounded batch update failed for template %s: %s',
