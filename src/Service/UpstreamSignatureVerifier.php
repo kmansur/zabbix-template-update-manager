@@ -38,12 +38,15 @@ final class UpstreamSignatureVerifier {
 			throw new RuntimeException('The upstream signature document is invalid JSON.', 0, $exception);
 		}
 
+		if (!is_array($signature)) {
+			throw new RuntimeException('The upstream signature document must be a JSON object.');
+		}
+
 		$expectedKeyId = $this->keyId();
 		$declaredSha = strtolower(trim((string) ($signature['content_sha256'] ?? '')));
 		$encodedSignature = trim((string) ($signature['signature_b64'] ?? ''));
 
-		if (!is_array($signature)
-				|| ($signature['schema_version'] ?? null) !== 1
+		if (($signature['schema_version'] ?? null) !== 1
 				|| ($signature['algorithm'] ?? null) !== 'ed25519'
 				|| ($signature['key_id'] ?? null) !== $expectedKeyId
 				|| preg_match('/^[a-f0-9]{64}$/', $declaredSha) !== 1
