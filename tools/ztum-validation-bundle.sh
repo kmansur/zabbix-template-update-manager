@@ -39,10 +39,6 @@ if git -C "$MODULE_DIR" rev-parse HEAD >/dev/null 2>&1; then
 fi
 
 php_version="$(php -r 'echo PHP_VERSION;' 2>/dev/null || echo unavailable)"
-sodium="$(php -r 'echo function_exists("sodium_crypto_sign_verify_detached") ? "yes" : "no";' 2>/dev/null || echo unavailable)"
-trusted_key="no"
-[[ -n "${ZTUM_TRUSTED_INDEX_PUBLIC_KEY_B64:-}" ]] && trusted_key="yes"
-
 cat > "$OUTPUT_DIR/environment.md" <<EOF
 # ZTUM external validation evidence
 
@@ -50,12 +46,9 @@ cat > "$OUTPUT_DIR/environment.md" <<EOF
 - ZTUM version: $version
 - ZTUM commit: $commit
 - PHP version: $php_version
-- PHP Sodium Ed25519 verification: $sodium
 - Browser: $BROWSER
 - Theme: $THEME
 - Module directory: $MODULE_DIR
-- Signed-index enforcement: ${ZTUM_REQUIRE_SIGNED_INDEX:-0}
-- Trusted-index key configured: $trusted_key
 - Offline-only mode: ${ZTUM_OFFLINE_ONLY:-0}
 
 This bundle contains no credentials by design. Review every file before publishing.
@@ -89,9 +82,7 @@ Record PASS / FAIL / NOT TESTED and attach evidence for:
 - batch stop-on-first-failure;
 - interrupted/resumed batch behavior;
 - rollback + recovery backup;
-- signed online index verification;
-- signed offline bundle verification;
-- tampered index/signature/manifest/source rejection;
+- tampered index/manifest/source rejection;
 - global operation serialization;
 - non-Super-Admin and CSRF negative tests;
 - light/dark UI pass;
