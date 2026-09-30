@@ -4,6 +4,11 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Documentation
+
+- Synchronized README, maintainer guidance, laboratory plan, roadmap and security posture with the published `v0.1.0-beta.60` prerelease and current field-validation state.
+- Documented the two source-proven materialized Zabbix discovery-rule defaults used by three-way semantic normalization.
+
 ## [0.1.0-beta.60] - 2026-09-30
 
 ### Fixed
