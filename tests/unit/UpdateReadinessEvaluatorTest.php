@@ -71,8 +71,21 @@ assertReadiness('blocked_unresolved', $result['status'], 'Unresolved three-way s
 
 $threeWayConflict = ['summary' => ['unresolved' => 0, 'conflict' => 1, 'local_only_overwrite' => 0]];
 $result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWayConflict, $preview, ['coverage' => 'complete', 'level' => 'conflict']);
-assertReadiness('blocked_conflict', $result['status'], 'Confirmed three-way conflict must remain a hard blocker.');
-assertReadiness(false, $result['candidate_for_backup'], 'Conflict must not advance to backup/update path.');
+assertReadiness('review_required', $result['status'], 'Confirmed three-way conflict with complete evidence should enter explicit reviewed path.');
+assertReadiness(true, $result['candidate_for_backup'], 'Known conflict may advance only to rollback-backup preparation.');
+assertReadiness(true, $result['manual_confirmation_required'], 'Known conflict must require explicit administrator acknowledgement.');
+assertReadiness(['confirmed_three_way_conflict'], $result['manual_reasons'], 'Confirmed conflict must be bound into reviewed evidence.');
+
+$result = UpdateReadinessEvaluator::evaluate(
+	$template,
+	$baseline,
+	$threeWayConflict,
+	$preview,
+	['coverage' => 'complete', 'level' => 'conflict'],
+	$verifiedBackup
+);
+assertReadiness('review_backup_verified', $result['status'], 'Known conflict with current rollback evidence should advance to reviewed preflight.');
+assertReadiness('run_manual_preflight', $result['next_step'], 'Known conflict must never enter unattended standard preflight.');
 
 $threeWayOverwrite = ['summary' => ['unresolved' => 0, 'conflict' => 0, 'local_only_overwrite' => 3]];
 $result = UpdateReadinessEvaluator::evaluate($template, $baseline, $threeWayOverwrite, $preview, ['coverage' => 'complete', 'level' => 'high']);

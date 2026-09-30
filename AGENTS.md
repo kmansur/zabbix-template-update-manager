@@ -175,9 +175,9 @@ The controlled update flow must include all of the following:
 2. installed version is older than the official candidate;
 3. historical baseline resolved;
 4. complete three-way analysis with no unresolved identities;
-5. no confirmed conflict;
-6. no known local-customization overwrite risk;
-7. standard update eligibility limited to `none`/`low` technical risk plus explicitly recognized bounded-medium changes marked `standard_path_eligible`; medium remains manual by default and high/conflict/unresolved/local-overwrite must never become automatic;
+5. confirmed BASE / LOCAL / UPSTREAM conflicts may proceed only through the explicit reviewed path when every affected identity/value is known, rollback evidence is verified and the Super Admin explicitly acknowledges the visibly listed reviewed risks before import;
+6. known local-customization overwrite risk may proceed only through the explicit reviewed path covered by the same explicit reviewed-risk acknowledgement;
+7. standard update eligibility remains limited to `none`/`low` technical risk plus explicitly recognized bounded-medium changes marked `standard_path_eligible`; medium/high/conflict/local-overwrite must never become automatic, while unresolved/unknown/integrity/security failures remain hard blockers;
 8. persistent rollback backup created;
 9. newest rollback backup revalidated against a fresh installed-template export (`backup_verified`);
 10. fresh server-side preflight;

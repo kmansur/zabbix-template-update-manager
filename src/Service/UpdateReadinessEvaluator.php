@@ -6,9 +6,10 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
  * Evaluates whether an official template update has enough proven comparison
  * evidence to advance through review, backup and controlled preflight.
  *
- * Hard blockers (missing/ambiguous baseline, unresolved identities or real
- * BASE/LOCAL/UPSTREAM conflicts) remain fail-closed. Known local-overwrite
- * differences and high technical risk enter an explicitly reviewed manual
+ * Hard blockers (missing/ambiguous baseline, unresolved identities, unknown
+ * risk/coverage or integrity prerequisites) remain fail-closed. Proven
+ * BASE/LOCAL/UPSTREAM conflicts, known local-overwrite differences and high
+ * technical risk enter an explicitly reviewed manual
  * path. Medium technical impact remains manual by default, except for narrowly
  * recognized standard-path-eligible changes proven by the risk analyzer (for
  * example bounded discard-only preprocessing maintenance with complete
@@ -74,9 +75,6 @@ final class UpdateReadinessEvaluator {
 			return self::blocked($result, 'blocked_unresolved', 'resolve_three_way_analysis', 'three_way_unresolved');
 		}
 
-		if ((int) ($threeWaySummary['conflict'] ?? 0) > 0) {
-			return self::blocked($result, 'blocked_conflict', 'resolve_conflicts', 'three_way_conflict');
-		}
 
 		if (!is_array($updateRisk)) {
 			return self::blocked($result, 'blocked_unresolved', 'resolve_risk_analysis', 'risk_unavailable');
@@ -87,14 +85,14 @@ final class UpdateReadinessEvaluator {
 		}
 
 		$riskLevel = (string) ($updateRisk['level'] ?? 'unknown');
-		if ($riskLevel === 'conflict') {
-			return self::blocked($result, 'blocked_conflict', 'resolve_conflicts', 'risk_conflict');
-		}
-		if ($riskLevel === 'unknown' || !in_array($riskLevel, ['none', 'low', 'medium', 'high'], true)) {
+		if ($riskLevel === 'unknown' || !in_array($riskLevel, ['none', 'low', 'medium', 'high', 'conflict'], true)) {
 			return self::blocked($result, 'blocked_unresolved', 'resolve_risk_analysis', 'risk_unknown');
 		}
 
 		$manualReasons = [];
+		if ((int) ($threeWaySummary['conflict'] ?? 0) > 0 || $riskLevel === 'conflict') {
+			$manualReasons[] = 'confirmed_three_way_conflict';
+		}
 		if ((int) ($threeWaySummary['local_only_overwrite'] ?? 0) > 0) {
 			$manualReasons[] = 'local_customization_overwrite';
 		}

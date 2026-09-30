@@ -54,7 +54,8 @@ final class TemplateControlledUpdateService {
 		string $templateId,
 		string $expectedEvidenceSha256,
 		bool $manualOverride = false,
-		bool $localOverwriteConfirmed = true
+		bool $localOverwriteConfirmed = true,
+		bool $conflictsConfirmed = false
 	): array {
 		$templateId = trim($templateId);
 		$expectedEvidenceSha256 = strtolower(trim($expectedEvidenceSha256));
@@ -94,6 +95,20 @@ final class TemplateControlledUpdateService {
 				'status' => 'blocked_manual_confirmation',
 				'write_performed' => false,
 				'reason' => 'local_overwrite_confirmation_required',
+				'preflight_status' => 'passed',
+				'preflight' => $preflight,
+				'candidate' => null,
+				'validation' => null
+			];
+		}
+
+		if ($manualOverride
+				&& in_array('confirmed_three_way_conflict', (array) ($preflight['manual_reasons'] ?? []), true)
+				&& !$conflictsConfirmed) {
+			return [
+				'status' => 'blocked_manual_confirmation',
+				'write_performed' => false,
+				'reason' => 'conflict_confirmation_required',
 				'preflight_status' => 'passed',
 				'preflight' => $preflight,
 				'candidate' => null,
