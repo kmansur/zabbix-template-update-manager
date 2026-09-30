@@ -10,6 +10,8 @@ final class BatchOperationRepository {
 	private const SCHEMA_VERSION = 1;
 	private const MAX_ENTRIES = 500;
 	private const MAX_BYTES = 4194304;
+	private const MAX_OPERATION_FILES = 200;
+	private const TERMINAL_RETENTION_SECONDS = 2592000;
 	private const DEFAULT_DIR = '/var/lib/zabbix-template-update-manager/batches';
 
 	private string $dir;
@@ -32,6 +34,8 @@ final class BatchOperationRepository {
 		}
 
 		$this->ensureDirectory();
+		$this->pruneExpiredTerminalOperations();
+		$this->assertCapacity();
 		$id = bin2hex(random_bytes(16));
 		$normalized = [];
 		$seen = [];
@@ -298,6 +302,66 @@ final class BatchOperationRepository {
 		}
 		if (!is_writable($this->dir)) {
 			throw new RuntimeException('Batch operation directory is not writable.');
+		}
+	}
+
+	private function pruneExpiredTerminalOperations(): void {
+		$now = time();
+		$files = glob($this->dir.DIRECTORY_SEPARATOR.'*.json');
+		if (!is_array($files)) {
+			return;
+		}
+
+		foreach ($files as $path) {
+			$id = basename($path, '.json');
+			if (preg_match('/^[a-f0-9]{32}$/', $id) !== 1 || is_link($path)) {
+				continue;
+		}
+			$mtime = filemtime($path);
+			if ($mtime === false || ($now - $mtime) < self::TERMINAL_RETENTION_SECONDS) {
+				continue;
+		}
+
+			try {
+				$state = $this->load($id);
+			}
+			catch (RuntimeException $exception) {
+				// Preserve unreadable evidence for explicit operator investigation.
+				continue;
+		}
+
+			if (!in_array($state['status'] ?? null, ['completed', 'failed', 'uncertain'], true)) {
+				continue;
+		}
+
+			$lockPath = $path.'.lock';
+			if (file_exists($lockPath)) {
+				$lock = fopen($lockPath, 'c+');
+				if (!is_resource($lock)) {
+					continue;
+				}
+				if (!flock($lock, LOCK_EX | LOCK_NB)) {
+					fclose($lock);
+					continue;
+				}
+				@unlink($path);
+				flock($lock, LOCK_UN);
+				fclose($lock);
+				@unlink($lockPath);
+			}
+			else {
+				@unlink($path);
+			}
+		}
+	}
+
+	private function assertCapacity(): void {
+		$files = glob($this->dir.DIRECTORY_SEPARATOR.'*.json');
+		$count = is_array($files) ? count($files) : 0;
+		if ($count >= self::MAX_OPERATION_FILES) {
+			throw new RuntimeException(
+				'Batch operation storage reached its safe capacity; inspect/archive terminal state before continuing.'
+			);
 		}
 	}
 
