@@ -21,6 +21,19 @@ final class ThreeWayChangeAnalyzer {
 		'unresolved'
 	];
 
+	/**
+	 * Zabbix may materialize selected implicit import defaults in the LOCAL
+	 * snapshot even when the canonical official YAML omits the field. Keep this
+	 * list deliberately narrow and entity-scoped so real local customization is
+	 * never hidden by broad default-value guessing.
+	 */
+	private const MATERIALIZED_FIELD_DEFAULTS = [
+		'discovery_rules' => [
+			'lifetime' => '30d',
+			'enabled_lifetime_type' => 'DISABLE_NEVER'
+		]
+	];
+
 	public static function analyze(array $historicalDiff, array $currentDiff, int $detailLimit = 250): array {
 		$historical = ImportCompareEntityExtractor::extract($historicalDiff);
 		$current = ImportCompareEntityExtractor::extract($currentDiff);
@@ -102,9 +115,22 @@ final class ThreeWayChangeAnalyzer {
 					continue;
 				}
 
-				$baseField = self::fieldState($base['value'], $field);
-				$localField = self::fieldState($local['value'], $field);
-				$upstreamField = self::fieldState($upstream['value'], $field);
+				$entityType = (string) (($historicalEntity ?? $currentEntity)['entity_type'] ?? '');
+				$baseField = self::normalizeMaterializedDefault(
+					$entityType,
+					(string) $field,
+					self::fieldState($base['value'], $field)
+				);
+				$localField = self::normalizeMaterializedDefault(
+					$entityType,
+					(string) $field,
+					self::fieldState($local['value'], $field)
+				);
+				$upstreamField = self::normalizeMaterializedDefault(
+					$entityType,
+					(string) $field,
+					self::fieldState($upstream['value'], $field)
+				);
 
 				if (self::stateEquals($baseField, $localField)
 						&& self::stateEquals($localField, $upstreamField)) {
@@ -188,6 +214,22 @@ final class ThreeWayChangeAnalyzer {
 		return array_key_exists($field, $snapshot)
 			? ['exists' => true, 'value' => $snapshot[$field]]
 			: ['exists' => false, 'value' => null];
+	}
+
+	private static function normalizeMaterializedDefault(string $entityType, string $field, array $state): array {
+		if ($state['exists']) {
+			return $state;
+		}
+
+		$defaults = self::MATERIALIZED_FIELD_DEFAULTS[$entityType] ?? [];
+		if (!array_key_exists($field, $defaults)) {
+			return $state;
+		}
+
+		return [
+			'exists' => true,
+			'value' => $defaults[$field]
+		];
 	}
 
 	private static function classify(array $base, array $local, array $upstream): string {

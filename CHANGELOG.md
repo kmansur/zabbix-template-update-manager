@@ -16,6 +16,10 @@ All notable changes to Template Update Manager will be documented in this file.
 
 - Laboratory validation now pins the immutable `v0.1.0-beta.59` release artifact explicitly, and roadmap/audit links reflect the published prerelease state.
 
+### Fixed
+
+- Three-way analysis now treats the proven Zabbix 7 `discovery_rules.enabled_lifetime_type=DISABLE_NEVER` materialized default as semantically equivalent to an omitted official YAML field, preventing false local-change/conflict reports while preserving fail-closed behavior for non-default local values.
+
 ## [0.1.0-beta.59] - 2026-09-24
 
 ### Added
