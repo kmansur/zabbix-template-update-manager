@@ -132,6 +132,7 @@ if ($rollback !== []) {
 
 if ($manualOverride) {
 	$manualReasonLabels = [
+		'confirmed_three_way_conflict' => _('Confirmed BASE / LOCAL / UPSTREAM conflict'),
 		'local_customization_overwrite' => _('Known local customization would be overwritten or removed'),
 		'medium_technical_risk' => _('Medium technical review priority'),
 		'high_technical_risk' => _('High technical review priority')
@@ -188,6 +189,15 @@ if ($status === 'passed') {
 					'I explicitly accept the reviewed technical-risk conditions above.'
 				))
 			);
+
+			if (in_array('confirmed_three_way_conflict', $manualReasons, true)) {
+				$confirmationList->addRow(
+					_('Confirmed conflicts'),
+					(new CCheckBox('confirm_conflicts', '1'))->setLabel(_(
+						'I reviewed the BASE / LOCAL / UPSTREAM conflicts and accept replacing the affected LOCAL values with the reviewed official UPSTREAM values.'
+					))
+				);
+			}
 
 			if (in_array('local_customization_overwrite', $manualReasons, true)) {
 				$confirmationList->addRow(
