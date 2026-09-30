@@ -17,11 +17,14 @@ The quick installer does **not** change Nginx, Apache, PHP-FPM configuration, th
 
 ## Recommended installation
 
+The bootstrap script is fetched from the immutable `v0.1.0-beta.61` tag, not from the moving `main` branch.
+
+
 Copy and paste these two commands into the Zabbix frontend server:
 
 ```bash
 curl -fsSL \
-  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/main/tools/quickinstall.sh \
+  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/v0.1.0-beta.61/tools/quickinstall.sh \
   -o /tmp/ztum-quickinstall.sh
 
 sudo bash /tmp/ztum-quickinstall.sh
@@ -31,7 +34,7 @@ If `curl` is not available but `wget` is:
 
 ```bash
 wget -q \
-  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/main/tools/quickinstall.sh \
+  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/v0.1.0-beta.61/tools/quickinstall.sh \
   -O /tmp/ztum-quickinstall.sh
 
 sudo bash /tmp/ztum-quickinstall.sh
@@ -71,7 +74,7 @@ sudo bash /tmp/ztum-quickinstall.sh --help
 Install a specific branch, tag or commit:
 
 ```bash
-sudo bash /tmp/ztum-quickinstall.sh --ref main
+sudo bash /tmp/ztum-quickinstall.sh --ref v0.1.0-beta.61
 ```
 
 Specify the Zabbix modules directory manually:
