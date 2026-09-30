@@ -30,9 +30,11 @@ class TemplateInstallBatchExecuteOne extends CController {
 		if ($ret) {
 			$uuid = strtolower(str_replace('-', '', trim((string) $this->getInput('uuid'))));
 			$evidence = strtolower(trim((string) $this->getInput('evidence_sha256')));
+			$operationId = strtolower(trim((string) $this->getInput('operation_id')));
 
 			$ret = preg_match('/^[a-f0-9]{32}$/', $uuid) === 1
-				&& preg_match('/^[a-f0-9]{64}$/', $evidence) === 1;
+				&& preg_match('/^[a-f0-9]{64}$/', $evidence) === 1
+				&& preg_match('/^[a-f0-9]{32}$/', $operationId) === 1;
 		}
 
 		if (!$ret) {
