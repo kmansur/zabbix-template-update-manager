@@ -31,9 +31,8 @@ Release identity:
 
 ```text
 Tag:        v0.1.0-beta.61
-Tag commit: 3694ab0ce4a687399e186ec9cde2774d0209c434
-tar.gz:     4eb075bc70d666ccb226f6c949ae96a732494566ea3b23a2396e3ae8ca7f6d6d
-zip:        889d96bc5cc88d3b35585f68a214e7c454a754d24fbe1f186ed326f7b24a9748
+Tag commit: verify against the published GitHub Release
+Archives:   verify against the published SHA256SUMS
 ```
 
 Verify the downloaded archive against the published `SHA256SUMS` before installation. Do not substitute a later `main` snapshot and still record the run as beta.61 evidence.
@@ -403,7 +402,7 @@ Expected behavior:
 - a review-only plan with `Ready = 0` explains that unattended batch execution is unavailable and directs the operator to `Review details`;
 - the comparison page retains the detailed BASE / LOCAL / UPSTREAM, risk and rollback evidence;
 - when readiness is `review_backup_verified`, the next action is `Run reviewed controlled preflight`;
-- the reviewed preflight must bind the manual-review reasons and still require the additional explicit Super Admin acknowledgement before `configuration.import`;
+- the reviewed preflight must bind the manual-review reasons and require one explicit Super Admin acknowledgement before `configuration.import`;
 - opening `Review details` itself performs no configuration write.
 
 ## 5C. Explicit reviewed batch override regression
@@ -419,10 +418,10 @@ Expected behavior:
 - the main batch confirmation stays disabled until at least one Ready row exists or one eligible Manual review checkbox is selected;
 - selecting reviewed rows enables the confirmation path and the status reports Ready plus selected-reviewed counts separately;
 - after the global confirmation is checked, `Update eligible templates` executes Ready rows plus explicitly selected reviewed rows in original selection order;
-- reviewed rows POST both manual-override acknowledgement fields and rerun fresh reviewed preflight before import;
+- reviewed rows bind manual-review mode, send the single batch acknowledgement, and rerun fresh reviewed preflight before import;
 - successful reviewed rows finish as `Updated and validated`;
 - stop-on-first-failure still applies across the combined queue;
-- a row containing `local_customization_overwrite` has an active reviewed checkbox only when rollback and manual preflight evidence are valid; Execution shows `Reviewed overwrite eligible · Review details`;
+- a row containing `local_customization_overwrite` or `confirmed_three_way_conflict` has an active reviewed checkbox only when rollback and manual preflight evidence are valid; Execution shows `Reviewed batch eligible · Review details`;
 - Conflict, Blocked, unresolved and request-failed rows must never be selectable or executable.
 
 ## 5D. Sticky select-all during preparation
@@ -451,7 +450,7 @@ Expected behavior:
 - Execution shows `Reviewed overwrite eligible · Review details`;
 - selecting any local-overwrite row enables the additional acknowledgement:
   `I explicitly accept overwriting local customizations for the selected templates.`;
-- `Update eligible templates` remains disabled until both the normal reviewed acknowledgement and the local-overwrite acknowledgement are checked;
+- `Update eligible templates` remains disabled until the single reviewed batch acknowledgement is checked;
 - the per-template request carries `manual_override=1`, `confirm_manual_override=1` and `confirm_local_overwrite=1`;
 - omitting the local-overwrite acknowledgement must return a no-write blocked result before import;
 - successful acknowledged rows still rerun fresh reviewed preflight, verify evidence, import through the single approved write boundary and validate afterward;
@@ -501,8 +500,8 @@ Expected behavior:
 Before any write, inspect at least one item from each category that naturally occurs:
 
 - **Ready**: eligible for controlled sequential execution;
-- **Manual review**: high or unrecognized-medium technical review state, or local-overwrite reviewed path;
-- **Conflict**: must never be executed; authoritative local-overwrite without conflict remains Manual review only;
+- **Manual review**: known conflict/local-overwrite or medium/high technical review state with complete authoritative evidence;
+- **Conflict**: legacy/compatibility classification only; current fully identified conflicts are Manual review, while unresolved/unknown evidence remains Blocked;
 - **Blocked**: incomplete/unresolved/not-applicable evidence.
 
 If every selected item becomes blocked unexpectedly, stop and inspect the individual **Review update** page for one template before changing code or filesystem data.
@@ -634,7 +633,7 @@ Confirm:
 - direct POST without the valid action-specific CSRF token is rejected by native Zabbix handling;
 - tampering a reviewed evidence fingerprint prevents that template from being written;
 - submitting more than the 500-template selected-update sanity ceiling fails closed;
-- conflict/manual-review/blocked items are absent from the hidden Ready execution set;
+- unattended Ready evidence excludes manual-review/blocked items; explicitly selected reviewed items use separate reviewed evidence;
 - a preflight built from a legacy index without a raw source fingerprint remains blocked until the refreshed index is available.
 
 ## 13. Filesystem tamper test (optional, disposable lab only)
@@ -716,7 +715,7 @@ Exercise the individual reviewed update path for a candidate whose manual reason
 
 Expected behavior:
 
-- the normal reviewed-risk acknowledgement remains required;
+- the single reviewed-risk acknowledgement remains required;
 - a separate `Local customization overwrite` checkbox is rendered;
 - omitting that specific acknowledgement blocks before `configuration.import`;
 - accepting both acknowledgements allows only the existing fresh-preflight/evidence-controlled path.
@@ -804,7 +803,7 @@ Stop all further writes if any occurs:
 - duplicate template objects appear;
 - backup integrity fails unexpectedly;
 - recovery backup does not match the current export;
-- a conflict/manual-review/unresolved item is offered as Ready;
+- a manual-review/unresolved item is offered as unattended Ready;
 - a template protected by **Never update** is offered for update preparation or execution;
 - selected review contains IDs that were not selected;
 - frontend logs indicate an ambiguous `configuration.import` result.
