@@ -98,12 +98,25 @@ jobs:
           bash -n tools/quickinstall-pt-br.sh
           bash -n tests/test_runtime_setup.sh
           bash -n tests/test_field_evidence.sh
+          bash -n tools/ztum-validation-bundle.sh
+          bash -n tests/test_validation_bundle.sh
 
       - name: Validate runtime setup helper
         run: tests/test_runtime_setup.sh
 
       - name: Validate field evidence helper
         run: bash tests/test_field_evidence.sh
+
+      - name: Validate external evidence bundle
+        run: bash tests/test_validation_bundle.sh
+
+      - name: Security tamper and interruption regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          php tests/unit/BatchOperationRepositoryTest.php
+          php tests/unit/UpstreamSignatureVerifierTest.php
+          php tests/unit/OfflineBundleSignatureTest.php
 
       - name: Set up Python
         uses: actions/setup-python@v7
