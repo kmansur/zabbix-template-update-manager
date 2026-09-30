@@ -31,7 +31,8 @@ class TemplateUpdate extends CController {
 			'confirm' => 'required|in 1',
 			'manual_override' => 'in 1',
 			'confirm_manual_override' => 'in 1',
-			'confirm_local_overwrite' => 'in 1'
+			'confirm_local_overwrite' => 'in 1',
+			'confirm_conflicts' => 'in 1'
 		]);
 
 		if ($ret && (string) $this->getInput('manual_override', '') === '1') {
@@ -64,6 +65,7 @@ class TemplateUpdate extends CController {
 			$evidence = (string) $this->getInput('evidence_sha256');
 			$manualOverride = (string) $this->getInput('manual_override', '') === '1';
 			$localOverwriteConfirmed = (string) $this->getInput('confirm_local_overwrite', '') === '1';
+			$conflictsConfirmed = (string) $this->getInput('confirm_conflicts', '') === '1';
 
 			$data['result'] = (new TemplateOperationLockService())->run(
 				'update',
@@ -72,7 +74,8 @@ class TemplateUpdate extends CController {
 					$templateId,
 					$evidence,
 					$manualOverride,
-					$localOverwriteConfirmed
+					$localOverwriteConfirmed,
+					$conflictsConfirmed
 				)
 			);
 		}
