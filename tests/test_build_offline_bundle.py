@@ -61,27 +61,29 @@ def main() -> int:
         index_file.write_bytes(index_bytes)
 
         signing_key = SigningKey.generate()
-        secret64 = signing_key._seed + bytes(signing_key.verify_key)
+        seed = bytes(signing_key)
+        secret64 = seed + bytes(signing_key.verify_key)
         env = os.environ.copy()
         env["ZTUM_INDEX_SIGNING_SECRET_KEY_B64"] = base64.b64encode(secret64).decode("ascii")
 
-        signer = root / "tools" / "ed25519_signing.py"
         sys.path.insert(0, str(root / "tools"))
         from ed25519_signing import write_signature
-        write_signature(index_file.with_name(index_file.name + ".sig.json"), index_bytes, signing_key._seed)
+        write_signature(index_file.with_name(index_file.name + ".sig.json"), index_bytes, seed)
 
         output = tmp / "bundle"
 
         subprocess.run(
-            sys.executable,
-            str(tool),
-            "--zabbix-repo",
-            str(repo),
-            "--index",
-            str(index_file),
-            "--output",
-            str(output),
-            "--require-signature",
+            [
+                sys.executable,
+                str(tool),
+                "--zabbix-repo",
+                str(repo),
+                "--index",
+                str(index_file),
+                "--output",
+                str(output),
+                "--require-signature",
+            ],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
