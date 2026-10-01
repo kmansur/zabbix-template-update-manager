@@ -228,6 +228,7 @@ $templateTable = (new CTableInfo())
 		_('Vendor'),
 		_('Installed'),
 		_('Available'),
+		_('Upstream updated'),
 		_('Status'),
 		_('Upstream identity'),
 		_('Update policy'),
@@ -324,6 +325,15 @@ foreach ($data['templates'] as $template) {
 		$actionCell = new CLink(_('View'), $compareUrl);
 	}
 
+	$upstreamUpdated = '—';
+	$upstreamVersionDate = is_array($template['upstream'] ?? null)
+		? trim((string) ($template['upstream']['version_date'] ?? ''))
+		: '';
+	if ($upstreamVersionDate !== ''
+			&& preg_match('/^(\\d{4})-(\\d{2})-(\\d{2})T/', $upstreamVersionDate, $dateParts) === 1) {
+		$upstreamUpdated = $dateParts[3].'/'.$dateParts[2].'/'.$dateParts[1];
+	}
+
 	$backupCell = '—';
 	if ($isInstalled && $data['can_compare'] && ($template['templateid'] ?? '') !== '') {
 		$backupCell = new CLink(
@@ -340,6 +350,7 @@ foreach ($data['templates'] as $template) {
 		$template['vendor_name'] !== '' ? $template['vendor_name'] : '—',
 		$isInstalled && $template['vendor_version'] !== '' ? $template['vendor_version'] : '—',
 		($template['upstream_vendor_version'] ?? '') !== '' ? $template['upstream_vendor_version'] : '—',
+		$upstreamUpdated,
 		FrontendUi::status(
 			$versionLabels[$template['version_status'] ?? 'not_applicable'] ?? _('Unknown'),
 			$versionTones[$template['version_status'] ?? 'not_applicable'] ?? FrontendUi::MUTED
