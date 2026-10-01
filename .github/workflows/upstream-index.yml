@@ -102,7 +102,6 @@ jobs:
               --depth 250 \
               --single-branch \
               --branch "$ref" \
-              --filter=blob:none \
               --sparse \
               "$repo" \
               "$source_dir" \
