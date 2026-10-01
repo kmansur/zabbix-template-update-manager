@@ -221,6 +221,26 @@ final class UpstreamIndexRepository {
 				}
 			}
 
+			$versionCommit = $template['version_commit'] ?? null;
+			$versionDate = $template['version_date'] ?? null;
+			if (($versionCommit === null) !== ($versionDate === null)) {
+				throw new RuntimeException('The upstream index contains incomplete template version metadata.');
+			}
+			if ($versionCommit !== null) {
+				if (!is_string($versionCommit) || !preg_match('/^[a-f0-9]{40}$/', $versionCommit)) {
+					throw new RuntimeException('The upstream index contains an invalid template version commit.');
+				}
+				if (!is_string($versionDate) || trim($versionDate) === '') {
+					throw new RuntimeException('The upstream index contains an invalid template version date.');
+				}
+				try {
+					new \DateTimeImmutable($versionDate);
+				}
+				catch (\Exception $exception) {
+					throw new RuntimeException('The upstream index contains an invalid template version date.', 0, $exception);
+				}
+			}
+
 			$hashes = $template['content_sha256s'] ?? null;
 			if (!is_array($hashes) || $hashes === []) {
 				throw new RuntimeException('The upstream index contains a template without content hashes.');
