@@ -10,12 +10,14 @@ on:
     paths:
       - '.github/workflows/upstream-index.yml'
       - 'tools/build_upstream_index.py'
+      - 'tools/enrich_upstream_version_metadata.py'
       - 'requirements-dev.txt'
       - 'VERSION'
       - 'src/Repository/UpstreamIndexRepository.php'
       - 'src/Support/ProjectVersion.php'
       - 'src/Support/ZabbixVersion.php'
       - 'tests/validate_generated_indexes.php'
+      - 'tests/test_enrich_upstream_version_metadata.py'
 
 permissions:
   contents: write
