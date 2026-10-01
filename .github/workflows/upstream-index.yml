@@ -53,7 +53,8 @@ jobs:
           # reliable for Actions; historical refs fall back to git.zabbix.com.
           CANONICAL_REPO='https://git.zabbix.com/scm/zbx/zabbix.git'
           MIRROR_REPO='https://github.com/zabbix/zabbix.git'
-          mkdir -p build/upstream
+          mkdir -p build/upstream build/previous
+          git fetch origin upstream-index:refs/remotes/origin/upstream-index || true
 
           resolve_ref() {
             local line="$1"
@@ -96,7 +97,7 @@ jobs:
 
             rm -rf "$source_dir"
             git -c http.version=HTTP/1.1 clone \
-              --depth 1 \
+              --depth 250 \
               --single-branch \
               --branch "$ref" \
               --filter=blob:none \
@@ -168,6 +169,11 @@ jobs:
             commit="$(git -C "$source_dir" rev-parse HEAD)"
             commit_date="$(git -C "$source_dir" show -s --format=%cI HEAD)"
 
+            previous_index="build/previous/${line}.json"
+            if ! git show "origin/upstream-index:indexes/${line}.json" > "$previous_index" 2>/dev/null; then
+              rm -f "$previous_index"
+            fi
+
             python tools/build_upstream_index.py \
               --source-dir "$source_dir" \
               --line "$line" \
@@ -175,6 +181,25 @@ jobs:
               --source-commit "$commit" \
               --source-commit-date "$commit_date" \
               --output "build/upstream/${line}.json"
+
+            set +e
+            python tools/enrich_upstream_version_metadata.py \
+              --source-dir "$source_dir" \
+              --index "build/upstream/${line}.json" \
+              ${previous_index:+--previous-index "$previous_index"}
+            enrich_rc=$?
+            set -e
+
+            if [[ "$enrich_rc" -eq 3 ]]; then
+              echo "Version metadata reached the shallow history boundary; fetching full branch history and retrying."
+              git -C "$source_dir" fetch --unshallow
+              python tools/enrich_upstream_version_metadata.py \
+                --source-dir "$source_dir" \
+                --index "build/upstream/${line}.json" \
+                ${previous_index:+--previous-index "$previous_index"}
+            elif [[ "$enrich_rc" -ne 0 ]]; then
+              exit "$enrich_rc"
+            fi
           }
 
           build_initial_line() {
