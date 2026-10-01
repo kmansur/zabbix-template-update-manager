@@ -35,6 +35,13 @@ def main() -> int:
                 f"{workflow}: first-party action must be pinned to an explicit major version: {value}"
             )
 
+
+    upstream = (root / ".github" / "workflows" / "upstream-index.yml").read_text(encoding="utf-8")
+    assert "--filter=blob:none" not in upstream, "Upstream index history clone must not use a promisor-only partial clone."
+    assert "publishing the validated index without optional version_date/version_commit metadata" in upstream, (
+        "Upstream index workflow must keep version metadata optional per line so one history outage does not block all index publication."
+    )
+
     print(f"Workflow validation passed for {len(workflows)} file(s).")
     return 0
 
