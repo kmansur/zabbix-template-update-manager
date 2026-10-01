@@ -84,9 +84,11 @@ def blame_version_line(repo: Path, path: str, line: int) -> tuple[str, str]:
         raise RuntimeError(f"git blame returned an invalid commit for {path}:{line}")
 
     if any(item == "boundary" for item in lines[1:]):
-        raise HistoryBoundaryError(
-            f"history boundary reached while resolving {path}:{line}; a deeper checkout is required"
-        )
+        shallow = run_git(repo, "rev-parse", "--is-shallow-repository").strip().lower() == "true"
+        if shallow:
+            raise HistoryBoundaryError(
+                f"history boundary reached while resolving {path}:{line}; a deeper checkout is required"
+            )
 
     commit_date = run_git(repo, "show", "-s", "--format=%cI", commit).strip()
     if not commit_date:
