@@ -134,7 +134,7 @@ assertCatalogControllerContract(
 assertCatalogControllerContract(
 	strpos($view, "_('Upstream updated')") !== false
 		&& strpos($view, "['version_date']") !== false
-		&& strpos($view, "$upstreamUpdated") !== false,
+		&& strpos($view, '$upstreamUpdated') !== false,
 	'Catalog must display the upstream vendor-version date from index metadata.'
 );
 
