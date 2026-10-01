@@ -182,21 +182,23 @@ jobs:
               --source-commit-date "$commit_date" \
               --output "build/upstream/${line}.json"
 
+            enrich_args=(
+              --source-dir "$source_dir"
+              --index "build/upstream/${line}.json"
+            )
+            if [[ -f "$previous_index" ]]; then
+              enrich_args+=(--previous-index "$previous_index")
+            fi
+
             set +e
-            python tools/enrich_upstream_version_metadata.py \
-              --source-dir "$source_dir" \
-              --index "build/upstream/${line}.json" \
-              ${previous_index:+--previous-index "$previous_index"}
+            python tools/enrich_upstream_version_metadata.py "${enrich_args[@]}"
             enrich_rc=$?
             set -e
 
             if [[ "$enrich_rc" -eq 3 ]]; then
               echo "Version metadata reached the shallow history boundary; fetching full branch history and retrying."
               git -C "$source_dir" fetch --unshallow
-              python tools/enrich_upstream_version_metadata.py \
-                --source-dir "$source_dir" \
-                --index "build/upstream/${line}.json" \
-                ${previous_index:+--previous-index "$previous_index"}
+              python tools/enrich_upstream_version_metadata.py "${enrich_args[@]}"
             elif [[ "$enrich_rc" -ne 0 ]]; then
               exit "$enrich_rc"
             fi
