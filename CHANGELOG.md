@@ -4,6 +4,12 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Added per-template upstream vendor-version provenance metadata (`version_commit` / `version_date`) derived from the exact `vendor.version` YAML line, with previous-index reuse and shallow-history fallback.
+- Added an **Upstream updated** date column to the template catalog without introducing per-row runtime network requests.
+
+
 ## [0.1.0-beta.61] - 2026-09-30
 
 ### Fixed
