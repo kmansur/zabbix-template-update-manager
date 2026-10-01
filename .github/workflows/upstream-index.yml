@@ -199,10 +199,25 @@ jobs:
 
             if [[ "$enrich_rc" -eq 3 ]]; then
               echo "Version metadata reached the shallow history boundary; fetching full branch history and retrying."
-              git -C "$source_dir" fetch --unshallow
-              python tools/enrich_upstream_version_metadata.py "${enrich_args[@]}"
-            elif [[ "$enrich_rc" -ne 0 ]]; then
-              exit "$enrich_rc"
+              if git -C "$source_dir" fetch --unshallow; then
+                set +e
+                python tools/enrich_upstream_version_metadata.py "${enrich_args[@]}"
+                enrich_rc=$?
+                set -e
+              else
+                enrich_rc=1
+              fi
+            fi
+
+            if [[ "$enrich_rc" -ne 0 ]]; then
+              echo "::warning::Unable to attach version metadata for Zabbix ${line}; publishing the validated index without optional version_date/version_commit metadata."
+              python tools/build_upstream_index.py \
+                --source-dir "$source_dir" \
+                --line "$line" \
+                --source-ref "$ref" \
+                --source-commit "$commit" \
+                --source-commit-date "$commit_date" \
+                --output "build/upstream/${line}.json"
             fi
           }
 
