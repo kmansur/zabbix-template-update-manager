@@ -3,8 +3,8 @@
   "source": {
     "line": "7.0",
     "ref": "release/7.0",
-    "commit": "947ec0751db9632ef3ae0a6ff8697f66b8f1398e",
-    "commit_date": "2026-09-30T17:37:30+03:00",
+    "commit": "b55d945c498efa81bc1ea0ec4ad961c79ad9541d",
+    "commit_date": "2026-10-02T14:06:59+03:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
@@ -31,7 +31,9 @@
           "path": "templates/db/mssql_odbc/template_db_mssql_odbc.yaml",
           "sha256": "d75a67708afdd7327131ab1b2b9884790727ee57d144277cc34ebfc62693212b"
         }
-      ]
+      ],
+      "version_commit": "111e0ac1858cc49cda4d31658725297b93d3c81a",
+      "version_date": "2026-07-30T12:02:06+03:00"
     },
     "00ade9277d7c41e8b57d638b22d54372": {
       "uuid": "00ade9277d7c41e8b57d638b22d54372",
@@ -50,7 +52,9 @@
           "path": "templates/db/oracle_odbc/template_db_oracle_odbc.yaml",
           "sha256": "60a24313ce743ecaa5cc72be1758498f009d06ecd1ebd1f70bba5bb759459387"
         }
-      ]
+      ],
+      "version_commit": "6fddb88798f06bc14b256a93a46acbd7a72dcba8",
+      "version_date": "2025-05-30T17:46:16+03:00"
     },
     "012e7043ff9849e197c42bf41cdf4d9a": {
       "uuid": "012e7043ff9849e197c42bf41cdf4d9a",
@@ -69,7 +73,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR1009-7G-1C-PC_snmp/template_net_mikrotik_CCR1009-7G-1C-PC_snmp.yaml",
           "sha256": "6c60d5b157676b3e0c063bdb7a0c103929f4a6e58b84736a9e40793c91a754c4"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "01deb47efa1f4a9092de67fd61820a7d": {
       "uuid": "01deb47efa1f4a9092de67fd61820a7d",
@@ -88,7 +94,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_mgs-3712f_snmp/template_net_zyxel_mgs-3712f_snmp.yaml",
           "sha256": "8e455bb97d3be9c1ce1aa07dea4d748c1c800c6eec271b64beb0e7e854843f27"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "024cf4f0711c4c39a4e016858efc5e37": {
       "uuid": "024cf4f0711c4c39a4e016858efc5e37",
@@ -107,7 +115,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "02aac022a62c48bba810d07bbaa712cc": {
       "uuid": "02aac022a62c48bba810d07bbaa712cc",
@@ -126,7 +136,9 @@
           "path": "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml",
           "sha256": "7940c9a366868499163bc3e4de69099af989078bd23d1d0e4ff18c0e82f5a02e"
         }
-      ]
+      ],
+      "version_commit": "b3352255097f404b0d3e94256abe7ca2261a9920",
+      "version_date": "2025-10-24T14:29:58+02:00"
     },
     "02f35169a5a54a5aad8b3f06e798ab1f": {
       "uuid": "02f35169a5a54a5aad8b3f06e798ab1f",
@@ -145,7 +157,9 @@
           "path": "templates/server/chassis_ipmi/template_server_chassis_ipmi.yaml",
           "sha256": "8405da741435e6dd43a51fc4cfd04e55e9c50754078f8104d3e171f6c8bd6432"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "0368ca599bbb49729587b9c43ac83084": {
       "uuid": "0368ca599bbb49729587b9c43ac83084",
@@ -164,7 +178,9 @@
           "path": "templates/app/envoy_proxy_http/template_app_envoy_proxy_http.yaml",
           "sha256": "2363084321b67dd38e20e7c5b3e32bd7c72d7cdb20de727458aeadcc5baca6f5"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "03e93dc9a8194a17958544a056d02316": {
       "uuid": "03e93dc9a8194a17958544a056d02316",
@@ -183,7 +199,9 @@
           "path": "templates/app/ms365_http/template_app_microsoft_365_http.yaml",
           "sha256": "352728211be5129a4f9118a51282fd9de43609146bef66970e838079a87998b8"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "057558a26d934b4683d73a7058499d62": {
       "uuid": "057558a26d934b4683d73a7058499d62",
@@ -202,7 +220,9 @@
           "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
           "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "05894ba2c9184d33992bf1bd21c347f6": {
       "uuid": "05894ba2c9184d33992bf1bd21c347f6",
@@ -221,7 +241,9 @@
           "path": "templates/app/memcached/template_app_memcached.yaml",
           "sha256": "4e33a7980acb42a1312b92e1f2734203089d296c678aefe1da496f76558bdf03"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "07695028a2ba4b66a5414797bec791df": {
       "uuid": "07695028a2ba4b66a5414797bec791df",
@@ -240,7 +262,9 @@
           "path": "templates/app/kubernetes_http/kubernetes_state_http/template_kubernetes_state.yaml",
           "sha256": "328e5278e328ec619e161fbc1b1b572a2cf948c7bb187d007aab9e5394dcc455"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "07b32152c3654e8ead4c1eeae24efa8f": {
       "uuid": "07b32152c3654e8ead4c1eeae24efa8f",
@@ -259,7 +283,9 @@
           "path": "templates/net/morningstar/morningstar_tristar_mppt_snmp/template_net_morningstar_tristar_mppt_snmp.yaml",
           "sha256": "82ad919e0bf53b7f45da46ade2b5472392c680fb29dfb0e606035f8523f89eea"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "08ef3d687d754b0aba17e1dcbd77d4bd": {
       "uuid": "08ef3d687d754b0aba17e1dcbd77d4bd",
@@ -278,7 +304,9 @@
           "path": "templates/app/cloudflare_http/template_app_cloudflare_http.yaml",
           "sha256": "0023a8469b03749e8ec66b6f693542d8220d1c824e0d52a622e82f02730088e0"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "09fb25d089f7467f860895f6e71d3fa2": {
       "uuid": "09fb25d089f7467f860895f6e71d3fa2",
@@ -297,7 +325,9 @@
           "path": "templates/app/ceph_agent2/template_app_ceph_agent2.yaml",
           "sha256": "0f037f499495c64ffaf3aec3d0cadbc06903cad4c0a51a1f75569f458253ff7f"
         }
-      ]
+      ],
+      "version_commit": "2cad0a358a8a32b266f1d5271917e937a7693d71",
+      "version_date": "2026-08-06T15:10:46+03:00"
     },
     "0b9a899ff8f1467c9fdf999d02b9fd77": {
       "uuid": "0b9a899ff8f1467c9fdf999d02b9fd77",
@@ -316,7 +346,9 @@
           "path": "templates/power/apc/apc_ups_symmetra_lx_snmp/template_power_apc_ups_symmetra_lx_snmp.yaml",
           "sha256": "a766aaa1bf0669c2be5920461d704aac89caa9412467b745cce424f9e0e8d37e"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "0bb43a48a33f48ad910441384486edb4": {
       "uuid": "0bb43a48a33f48ad910441384486edb4",
@@ -335,7 +367,9 @@
           "path": "templates/app/nutanix_http/template_app_nutanix_prism_element_http.yaml",
           "sha256": "027d3769c1bd9a50f4f5be0834392bf024f065b16d6d10b535132da770b8e986"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "0c7b3c03a5854f868b56f3ab63e2d3f7": {
       "uuid": "0c7b3c03a5854f868b56f3ab63e2d3f7",
@@ -354,7 +388,9 @@
           "path": "templates/net/mikrotik/mikrotik_PowerBox_snmp/template_net_mikrotik_PowerBox_snmp.yaml",
           "sha256": "fc68234ae3b0578b153770e5107e70ef014a5964f42ab8209d42cc3833e1a407"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "0c94915edb4c41bf8c627dddb4f68f5a": {
       "uuid": "0c94915edb4c41bf8c627dddb4f68f5a",
@@ -373,7 +409,9 @@
           "path": "templates/app/opnsense_snmp/template_app_opnsense_snmp.yaml",
           "sha256": "f02a84ccdcb103acb2065a1966758ee01c86d6670b2eaf1a174439571bd9d1c7"
         }
-      ]
+      ],
+      "version_commit": "b7b4ad59a3d8f9d64f6d546c5b8e1f9dd5afe743",
+      "version_date": "2026-03-19T16:10:49+02:00"
     },
     "0f6889282f6048e2b1370e569e578985": {
       "uuid": "0f6889282f6048e2b1370e569e578985",
@@ -392,7 +430,9 @@
           "path": "templates/app/process/template_module_process.yaml",
           "sha256": "e202102d2567b7099719a3fd42f3b42343ea3e242df3b0961c9f2cde1311e905"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "0ffde4421f524bcbac2f47fec87c0f95": {
       "uuid": "0ffde4421f524bcbac2f47fec87c0f95",
@@ -411,7 +451,9 @@
           "path": "templates/server/hpe_synergy_http/template_server_hpe_synergy_http.yaml",
           "sha256": "d75b72241ea9ba2526c4eb3f815fb485557263f48b1eda32a56b7fa9257836e4"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "10537641cfa3416ab0f1451cdb61d804": {
       "uuid": "10537641cfa3416ab0f1451cdb61d804",
@@ -430,7 +472,9 @@
           "path": "templates/san/hpe_msa2060_http/template_san_hpe_msa2060_http.yaml",
           "sha256": "3937bd3bbf81a58bf26fd7c69f85eb7de0976161013d28f47d8db4f9dbf9b18c"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "11144543d1144a3693aa0b97a1c20dac": {
       "uuid": "11144543d1144a3693aa0b97a1c20dac",
@@ -449,7 +493,9 @@
           "path": "templates/app/github_http/template_app_github_http.yaml",
           "sha256": "b699b4654d063ffe333977da4617c2fad4befe4f9f2897a667e6ada4aa326be8"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "13b06904a6bf41cbb795e3193d896340": {
       "uuid": "13b06904a6bf41cbb795e3193d896340",
@@ -468,7 +514,9 @@
           "path": "templates/os/windows_agent/template_os_windows_agent.yaml",
           "sha256": "1734d3bc226b091a243260f86c97743cfb071f2f74bfeb301401f4ef08154517"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "13d5bb0a4ae84228bff408aab5be338e": {
       "uuid": "13d5bb0a4ae84228bff408aab5be338e",
@@ -487,7 +535,9 @@
           "path": "templates/app/nginx_http/template_app_nginx_http.yaml",
           "sha256": "d91198c72b5a4c1e6761b4cbb3d18a860f8a880b6bebf18fdff58b0ac9c50723"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "141438a05f904b518c7d3ddfbbabf91f": {
       "uuid": "141438a05f904b518c7d3ddfbbabf91f",
@@ -506,7 +556,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB2011iL-IN_snmp/template_net_mikrotik_RB2011iL-IN_snmp.yaml",
           "sha256": "3b0b878735c81f16708b2ee2c50eb0cbe3ecfc7fb9ca97d00c8e23585c6c095e"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "16f281aeb8904d3db8b66dda94611fcc": {
       "uuid": "16f281aeb8904d3db8b66dda94611fcc",
@@ -525,7 +577,9 @@
           "path": "templates/app/pfsense_snmp/template_app_pfsense_snmp.yaml",
           "sha256": "76fa456f250c9a6ae30c266cf0ee76de788baa15c847cbc2d412667f71000b6c"
         }
-      ]
+      ],
+      "version_commit": "b7b4ad59a3d8f9d64f6d546c5b8e1f9dd5afe743",
+      "version_date": "2026-03-19T16:10:49+02:00"
     },
     "172ec7e51f1c4a6ba49baffbab3dda97": {
       "uuid": "172ec7e51f1c4a6ba49baffbab3dda97",
@@ -544,7 +598,9 @@
           "path": "templates/server/hp/hp_bl460_snmp/template_server_hp_bl460_snmp.yaml",
           "sha256": "ab73a62d33822513b93d6ae09fca0a463fa16200f9ba5ca42978fdd2a1e9527b"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "1782caa5bf724f66a23e7dbb96ef7ba2": {
       "uuid": "1782caa5bf724f66a23e7dbb96ef7ba2",
@@ -563,7 +619,9 @@
           "path": "templates/net/mikrotik/mikrotik_netPower_Lite_7R_snmp/template_net_mikrotik_netPower_Lite_7R_snmp.yaml",
           "sha256": "ec7ed7df473646c22847e398ac6083dc410a1c855988a799b471912b320f97ec"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "178645e229484bcf9cb030dc1edccebb": {
       "uuid": "178645e229484bcf9cb030dc1edccebb",
@@ -582,7 +640,9 @@
           "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
           "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "1818cd052f174772a48bfc275d0016dd": {
       "uuid": "1818cd052f174772a48bfc275d0016dd",
@@ -601,7 +661,9 @@
           "path": "templates/net/cisco/cisco_secure_ftd_http/template_net_cisco_secure_ftd_http.yaml",
           "sha256": "785af7284546ebce50332caae1c522551334e9c47de330f0fb6d49e75079dd5e"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "185867ae9b4a46b59d53931d3330c770": {
       "uuid": "185867ae9b4a46b59d53931d3330c770",
@@ -620,7 +682,9 @@
           "path": "templates/server/dell/dell_r660_http/template_server_dell_r660_http.yaml",
           "sha256": "636199bba4f516cbefc85e2b72df36d51747344dc42c76eb0eec605564f8f16b"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "1945f22f8ba84ce89454d9513979a3c6": {
       "uuid": "1945f22f8ba84ce89454d9513979a3c6",
@@ -639,7 +703,9 @@
           "path": "templates/net/stormshield_sns/template_net_stormshield_sns_snmp.yaml",
           "sha256": "b3ce2bb6cbc405ac5b8a7dd54db61d9e1ad4f39019f095415b79b449d694f335"
         }
-      ]
+      ],
+      "version_commit": "fb69ab13dbc3aeaf89edb7ebf6c778d3284ba457",
+      "version_date": "2025-10-29T10:55:35+02:00"
     },
     "1a74dd95e7244493a1b13b94fe9dd9e8": {
       "uuid": "1a74dd95e7244493a1b13b94fe9dd9e8",
@@ -658,7 +724,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB260GS_snmp/template_net_mikrotik_RB260GS_snmp.yaml",
           "sha256": "06024944a9cdac3d4adb1fdd0b8a78bf90bf7a15b5ab29785da0b8f7d81aea89"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "1ae69b01417849b180717f62ad7819d6": {
       "uuid": "1ae69b01417849b180717f62ad7819d6",
@@ -677,7 +745,9 @@
           "path": "templates/db/mysql_agent_active/template_db_mysql_agent_active.yaml",
           "sha256": "11c1b27d434e74c4d6a1e9dc3d4be0ffcb9df8676167a0ded880184ae0355a7c"
         }
-      ]
+      ],
+      "version_commit": "c3aeec928c69e20db457e89ad9996c77c45d5561",
+      "version_date": "2025-11-14T13:39:34+01:00"
     },
     "1bb42fbdb9054645a62ff81f14ba3b99": {
       "uuid": "1bb42fbdb9054645a62ff81f14ba3b99",
@@ -696,7 +766,9 @@
           "path": "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml",
           "sha256": "bd3f9e36d69d652cffa9befda242140c7fd587fd0e841beef52dd7180b1650c1"
         }
-      ]
+      ],
+      "version_commit": "9cbbe216e11e986196b0d03a6fb9639136b8bf70",
+      "version_date": "2026-07-24T13:46:33+03:00"
     },
     "1cbda0970410435684135884d0cb7090": {
       "uuid": "1cbda0970410435684135884d0cb7090",
@@ -715,7 +787,9 @@
           "path": "templates/app/php-fpm_agent/template_app_php-fpm_agent.yaml",
           "sha256": "7369de980a7b325260fc13be2fe17181d6aa7805903ee7a324cadba772311591"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "1dac0a88c3774315b90622a48031e369": {
       "uuid": "1dac0a88c3774315b90622a48031e369",
@@ -734,7 +808,9 @@
           "path": "templates/power/apc/apc_ups_symmetra_rm_snmp/template_power_apc_ups_symmetra_rm_snmp.yaml",
           "sha256": "1ad589703913146efc79da8a2958e67a6d2346caf0bd71e14eb5126ca4bc086d"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "1e9fe6b88c7542638c0f5d94484858b2": {
       "uuid": "1e9fe6b88c7542638c0f5d94484858b2",
@@ -753,7 +829,9 @@
           "path": "templates/server/dell/dell_r820_http/template_server_dell_r820_http.yaml",
           "sha256": "54ab8edccc4a352ec0cfafeb91a3fffe29dd6d5f6b52ebd883cee9c7c1e93d41"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "1f38deb487fc4a8d965e407ba7c5247f": {
       "uuid": "1f38deb487fc4a8d965e407ba7c5247f",
@@ -772,7 +850,9 @@
           "path": "templates/net/fortinet/fortigate_snmp/template_net_fortigate_snmp.yaml",
           "sha256": "d7f16f18d625759d33f82b4b41ae3927c06bc499a26a826bbae2ffb8242e3853"
         }
-      ]
+      ],
+      "version_commit": "3a90c9e6f4a26d6f9b5d390b0515875397edd710",
+      "version_date": "2025-10-17T13:04:21+03:00"
     },
     "20147f00f92d4240aab0b70cf578c022": {
       "uuid": "20147f00f92d4240aab0b70cf578c022",
@@ -791,7 +871,9 @@
           "path": "templates/server/dell/dell_r840_http/template_server_dell_r840_http.yaml",
           "sha256": "179b57e348197c17d1c2b34ac57183bbe88fe21f28a206eedd31f3a849b1bbf2"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "20ea139663264c21bca0dcecf2e95589": {
       "uuid": "20ea139663264c21bca0dcecf2e95589",
@@ -810,7 +892,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS106-1C-5S_snmp/template_net_mikrotik_CRS106-1C-5S_snmp.yaml",
           "sha256": "48515a088b6aebbda2d46a5d724f0b498aabf9e30ace66f9b924e5ad8a362424"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "21a95afef0e74fb19691693090403d1d": {
       "uuid": "21a95afef0e74fb19691693090403d1d",
@@ -829,7 +913,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_mes3500-10_snmp/template_net_zyxel_mes3500-10_snmp.yaml",
           "sha256": "8bd5e924586fd0e325e010baec6bc86c3d631912ca95516c57bc4bc2c1d7a822"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "21cca24cec1d40cdb0c2999aa6ac3037": {
       "uuid": "21cca24cec1d40cdb0c2999aa6ac3037",
@@ -848,7 +934,9 @@
           "path": "templates/db/postgresql_agent2_active/template_db_postgresql_agent2_active.yaml",
           "sha256": "b24306f2bb899f990cc47d4300835d1ff6856b196af1320e6d541302565a0890"
         }
-      ]
+      ],
+      "version_commit": "fd01bbbbd6b0f68f7e4f88589ab025937c2a61a0",
+      "version_date": "2025-04-22T14:01:05+02:00"
     },
     "21f3e79e1d2e4f5e868d1ef81c94bbfd": {
       "uuid": "21f3e79e1d2e4f5e868d1ef81c94bbfd",
@@ -867,7 +955,9 @@
           "path": "templates/net/qtech_snmp/template_net_qtech_snmp.yaml",
           "sha256": "7c73bebf403dbb7687b4eb4070a0d838faad9a0d743a76c46d7810b09a24a708"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "223101f878704022a04c30c3ff066e3f": {
       "uuid": "223101f878704022a04c30c3ff066e3f",
@@ -886,7 +976,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS305-1G-4S+IN_snmp/template_net_mikrotik_CRS305-1G-4S+IN_snmp.yaml",
           "sha256": "6a755bd1f5ff9a2b3caaf7c7e156d48e3170961db51022475fb38566d6d3f092"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "230fa9f7c1774821bbe6cdcbbba5cbc6": {
       "uuid": "230fa9f7c1774821bbe6cdcbbba5cbc6",
@@ -905,7 +997,9 @@
           "path": "templates/net/morningstar/morningstar_tristar_pwm_snmp/template_net_morningstar_tristar_pwm_snmp.yaml",
           "sha256": "b5e26eaf03e7547f8bb501934fa7877417afeea65e19c5bad0b974b32a8478fa"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "2327c665b46e4aa781d41240168c3867": {
       "uuid": "2327c665b46e4aa781d41240168c3867",
@@ -924,7 +1018,9 @@
           "path": "templates/server/intel_sr1630_ipmi/template_server_intel_sr1630_ipmi.yaml",
           "sha256": "a5d7010d5be2e80e9cab58081d128a57850e5a85116b885f14088483f2b24766"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "2420a8a4fda74fbc81743aed69fafa3b": {
       "uuid": "2420a8a4fda74fbc81743aed69fafa3b",
@@ -943,7 +1039,9 @@
           "path": "templates/app/kubernetes_http/kubernetes_controller_manager_http/template_kubernetes_controller_manager.yaml",
           "sha256": "93fe1476658c833abcb8a7c013bf34a209bafe85017f285097f66f3e08e0e86f"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "249de8d8d21e4dda9c3f766ab6201378": {
       "uuid": "249de8d8d21e4dda9c3f766ab6201378",
@@ -962,7 +1060,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_mes-3528_snmp/template_net_zyxel_mes-3528_snmp.yaml",
           "sha256": "47244fd153b62fa00be117251cc8ea35e769bd42a8512a257d0e50492e419f28"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "24b64f6d22b446dabecc86ee3f199004": {
       "uuid": "24b64f6d22b446dabecc86ee3f199004",
@@ -981,7 +1081,9 @@
           "path": "templates/app/controlm_http/template_app_controlm_http.yaml",
           "sha256": "87abd136c7c4fc94370d2ab6761c6d4f902d839582ebd1bb5475c7b59148cc6d"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "24bed6339f0a492fab86fe757394b937": {
       "uuid": "24bed6339f0a492fab86fe757394b937",
@@ -1000,7 +1102,9 @@
           "path": "templates/net/morningstar/morningstar_prostar_pwm_snmp/template_net_morningstar_prostar_pwm_snmp.yaml",
           "sha256": "3adee8b2a69bc30cce2d8033a4e2f509f637e626396e44f4e5ba907974df9dc9"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "2506b0ca01884903b547b1e19b76ce6d": {
       "uuid": "2506b0ca01884903b547b1e19b76ce6d",
@@ -1019,7 +1123,9 @@
           "path": "templates/os/linux_prom/template_os_linux_prom.yaml",
           "sha256": "0520cc57d88a92454803325c66f5d2c49c1c70c623fb1367054ae74d63680c56"
         }
-      ]
+      ],
+      "version_commit": "b7b4ad59a3d8f9d64f6d546c5b8e1f9dd5afe743",
+      "version_date": "2026-03-19T16:10:49+02:00"
     },
     "2526dce71d714e31bd545e96370c67b2": {
       "uuid": "2526dce71d714e31bd545e96370c67b2",
@@ -1038,7 +1144,9 @@
           "path": "templates/app/website_browser/template_app_website_browser.yaml",
           "sha256": "f1c13dfba6ed85cec6bb8ead8dde9c0bd094eb1d8724731c757e6ecca15747cb"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "26674f62500e4e79b9f470bbf962130d": {
       "uuid": "26674f62500e4e79b9f470bbf962130d",
@@ -1057,7 +1165,9 @@
           "path": "templates/net/arista_snmp/template_net_arista_snmp.yaml",
           "sha256": "f3e8b2f0099072fbaa0802f9d23e8653d612db5affae5f6643c84cf24018347e"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "2785d83763c641a7a7937b516665d93a": {
       "uuid": "2785d83763c641a7a7937b516665d93a",
@@ -1076,7 +1186,9 @@
           "path": "templates/net/mikrotik/mikrotik_hEX_lite_snmp/template_net_mikrotik_hEX_lite_snmp.yaml",
           "sha256": "2d21b8850f5e3b24cce76db481a5a8ee8c7e4160b1a825e1f7b88f686743bade"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "27f6424905884dbb96ab9210d987a56c": {
       "uuid": "27f6424905884dbb96ab9210d987a56c",
@@ -1095,7 +1207,9 @@
           "path": "templates/app/nginx_agent/template_app_nginx_agent.yaml",
           "sha256": "881f22154f5c4210722f78bc57c5ae0aa1c4e2f9b662a8f4b8c8d1be65fc2c82"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "28e31ef9402d4c1ba2fbc730a288d2d8": {
       "uuid": "28e31ef9402d4c1ba2fbc730a288d2d8",
@@ -1114,7 +1228,9 @@
           "path": "templates/app/truenas_snmp/template_app_truenas_core_snmp.yaml",
           "sha256": "b9a759592f55491935e86205534bbaee7153fcd6c0b751bfdd0971c7200ff806"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "292970ad91204722b5e5cb3233fc0026": {
       "uuid": "292970ad91204722b5e5cb3233fc0026",
@@ -1133,7 +1249,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_mes3500-24_snmp/template_net_zyxel_mes3500-24_snmp.yaml",
           "sha256": "db3a74e170d8bf3a6c24fc6689561c9848e2828e1a63c037e17edd2cc9040ea3"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "29325098807848aa928b4192ad5e020f": {
       "uuid": "29325098807848aa928b4192ad5e020f",
@@ -1152,7 +1270,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "2b9039885edf45b8bdd39f16dd069133": {
       "uuid": "2b9039885edf45b8bdd39f16dd069133",
@@ -1171,7 +1291,9 @@
           "path": "templates/net/tplink_snmp/template_net_tplink_snmp.yaml",
           "sha256": "0eb099e0078e51720d42d86ee4f74219ca6e31cbbd7b23dd822d9c73e4cf5096"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "2bd6f566391d49dab6bee184522ab5fa": {
       "uuid": "2bd6f566391d49dab6bee184522ab5fa",
@@ -1190,7 +1312,9 @@
           "path": "templates/net/mikrotik/mikrotik_FiberBox_snmp/template_net_mikrotik_FiberBox_snmp.yaml",
           "sha256": "e1a07deb9da47388b90453c6074c881df93864e38420d1a6fe69f543b735c661"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "2bf5827343f0420792ad953f290baa05": {
       "uuid": "2bf5827343f0420792ad953f290baa05",
@@ -1209,7 +1333,9 @@
           "path": "templates/app/wildfly_server_jmx/template_app_wildfly_server_jmx.yaml",
           "sha256": "384e16d705dfc803e58daf9dd9a52f8d07a9bce72c76858e810846edd6250dab"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "2c96393f8f2945c1a9f03f86adf5eb57": {
       "uuid": "2c96393f8f2945c1a9f03f86adf5eb57",
@@ -1228,7 +1354,9 @@
           "path": "templates/app/mantisbt_http/template_app_mantisbt_http.yaml",
           "sha256": "36ac61e7a77ef9f8453107d97f94cf394a66c38abaed70672e1cd472ddd2e994"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "2cae7d2eeca04e6fa7419759ac9ad814": {
       "uuid": "2cae7d2eeca04e6fa7419759ac9ad814",
@@ -1247,7 +1375,9 @@
           "path": "templates/net/meraki_http/template_net_meraki_http.yaml",
           "sha256": "0114a5acb5c9f4df8123a21007499f724f9d57dcf547e3921362902b6bb62771"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "2ce384bafd524db5b910d7f55bca1fbb": {
       "uuid": "2ce384bafd524db5b910d7f55bca1fbb",
@@ -1266,7 +1396,9 @@
           "path": "templates/app/veeam/enterprise_manager_http/template_veeam_enterprise_manager_http.yaml",
           "sha256": "2bbb8b3d3a1aae0abb108a122f6f8f5290ee414bd977f2f5658605316bd56594"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "2d20a2fbd540492089fdcafc8feb60e3": {
       "uuid": "2d20a2fbd540492089fdcafc8feb60e3",
@@ -1285,7 +1417,9 @@
           "path": "templates/net/morningstar/morningstar_tristar_mppt_600V_snmp/template_net_morningstar_tristar_mppt_600V_snmp.yaml",
           "sha256": "dacb04d2f23b65ede59d5c04258cea17140d735f8490d55d3cf0128fae38e34b"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "2d8b9329b5d04cdf85bf17d2d0db2b29": {
       "uuid": "2d8b9329b5d04cdf85bf17d2d0db2b29",
@@ -1304,7 +1438,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "2eb43a3c9666467683b9ce09d2bd26d7": {
       "uuid": "2eb43a3c9666467683b9ce09d2bd26d7",
@@ -1323,7 +1459,9 @@
           "path": "templates/app/kafka_jmx/template_app_kafka_jmx.yaml",
           "sha256": "820e12468c570167f71d0350d28a0a0b690340844c0818f97d23fa7963b67141"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "2ef2f2eb75ee4a0bae839e22aa76e5fc": {
       "uuid": "2ef2f2eb75ee4a0bae839e22aa76e5fc",
@@ -1342,7 +1480,9 @@
           "path": "templates/app/jenkins/template_app_jenkins.yaml",
           "sha256": "e1666b2921f354d02e35d6fe49679d0e3683bde9968ff70d6c8c05ad37274d34"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "2f82248e411340429d390e8389850401": {
       "uuid": "2f82248e411340429d390e8389850401",
@@ -1361,7 +1501,9 @@
           "path": "templates/app/vault_http/template_app_vault_http.yaml",
           "sha256": "d773975e52410d80f91a48654791de625db3652656b7988bd2f08300f12bce7b"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "2fca6b60914b4fa98132b1a7885ab014": {
       "uuid": "2fca6b60914b4fa98132b1a7885ab014",
@@ -1380,7 +1522,9 @@
           "path": "templates/net/meraki_http/template_net_meraki_http.yaml",
           "sha256": "0114a5acb5c9f4df8123a21007499f724f9d57dcf547e3921362902b6bb62771"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "30cc187a4e994c39b07f53d86b5cc6bc": {
       "uuid": "30cc187a4e994c39b07f53d86b5cc6bc",
@@ -1399,7 +1543,9 @@
           "path": "templates/tel/asterisk_http/template_tel_asterisk_http.yaml",
           "sha256": "0c4983e05614684bbe3faafa4e36efdd5074b8f6573697bfa1971e9cc080a045"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "30d084c6b7844b7cab6cf820b00bb7b2": {
       "uuid": "30d084c6b7844b7cab6cf820b00bb7b2",
@@ -1418,7 +1564,9 @@
           "path": "templates/net/cisco/cisco_catalyst_3750_24ts_snmp/template_net_cisco_catalyst_3750_24ts_snmp.yaml",
           "sha256": "01cc64ebf23d7841dabd4ae12a662f60fa0cf9a06486df82a4db8a2eceb4ad4e"
         }
-      ]
+      ],
+      "version_commit": "b7b4ad59a3d8f9d64f6d546c5b8e1f9dd5afe743",
+      "version_date": "2026-03-19T16:10:49+02:00"
     },
     "318fd61c22fa4f1a92a71376814d6c32": {
       "uuid": "318fd61c22fa4f1a92a71376814d6c32",
@@ -1437,7 +1585,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB2011iLS-IN_snmp/template_net_mikrotik_RB2011iLS-IN_snmp.yaml",
           "sha256": "3bb45d0949cc277fbe82b64861456d5c408716b56b526051560eb8fb7c13f6e8"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "32d3c78ff44c4c3c9ff5b893ad7f5fc9": {
       "uuid": "32d3c78ff44c4c3c9ff5b893ad7f5fc9",
@@ -1456,7 +1606,9 @@
           "path": "templates/power/apc/apc_ups_smart_rt_1000_xl_snmp/template_power_apc_ups_smart_rt_1000_xl_snmp.yaml",
           "sha256": "1d01f6b46854543d7c83664530e8482c8d4f570764be18ad23c3496556f26ccc"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "33c77d08d94242b88703eea0fb6c2d91": {
       "uuid": "33c77d08d94242b88703eea0fb6c2d91",
@@ -1475,7 +1627,9 @@
           "path": "templates/net/vyatta_virtual_router/template_net_vyatta_virtual_router_snmp.yaml",
           "sha256": "d642e2b3595c1d0339f3733a4dd87226659f63202a0c6a163a6d56413cef5ff6"
         }
-      ]
+      ],
+      "version_commit": "5bf1eaf470eebd4831c93209142768dd1ab750b2",
+      "version_date": "2025-12-29T11:34:54+01:00"
     },
     "340ec6917c274ead8fab36925e57f30a": {
       "uuid": "340ec6917c274ead8fab36925e57f30a",
@@ -1494,7 +1648,9 @@
           "path": "templates/power/apc/apc_ups_smart_rt_1000_rm_xl_snmp/template_power_apc_ups_smart_rt_1000_rm_xl_snmp.yaml",
           "sha256": "7b1064e178c8391e8074f9a6dd62c07cdf4dd4364c2be06e32c076b37eaa7c88"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "34f386276a094e8e9a6e46653fdf05b1": {
       "uuid": "34f386276a094e8e9a6e46653fdf05b1",
@@ -1513,7 +1669,9 @@
           "path": "templates/app/nextcloud/template_app_nextcloud_http.yaml",
           "sha256": "6937f2408acd81655f2acc4679da0d7472ec5ffccc1fe51fe571caf0bdb6014c"
         }
-      ]
+      ],
+      "version_commit": "4f5ca87466c991ceae57770468026964a3c199ab",
+      "version_date": "2025-11-03T13:01:20+01:00"
     },
     "35ef29f24158444097272d2ea7fa6044": {
       "uuid": "35ef29f24158444097272d2ea7fa6044",
@@ -1532,7 +1690,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "36116d8675da47b8a678193969d5a787": {
       "uuid": "36116d8675da47b8a678193969d5a787",
@@ -1551,7 +1711,9 @@
           "path": "templates/db/cockroachdb_http/template_db_cockroachdb_http.yaml",
           "sha256": "e6d69bde40d87dda36634170b075937e2970a06edd247c52eab879ee0c4dd2ff"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "3645654baaf04f11927b171bcb048349": {
       "uuid": "3645654baaf04f11927b171bcb048349",
@@ -1570,7 +1732,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_ies-6000_snmp/template_net_zyxel_ies-6000_snmp.yaml",
           "sha256": "c98e0546b01be0599b35e1a36c8a9b061e475c73beafa3fdb7217ff75d5a2e4e"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "379aaf7e87574debb4f5c3947a22ec68": {
       "uuid": "379aaf7e87574debb4f5c3947a22ec68",
@@ -1589,7 +1753,9 @@
           "path": "templates/server/hp/hp_dl380_snmp/template_server_hp_dl380_snmp.yaml",
           "sha256": "6fde333db9ef1dcb551bdf8410c40d69f0c3c881a7a1575e98c99647ed642031"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "37e5eb5606bc4abba66c8b20381a1e8a": {
       "uuid": "37e5eb5606bc4abba66c8b20381a1e8a",
@@ -1608,7 +1774,9 @@
           "path": "templates/net/icmp_ping/template_module_icmp_ping.yaml",
           "sha256": "1c5815e87c23152eca8e2d050e265c11f80ecf988c870186e077f1a2b2181143"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "38456af4aedd4b168ec3fa4ad2acb256": {
       "uuid": "38456af4aedd4b168ec3fa4ad2acb256",
@@ -1627,7 +1795,9 @@
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
           "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "395184b5d5b048a68e06c91154c56847": {
       "uuid": "395184b5d5b048a68e06c91154c56847",
@@ -1646,7 +1816,9 @@
           "path": "templates/net/dlink_des7200_snmp/template_net_dlink_des7200_snmp.yaml",
           "sha256": "7e80c0e71507ce9585e56e432a9e4e02dac604a670f28026659713cc3557346d"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "399bd1ee587245ecac6f39beaa99886f": {
       "uuid": "399bd1ee587245ecac6f39beaa99886f",
@@ -1665,7 +1837,9 @@
           "path": "templates/db/postgresql_agent/template_db_postgresql_agent.yaml",
           "sha256": "e12ec7a0b42ddaee8ddf8515521b0a0368fdd7fab1e7b489a57c5a5310540f2a"
         }
-      ]
+      ],
+      "version_commit": "fd01bbbbd6b0f68f7e4f88589ab025937c2a61a0",
+      "version_date": "2025-04-22T14:01:05+02:00"
     },
     "39e2f742d0b24ea489b7f61d27a5df1c": {
       "uuid": "39e2f742d0b24ea489b7f61d27a5df1c",
@@ -1684,7 +1858,9 @@
           "path": "templates/net/meraki_http/template_net_meraki_http.yaml",
           "sha256": "0114a5acb5c9f4df8123a21007499f724f9d57dcf547e3921362902b6bb62771"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "3a0bbbb2ec0a4c58bba3ba3a3d6ce660": {
       "uuid": "3a0bbbb2ec0a4c58bba3ba3a3d6ce660",
@@ -1703,7 +1879,9 @@
           "path": "templates/db/tidb_http/tidb_tikv_http/template_db_tidb_tikv_http.yaml",
           "sha256": "ed2d36900ffb76d1d5e3076d7f89194431963801dddeadb9776b7dc01692f5cf"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "3a71dcdcfe0b4a0e8284d8939d335cce": {
       "uuid": "3a71dcdcfe0b4a0e8284d8939d335cce",
@@ -1722,7 +1900,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_aam1212-51_snmp/template_net_zyxel_aam1212-51_snmp.yaml",
           "sha256": "3ebcfca6e1bd79af2701260783d2f802ddfeb3b37dd9c542cc362e469f138e78"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "3a7ff6eb19bb4a42b5b5b34a7179b30c": {
       "uuid": "3a7ff6eb19bb4a42b5b5b34a7179b30c",
@@ -1741,7 +1921,9 @@
           "path": "templates/net/checkpoint/quantum_ngfw_snmp/template_net_checkpoint_ngfw_snmp.yaml",
           "sha256": "c0309f731bfacb248143f4c2a90448e519751fedb14e4d664af77c45e4dbfbe0"
         }
-      ]
+      ],
+      "version_commit": "96b8745e028ff612690a747d69c782405df33608",
+      "version_date": "2026-07-30T12:40:02+03:00"
     },
     "3ba7dec7c0034d86ad1c73b4f8ee8994": {
       "uuid": "3ba7dec7c0034d86ad1c73b4f8ee8994",
@@ -1760,7 +1942,9 @@
           "path": "templates/server/dell/dell_r660_snmp/template_server_dell_r660_snmp.yaml",
           "sha256": "c8c0bc285ab281604ba0620653da6cdfebdca7baf6b3c27254d05c33ebe47bc1"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "3bbfe42c78c74f04a2565431fbdd19e2": {
       "uuid": "3bbfe42c78c74f04a2565431fbdd19e2",
@@ -1779,7 +1963,9 @@
           "path": "templates/net/morningstar/morningstar_suresine_snmp/template_net_morningstar_suresine_snmp.yaml",
           "sha256": "e38147acf04e1968dd1954669080518bd0e346bd55c398ddf67b92b91dafa996"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "3cc8c9ae7055458c9a803597007f70bd": {
       "uuid": "3cc8c9ae7055458c9a803597007f70bd",
@@ -1798,7 +1984,9 @@
           "path": "templates/app/tomcat_jmx/template_app_tomcat_jmx.yaml",
           "sha256": "43432304fb56e121c8357c5f80c8827d6cc9f1183d1a911a4c3c8aded08c2ff3"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "3d527f609e344ed8a4ec19762c31c619": {
       "uuid": "3d527f609e344ed8a4ec19762c31c619",
@@ -1817,7 +2005,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "3db29bb6b2b14fa289ba7915264efcdf": {
       "uuid": "3db29bb6b2b14fa289ba7915264efcdf",
@@ -1836,7 +2026,9 @@
           "path": "templates/app/consul_http/consul_cluster/template_consul_cluster_http.yaml",
           "sha256": "62ad78b6c1daf1842a737b01a400059cef948229332c76c356ae4c5e5f9afb68"
         }
-      ]
+      ],
+      "version_commit": "9d4ed9a5568b4b16194f757a47085ec9715e452f",
+      "version_date": "2025-04-15T10:59:50+03:00"
     },
     "3db86b0d235e4c7b80f7d6144ca08925": {
       "uuid": "3db86b0d235e4c7b80f7d6144ca08925",
@@ -1855,7 +2047,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_ies-500x_snmp/template_net_zyxel_ies-500x_snmp.yaml",
           "sha256": "5d03243d32856db1f49bf63cbfdf469652045798754e8383023ff03408d8eeff"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "3dfd1a55987848e5aa6ffe92c228f63b": {
       "uuid": "3dfd1a55987848e5aa6ffe92c228f63b",
@@ -1874,7 +2068,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB1100AHx4_snmp/template_net_mikrotik_RB1100AHx4_snmp.yaml",
           "sha256": "98e473a50dfe70b810d5ea8392133612dcb9c9ea2d0cfb794616654cf29dcf3f"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "3ec55c9966624ef5bc1b50502812d581": {
       "uuid": "3ec55c9966624ef5bc1b50502812d581",
@@ -1893,7 +2089,9 @@
           "path": "templates/power/apc/apc_ups_snmp/template_power_apc_ups_snmp.yaml",
           "sha256": "172372231042ea7526f85842ae462892e426887750df7fedff453a73c3e849b2"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "3f707f39c32a4b6e8b214c38a260f6f9": {
       "uuid": "3f707f39c32a4b6e8b214c38a260f6f9",
@@ -1912,7 +2110,9 @@
           "path": "templates/server/dell/dell_r740_http/template_server_dell_r740_http.yaml",
           "sha256": "a7d9462b412be328c11681f950f69db50fb4c78e2af73b2c0391427280ce92ab"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "3fb4020df2984b0ab64dfd8355ff5c65": {
       "uuid": "3fb4020df2984b0ab64dfd8355ff5c65",
@@ -1931,7 +2131,9 @@
           "path": "templates/cctv/hikvision/template_cctv_hikvision.yaml",
           "sha256": "a22cd3f421f8dca428ef409fad9ceff57646db24c36d5b14d08aabea7d3bb108"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "40c233aaa3424fd29dc378022ff3461d": {
       "uuid": "40c233aaa3424fd29dc378022ff3461d",
@@ -1950,7 +2152,9 @@
           "path": "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml",
           "sha256": "bd3f9e36d69d652cffa9befda242140c7fd587fd0e841beef52dd7180b1650c1"
         }
-      ]
+      ],
+      "version_commit": "9cbbe216e11e986196b0d03a6fb9639136b8bf70",
+      "version_date": "2026-07-24T13:46:33+03:00"
     },
     "419145c8af7e4b8eb30af8460bbed566": {
       "uuid": "419145c8af7e4b8eb30af8460bbed566",
@@ -1969,7 +2173,9 @@
           "path": "templates/server/dell/dell_r750_snmp/template_server_dell_r750_snmp.yaml",
           "sha256": "45c3950fe510f3cfc090115caeaa2d9aae025e060d9488e91b32bf638ff251a9"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "42b18986c8b34c2d9c36f9cd00565bd5": {
       "uuid": "42b18986c8b34c2d9c36f9cd00565bd5",
@@ -1988,7 +2194,9 @@
           "path": "templates/server/dell/dell_r750_http/template_server_dell_r750_http.yaml",
           "sha256": "a1ea99dec8b955e80860cd34ba174b1b9198fe9d21db07c17dae35fa9da8a458"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "43596328d4d74a5592906a9e08e3fd96": {
       "uuid": "43596328d4d74a5592906a9e08e3fd96",
@@ -2007,7 +2215,9 @@
           "path": "templates/db/tidb_http/tidb_pd_http/template_db_tidb_pd_http.yaml",
           "sha256": "1d7298dcd3573b3cc69ffbc25965d27ab78aaeab10d176d87701bcb1cf1ab597"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "43dc5c8a9a0e4786b64e44422c7f32b4": {
       "uuid": "43dc5c8a9a0e4786b64e44422c7f32b4",
@@ -2026,7 +2236,9 @@
           "path": "templates/server/dell_idrac_snmp/template_server_dell_idrac_snmp.yaml",
           "sha256": "24454a10890f84561bfdf77bc5dae943e35e3145a7cceb3e17a00b020447274f"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "44990575121d4798b9e10520604c786c": {
       "uuid": "44990575121d4798b9e10520604c786c",
@@ -2045,7 +2257,9 @@
           "path": "templates/san/pure_storage_flasharray/template_pure_storage_flasharray_http.yaml",
           "sha256": "221dbfba744c99417d7ea9188d9231f8cd17aaa2258b1e4cccf651cc744e6de8"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "44c2c2d94a4447c6a924386640e4854a": {
       "uuid": "44c2c2d94a4447c6a924386640e4854a",
@@ -2064,7 +2278,9 @@
           "path": "templates/net/f5_bigip_snmp/template_net_f5_bigip_snmp.yaml",
           "sha256": "f56b3848640377ffe4a73fa7e554e1ddf41635bcc35f9556089c74fde9569eaf"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "44eac6a1abe34999b85ad6d0e40073fd": {
       "uuid": "44eac6a1abe34999b85ad6d0e40073fd",
@@ -2083,7 +2299,9 @@
           "path": "templates/app/nomad/template_app_nomad_http.yaml",
           "sha256": "49db24b4f9b50858a79890a1011e6e430693d1eac8ff0b2be796dd6d204cc4db"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "4583f0c3bc894251a6c5e7129cb5b9aa": {
       "uuid": "4583f0c3bc894251a6c5e7129cb5b9aa",
@@ -2102,7 +2320,9 @@
           "path": "templates/net/cisco/cisco_catalyst_3750_24ps_snmp/template_net_cisco_catalyst_3750_24ps_snmp.yaml",
           "sha256": "7a46e6d861003e4bcddc0e9f196c8436a16a78db108438fd205c35ef25e1e5a7"
         }
-      ]
+      ],
+      "version_commit": "b7b4ad59a3d8f9d64f6d546c5b8e1f9dd5afe743",
+      "version_date": "2026-03-19T16:10:49+02:00"
     },
     "4677be3e07bf4f3285496f2f4230b928": {
       "uuid": "4677be3e07bf4f3285496f2f4230b928",
@@ -2121,7 +2341,9 @@
           "path": "templates/app/iis_agent_active/template_app_iis_agent_active.yaml",
           "sha256": "84c015d4dfb6195834b0b18c29ce79814f1339ae4298fbcc4455bc14ac1aecbc"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "47d87c39c121429b98a18f641aa443ea": {
       "uuid": "47d87c39c121429b98a18f641aa443ea",
@@ -2140,7 +2362,9 @@
           "path": "templates/db/gridgain_jmx/template_db_gridgain_jmx.yaml",
           "sha256": "711692b5fbab4b686bde4d1784a399938379a4aba4c0abeba72e39c66b10554e"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "4904f84303c74c5e955b7849730c3155": {
       "uuid": "4904f84303c74c5e955b7849730c3155",
@@ -2159,7 +2383,9 @@
           "path": "templates/db/mysql_agent2/template_db_mysql_agent2.yaml",
           "sha256": "3b68ca413b1ea28561bf20d2512b0d6db8a40839ea5c85410408fe9ef56b7491"
         }
-      ]
+      ],
+      "version_commit": "c3aeec928c69e20db457e89ad9996c77c45d5561",
+      "version_date": "2025-11-14T13:39:34+01:00"
     },
     "4958b76448d74ff1b6d7d6280449beee": {
       "uuid": "4958b76448d74ff1b6d7d6280449beee",
@@ -2178,7 +2404,9 @@
           "path": "templates/app/proxmox/template_app_proxmox.yaml",
           "sha256": "0cc620659d2c1cbb6d84555907a0fba27917edfe6f1a0de8ebd84a5e9a590344"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "49c77ce207f8478da53e761526d6eca5": {
       "uuid": "49c77ce207f8478da53e761526d6eca5",
@@ -2197,7 +2425,9 @@
           "path": "templates/app/php-fpm_http/template_app_php-fpm_http.yaml",
           "sha256": "fda637ae21a7eeed683f41d3324f04b8539c4ccdfdc1097a2cb572dd30bd5d77"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "4b27e636b6ad4ce68511d344d5604999": {
       "uuid": "4b27e636b6ad4ce68511d344d5604999",
@@ -2216,7 +2446,9 @@
           "path": "templates/app/wildfly_domain_jmx/template_app_wildfly_domain_jmx.yaml",
           "sha256": "9e367be9f7cae159f9898ed52a3989f5d9735c92bf7c1e942dd9ef264a1f921d"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "4c7d0c6e342b40458611bdb6e9dd958f": {
       "uuid": "4c7d0c6e342b40458611bdb6e9dd958f",
@@ -2235,7 +2467,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "4cb1aabe2b704b5c882963c2ef87d8f6": {
       "uuid": "4cb1aabe2b704b5c882963c2ef87d8f6",
@@ -2254,7 +2488,9 @@
           "path": "templates/net/generic_snmp_snmp/template_module_generic_snmp_snmp.yaml",
           "sha256": "67ae25b1643910727e2921c6eeb0640a381a773a6b5dcf051490f40a78d0494c"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "4d3a7adbb6964bd08f2b9d28e0da6496": {
       "uuid": "4d3a7adbb6964bd08f2b9d28e0da6496",
@@ -2273,7 +2509,9 @@
           "path": "templates/os/linux_snmp_snmp/template_os_linux_snmp_snmp.yaml",
           "sha256": "be329a5e99befab4472f29c8c7f3b8d4e2d4b30d78c8a733a10df7f51e7fa838"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "4e1e9372a5fe4297936210bc4fc4b1c0": {
       "uuid": "4e1e9372a5fe4297936210bc4fc4b1c0",
@@ -2292,7 +2530,9 @@
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
           "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
         }
-      ]
+      ],
+      "version_commit": "93bc8a9f742629221afcb72797593256e52bcbbe",
+      "version_date": "2026-09-07T15:17:41+02:00"
     },
     "4e3fb27f028e4c35b8c9fc43b11c07d7": {
       "uuid": "4e3fb27f028e4c35b8c9fc43b11c07d7",
@@ -2311,7 +2551,9 @@
           "path": "templates/cloud/openstack/template_cloud_openstack_http.yaml",
           "sha256": "2660ba99e986029b791abc8b79978dc2cd67cfc6bc212907b49510870652475b"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "4ffb0f9103084384a98379ed533865e9": {
       "uuid": "4ffb0f9103084384a98379ed533865e9",
@@ -2330,7 +2572,9 @@
           "path": "templates/power/apc/apc_ups_symmetra_rx_snmp/template_power_apc_ups_symmetra_rx_snmp.yaml",
           "sha256": "3c4ec0a7c2efddd90b933298a031a3f279d594c63b4a91af8e38da44131b4ab0"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "507d70db18554a4e9ee5e09bb29bc85f": {
       "uuid": "507d70db18554a4e9ee5e09bb29bc85f",
@@ -2349,7 +2593,9 @@
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
           "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "5175afdf713744d9a81ce53864ccfc1d": {
       "uuid": "5175afdf713744d9a81ce53864ccfc1d",
@@ -2368,7 +2614,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "51ffd432b9324ce2b04e1d4dc4122d16": {
       "uuid": "51ffd432b9324ce2b04e1d4dc4122d16",
@@ -2387,7 +2635,9 @@
           "path": "templates/db/mysql_agent2_active/template_db_mysql_agent2_active.yaml",
           "sha256": "e02ffdb85e799ef407c2fbcd284794415c482885ac6f81343e125fad57e55298"
         }
-      ]
+      ],
+      "version_commit": "c3aeec928c69e20db457e89ad9996c77c45d5561",
+      "version_date": "2025-11-14T13:39:34+01:00"
     },
     "521d864fe8574f19b350f7ddbe259042": {
       "uuid": "521d864fe8574f19b350f7ddbe259042",
@@ -2406,7 +2656,9 @@
           "path": "templates/san/huawei_dorado_snmp/template_san_huawei_dorado_snmp.yaml",
           "sha256": "0c9a197e2971f73499b48ee7fad19c600b102fecd9c7660191d1b557e42c990f"
         }
-      ]
+      ],
+      "version_commit": "fc0a83bba9fcf4fece49359f0201cb83c58af0a4",
+      "version_date": "2025-08-05T16:01:39+03:00"
     },
     "5265860748e14dea8ed58b35fd9fe3d1": {
       "uuid": "5265860748e14dea8ed58b35fd9fe3d1",
@@ -2425,7 +2677,9 @@
           "path": "templates/net/aruba/aruba_cx8300s_snmp/template_net_aruba_cx8300s_snmp.yaml",
           "sha256": "ecd6cc5ed79e0c7a40a8d64bd42b8e2af25137a43117172633148ea7b54508e9"
         }
-      ]
+      ],
+      "version_commit": "29d71fb3b8e5b2275fc3807512e8e3e508ddafe9",
+      "version_date": "2025-09-04T12:54:41+03:00"
     },
     "52b2664578884d9eba62e47375c99f8e": {
       "uuid": "52b2664578884d9eba62e47375c99f8e",
@@ -2444,7 +2698,9 @@
           "path": "templates/app/elasticsearch_http/template_app_elasticsearch_http.yaml",
           "sha256": "6da79d3d1eb612b3b6b3effe476efb20791b0c7fa28f35b4a9a06a199926ef97"
         }
-      ]
+      ],
+      "version_commit": "b93e81ec6d6b7a36d9390074f9e29e56e934ca5d",
+      "version_date": "2026-07-13T11:13:22+03:00"
     },
     "53044571fb864d87af32473e08c76d0b": {
       "uuid": "53044571fb864d87af32473e08c76d0b",
@@ -2463,7 +2719,9 @@
           "path": "templates/net/alcatel_timetra_snmp/template_net_alcatel_timetra_snmp.yaml",
           "sha256": "f6390ba9504bba3178609cb082d30ef4c6d11516b455ba69a798895377dbfea9"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "5331ecc3be9f47d6a8eb0732ae141239": {
       "uuid": "5331ecc3be9f47d6a8eb0732ae141239",
@@ -2482,7 +2740,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB260GSP_snmp/template_net_mikrotik_RB260GSP_snmp.yaml",
           "sha256": "9c3beb2e9ffe28672e33a695fb02f534c51fd24bb12ca1ea84f7d4bc3dd35d4c"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "538ec67ce01341a9b281dbd86d86d2a2": {
       "uuid": "538ec67ce01341a9b281dbd86d86d2a2",
@@ -2501,7 +2761,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS112-8P-4S-IN_snmp/template_net_mikrotik_CRS112-8P-4S-IN_snmp.yaml",
           "sha256": "4174da85eb1cdb1d238f4cb9210abe11de2645e6d994fffd2d59e1673651277e"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "54f0ffb538d94a9bb8062df3e63c4cb6": {
       "uuid": "54f0ffb538d94a9bb8062df3e63c4cb6",
@@ -2520,7 +2782,9 @@
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
           "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "56079badd056419383cc26e6a4fcc7e0": {
       "uuid": "56079badd056419383cc26e6a4fcc7e0",
@@ -2539,7 +2803,9 @@
           "path": "templates/app/vmware/template_app_vmware.yaml",
           "sha256": "2e3d7a73da4bcfab68d5cd3043c17027d4e0dff887597393f6ce660e0c66fb5f"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "5630ec1b1baf449abe1bc5521f85fe6c": {
       "uuid": "5630ec1b1baf449abe1bc5521f85fe6c",
@@ -2558,7 +2824,9 @@
           "path": "templates/app/certificate_agent2/template_app_certificate_agent2.yaml",
           "sha256": "dfade7f7633601dd1ced0bf1b90ba532eb8407c757b68bb8113c8d993aff623e"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "57aeccd43b744942b9555269b79a96ad": {
       "uuid": "57aeccd43b744942b9555269b79a96ad",
@@ -2577,7 +2845,9 @@
           "path": "templates/net/hp_hh3c_snmp/template_net_hp_hh3c_snmp.yaml",
           "sha256": "b322af829a9f5a5b8ee74c2f3b7540b2282da0abe23188166431194e085630eb"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "586119e5e27e4062a3cce8601ecb8d71": {
       "uuid": "586119e5e27e4062a3cce8601ecb8d71",
@@ -2596,7 +2866,9 @@
           "path": "templates/server/hp/hp_bl920_snmp/template_server_hp_bl920_snmp.yaml",
           "sha256": "ef282a374a5cd8e8382bad8c04d0f8a17889288002991ddf50f970b08cdb6cbd"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "5899b2f0aced4085b5ac25d0461b3425": {
       "uuid": "5899b2f0aced4085b5ac25d0461b3425",
@@ -2620,7 +2892,9 @@
           "path": "templates/app/vmware_fqdn/template_app_vmware_fqdn.yaml",
           "sha256": "62cf2779fb156c771dde1fb927671d0a23b54f5ce90bb879841810baaca4d85a"
         }
-      ]
+      ],
+      "version_commit": "b66c3d328fb7e61307bfb60e0ad7f2f5c9abbe8c",
+      "version_date": "2026-07-06T12:52:09+02:00"
     },
     "5920713da492452889adabc25e259caa": {
       "uuid": "5920713da492452889adabc25e259caa",
@@ -2639,7 +2913,9 @@
           "path": "templates/net/netgear_snmp/template_net_netgear_snmp.yaml",
           "sha256": "1091ce551176011ffec9221bae9b54ee2b7f4e86886b3ea92bbd54ea46981eb3"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "5c42de26643c4b43b23a11159df021ce": {
       "uuid": "5c42de26643c4b43b23a11159df021ce",
@@ -2658,7 +2934,9 @@
           "path": "templates/db/cassandra_jmx/template_db_cassandra_jmx.yaml",
           "sha256": "8f7451e53f3429c6faf82630bf48c25b52e5f8d7bc1d1dbef3ca6177bc694587"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "5d3971cd973b46e7915d7ae0750bac57": {
       "uuid": "5d3971cd973b46e7915d7ae0750bac57",
@@ -2677,7 +2955,9 @@
           "path": "templates/power/apc/apc_ups_galaxy_3500_snmp/template_power_apc_ups_galaxy_3500_snmp.yaml",
           "sha256": "9d6a48f66c51fcc26fe406dc0ef03643284eebb02655a98db8e3cd904e2fc3a7"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "5e225ad1c2cc4d0bbf75586e7bf8871b": {
       "uuid": "5e225ad1c2cc4d0bbf75586e7bf8871b",
@@ -2696,7 +2976,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "5ed19d1f74224588bf5f53ac47003acc": {
       "uuid": "5ed19d1f74224588bf5f53ac47003acc",
@@ -2715,7 +2997,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR1016-12G_snmp/template_net_mikrotik_CCR1016-12G_snmp.yaml",
           "sha256": "1b04d9cef9d236f0f3d7181f2c244ebeb5cb4a750a2a2223b039eec085a6f75c"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "5fa761bc51e4432a90c6c9eece930c4a": {
       "uuid": "5fa761bc51e4432a90c6c9eece930c4a",
@@ -2734,7 +3018,9 @@
           "path": "templates/app/rabbitmq_agent/template_app_rabbitmq_agent.yaml",
           "sha256": "9d8f0f351df6c764191c8f3a4ba7e50d188783920183292e6c0b60bf6ddad170"
         }
-      ]
+      ],
+      "version_commit": "be542d608be5ea5d3f0cce13ac76709ac940844f",
+      "version_date": "2026-07-14T11:33:59+03:00"
     },
     "5fdd2ca8b8f84962aaea5a218b46ea7d": {
       "uuid": "5fdd2ca8b8f84962aaea5a218b46ea7d",
@@ -2753,7 +3039,9 @@
           "path": "templates/os/windows_agent_active/template_os_windows_agent_active.yaml",
           "sha256": "1db2c1e516ea74105de846d4e122a8017c092e9c15f1ebd064bb110326262985"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "6095f32a1e6f432a8a053e6245891632": {
       "uuid": "6095f32a1e6f432a8a053e6245891632",
@@ -2772,7 +3060,9 @@
           "path": "templates/net/ribbon/ribbon_sbc_edge/template_net_ribbon_sbc_edge_http.yaml",
           "sha256": "33cbe544fc34991683c03c7d93491ab911efaaea2cd79e6075eaa4eb3e907014"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "60cb9ccb922e4fd194a1d9573db10237": {
       "uuid": "60cb9ccb922e4fd194a1d9573db10237",
@@ -2791,7 +3081,9 @@
           "path": "templates/server/hp/hp_dl360_snmp/template_server_hp_dl360_snmp.yaml",
           "sha256": "e95ea9ae74023b417bf5100e86213c31da8d5ac4bdaa29531c7482c71d8a08b9"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "62d99b55585e41dd89736f5f46074dcb": {
       "uuid": "62d99b55585e41dd89736f5f46074dcb",
@@ -2810,7 +3102,9 @@
           "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
           "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "650bec3f2f364a478b82317396949459": {
       "uuid": "650bec3f2f364a478b82317396949459",
@@ -2829,7 +3123,9 @@
           "path": "templates/app/zabbix_agent/template_module_zabbix_agent.yaml",
           "sha256": "2a3e02b7976257ff05e760d437254bc653e166369414e84fc071978d33a8edd7"
         }
-      ]
+      ],
+      "version_commit": "71d8fa708912082b5205b6cac5a4c8586d97bcfa",
+      "version_date": "2023-03-08T12:05:02+01:00"
     },
     "654910b270d9464f863ed085ba7302ce": {
       "uuid": "654910b270d9464f863ed085ba7302ce",
@@ -2848,7 +3144,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR1016-12S-1S+_snmp/template_net_mikrotik_CCR1016-12S-1S+_snmp.yaml",
           "sha256": "243f654042c664b1bcc226b686efdb79875fceaa3b02f1e54d7957c15b56284d"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "67332e679035423f85090aa985947c36": {
       "uuid": "67332e679035423f85090aa985947c36",
@@ -2867,7 +3165,9 @@
           "path": "templates/net/generic_snmp/template_net_generic_snmp.yaml",
           "sha256": "7153477443c965c7f30f1d532ccd4ab27eadbd55f0d86d5149a2155470e7ee8e"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "6742f5ed33ca4c19b8e61203770e5fe5": {
       "uuid": "6742f5ed33ca4c19b8e61203770e5fe5",
@@ -2886,7 +3186,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS328-4C-20S-4S+RM_snmp/template_net_mikrotik_CRS328-4C-20S-4S+RM_snmp.yaml",
           "sha256": "6e96b9e96464ba7873fcfe8d2e66cd53fc4c35781f760b5d294ac77648610465"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "682ac14a5d294f4790ac8411ab6c33bf": {
       "uuid": "682ac14a5d294f4790ac8411ab6c33bf",
@@ -2905,7 +3207,9 @@
           "path": "templates/net/ribbon/ribbon_sbc_swe_core/template_net_ribbon_sbc_swe_core_http.yaml",
           "sha256": "346e17fd28cacdbd20c4fd4291eb6e31a877371bfdd8d81a8f259c53c50ea757"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "68c2034014f24115ae9e910962530472": {
       "uuid": "68c2034014f24115ae9e910962530472",
@@ -2924,7 +3228,9 @@
           "path": "templates/net/mikrotik/mikrotik_hEX_snmp/template_net_mikrotik_hEX_snmp.yaml",
           "sha256": "56c9787a17556924930a83c791e8a3144e1dda481233e9f5400cd8651b598368"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "6c235d126c1f4895acfe2156b140a886": {
       "uuid": "6c235d126c1f4895acfe2156b140a886",
@@ -2943,7 +3249,9 @@
           "path": "templates/net/ubiquiti_airos_snmp/template_net_ubiquiti_airos_snmp.yaml",
           "sha256": "8da9403828f3818fae168df2231f7ccb23fac632e20d23b3e4c689b0d728aed0"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "6d2443db49e54d59a82b9b525f2424ef": {
       "uuid": "6d2443db49e54d59a82b9b525f2424ef",
@@ -2962,7 +3270,9 @@
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
           "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "6d6c147c87de4af1b09cf0f55bac50a0": {
       "uuid": "6d6c147c87de4af1b09cf0f55bac50a0",
@@ -2981,7 +3291,9 @@
           "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
           "sha256": "b7ab58a4091478d0c080264d68cf94ee4c0d6f03b2836d1e7b673ce3b1333406"
         }
-      ]
+      ],
+      "version_commit": "b3352255097f404b0d3e94256abe7ca2261a9920",
+      "version_date": "2025-10-24T14:29:58+02:00"
     },
     "6d9737c72e5540d39e3553b773a587b1": {
       "uuid": "6d9737c72e5540d39e3553b773a587b1",
@@ -3000,7 +3312,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB2011iL-RM_snmp/template_net_mikrotik_RB2011iL-RM_snmp.yaml",
           "sha256": "2a9c05c4266d86349bd1714c6a5c86bb34a33c66fa2b243bb4783834cfbc8d34"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "6ecfb7083ddf45f183ab4be50cfba37a": {
       "uuid": "6ecfb7083ddf45f183ab4be50cfba37a",
@@ -3019,7 +3333,9 @@
           "path": "templates/net/brocade_foundry_sw_snmp/template_net_brocade_foundry_sw_snmp.yaml",
           "sha256": "389e07187bf60d232e39053459987986a17035900677c41e0c5cea9bc37747ee"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "6f7f2c44e13a46a4b219fbb5db92f3f7": {
       "uuid": "6f7f2c44e13a46a4b219fbb5db92f3f7",
@@ -3038,7 +3354,9 @@
           "path": "templates/net/intel_qlogic_infiniband_snmp/template_net_intel_qlogic_infiniband_snmp.yaml",
           "sha256": "67209ce9496f084c70b536df21ef48fd679ba59543e0bab9a3d19a4fbd8efc90"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "6fd1bd7226934f498169202ba4e9a482": {
       "uuid": "6fd1bd7226934f498169202ba4e9a482",
@@ -3057,7 +3375,9 @@
           "path": "templates/net/velocloud_http/template_net_velocloud_http.yaml",
           "sha256": "2a0cf64bb29cd2dcb16f1cb9ae436bc6567ee159181670bae86b7b64df75f66c"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "6ff896f545e043cc98de6d98698d41df": {
       "uuid": "6ff896f545e043cc98de6d98698d41df",
@@ -3076,7 +3396,9 @@
           "path": "templates/net/cisco/cisco_catalyst_3750_24fs_snmp/template_net_cisco_catalyst_3750_24fs_snmp.yaml",
           "sha256": "5dd3103d2065c8a83ba59b5a971ded45339606b2ed40a7cf3b57f5fc1d4d2b6b"
         }
-      ]
+      ],
+      "version_commit": "b7b4ad59a3d8f9d64f6d546c5b8e1f9dd5afe743",
+      "version_date": "2026-03-19T16:10:49+02:00"
     },
     "7005acc9123e4bc290805a3a16dab9cf": {
       "uuid": "7005acc9123e4bc290805a3a16dab9cf",
@@ -3095,7 +3417,9 @@
           "path": "templates/db/postgresql_agent_active/template_db_postgresql_agent_active.yaml",
           "sha256": "2da59af0bdf5b24c4b73c330d58cd378a47a9a292376959b510ed0818fbd9942"
         }
-      ]
+      ],
+      "version_commit": "fd01bbbbd6b0f68f7e4f88589ab025937c2a61a0",
+      "version_date": "2025-04-22T14:01:05+02:00"
     },
     "72aab08f7f27406a8f2c291648e5ba95": {
       "uuid": "72aab08f7f27406a8f2c291648e5ba95",
@@ -3114,7 +3438,9 @@
           "path": "templates/app/generic_java_jmx/template_app_generic_java_jmx.yaml",
           "sha256": "6bd903cf11b27c5862f2417827cbadb7d91025976045ecdcd7649dfc8c4c4022"
         }
-      ]
+      ],
+      "version_commit": "765807ec44144a90670f8dfe23b402d003cec611",
+      "version_date": "2026-08-21T09:32:51+03:00"
     },
     "738085dde4e749d49199e5e6fd4d56ab": {
       "uuid": "738085dde4e749d49199e5e6fd4d56ab",
@@ -3133,7 +3459,9 @@
           "path": "templates/app/veeam/backup_replication_http/template_veeam_backup_replication_http.yaml",
           "sha256": "be6bfc4db8a708645f976e7ffddeef7636615e940d665faff5fa810ad5a16671"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "73f123bb9ffe4587a0269c7e8752b2ed": {
       "uuid": "73f123bb9ffe4587a0269c7e8752b2ed",
@@ -3152,7 +3480,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_gs4012f_snmp/template_net_zyxel_gs4012f_snmp.yaml",
           "sha256": "256b7fe12bf6fffab733e36fc0a7f50c71ec2f2b05949fdbc6674f65db52042f"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "75ada0d6fb22416a9e6e5f44c2c3f64a": {
       "uuid": "75ada0d6fb22416a9e6e5f44c2c3f64a",
@@ -3171,7 +3501,9 @@
           "path": "templates/net/mikrotik/mikrotik_CSS326-24G-2S+RM_snmp/template_net_mikrotik_CSS326-24G-2S+RM_snmp.yaml",
           "sha256": "97ec2d287fff358fca124d6de075eb09acd2a8fee6675017aad810da12e59bfa"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "75d009cd4dc84ee7a8fc479fa2fbaeee": {
       "uuid": "75d009cd4dc84ee7a8fc479fa2fbaeee",
@@ -3190,7 +3522,9 @@
           "path": "templates/net/cisco/cisco_asav_snmp/template_net_cisco_asav_snmp.yaml",
           "sha256": "d1d4a5d22d760b909befe4cb8e2a0190b0d6e4ceee4a11738c99d9a89d8834ac"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "75fc96367e8d4588ba8314145fc12d35": {
       "uuid": "75fc96367e8d4588ba8314145fc12d35",
@@ -3209,7 +3543,9 @@
           "path": "templates/db/mssql_agent2/template_db_mssql_agent2.yaml",
           "sha256": "1dc2dece4775791ba49e676b19c773f7f8cce5a597f004014d78356e61ab2336"
         }
-      ]
+      ],
+      "version_commit": "cdfa869330b7267f1fc12efcce7c86d31d4cf669",
+      "version_date": "2026-07-01T11:08:55+03:00"
     },
     "760be6e1c2194a5bb7c0df47cc5f71ca": {
       "uuid": "760be6e1c2194a5bb7c0df47cc5f71ca",
@@ -3228,7 +3564,9 @@
           "path": "templates/os/openbsd/template_os_openbsd.yaml",
           "sha256": "8d355409be54fd21a286d3c11a9f568f2be77936d3742f2bfa7986b84c0fcd75"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "7802db8c2f9c4a7eba7b381b8f3fa5c5": {
       "uuid": "7802db8c2f9c4a7eba7b381b8f3fa5c5",
@@ -3247,7 +3585,9 @@
           "path": "templates/net/mikrotik/mikrotik_hEX_S_snmp/template_net_mikrotik_hEX_S_snmp.yaml",
           "sha256": "68b47f0533b59c977c1b952c2e69c0496fc3517dfe040a553045684b8ca392fd"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "780c4a9a657e42fc83f1ab9a535f5184": {
       "uuid": "780c4a9a657e42fc83f1ab9a535f5184",
@@ -3266,7 +3606,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB4011iGS+RM_snmp/template_net_mikrotik_RB4011iGS+RM_snmp.yaml",
           "sha256": "cdc18a92385f96309c87eb6bd645398f9e80eb8b64106a8984d9f78435ee4357"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "79267c69f54a4e59b4152aba4e8c4bd5": {
       "uuid": "79267c69f54a4e59b4152aba4e8c4bd5",
@@ -3285,7 +3627,9 @@
           "path": "templates/san/netapp_aff_a700_http/template_san_netapp_aff_a700_http.yaml",
           "sha256": "c1b9aa0e943d79c459cc9af7b8de4ddd8b6811394803ed229855d0356141d1aa"
         }
-      ]
+      ],
+      "version_commit": "018b620d43b72600be98e9dbb41abc62e3144e2a",
+      "version_date": "2025-09-29T10:09:13+03:00"
     },
     "7942fb93ae3b47cf9ca0ea4beb0675ce": {
       "uuid": "7942fb93ae3b47cf9ca0ea4beb0675ce",
@@ -3309,7 +3653,9 @@
           "path": "templates/app/vmware_fqdn/template_app_vmware_fqdn.yaml",
           "sha256": "62cf2779fb156c771dde1fb927671d0a23b54f5ce90bb879841810baaca4d85a"
         }
-      ]
+      ],
+      "version_commit": "b66c3d328fb7e61307bfb60e0ad7f2f5c9abbe8c",
+      "version_date": "2026-07-06T12:52:09+02:00"
     },
     "79b16cbbe593444eae3de66de0cb566b": {
       "uuid": "79b16cbbe593444eae3de66de0cb566b",
@@ -3328,7 +3674,9 @@
           "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
           "sha256": "b7ab58a4091478d0c080264d68cf94ee4c0d6f03b2836d1e7b673ce3b1333406"
         }
-      ]
+      ],
+      "version_commit": "b3352255097f404b0d3e94256abe7ca2261a9920",
+      "version_date": "2025-10-24T14:29:58+02:00"
     },
     "7af6d68b223a43d4bf8526cc5dc3fe2e": {
       "uuid": "7af6d68b223a43d4bf8526cc5dc3fe2e",
@@ -3347,7 +3695,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "7b3ecb24366f4685970df8e1143323f0": {
       "uuid": "7b3ecb24366f4685970df8e1143323f0",
@@ -3366,7 +3716,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR1036-8G-2S+EM_snmp/template_net_mikrotik_CCR1036-8G-2S+EM_snmp.yaml",
           "sha256": "8a9b3bc80e3c9280cf8bd1e22c4b29443947637c775fe8ab8e50df0ae385b7b3"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "7b6c6228b25f4586b42cd1bf37ff8034": {
       "uuid": "7b6c6228b25f4586b42cd1bf37ff8034",
@@ -3385,7 +3737,9 @@
           "path": "templates/server/smart_agent2/template_module_smart_agent2.yaml",
           "sha256": "3d07a729044efe1f71167a777a5d335fcd63dccc9eb691f6a3a6c78a07a71f7b"
         }
-      ]
+      ],
+      "version_commit": "c470fb76590d2f6353d2356cad931d6d432d347d",
+      "version_date": "2025-08-29T16:21:27+03:00"
     },
     "7b6f7a12a6b449ca926e74c894eca354": {
       "uuid": "7b6f7a12a6b449ca926e74c894eca354",
@@ -3404,7 +3758,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB5009UG+S+IN_snmp/template_net_mikrotik_RB5009UG+S+IN_snmp.yaml",
           "sha256": "44e3dfb8926671b146f78f4ff2049fcaa9b617a517de77d5fc8a73a093a53048"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "7e6bb0931a72459db9514aa924b420bc": {
       "uuid": "7e6bb0931a72459db9514aa924b420bc",
@@ -3423,7 +3779,9 @@
           "path": "templates/os/aix/template_os_aix.yaml",
           "sha256": "8afb34559ac20f80786576837b627351f12001171aa6edbf9ebed3bc0d7c62f0"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "7f44e67e3f564ec9894c9142d7276553": {
       "uuid": "7f44e67e3f564ec9894c9142d7276553",
@@ -3442,7 +3800,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR1036-8G-2S+_snmp/template_net_mikrotik_CCR1036-8G-2S+_snmp.yaml",
           "sha256": "e24f27f361558f433284803e9cab3d3403bbc0d613e164c546b317f23e082115"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "8098b3c157ab456abd55d3840eef79c1": {
       "uuid": "8098b3c157ab456abd55d3840eef79c1",
@@ -3461,7 +3821,9 @@
           "path": "templates/app/openweathermap_http/template_app_openweathermap_http.yaml",
           "sha256": "960d0530c3aac5bb7426343b55e46220105af6c3dc21a482712b7e1c6f3ae640"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "80fc469750f84061924662a98c33580c": {
       "uuid": "80fc469750f84061924662a98c33580c",
@@ -3480,7 +3842,9 @@
           "path": "templates/net/cisco/cisco_nexus_9000_series_snmp/template_net_cisco_nexus_9000_series_snmp.yaml",
           "sha256": "bb41fe808721634e07370779782790a5c970b64ad0160ee3e1f648f8bb7aad18"
         }
-      ]
+      ],
+      "version_commit": "fec30982e2fa4422e1ae36b29daab4fae1acc28f",
+      "version_date": "2026-08-04T12:51:13+02:00"
     },
     "812073bf8df143bcae2a84b32c3965e5": {
       "uuid": "812073bf8df143bcae2a84b32c3965e5",
@@ -3499,7 +3863,9 @@
           "path": "templates/app/haproxy_agent/template_app_haproxy_agent.yaml",
           "sha256": "44bd4d7af5f7904341c9bdd641c82917897fd55fd8a7a871e2a1ce8e978eed63"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "815b5a81b29a477695fddbd533ad9c84": {
       "uuid": "815b5a81b29a477695fddbd533ad9c84",
@@ -3518,7 +3884,9 @@
           "path": "templates/net/mikrotik/mikrotik_snmp/template_net_mikrotik_snmp.yaml",
           "sha256": "f4fae7bb054e10d04897246874a111cf2ec38dd3d3aef1c9000ae3b69f8fcb95"
         }
-      ]
+      ],
+      "version_commit": "c91fbfe0813e138c0618d2cd60b6e7eef8c767d3",
+      "version_date": "2025-12-02T07:41:20+01:00"
     },
     "81aa8c5ab5594f77a2b26fb7f5094048": {
       "uuid": "81aa8c5ab5594f77a2b26fb7f5094048",
@@ -3537,7 +3905,9 @@
           "path": "templates/db/mongodb/template_db_mongodb.yaml",
           "sha256": "e31c6a4cf3c3bc796901ce7497df95b46e78a73dbcbec0c12edc334e57e1f8f7"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "820fa4a1565c43e4aac07a691a5bface": {
       "uuid": "820fa4a1565c43e4aac07a691a5bface",
@@ -3556,7 +3926,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "82b428ad78d34988b93f3d577f2b6adc": {
       "uuid": "82b428ad78d34988b93f3d577f2b6adc",
@@ -3575,7 +3947,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR1036-12G-4S_snmp/template_net_mikrotik_CCR1036-12G-4S_snmp.yaml",
           "sha256": "6f1517602ad1aea94b5c3cabe035fca5b2bd64d5baf566b6a79a30d54496a755"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "8598d0e2bd6f4903832ec91b7b300062": {
       "uuid": "8598d0e2bd6f4903832ec91b7b300062",
@@ -3594,7 +3968,9 @@
           "path": "templates/app/nomad/template_app_nomad_http.yaml",
           "sha256": "49db24b4f9b50858a79890a1011e6e430693d1eac8ff0b2be796dd6d204cc4db"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "85ce114c802e4e28a5f3597e07d07032": {
       "uuid": "85ce114c802e4e28a5f3597e07d07032",
@@ -3613,7 +3989,9 @@
           "path": "templates/app/kubernetes_http/kubernetes_api_server_http/template_kubernetes_api_servers.yaml",
           "sha256": "e60b441d20e7d1084d2e7dfdc6b52b167183beb60a9f0defeb4fadd4132d13a9"
         }
-      ]
+      ],
+      "version_commit": "53069b54282d881627d62f7dca34d3ba80014e4e",
+      "version_date": "2025-07-08T16:23:28+02:00"
     },
     "861dbdece18f4b8f85214a319995eb3e": {
       "uuid": "861dbdece18f4b8f85214a319995eb3e",
@@ -3632,7 +4010,9 @@
           "path": "templates/net/extreme_snmp/template_net_extreme_snmp.yaml",
           "sha256": "f90c9537f23df3a802ad6d64d451711bc8a24eb5a63d2b48dce32cd1b0526805"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "86702e8bc514434e8c914d50c206cb94": {
       "uuid": "86702e8bc514434e8c914d50c206cb94",
@@ -3651,7 +4031,9 @@
           "path": "templates/app/apache_http/template_app_apache_http.yaml",
           "sha256": "2267d7e7733374f18e5d8960e47c578ceb3253856c3baf287ae93e49b803ad5f"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "884bdbeea93c4be0a11a2c92a5f8adce": {
       "uuid": "884bdbeea93c4be0a11a2c92a5f8adce",
@@ -3670,7 +4052,9 @@
           "path": "templates/app/consul_http/consul/template_consul_node_http.yaml",
           "sha256": "2643dbb4991b98f050aa9d0a620ce512ec12b74388ca54c4d969ad7515c2d425"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "89eef2fe23964f44bf9aec6d00e39efd": {
       "uuid": "89eef2fe23964f44bf9aec6d00e39efd",
@@ -3689,7 +4073,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_mgs3500-24s_snmp/template_net_zyxel_mgs3500-24s_snmp.yaml",
           "sha256": "cb24943cf05186d7b7fa85b250a77245311273b59b4518c34ba0067e5bbf27f7"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "8aa4557f6c3f4aadbc03447fca3af9f6": {
       "uuid": "8aa4557f6c3f4aadbc03447fca3af9f6",
@@ -3708,7 +4094,9 @@
           "path": "templates/app/zabbix_agent/template_module_zabbix_agent.yaml",
           "sha256": "2a3e02b7976257ff05e760d437254bc653e166369414e84fc071978d33a8edd7"
         }
-      ]
+      ],
+      "version_commit": "71d8fa708912082b5205b6cac5a4c8586d97bcfa",
+      "version_date": "2023-03-08T12:05:02+01:00"
     },
     "8ab5387c8887435587cce8383b2fc6c5": {
       "uuid": "8ab5387c8887435587cce8383b2fc6c5",
@@ -3727,7 +4115,9 @@
           "path": "templates/app/nutanix_http/template_app_nutanix_prism_element_http.yaml",
           "sha256": "027d3769c1bd9a50f4f5be0834392bf024f065b16d6d10b535132da770b8e986"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "8afa1796d280425b99c7ea36900dac24": {
       "uuid": "8afa1796d280425b99c7ea36900dac24",
@@ -3746,7 +4136,9 @@
           "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
           "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "8c8474148c2a4eaeabe5a9331ea99d77": {
       "uuid": "8c8474148c2a4eaeabe5a9331ea99d77",
@@ -3765,7 +4157,9 @@
           "path": "templates/app/rabbitmq_http/template_app_rabbitmq_http.yaml",
           "sha256": "c12c3fe454bc3f6e65f1c71cb6482cb649bcb798bf8240cb090c24a125283110"
         }
-      ]
+      ],
+      "version_commit": "be542d608be5ea5d3f0cce13ac76709ac940844f",
+      "version_date": "2026-07-14T11:33:59+03:00"
     },
     "8cad0f2564694416b60bd8a414948641": {
       "uuid": "8cad0f2564694416b60bd8a414948641",
@@ -3784,7 +4178,9 @@
           "path": "templates/app/nginx_plus_http/template_app_nginx_plus_http.yaml",
           "sha256": "a98907dc1f1a77dab64bb541b56c7d7e4862f670ebf4126be9eca99617131a0d"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "8cd15d3b39654eb7b7423e6b109037b2": {
       "uuid": "8cd15d3b39654eb7b7423e6b109037b2",
@@ -3803,7 +4199,9 @@
           "path": "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml",
           "sha256": "7940c9a366868499163bc3e4de69099af989078bd23d1d0e4ff18c0e82f5a02e"
         }
-      ]
+      ],
+      "version_commit": "b3352255097f404b0d3e94256abe7ca2261a9920",
+      "version_date": "2025-10-24T14:29:58+02:00"
     },
     "8cdbe00a2a3046ee962d28d32567968a": {
       "uuid": "8cdbe00a2a3046ee962d28d32567968a",
@@ -3822,7 +4220,9 @@
           "path": "templates/app/travis_ci_http/template_app_travis_ci_http.yaml",
           "sha256": "6338e6d127b46e5c7bebf6b74abad32409b872a9afaa8c46382d867a3ece85be"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "8cf537f34600403b9de31d3db4eb2a1d": {
       "uuid": "8cf537f34600403b9de31d3db4eb2a1d",
@@ -3841,7 +4241,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB2011UiAS-IN_snmp/template_net_mikrotik_RB2011UiAS-IN_snmp.yaml",
           "sha256": "9c381d828684c9c329bb54bfc9e5de726c498b01766b6b99e9fa116c0c38d128"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "8d22b4d1a9c6457fbd6fd959263f91db": {
       "uuid": "8d22b4d1a9c6457fbd6fd959263f91db",
@@ -3860,7 +4262,9 @@
           "path": "templates/net/mikrotik/mikrotik_CSS610-8G-2S+IN_snmp/template_net_mikrotik_CSS610-8G-2S+IN_snmp.yaml",
           "sha256": "0b9c3dd80172484276cddd039ac61ba0cf22c238b8ba823d1a6153228accc9f4"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "8d5fe5b4ebb64255a2429b34c7dd3681": {
       "uuid": "8d5fe5b4ebb64255a2429b34c7dd3681",
@@ -3879,7 +4283,9 @@
           "path": "templates/app/sharepoint_http/template_app_sharepoint_http.yaml",
           "sha256": "7ffba845d3996746781e72ba41ac17af897f4646f79322507c8a3a2c430281b3"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "8d7d49fd0b3f4b1f9046dc0e94457931": {
       "uuid": "8d7d49fd0b3f4b1f9046dc0e94457931",
@@ -3898,7 +4304,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS112-8G-4S-IN_snmp/template_net_mikrotik_CRS112-8G-4S-IN_snmp.yaml",
           "sha256": "8aadad9f9dc7da529d519442401467779ca1591c77d072522f1773e495d60002"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "8da94e2f01ff46e28becf0b08ff09ace": {
       "uuid": "8da94e2f01ff46e28becf0b08ff09ace",
@@ -3917,7 +4325,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS312-4C+8XG-RM_snmp/template_net_mikrotik_CRS312-4C+8XG-RM_snmp.yaml",
           "sha256": "ece19e610493987d5052c8afec6a9d55355d2484909fca461121481fcee0659e"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "8e5236f799b347a8ae90a979198be85e": {
       "uuid": "8e5236f799b347a8ae90a979198be85e",
@@ -3936,7 +4346,9 @@
           "path": "templates/app/squid_snmp/template_app_squid_snmp.yaml",
           "sha256": "17a9bb583a81e5a20dc84ecd3fdb665e1957cddd18406fce2cab8345b5973d0f"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "8e6d7067cd094e56a52db999b3199edc": {
       "uuid": "8e6d7067cd094e56a52db999b3199edc",
@@ -3955,7 +4367,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_ies1248-51_snmp/template_net_zyxel_ies1248-51_snmp.yaml",
           "sha256": "2814d160d5988819d66ed69df3531e7e1e2cb65844ff0b2274b1a3d144d5bd9a"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "8ea7299983f24d0a913606e334f0e526": {
       "uuid": "8ea7299983f24d0a913606e334f0e526",
@@ -3974,7 +4388,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_mgs-3712_snmp/template_net_zyxel_mgs-3712_snmp.yaml",
           "sha256": "56f16cbf15b27ea3dbe49c970e35269196b9dd623b26fdf21d95efb3d10093e8"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "8ec72ebbe3204d7789429640abcac610": {
       "uuid": "8ec72ebbe3204d7789429640abcac610",
@@ -3993,7 +4409,9 @@
           "path": "templates/db/tidb_http/tidb_tidb_http/template_db_tidb_tidb_http.yaml",
           "sha256": "ce28952df3f3111ba945824b4d928db4ecf158b01e6da93eba867f7deb6792e5"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "8ec76aeb703747a5affdf435bc12f572": {
       "uuid": "8ec76aeb703747a5affdf435bc12f572",
@@ -4012,7 +4430,9 @@
           "path": "templates/power/apc/apc_ups_smart_srt_5000_snmp/template_power_apc_ups_smart_srt_5000_snmp.yaml",
           "sha256": "0292dd713688c4943e4b739dad6621704c3900ebead79404639b69bea18eb0b4"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "90ac276995294a6aa88462c032d2ddaf": {
       "uuid": "90ac276995294a6aa88462c032d2ddaf",
@@ -4031,7 +4451,9 @@
           "path": "templates/app/systemd/template_app_systemd.yaml",
           "sha256": "4b298b037939e36b67d4f8993ceb1c7a17194197bd7518e65c81c60dd9772dfd"
         }
-      ]
+      ],
+      "version_commit": "74a5490c5dc9c38a072ed2917603065ea5065a1b",
+      "version_date": "2025-05-05T12:03:54+02:00"
     },
     "930c0e0534a9424fb01f2b6218d8ce59": {
       "uuid": "930c0e0534a9424fb01f2b6218d8ce59",
@@ -4050,7 +4472,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR1036-12G-4S-EM_snmp/template_net_mikrotik_CCR1036-12G-4S-EM_snmp.yaml",
           "sha256": "97ab083eaa8f6563abcf0ce097f46197bf009e05dc4484a728bc4ad1f812c0bf"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "948d046cb2894e5c8d07767a518cc1a9": {
       "uuid": "948d046cb2894e5c8d07767a518cc1a9",
@@ -4069,7 +4493,9 @@
           "path": "templates/app/haproxy_http/template_app_haproxy_http.yaml",
           "sha256": "39b0882101ad59d86b913024cfe2ccbadd946b0607604ada6ff0438190f3c5de"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "95f2053c21094ad4968440b562cc7ea2": {
       "uuid": "95f2053c21094ad4968440b562cc7ea2",
@@ -4088,7 +4514,9 @@
           "path": "templates/db/clickhouse_http/template_db_clickhouse_http.yaml",
           "sha256": "3104c53aa7c3d991d825dfd33c8bec2b07cfc92cc5d57d76d3518783e35dcad1"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "9643f22821104f809e2486be83e1816e": {
       "uuid": "9643f22821104f809e2486be83e1816e",
@@ -4107,7 +4535,9 @@
           "path": "templates/server/dell/dell_r720_http/template_server_dell_r720_http.yaml",
           "sha256": "39b6a2b55965bf17e8fddff94a51c38fb2d58c5124aef7e9adcd3f221eb5f62e"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "969cf5dca58f47f0b271ccf62ef79c13": {
       "uuid": "969cf5dca58f47f0b271ccf62ef79c13",
@@ -4126,7 +4556,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB2011UiAS-RM_snmp/template_net_mikrotik_RB2011UiAS-RM_snmp.yaml",
           "sha256": "484323ea20bf52a7bdb30b63e442e7ecc6f2eae372efd0acb0f5bf97a5ee4747"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "970c2342146549768e6b91a26089bcdf": {
       "uuid": "970c2342146549768e6b91a26089bcdf",
@@ -4145,7 +4577,9 @@
           "path": "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml",
           "sha256": "7940c9a366868499163bc3e4de69099af989078bd23d1d0e4ff18c0e82f5a02e"
         }
-      ]
+      ],
+      "version_commit": "b3352255097f404b0d3e94256abe7ca2261a9920",
+      "version_date": "2025-10-24T14:29:58+02:00"
     },
     "9cc843a085bb4ee5af0dc4d764a7eee9": {
       "uuid": "9cc843a085bb4ee5af0dc4d764a7eee9",
@@ -4164,7 +4598,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_mgs3520-28x_snmp/template_net_zyxel_mgs3520-28x_snmp.yaml",
           "sha256": "858463a8a1afac8e2f2ad448042543395db282009e1dfcec1c00b0c63f1176e1"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "9d7871c093f9489293421396b9fea668": {
       "uuid": "9d7871c093f9489293421396b9fea668",
@@ -4183,7 +4619,9 @@
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
           "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "9fde0e1c36f8453da72f97535d4e74ca": {
       "uuid": "9fde0e1c36f8453da72f97535d4e74ca",
@@ -4202,7 +4640,9 @@
           "path": "templates/server/dell/dell_r740_snmp/template_server_dell_r740_snmp.yaml",
           "sha256": "d78b4378058c38fa968c9e6d69dc69cd9f07ab970387c0d97daa3b9e4b4082d9"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "a0e05ca631034676821b7e0e1ce25488": {
       "uuid": "a0e05ca631034676821b7e0e1ce25488",
@@ -4221,7 +4661,9 @@
           "path": "templates/app/exchange_active/template_app_exchange_active.yaml",
           "sha256": "b17ce46f50ed470f50a65c10e344b9db72c559a9cb35802132503162330cddc6"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "a14ab6b4e80643fe8daa9d7288658f79": {
       "uuid": "a14ab6b4e80643fe8daa9d7288658f79",
@@ -4240,7 +4682,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "a326034825984bbd8a3a5885f3939bb3": {
       "uuid": "a326034825984bbd8a3a5885f3939bb3",
@@ -4259,7 +4703,9 @@
           "path": "templates/net/juniper_snmp/template_net_juniper_snmp.yaml",
           "sha256": "779e58fa0fdafbcd7b3aa0dfc0ce8f75e74f5101377f7a76082055d945c6b077"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "a3dc630729e443139f4e608954fa6e19": {
       "uuid": "a3dc630729e443139f4e608954fa6e19",
@@ -4278,7 +4724,9 @@
           "path": "templates/os/freebsd/template_os_freebsd.yaml",
           "sha256": "f20cd69ba95b8b47f837c908945c8848d8320121537d11ee12490f09054fa4fc"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "a5ddacdd5ac64b82bf5183769cc03e8c": {
       "uuid": "a5ddacdd5ac64b82bf5183769cc03e8c",
@@ -4297,7 +4745,9 @@
           "path": "templates/net/mikrotik/mikrotik_hEX_PoE_lite_snmp/template_net_mikrotik_hEX_PoE_lite_snmp.yaml",
           "sha256": "c2b777c918e0d75c5e8a78854492d209b6e50a74410830d4e3ad33ba5cb30663"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "a60798c651604d93a062bec0f8a89751": {
       "uuid": "a60798c651604d93a062bec0f8a89751",
@@ -4316,7 +4766,9 @@
           "path": "templates/net/mellanox_snmp/template_net_mellanox_snmp.yaml",
           "sha256": "aaa9ef49e1c6edf10a311d001a1744ad56c408856eb0429c8122f7193827cd03"
         }
-      ]
+      ],
+      "version_commit": "b7b4ad59a3d8f9d64f6d546c5b8e1f9dd5afe743",
+      "version_date": "2026-03-19T16:10:49+02:00"
     },
     "a6fe3640b23544e7ae15d438b38ce1cd": {
       "uuid": "a6fe3640b23544e7ae15d438b38ce1cd",
@@ -4335,7 +4787,9 @@
           "path": "templates/db/influxdb_http/template_db_influxdb_http.yaml",
           "sha256": "7177d4649f62cf78367b990943a54d2d33e48fbe8a36bb38c2bd120a9677bd8b"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "a7f0c853c6634b1dacaaf43c2a0d9375": {
       "uuid": "a7f0c853c6634b1dacaaf43c2a0d9375",
@@ -4354,7 +4808,9 @@
           "path": "templates/app/jira_datacenter_jmx/template_app_jira_datacenter_jmx.yaml",
           "sha256": "fe4cdfac80f11f094c7ca4cee692fac68e0bae9f349307431991cea5a869df83"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "a809695fbc784b75adcd4833c86bca8d": {
       "uuid": "a809695fbc784b75adcd4833c86bca8d",
@@ -4373,7 +4829,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR1009-7G-1C-1S+_snmp/template_net_mikrotik_CCR1009-7G-1C-1S+_snmp.yaml",
           "sha256": "13d9399ed3165201b9fa6156997e6f91f7b2ce85064a0161c80adc6c297b0520"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "a8d91e4f36794e32b73090d5edf3d7ae": {
       "uuid": "a8d91e4f36794e32b73090d5edf3d7ae",
@@ -4392,7 +4850,9 @@
           "path": "templates/app/apache_agent/template_app_apache_agent.yaml",
           "sha256": "52ebb9795cec63dbe483f615e7b613a8b3e884b739809b3c26d482146c9c594d"
         }
-      ]
+      ],
+      "version_commit": "749102f6399da61301c1fe25d1d2fbfc3899a868",
+      "version_date": "2026-04-27T11:45:02+02:00"
     },
     "a93f57ccc68e442da79bf4a20fe46570": {
       "uuid": "a93f57ccc68e442da79bf4a20fe46570",
@@ -4411,7 +4871,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "a9e83f950e9f41a78474d523c8376338": {
       "uuid": "a9e83f950e9f41a78474d523c8376338",
@@ -4430,7 +4892,9 @@
           "path": "templates/app/php-fpm_agent_active/template_app_php-fpm_agent_active.yaml",
           "sha256": "54419e6db763cac4a76d1db02756a347c63b116bd9585efce24d663b3708fd49"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "aa3286a824464020863ead141e8f0afc": {
       "uuid": "aa3286a824464020863ead141e8f0afc",
@@ -4449,7 +4913,9 @@
           "path": "templates/app/apache_agent_active/template_app_apache_agent_active.yaml",
           "sha256": "c6f1beaf01339b928a020794f1c92aa361032e680e9cd173a76ec9500c5dc391"
         }
-      ]
+      ],
+      "version_commit": "749102f6399da61301c1fe25d1d2fbfc3899a868",
+      "version_date": "2026-04-27T11:45:02+02:00"
     },
     "aa3ce9bd8c1d40a2b0f83f9e642e88ee": {
       "uuid": "aa3ce9bd8c1d40a2b0f83f9e642e88ee",
@@ -4468,7 +4934,9 @@
           "path": "templates/net/cisco/cisco_snmp/template_net_cisco_snmp.yaml",
           "sha256": "bd3f9e36d69d652cffa9befda242140c7fd587fd0e841beef52dd7180b1650c1"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "ab05dbb15ff047f192782f617f0627ac": {
       "uuid": "ab05dbb15ff047f192782f617f0627ac",
@@ -4487,7 +4955,9 @@
           "path": "templates/db/ignite_jmx/template_db_ignite_jmx.yaml",
           "sha256": "5ba3ba878f6a032cb8c91676cd959107f58d59c5553b49853e6fad8758b134dd"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "ab18a5665b7d4bed876881b5c4e8ce51": {
       "uuid": "ab18a5665b7d4bed876881b5c4e8ce51",
@@ -4506,7 +4976,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_xgs-4728f_snmp/template_net_zyxel_xgs-4728f_snmp.yaml",
           "sha256": "4c0374cffba2630c8115045c3dfebf99bff532498f56a4d4cb11f1e36b275cb6"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "ab871d051e304f83950171c5243aa4db": {
       "uuid": "ab871d051e304f83950171c5243aa4db",
@@ -4525,7 +4997,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR2004-16G-2S+_snmp/template_net_mikrotik_CCR2004-16G-2S+_snmp.yaml",
           "sha256": "806aa1d1a3a54c9ac742ea4dfe06540c37afa005340a2b8456d316be26535dfb"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "ad4c3dad4b7b492685d1fd3bd3a664f9": {
       "uuid": "ad4c3dad4b7b492685d1fd3bd3a664f9",
@@ -4544,7 +5018,9 @@
           "path": "templates/net/huawei_snmp/template_net_huawei_snmp.yaml",
           "sha256": "bef7095e0f5ee4d120fb16be6ebd40b89967ff52a5087761065348935d5e22d8"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "ae3ce7156aae4ae79a72742365c884ea": {
       "uuid": "ae3ce7156aae4ae79a72742365c884ea",
@@ -4563,7 +5039,9 @@
           "path": "templates/san/pure_storage_flasharray/template_pure_storage_flasharray_http.yaml",
           "sha256": "221dbfba744c99417d7ea9188d9231f8cd17aaa2258b1e4cccf651cc744e6de8"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "af21edc47557400583e537904ea632aa": {
       "uuid": "af21edc47557400583e537904ea632aa",
@@ -4582,7 +5060,9 @@
           "path": "templates/app/aranet_http/template_app_aranet_http.yaml",
           "sha256": "18496447728c2a6b768652433fc231204cb2f2b933019e74d318a3cda0e10d0b"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "b126aaf4499d49d7b4fcee0329b7dea7": {
       "uuid": "b126aaf4499d49d7b4fcee0329b7dea7",
@@ -4601,7 +5081,9 @@
           "path": "templates/net/mikrotik/mikrotik_netPower_16P_snmp/template_net_mikrotik_netPower_16P_snmp.yaml",
           "sha256": "f974f437eff8edbed99e4ba30b9ee28ce0fa739aac570232650258bfe040a4bc"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "b1271833815f46499458a8631d0bda20": {
       "uuid": "b1271833815f46499458a8631d0bda20",
@@ -4620,7 +5102,9 @@
           "path": "templates/net/ciena/template_net_ciena_3906_snmp.yaml",
           "sha256": "49c7bc68194c4a73e87a49de834e34bdd9c2e1da52a4dacfa801a7f7885ff3f2"
         }
-      ]
+      ],
+      "version_commit": "867c1335f699d0ed504deba172d46def829440c6",
+      "version_date": "2025-12-02T12:57:00+01:00"
     },
     "b1fd823d262042e08291313f72be9452": {
       "uuid": "b1fd823d262042e08291313f72be9452",
@@ -4639,7 +5123,9 @@
           "path": "templates/os/hp-ux/template_os_hp-ux.yaml",
           "sha256": "ddf483d70868e69b3415ad4bec533eadd89d978973c4c1ae7c5b31267835bdda"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "b25b8b517a4743c48037bfa10af3dc3c": {
       "uuid": "b25b8b517a4743c48037bfa10af3dc3c",
@@ -4658,7 +5144,9 @@
           "path": "templates/app/etcd_http/template_app_etcd_http.yaml",
           "sha256": "4e7e15fa132bc81c3c41e0e2ceef77a6b470e3d4607d8e98b42b0b85f8736297"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "b3caafda8c5345cc832ac3be3cefa615": {
       "uuid": "b3caafda8c5345cc832ac3be3cefa615",
@@ -4677,7 +5165,9 @@
           "path": "templates/power/apc/apc_ups_smart_srt_8000_snmp/template_power_apc_ups_smart_srt_8000_snmp.yaml",
           "sha256": "cbccb70689fc525f756fdffcdee189f487c544645b598e2f86f01714ef073cc4"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "b43a7c5f1d1d43d28e2eb8f0a9f6f16f": {
       "uuid": "b43a7c5f1d1d43d28e2eb8f0a9f6f16f",
@@ -4696,7 +5186,9 @@
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
           "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "b6027e374e424481951ca2256099515c": {
       "uuid": "b6027e374e424481951ca2256099515c",
@@ -4715,7 +5207,9 @@
           "path": "templates/app/nutanix_http/template_app_nutanix_prism_element_http.yaml",
           "sha256": "027d3769c1bd9a50f4f5be0834392bf024f065b16d6d10b535132da770b8e986"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "b606eda347ea4663a33ad4d12a482750": {
       "uuid": "b606eda347ea4663a33ad4d12a482750",
@@ -4734,7 +5228,9 @@
           "path": "templates/app/zookeeper_http/template_app_zookeeper_http.yaml",
           "sha256": "0507837d7ec8343bb98dfb3e9c5484ffb56bc9d7909036ed73d6a39e2c9faa5a"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "b84324c2a40a496dbbb379bbf5dde8d5": {
       "uuid": "b84324c2a40a496dbbb379bbf5dde8d5",
@@ -4753,7 +5249,9 @@
           "path": "templates/net/morningstar/morningstar_prostar_mppt_snmp/template_net_morningstar_prostar_mppt_snmp.yaml",
           "sha256": "2da4369eaa1a8f3c0636f78660c1db200d9a7c32c5e22f03dbd9ea2e237a04e6"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "b8750c02b5624c6889979b129735bd56": {
       "uuid": "b8750c02b5624c6889979b129735bd56",
@@ -4772,7 +5270,9 @@
           "path": "templates/san/hpe_primera_http/template_san_hpe_primera_http.yaml",
           "sha256": "bc8eeb76349dbd8fd0d0e2a319549d2fb668c8896aa63fca7c5338aeecd0ad2e"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "b8a6f34fd5c447b1b9310746a96f4e80": {
       "uuid": "b8a6f34fd5c447b1b9310746a96f4e80",
@@ -4791,7 +5291,9 @@
           "path": "templates/net/zyxel_snmp/zyxel_es3500-8pd_snmp/template_net_zyxel_es3500-8pd_snmp.yaml",
           "sha256": "4028fadcdcec5664206f1b111ef297d934685f8ab0c01c1a73a9e2c63cafa587"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "b917e122785c4bd4bd004e69badc93de": {
       "uuid": "b917e122785c4bd4bd004e69badc93de",
@@ -4810,7 +5312,9 @@
           "path": "templates/net/ribbon/ribbon_sbc_swe_core/template_net_ribbon_sbc_swe_core_http.yaml",
           "sha256": "346e17fd28cacdbd20c4fd4291eb6e31a877371bfdd8d81a8f259c53c50ea757"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "b9514029d03b44de9adf24251778dbf3": {
       "uuid": "b9514029d03b44de9adf24251778dbf3",
@@ -4829,7 +5333,9 @@
           "path": "templates/app/rabbitmq_http/template_app_rabbitmq_http.yaml",
           "sha256": "c12c3fe454bc3f6e65f1c71cb6482cb649bcb798bf8240cb090c24a125283110"
         }
-      ]
+      ],
+      "version_commit": "feccd08d9fa920750d7946ecaaa826348de3eef2",
+      "version_date": "2026-08-06T10:53:23+03:00"
     },
     "bc056b1724e748bba50928f8cc605f8e": {
       "uuid": "bc056b1724e748bba50928f8cc605f8e",
@@ -4848,7 +5354,9 @@
           "path": "templates/db/yugabytedb_http/template_db_yugabyte_http.yaml",
           "sha256": "b76d32e04a09f511d955376e97b41c07c69fb885298fa0c3370ba20cc36257d6"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "bc80883918ac4f879427ca145122b5cb": {
       "uuid": "bc80883918ac4f879427ca145122b5cb",
@@ -4867,7 +5375,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS326-24G-2S+RM_snmp/template_net_mikrotik_CRS326-24G-2S+RM_snmp.yaml",
           "sha256": "c8c00d4a6705fee62faeedcd7bf4287c6dd0ef8a9a0ad1158786eeb119c7143b"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "bcc01f2b466345c4bcbe0cea1a7884d1": {
       "uuid": "bcc01f2b466345c4bcbe0cea1a7884d1",
@@ -4886,7 +5396,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS309-1G-8S+IN_snmp/template_net_mikrotik_CRS309-1G-8S+IN_snmp.yaml",
           "sha256": "df3155a3dff8e88c9ffa6f2b771518fce589ee3997e639f8ec6b7ca8d14b963b"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "be10b1140fce4cc08247260b71bcd037": {
       "uuid": "be10b1140fce4cc08247260b71bcd037",
@@ -4905,7 +5417,9 @@
           "path": "templates/san/hpe_msa2040_http/template_san_hpe_msa2040_http.yaml",
           "sha256": "c200c6f692f850a10d2c5c8314d401fdf229c463156bdb2aa60ca1849e7b914d"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "bf3107deff3a4aabab1e1c0ee71a3281": {
       "uuid": "bf3107deff3a4aabab1e1c0ee71a3281",
@@ -4924,7 +5438,9 @@
           "path": "templates/app/acronis/template_app_acronis_cyber_protect_cloud_http.yaml",
           "sha256": "b6e8e0ace055584828a2d8d2b7c1821a6ce7da2554355ce6372d2c8a8f3915c6"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "c0263df8d8c14d30b24afcf45a6a354f": {
       "uuid": "c0263df8d8c14d30b24afcf45a6a354f",
@@ -4943,7 +5459,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "c03e1ab0128a4ae1847bc04a34f5634e": {
       "uuid": "c03e1ab0128a4ae1847bc04a34f5634e",
@@ -4962,7 +5480,9 @@
           "path": "templates/net/mikrotik/mikrotik_PowerBox_Pro_snmp/template_net_mikrotik_PowerBox_Pro_snmp.yaml",
           "sha256": "335586c7ab1fb26f946d818bcd1c5eddfbd9c5b471048b263cf4eaf495d278f6"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "c077d6c381904e94a4df88136588b551": {
       "uuid": "c077d6c381904e94a4df88136588b551",
@@ -4981,7 +5501,9 @@
           "path": "templates/app/controlm_http/template_app_controlm_http.yaml",
           "sha256": "87abd136c7c4fc94370d2ab6761c6d4f902d839582ebd1bb5475c7b59148cc6d"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "c1396bf1e8cf46f6a407e88ddceef0b8": {
       "uuid": "c1396bf1e8cf46f6a407e88ddceef0b8",
@@ -5000,7 +5522,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "c2a7ddca051d4b4a9553f339c57e47a9": {
       "uuid": "c2a7ddca051d4b4a9553f339c57e47a9",
@@ -5019,7 +5543,9 @@
           "path": "templates/server/hp_ilo_snmp/template_server_hp_ilo_snmp.yaml",
           "sha256": "39a2d33c0e0c65d34c8c90d02617cb5d7f7ab2ca92562d253620f68b4bf24f7c"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "c3a9fa0e07be4c1bbe19ae65c3375d17": {
       "uuid": "c3a9fa0e07be4c1bbe19ae65c3375d17",
@@ -5038,7 +5564,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "c5564dd58c394b969d5365cc5de3e7f8": {
       "uuid": "c5564dd58c394b969d5365cc5de3e7f8",
@@ -5057,7 +5585,9 @@
           "path": "templates/san/huawei_5300v5_snmp/template_san_huawei_5300v5_snmp.yaml",
           "sha256": "40f5309095e9c377dca0fe9ed94c575ee4543a589f04f76e5c27a14fe1fa6ef1"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "c5f41fe0f54f470f9e304384838f150a": {
       "uuid": "c5f41fe0f54f470f9e304384838f150a",
@@ -5076,7 +5606,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS326-24G-2S+IN_snmp/template_net_mikrotik_CRS326-24G-2S+IN_snmp.yaml",
           "sha256": "1f7ffbac5a6e4d579dc36dcbf34cdfbc5e437c7262e83cf7eabbd84abd057000"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "c5fd214cdd0d4b3b8272e73b022ba5c2": {
       "uuid": "c5fd214cdd0d4b3b8272e73b022ba5c2",
@@ -5095,7 +5627,9 @@
           "path": "templates/app/docker/template_app_docker.yaml",
           "sha256": "da58e4ee27782c5997d50da0366e886249925e3595c60b25c14b4a67d446b0ff"
         }
-      ]
+      ],
+      "version_commit": "3f2e4ef632308a2443dfcfc830376fb16a28a6a9",
+      "version_date": "2026-02-27T10:38:37+02:00"
     },
     "c60e5929ab474f67bbe67dc6b04e709d": {
       "uuid": "c60e5929ab474f67bbe67dc6b04e709d",
@@ -5114,7 +5648,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "c6d9475847f44d9193f8253e5995b8f8": {
       "uuid": "c6d9475847f44d9193f8253e5995b8f8",
@@ -5133,7 +5669,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "c7c7e5dc319b4801982e719beb1c5191": {
       "uuid": "c7c7e5dc319b4801982e719beb1c5191",
@@ -5152,7 +5690,9 @@
           "path": "templates/app/iis_agent/template_app_iis_agent.yaml",
           "sha256": "184e5146343d4818c13dd4934c13af148e0379edd1fa78f179a48a1fe15db366"
         }
-      ]
+      ],
+      "version_commit": "2121c45564715bcf78fba818845e853fce609ba5",
+      "version_date": "2025-05-15T16:01:38+02:00"
     },
     "c87e0a2e0683483ab7c6f3c380e9f840": {
       "uuid": "c87e0a2e0683483ab7c6f3c380e9f840",
@@ -5171,7 +5711,9 @@
           "path": "templates/app/activemq_jmx/template_app_activemq_jmx.yaml",
           "sha256": "48972b6f89b20089910048b9b0065fe46471e1b9d0e9941c7b72aa8f1c73809a"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "c8db153405704d859ba5ee19f08b46f3": {
       "uuid": "c8db153405704d859ba5ee19f08b46f3",
@@ -5190,7 +5732,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS125-24G-1S-2HnD-IN_snmp/template_net_mikrotik_CRS125-24G-1S-2HnD-IN_snmp.yaml",
           "sha256": "4d17f76891d084e7195d0aac10f31099446a51b094d580a9ce45dce3c0d910eb"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "c8e6452eb3924cab9ec51eeaf91435fa": {
       "uuid": "c8e6452eb3924cab9ec51eeaf91435fa",
@@ -5209,7 +5753,9 @@
           "path": "templates/net/cradlepoint/ncm_v2_http/template_net_cradlepoint_http.yaml",
           "sha256": "ec1ff5a33effb7e4a031d310999e203b6c5caa7d82f66dfcd00f7320848cf944"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "c94105c23220452baed03ba87f09ca12": {
       "uuid": "c94105c23220452baed03ba87f09ca12",
@@ -5228,7 +5774,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "c9e1acd3ae4a427ab39724b6bcaf839e": {
       "uuid": "c9e1acd3ae4a427ab39724b6bcaf839e",
@@ -5247,7 +5795,9 @@
           "path": "templates/server/ibm_imm_snmp/template_server_ibm_imm_snmp.yaml",
           "sha256": "c3a9f8ec3d861bf8f411ef2b324215704ff5939e4a7394ddcc7d2e672cff015e"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "ca02e82e6c414d0aa7aedc8d78468a49": {
       "uuid": "ca02e82e6c414d0aa7aedc8d78468a49",
@@ -5266,7 +5816,9 @@
           "path": "templates/app/vmware_fqdn/template_app_vmware_fqdn.yaml",
           "sha256": "62cf2779fb156c771dde1fb927671d0a23b54f5ce90bb879841810baaca4d85a"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "cb66d34564e44b3893442fc74cf6e951": {
       "uuid": "cb66d34564e44b3893442fc74cf6e951",
@@ -5285,7 +5837,9 @@
           "path": "templates/server/cisco_ucs_snmp/template_server_cisco_ucs_snmp.yaml",
           "sha256": "12f4f8419097186fe3ce8c5c7775522c5c11cff408ceb6e68b3fbd2df129b0b3"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "cbf70ed444394566bcf213dd63d4d352": {
       "uuid": "cbf70ed444394566bcf213dd63d4d352",
@@ -5304,7 +5858,9 @@
           "path": "templates/app/exchange/template_app_exchange.yaml",
           "sha256": "ff4002a7a25095996184345406fa486822f75a7d42544701b6743899b5a78cc1"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "cc762a057f0f467ab571b6d76a9bb278": {
       "uuid": "cc762a057f0f467ab571b6d76a9bb278",
@@ -5323,7 +5879,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB3011UiAS-RM_snmp/template_net_mikrotik_RB3011UiAS-RM_snmp.yaml",
           "sha256": "6fc38a288d1a10e53080de4b63c11a4d4f0cea8de310f6b1f5b810a2f75fb04d"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "cce20a5d149a48b7ac7f5383c3510883": {
       "uuid": "cce20a5d149a48b7ac7f5383c3510883",
@@ -5342,7 +5900,9 @@
           "path": "templates/net/hp_hpn_snmp/template_net_hp_hpn_snmp.yaml",
           "sha256": "ff80c2d5193f0f49cafbdc8e5ee3924846968397461e33453d655960ba609da6"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "cdb6ebceb1174bada392dd24889b14d9": {
       "uuid": "cdb6ebceb1174bada392dd24889b14d9",
@@ -5361,7 +5921,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS212-1G-10S-1S+IN_snmp/template_net_mikrotik_CRS212-1G-10S-1S+IN_snmp.yaml",
           "sha256": "ac371c7a8ad9e6333b9b0aea4d2adba70a52991a4366faba81ccdedf8feccb6d"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "cf0947cc05d3450b9a6d66b2eb180482": {
       "uuid": "cf0947cc05d3450b9a6d66b2eb180482",
@@ -5380,7 +5942,9 @@
           "path": "templates/server/supermicro_aten_snmp/template_server_supermicro_aten_snmp.yaml",
           "sha256": "0b6928d24fc8923b77257f0fd4e25b6438f7a533cf1aaf7f8964345823cb2398"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "d023e2cd326c486f908e3e361d1fe157": {
       "uuid": "d023e2cd326c486f908e3e361d1fe157",
@@ -5399,7 +5963,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "d0571c5f2c204b7ab244843040288a35": {
       "uuid": "d0571c5f2c204b7ab244843040288a35",
@@ -5418,7 +5984,9 @@
           "path": "templates/app/acronis/template_app_acronis_cyber_protect_cloud_http.yaml",
           "sha256": "b6e8e0ace055584828a2d8d2b7c1821a6ce7da2554355ce6372d2c8a8f3915c6"
         }
-      ]
+      ],
+      "version_commit": "ded2220580fb605ead25542f70674e4bbc1df3ee",
+      "version_date": "2023-08-29T12:25:44+03:00"
     },
     "d0ef7d659a8f4beaaabfc4b6134e737a": {
       "uuid": "d0ef7d659a8f4beaaabfc4b6134e737a",
@@ -5437,7 +6005,9 @@
           "path": "templates/db/postgresql_agent2/template_db_postgresql_agent2.yaml",
           "sha256": "93ae1a3fb4ec69a4a2b3764b4ae490a1d3f731f071062f3cb5b49383bb05ed1a"
         }
-      ]
+      ],
+      "version_commit": "fd01bbbbd6b0f68f7e4f88589ab025937c2a61a0",
+      "version_date": "2025-04-22T14:01:05+02:00"
     },
     "d0fd5d346b1740dda9d3a976371789dd": {
       "uuid": "d0fd5d346b1740dda9d3a976371789dd",
@@ -5456,7 +6026,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "d1c1ab5db2c34c17ae3541407f8b7faa": {
       "uuid": "d1c1ab5db2c34c17ae3541407f8b7faa",
@@ -5475,7 +6047,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS354-48G-4S+2Q+RM_snmp/template_net_mikrotik_CRS354-48G-4S+2Q+RM_snmp.yaml",
           "sha256": "15691a816fc212f5fd1f26f1bb156bc862d8ad4ec39093c641f1cc9a987bd2e1"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "d2cebb67b4d94a12a072db85e7be6a33": {
       "uuid": "d2cebb67b4d94a12a072db85e7be6a33",
@@ -5494,7 +6068,9 @@
           "path": "templates/app/nginx_agent_active/template_app_nginx_agent_active.yaml",
           "sha256": "509e46f48a91ca8085a7f27f19e1890549374576903f17589491f695debd4ea0"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "d3176749a5274264938f487cd89d17eb": {
       "uuid": "d3176749a5274264938f487cd89d17eb",
@@ -5513,7 +6089,9 @@
           "path": "templates/net/dlink_des_snmp/template_net_dlink_des_snmp.yaml",
           "sha256": "846b64463c23b3c1d32386097bfaac768e54a47fadb076b09353356a2c4a10cd"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "d31c888d12aa4bf68f280bc242501743": {
       "uuid": "d31c888d12aa4bf68f280bc242501743",
@@ -5532,7 +6110,9 @@
           "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
           "sha256": "b7ab58a4091478d0c080264d68cf94ee4c0d6f03b2836d1e7b673ce3b1333406"
         }
-      ]
+      ],
+      "version_commit": "b3352255097f404b0d3e94256abe7ca2261a9920",
+      "version_date": "2025-10-24T14:29:58+02:00"
     },
     "d38b271797bd41f2ad8c79d83b9d8d9c": {
       "uuid": "d38b271797bd41f2ad8c79d83b9d8d9c",
@@ -5551,7 +6131,9 @@
           "path": "templates/db/mongodb_cluster/template_db_mongodb_cluster.yaml",
           "sha256": "fd8d2c17a4bc7d5360db0bc975dcb30e37be0ae13d7513f53e4985badf45be21"
         }
-      ]
+      ],
+      "version_commit": "ef5bb05307608273d43b2b065e4a21593a439a7a",
+      "version_date": "2026-08-28T15:19:04+02:00"
     },
     "d41c5d0fa91545d68cced1b5dabe4bf1": {
       "uuid": "d41c5d0fa91545d68cced1b5dabe4bf1",
@@ -5570,7 +6152,9 @@
           "path": "templates/server/dell/dell_r820_snmp/template_server_dell_r820_snmp.yaml",
           "sha256": "ad97342f30a199ab72b7073f233b27479603b74642d228996fbc85e80ef0beb4"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "d50f6dcfc3e44244a0fc9fd933607024": {
       "uuid": "d50f6dcfc3e44244a0fc9fd933607024",
@@ -5589,7 +6173,9 @@
           "path": "templates/server/hpe_ilo_http/template_server_hpe_ilo_http.yaml",
           "sha256": "e6a59543d0fa87af39c7e61074feeec0ca62351726e2cc5f28d07856b4493cb5"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "d596d6d231bf49c08890aa3ff135ecc6": {
       "uuid": "d596d6d231bf49c08890aa3ff135ecc6",
@@ -5608,7 +6194,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR1009-7G-1C-1S+PC_snmp/template_net_mikrotik_CCR1009-7G-1C-1S+PC_snmp.yaml",
           "sha256": "f68a898d780ae9d790e9d3115158567189a7f82c8d99b8c6a13f552cc8c34a11"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "d5dc11ae9ab143a89c4be534bbb35188": {
       "uuid": "d5dc11ae9ab143a89c4be534bbb35188",
@@ -5627,7 +6215,9 @@
           "path": "templates/app/rabbitmq_agent/template_app_rabbitmq_agent.yaml",
           "sha256": "9d8f0f351df6c764191c8f3a4ba7e50d188783920183292e6c0b60bf6ddad170"
         }
-      ]
+      ],
+      "version_commit": "feccd08d9fa920750d7946ecaaa826348de3eef2",
+      "version_date": "2026-08-06T10:53:23+03:00"
     },
     "d5eb4ce08a334098a85e6e02c534be90": {
       "uuid": "d5eb4ce08a334098a85e6e02c534be90",
@@ -5646,7 +6236,9 @@
           "path": "templates/server/cisco_ucs_manager_snmp/template_server_cisco_ucs_manager_snmp.yaml",
           "sha256": "18942a4117ccb9cb819821eff8c0db95e8c45f2f9dbf30ac22f1664140d70465"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "d670c32f007d438c9dcd32db57d2b691": {
       "uuid": "d670c32f007d438c9dcd32db57d2b691",
@@ -5665,7 +6257,9 @@
           "path": "templates/db/oracle_agent2/template_db_oracle_agent2.yaml",
           "sha256": "12eccd0fb6742ba01a88372df293cf1b05fddb867931467ee5d26c5e5d37cfd5"
         }
-      ]
+      ],
+      "version_commit": "6fddb88798f06bc14b256a93a46acbd7a72dcba8",
+      "version_date": "2025-05-30T17:46:16+03:00"
     },
     "dce23cdaef364e139efa580d8a304ffe": {
       "uuid": "dce23cdaef364e139efa580d8a304ffe",
@@ -5684,7 +6278,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "dcf88bca5aaf4123a10eb3daab28a9af": {
       "uuid": "dcf88bca5aaf4123a10eb3daab28a9af",
@@ -5703,7 +6299,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS328-24P-4S+RM_snmp/template_net_mikrotik_CRS328-24P-4S+RM_snmp.yaml",
           "sha256": "17cbb483b74ce8b6bc00afd0c997d7e4e9ff45a1410c7c4fbae4c50e406668cc"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "dd114bf0fb2f46bc84840f1bb24e2b23": {
       "uuid": "dd114bf0fb2f46bc84840f1bb24e2b23",
@@ -5722,7 +6320,9 @@
           "path": "templates/app/zabbix_proxy/template_app_zabbix_proxy.yaml",
           "sha256": "7940c9a366868499163bc3e4de69099af989078bd23d1d0e4ff18c0e82f5a02e"
         }
-      ]
+      ],
+      "version_commit": "a4bb963c43333564f6ece4a0c0a0c55a0c218114",
+      "version_date": "2025-08-22T14:02:32+03:00"
     },
     "de38542cf4f24fafab33520677f392c4": {
       "uuid": "de38542cf4f24fafab33520677f392c4",
@@ -5741,7 +6341,9 @@
           "path": "templates/app/certificate_agent2_active/template_app_certificate_agent2_active.yaml",
           "sha256": "9274b5c0bfff05edd4fe4ae044b173642c8c5bca8d2de88b3030fd389647c76c"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "de96d02bd5f242bfa31308ae2131d03f": {
       "uuid": "de96d02bd5f242bfa31308ae2131d03f",
@@ -5760,7 +6362,9 @@
           "path": "templates/net/brocade_fc_sw_snmp/template_net_brocade_fc_sw_snmp.yaml",
           "sha256": "fff2b720fcde42881208667006a518073dc212f2333abf1b3651af92d91b9e84"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "e0a7c3e725c445228b03116dc6114fe9": {
       "uuid": "e0a7c3e725c445228b03116dc6114fe9",
@@ -5779,7 +6383,9 @@
           "path": "templates/db/postgresql_odbc/template_db_postgresql_odbc.yaml",
           "sha256": "27d4a375f306d94cba209d1b5f1575673d1fc327e79323e20c07299a4e9803b4"
         }
-      ]
+      ],
+      "version_commit": "fd01bbbbd6b0f68f7e4f88589ab025937c2a61a0",
+      "version_date": "2025-04-22T14:01:05+02:00"
     },
     "e111446745a1425b862f8727ae63bce4": {
       "uuid": "e111446745a1425b862f8727ae63bce4",
@@ -5798,7 +6404,9 @@
           "path": "templates/db/redis/template_db_redis.yaml",
           "sha256": "0532b6d417f5a93c515377fb84a461aaa971f56910be03ecc0e971dd0d6bec9a"
         }
-      ]
+      ],
+      "version_commit": "eadc8903ca2ec430e8386192df85ed2c4a2d30b1",
+      "version_date": "2026-08-07T12:39:05+03:00"
     },
     "e118ab11c1ec4f9cbe21dfce1441c0f6": {
       "uuid": "e118ab11c1ec4f9cbe21dfce1441c0f6",
@@ -5817,7 +6425,9 @@
           "path": "templates/san/netapp_fas3220_snmp/template_san_netapp_fas3220_snmp.yaml",
           "sha256": "035a062fbd5bcaeaf29f8d0f5cdc3ab254f2dc0aaafbacd7650240983c4ea44e"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "e129aeba7c814bf189772cf5919b4bbb": {
       "uuid": "e129aeba7c814bf189772cf5919b4bbb",
@@ -5836,7 +6446,9 @@
           "path": "templates/app/hadoop_http/template_app_hadoop_http.yaml",
           "sha256": "b31d02e0f7e4059e96df046f0ad2ca45b1e7930e21a41ecfe84e180b12fd416e"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "e19c120027e04da69b130e0f6cea29fc": {
       "uuid": "e19c120027e04da69b130e0f6cea29fc",
@@ -5855,7 +6467,9 @@
           "path": "templates/db/mysql_odbc/template_db_mysql_odbc.yaml",
           "sha256": "3838691e6ee0bfe5336282f15700d2f3261a59b606b2cbc7c519709a77ebc458"
         }
-      ]
+      ],
+      "version_commit": "c3aeec928c69e20db457e89ad9996c77c45d5561",
+      "version_date": "2025-11-14T13:39:34+01:00"
     },
     "e1ca624566424496bff9d90c261ab37b": {
       "uuid": "e1ca624566424496bff9d90c261ab37b",
@@ -5874,7 +6488,9 @@
           "path": "templates/net/velocloud_http/template_net_velocloud_http.yaml",
           "sha256": "2a0cf64bb29cd2dcb16f1cb9ae436bc6567ee159181670bae86b7b64df75f66c"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "e1e25df663204b099f2597caf89a0678": {
       "uuid": "e1e25df663204b099f2597caf89a0678",
@@ -5893,7 +6509,9 @@
           "path": "templates/net/cisco/cisco_sdwan_http/template_net_cisco_sdwan_http.yaml",
           "sha256": "8b597beaf462489a21f65657b9932a3742b6a33ccc825c6a5e686560aeac096c"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "e2307c94f1744af7a8f1f458a67af424": {
       "uuid": "e2307c94f1744af7a8f1f458a67af424",
@@ -5912,7 +6530,9 @@
           "path": "templates/os/linux_active/template_os_linux_active.yaml",
           "sha256": "ab9fc4e0e55ceec898cdd39de8601cf012922453a6f2871173d03da9b09cde6a"
         }
-      ]
+      ],
+      "version_commit": "a22144463f7d2429550cf01f34e6df5457e7ac8c",
+      "version_date": "2026-05-05T08:32:44+03:00"
     },
     "e2d2b4e4ac28483996cc11fe42823d57": {
       "uuid": "e2d2b4e4ac28483996cc11fe42823d57",
@@ -5931,7 +6551,9 @@
           "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
           "sha256": "b7ab58a4091478d0c080264d68cf94ee4c0d6f03b2836d1e7b673ce3b1333406"
         }
-      ]
+      ],
+      "version_commit": "3dd7e4307162e744e0b5fc4a6518426972b0a0e5",
+      "version_date": "2025-07-18T15:36:39+03:00"
     },
     "e518b1340ce44d7389d2cc7c304a97b4": {
       "uuid": "e518b1340ce44d7389d2cc7c304a97b4",
@@ -5950,7 +6572,9 @@
           "path": "templates/server/smart_agent2_active/template_module_smart_agent2_active.yaml",
           "sha256": "aec31cadd10caadf314e30691899ce51fa9a3902ad652da6930467de8916cf6f"
         }
-      ]
+      ],
+      "version_commit": "c470fb76590d2f6353d2356cad931d6d432d347d",
+      "version_date": "2025-08-29T16:21:27+03:00"
     },
     "e5486d98ff414c1391de1bd369a7f9db": {
       "uuid": "e5486d98ff414c1391de1bd369a7f9db",
@@ -5969,7 +6593,9 @@
           "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
           "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "e56c9577c225476eb6d8f1c2f5dc90a5": {
       "uuid": "e56c9577c225476eb6d8f1c2f5dc90a5",
@@ -5988,7 +6614,9 @@
           "path": "templates/net/fortinet/fortigate_http/template_net_fortigate_http.yaml",
           "sha256": "1ab2ce221b1ec794facda8668234b54714e6146853914e819fea4c2b983d631f"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "e5cf4e7ac41a470b99e4262d1c5ee104": {
       "uuid": "e5cf4e7ac41a470b99e4262d1c5ee104",
@@ -6007,7 +6635,9 @@
           "path": "templates/net/cisco/cisco_sdwan_http/template_net_cisco_sdwan_http.yaml",
           "sha256": "8b597beaf462489a21f65657b9932a3742b6a33ccc825c6a5e686560aeac096c"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "e5ec7acc7efc4ac491b6fa552ab077ae": {
       "uuid": "e5ec7acc7efc4ac491b6fa552ab077ae",
@@ -6026,7 +6656,9 @@
           "path": "templates/net/dell_force_s_series_snmp/template_net_dell_force_s_series_snmp.yaml",
           "sha256": "569e3bbb04a20190ab5909db872ce19e43ceee526b762e23a9be6dae86fe8c76"
         }
-      ]
+      ],
+      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
+      "version_date": "2026-09-09T12:29:56+02:00"
     },
     "e6b0aada359944d09ee4bd46c1a55587": {
       "uuid": "e6b0aada359944d09ee4bd46c1a55587",
@@ -6045,7 +6677,9 @@
           "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
           "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "e74c1e12f82e4d9880a368b53f5e65a4": {
       "uuid": "e74c1e12f82e4d9880a368b53f5e65a4",
@@ -6064,7 +6698,9 @@
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
           "sha256": "58694bbe98e83589789609585a32ce877f789fc635471a863e307d6e4579c943"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "e785916967c14544b59c3644c3edda3a": {
       "uuid": "e785916967c14544b59c3644c3edda3a",
@@ -6083,7 +6719,9 @@
           "path": "templates/app/kubernetes_http/kubernetes_kubelet_http/template_kubernetes_kubelet.yaml",
           "sha256": "49240db1d678e4138ca4f10fb2316936344f9c1b5efcdf4b2b1e6463d3f56c6e"
         }
-      ]
+      ],
+      "version_commit": "71d8fa708912082b5205b6cac5a4c8586d97bcfa",
+      "version_date": "2023-03-08T12:05:02+01:00"
     },
     "e7894db1c4c94e0f8715977e751368b3": {
       "uuid": "e7894db1c4c94e0f8715977e751368b3",
@@ -6102,7 +6740,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR1072-1G-8S+_snmp/template_net_mikrotik_CCR1072-1G-8S+_snmp.yaml",
           "sha256": "a684ae3fe99799f35cf2bb57c24b2f4b346b3a21b26b7fab5b92f4db8887b8b8"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "e7ed0e0cbd0b439394f6498ea90dc31d": {
       "uuid": "e7ed0e0cbd0b439394f6498ea90dc31d",
@@ -6121,7 +6761,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS326-24S+2Q+RM_snmp/template_net_mikrotik_CRS326-24S+2Q+RM_snmp.yaml",
           "sha256": "88734bfb02429ae9155491ce2a5a2dd1aaeea0755cff8e1f8c543213bb1b2eb7"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "e8c0b2c40e884f1598d86f3edf020ea7": {
       "uuid": "e8c0b2c40e884f1598d86f3edf020ea7",
@@ -6140,7 +6782,9 @@
           "path": "templates/power/apc/apc_ups_smart_2200_rm_snmp/template_power_apc_ups_smart_2200_rm_snmp.yaml",
           "sha256": "de59b9b6c1fb679210e069ed12114cd750f757ea558fe2ccc8b28abecb990071"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "e8f89476695848e99ba900a5664d290b": {
       "uuid": "e8f89476695848e99ba900a5664d290b",
@@ -6159,7 +6803,9 @@
           "path": "templates/cloud/oracle_cloud/template_cloud_oracle_http.yaml",
           "sha256": "30956f37b94fa4363dbe46e7a3217531e1a1181e057ac55ba1b7076d90dcd1b7"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "ea096c13a09b4d7a9be0aab1cec95206": {
       "uuid": "ea096c13a09b4d7a9be0aab1cec95206",
@@ -6178,7 +6824,9 @@
           "path": "templates/net/cisco/cisco_catalyst_3750_48ps_snmp/template_net_cisco_catalyst_3750_48ps_snmp.yaml",
           "sha256": "56a8d05bcac5317d54f64fcf13251f47afb82934dccd13f5ed95f3e490210902"
         }
-      ]
+      ],
+      "version_commit": "b7b4ad59a3d8f9d64f6d546c5b8e1f9dd5afe743",
+      "version_date": "2026-03-19T16:10:49+02:00"
     },
     "eaf36c98b91843b7b79bd5184a23d377": {
       "uuid": "eaf36c98b91843b7b79bd5184a23d377",
@@ -6197,7 +6845,9 @@
           "path": "templates/os/solaris/template_os_solaris.yaml",
           "sha256": "aea735e4328a4f62f5c6ad75c74960f4c8d913f78d6f4259fb64c22bbc40e2f2"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "eafd78764fde4110b9e46ae184f327ba": {
       "uuid": "eafd78764fde4110b9e46ae184f327ba",
@@ -6216,7 +6866,9 @@
           "path": "templates/power/apc/apc_ups_smart_3000_xlm_snmp/template_power_apc_ups_smart_3000_xlm_snmp.yaml",
           "sha256": "b9a8815a782fa9099df71f36047f452e4805957dd2f81af7562fe9759875a1cd"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "ec92c7b0b1d14946b6ac61de89357199": {
       "uuid": "ec92c7b0b1d14946b6ac61de89357199",
@@ -6235,7 +6887,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "ece96efdf0a045b99ede7978fa9366d6": {
       "uuid": "ece96efdf0a045b99ede7978fa9366d6",
@@ -6254,7 +6908,9 @@
           "path": "templates/app/kubernetes_http/kubernetes_scheduler_http/template_kubernetes_scheduler.yaml",
           "sha256": "60ce2afaeb1dd032112f55b9d7f5ab4f26ac0cc56a9ab7ede01a5ce5be6cff83"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "edc752f178f94b9dbaee459ec7bacc66": {
       "uuid": "edc752f178f94b9dbaee459ec7bacc66",
@@ -6273,7 +6929,9 @@
           "path": "templates/net/paloalto/paloalto_pa440/template_net_paloalto_pa440_http.yaml",
           "sha256": "483fe338aed30e2f3506e3a109e086e5744a7c44422f9fec678f7b29e275c8fb"
         }
-      ]
+      ],
+      "version_commit": "dc1de55c714bb37bf9134b88dbe1102dab074960",
+      "version_date": "2025-01-23T11:34:25+01:00"
     },
     "f01bd64eef4049fabe087cccae590226": {
       "uuid": "f01bd64eef4049fabe087cccae590226",
@@ -6292,7 +6950,9 @@
           "path": "templates/server/intel_sr1530_ipmi/template_server_intel_sr1530_ipmi.yaml",
           "sha256": "54d69125ea99162d7475b031cf5f00ea08d7ecc59f5ec5277af0add3bf1e87fd"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "f1336fd88ab0415a9c02892a71e50032": {
       "uuid": "f1336fd88ab0415a9c02892a71e50032",
@@ -6311,7 +6971,9 @@
           "path": "templates/net/morningstar/morningstar_sunsaver_mppt_snmp/template_net_morningstar_sunsaver_mppt_snmp.yaml",
           "sha256": "8d2e6227a523d9034e84e39da69546b62510958d43281dc9aa705fbe6b244942"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "f1928e12f9554599a9adb516f38b6bf6": {
       "uuid": "f1928e12f9554599a9adb516f38b6bf6",
@@ -6330,7 +6992,9 @@
           "path": "templates/net/mikrotik/mikrotik_netPower_15FR_snmp/template_net_mikrotik_netPower_15FR_snmp.yaml",
           "sha256": "fe349b3c4604f302bfc23f28bf45619f5e928d66f17bcd00f2c2586205a7d4f8"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "f255e3fc32124b55b2a17ef3c961e5f5": {
       "uuid": "f255e3fc32124b55b2a17ef3c961e5f5",
@@ -6349,7 +7013,9 @@
           "path": "templates/db/mysql_agent/template_db_mysql_agent.yaml",
           "sha256": "31e064558d76891649bf4cf5eaaf41bd4f2567252e919b466e77a50e0772d86a"
         }
-      ]
+      ],
+      "version_commit": "c3aeec928c69e20db457e89ad9996c77c45d5561",
+      "version_date": "2025-11-14T13:39:34+01:00"
     },
     "f2efeb94f4bd4ed9ab34a973c0363eb8": {
       "uuid": "f2efeb94f4bd4ed9ab34a973c0363eb8",
@@ -6368,7 +7034,9 @@
           "path": "templates/net/mikrotik/mikrotik_CCR2004-1G-12S+2XS_snmp/template_net_mikrotik_CCR2004-1G-12S+2XS_snmp.yaml",
           "sha256": "968928652b345d8ef8bb0a025db82e758c470ffb5c701d693a84fc60b33fb3dc"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "f397be2340734d24bc666102fbe184a5": {
       "uuid": "f397be2340734d24bc666102fbe184a5",
@@ -6387,7 +7055,9 @@
           "path": "templates/app/kubernetes_http/kubernetes_nodes_http/template_kubernetes_nodes.yaml",
           "sha256": "94e6413e0682e750f8276bcdec0ab40dbdaf61c10a276d7049933c6cc686ea6c"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "f445dac89ff74deabaae9dcb84815998": {
       "uuid": "f445dac89ff74deabaae9dcb84815998",
@@ -6406,7 +7076,9 @@
           "path": "templates/app/gitlab_http/template_app_gitlab_http.yaml",
           "sha256": "70ca0e8ba25576e02e88448bfdc6eee0b5fa14d310695ef31620ac1ae6244c9a"
         }
-      ]
+      ],
+      "version_commit": "8f8d7b9444bc56c4ee2cfcd2e6ff2695f2bd6fd2",
+      "version_date": "2025-01-09T16:09:24+02:00"
     },
     "f474ff823fe84d689b9e4c6a4f0ce59e": {
       "uuid": "f474ff823fe84d689b9e4c6a4f0ce59e",
@@ -6425,7 +7097,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS317-1G-16S+RM_snmp/template_net_mikrotik_CRS317-1G-16S+RM_snmp.yaml",
           "sha256": "a9b8ed2f39b711e1e0a5241806ea4017e67e22b621267c3232f29829f83b2426"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "f552ead096ff4ebb8e4cc44c437e1f2f": {
       "uuid": "f552ead096ff4ebb8e4cc44c437e1f2f",
@@ -6444,7 +7118,9 @@
           "path": "templates/net/cradlepoint/ncm_v2_http/template_net_cradlepoint_http.yaml",
           "sha256": "ec1ff5a33effb7e4a031d310999e203b6c5caa7d82f66dfcd00f7320848cf944"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "f59c8b4156ec4386a7c724534ddd384d": {
       "uuid": "f59c8b4156ec4386a7c724534ddd384d",
@@ -6463,7 +7139,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "f5fff9a83f774f4688692ad58aa35d45": {
       "uuid": "f5fff9a83f774f4688692ad58aa35d45",
@@ -6482,7 +7160,9 @@
           "path": "templates/db/yugabytedb_http/template_db_yugabyte_http.yaml",
           "sha256": "b76d32e04a09f511d955376e97b41c07c69fb885298fa0c3370ba20cc36257d6"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "f64ad01567914165a493815e492fb315": {
       "uuid": "f64ad01567914165a493815e492fb315",
@@ -6501,7 +7181,9 @@
           "path": "templates/net/brocade_foundry_sw_snmp/template_net_brocade_foundry_sw_snmp.yaml",
           "sha256": "389e07187bf60d232e39053459987986a17035900677c41e0c5cea9bc37747ee"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "f744679600844c07b2b4eedda9bc3d0c": {
       "uuid": "f744679600844c07b2b4eedda9bc3d0c",
@@ -6520,7 +7202,9 @@
           "path": "templates/net/cisco/cisco_catalyst_3750_48ts_snmp/template_net_cisco_catalyst_3750_48ts_snmp.yaml",
           "sha256": "d0297a770893253c544c89e0a9a4dcee482987d83f80bd414363bc220499ed3e"
         }
-      ]
+      ],
+      "version_commit": "b7b4ad59a3d8f9d64f6d546c5b8e1f9dd5afe743",
+      "version_date": "2026-03-19T16:10:49+02:00"
     },
     "f74adf26d9ab44ada318002d31fd2881": {
       "uuid": "f74adf26d9ab44ada318002d31fd2881",
@@ -6539,7 +7223,9 @@
           "path": "templates/app/nomad/template_app_nomad_http.yaml",
           "sha256": "49db24b4f9b50858a79890a1011e6e430693d1eac8ff0b2be796dd6d204cc4db"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "f895df5b37494f668cde1a2388d7af8b": {
       "uuid": "f895df5b37494f668cde1a2388d7af8b",
@@ -6558,7 +7244,9 @@
           "path": "templates/os/macos/template_os_macos.yaml",
           "sha256": "9eb8f807991bbfc8337914d77ba68236548dde08de7f4e95c2ad2bd2f1f61121"
         }
-      ]
+      ],
+      "version_commit": "7446bcb1f8b47a88a72c6398077d7382842c7cb4",
+      "version_date": "2025-02-05T23:45:19+01:00"
     },
     "f8f7908280354f2abeed07dc788c3747": {
       "uuid": "f8f7908280354f2abeed07dc788c3747",
@@ -6577,7 +7265,9 @@
           "path": "templates/os/linux/template_os_linux.yaml",
           "sha256": "6d4ebc020d78ff90791fa54e7bf2e407cfc0b8d9c5a972fbecc659d735ffa889"
         }
-      ]
+      ],
+      "version_commit": "a22144463f7d2429550cf01f34e6df5457e7ac8c",
+      "version_date": "2026-05-05T08:32:44+03:00"
     },
     "f9a59315c8944853bb91c0a9ec3056d7": {
       "uuid": "f9a59315c8944853bb91c0a9ec3056d7",
@@ -6596,7 +7286,9 @@
           "path": "templates/os/windows_snmp/template_os_windows_snmp.yaml",
           "sha256": "7fcb4efe6127761570aab9941581da56072d15bf6f48a2b08ca8c6b8833026cb"
         }
-      ]
+      ],
+      "version_commit": "c91fbfe0813e138c0618d2cd60b6e7eef8c767d3",
+      "version_date": "2025-12-02T07:41:20+01:00"
     },
     "fa58228fee8a4e34a7c6503950d1c615": {
       "uuid": "fa58228fee8a4e34a7c6503950d1c615",
@@ -6615,7 +7307,9 @@
           "path": "templates/cloud/azure_http/template_cloud_azure_http.yaml",
           "sha256": "7ad3d9368e36fd403c783786b0415d3a5e6e4904ea3961cb4be666c31d479935"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     },
     "fa5e5e131eb34bbea1b1f7b2352a853d": {
       "uuid": "fa5e5e131eb34bbea1b1f7b2352a853d",
@@ -6634,7 +7328,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS354-48P-4S+2Q+RM_snmp/template_net_mikrotik_CRS354-48P-4S+2Q+RM_snmp.yaml",
           "sha256": "7a2e33bb7b1b84edf5ca6f5334bc6b95de57f536b54ac9d29b2040ca02cde94e"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "fac16383680c4454be48b6db870d975e": {
       "uuid": "fac16383680c4454be48b6db870d975e",
@@ -6653,7 +7349,9 @@
           "path": "templates/net/mikrotik/mikrotik_CRS109-8G-1S-2HnD-IN_snmp/template_net_mikrotik_CRS109-8G-1S-2HnD-IN_snmp.yaml",
           "sha256": "64f0ebf0847d34e2d3761361e12eb1ce3bd5e68e113e5593adb6ded586195995"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "fac50638cb77468598c29a6a47520c24": {
       "uuid": "fac50638cb77468598c29a6a47520c24",
@@ -6672,7 +7370,9 @@
           "path": "templates/net/mikrotik/mikrotik_RB1100AHx4_Dude_Edition_snmp/template_net_mikrotik_RB1100AHx4_Dude_Edition_snmp.yaml",
           "sha256": "a337305f23a2f440513c420c2ed8e84201dc296a8fc34aba628c50a1f05c3753"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "fc834b8da8864678b55557e9a237eac9": {
       "uuid": "fc834b8da8864678b55557e9a237eac9",
@@ -6691,7 +7391,9 @@
           "path": "templates/server/dell/dell_r840_snmp/template_server_dell_r840_snmp.yaml",
           "sha256": "58e9198a9750b54cf6f36f4e7e7a9bfa0cda401f28e33b020e3c81d5f07cf1ea"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "fd36e0a231d343d38a95d1ed789584ca": {
       "uuid": "fd36e0a231d343d38a95d1ed789584ca",
@@ -6710,7 +7412,9 @@
           "path": "templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml",
           "sha256": "21b701a32375a966a0e2740d5d080705881b492eb646a30bb9ac41d5c77ba897"
         }
-      ]
+      ],
+      "version_commit": "92a3fe955bde8430f315d49b7950b4e8d0d4aa24",
+      "version_date": "2026-08-31T08:15:31+02:00"
     },
     "fe5b8448661f41b9a6d948fccd7f9045": {
       "uuid": "fe5b8448661f41b9a6d948fccd7f9045",
@@ -6729,7 +7433,9 @@
           "path": "templates/server/dell/dell_r720_snmp/template_server_dell_r720_snmp.yaml",
           "sha256": "3f39536a72c6f850c37cb1467dd825ae014d98984c9b1f2e8cce715064aced7c"
         }
-      ]
+      ],
+      "version_commit": "7f955dfc61f7f59c1070609b2200d85a8a4576ec",
+      "version_date": "2026-08-07T12:20:02+02:00"
     },
     "fe7eb8b22ce84017b07bcab36e9032dc": {
       "uuid": "fe7eb8b22ce84017b07bcab36e9032dc",
@@ -6748,7 +7454,9 @@
           "path": "templates/net/juniper_mx_snmp/template_net_juniper_mx_snmp.yaml",
           "sha256": "d554995c3dea8e4f4526959b06b67d88e77cb940f699217a55e2235eccc50ddc"
         }
-      ]
+      ],
+      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
+      "version_date": "2025-07-07T12:33:29+02:00"
     },
     "ff57532daf924030b364e3b75acb74c4": {
       "uuid": "ff57532daf924030b364e3b75acb74c4",
@@ -6767,7 +7475,9 @@
           "path": "templates/net/mikrotik/mikrotik_hEX_PoE_snmp/template_net_mikrotik_hEX_PoE_snmp.yaml",
           "sha256": "43096974509ad97ed34caf323f98554a3d9ae3818b44cad2c45f46f8440a861f"
         }
-      ]
+      ],
+      "version_commit": "443033dd17deb8471917f035178e47e6d98e7c00",
+      "version_date": "2025-07-08T14:22:17+02:00"
     },
     "ff637e001b91472d8730eb7f10e65800": {
       "uuid": "ff637e001b91472d8730eb7f10e65800",
@@ -6786,7 +7496,9 @@
           "path": "templates/cloud/openstack/template_cloud_openstack_http.yaml",
           "sha256": "2660ba99e986029b791abc8b79978dc2cd67cfc6bc212907b49510870652475b"
         }
-      ]
+      ],
+      "version_commit": "3d23a2f61b398401c98a2981d7c566c9ee3c8d96",
+      "version_date": "2026-08-13T12:06:15+02:00"
     }
   }
 }
