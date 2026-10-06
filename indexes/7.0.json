@@ -3,8 +3,8 @@
   "source": {
     "line": "7.0",
     "ref": "release/7.0",
-    "commit": "da9a9fca5a01f8b7caaca0750ab3500ca2ad8c11",
-    "commit_date": "2026-10-05T10:35:55+03:00",
+    "commit": "c563c0a4964a333238ace3a216cd975d28d1dee8",
+    "commit_date": "2026-10-06T09:06:33+03:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
@@ -2497,21 +2497,21 @@
       "name": "Linux by SNMP",
       "technical_name": "Linux by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.0-4",
+      "vendor_version": "7.0-5",
       "paths": [
         "templates/os/linux_snmp_snmp/template_os_linux_snmp_snmp.yaml"
       ],
       "content_sha256s": [
-        "3099b7613e3b734fbd85d2647f6587c0d954a1e1b27e9be7ed2d662d71b7ebad"
+        "beb0bd4dddb23ccf5346afbdc7b4cd04d05d0326319e92da7175680cfb182ac8"
       ],
       "sources": [
         {
           "path": "templates/os/linux_snmp_snmp/template_os_linux_snmp_snmp.yaml",
-          "sha256": "be329a5e99befab4472f29c8c7f3b8d4e2d4b30d78c8a733a10df7f51e7fa838"
+          "sha256": "febb2aa69a7687aebef802310cd3e7c6811aa4b63adbe403ec8f0afe96227ac0"
         }
       ],
-      "version_commit": "57121cc371fa7c8e924fc6dbd52fc3e36dc44a87",
-      "version_date": "2025-07-07T12:33:29+02:00"
+      "version_commit": "1bfcda54af78d621b6ba6381089c587af1ee7b88",
+      "version_date": "2026-10-05T19:46:42+02:00"
     },
     "4e1e9372a5fe4297936210bc4fc4b1c0": {
       "uuid": "4e1e9372a5fe4297936210bc4fc4b1c0",
