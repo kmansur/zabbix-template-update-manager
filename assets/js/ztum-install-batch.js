@@ -182,7 +182,7 @@ window.ZTUMInstallBatchInit = (config, labels) => {
 		body.append('confirm', '1');
 		body.append('operation_id', operationId);
 
-		const response = await fetch(config.executeOneUrl, {
+		const response = await fetch(requireBatchEndpoint('executeOneUrl'), {
 			method: 'POST',
 			body,
 			credentials: 'same-origin',
@@ -212,7 +212,7 @@ window.ZTUMInstallBatchInit = (config, labels) => {
 		body.append(config.csrfName, config.batchStateCsrfToken);
 		body.append('operation_id', operationId);
 		body.append('recover_stale', '1');
-		const response = await fetch(config.batchStateUrl, {
+		const response = await fetch(requireBatchEndpoint('batchStateUrl'), {
 			method: 'POST',
 			body,
 			credentials: 'same-origin',
@@ -239,6 +239,14 @@ window.ZTUMInstallBatchInit = (config, labels) => {
 			return persisted.subject === entry.subject
 				&& persisted.evidence_sha256 === entry.evidence_sha256;
 		});
+	};
+
+	const requireBatchEndpoint = (name) => {
+		const value = config[name];
+		if (typeof value !== 'string' || !/^zabbix\.php\?/.test(value) || !value.includes('action=ztum.')) {
+			throw new Error('ZTUM batch configuration error: missing or invalid ' + name);
+		}
+		return value;
 	};
 
 	const createOrResumeOperation = async (entries) => {
@@ -269,7 +277,7 @@ window.ZTUMInstallBatchInit = (config, labels) => {
 		body.append(config.csrfName, config.batchCreateCsrfToken);
 		body.append('type', 'install');
 		body.append('entries', JSON.stringify(persistedEntries(entries)));
-		const response = await fetch(config.batchCreateUrl, {
+		const response = await fetch(requireBatchEndpoint('batchCreateUrl'), {
 			method: 'POST',
 			body,
 			credentials: 'same-origin',
