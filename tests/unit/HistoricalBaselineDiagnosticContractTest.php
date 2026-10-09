@@ -22,9 +22,9 @@ foreach ([
 		'Missing read-only historical diagnostic: '.$evidence);
 }
 
-assertHistoryDiagnostic(strpos($analysis, "($baseline['status'] ?? null) !== 'found'") !== false,
+assertHistoryDiagnostic(strpos($analysis, '($baseline[\'status\'] ?? null) !== \'found\'') !== false,
 	'Unresolved historical states must receive diagnostics.');
-assertHistoryDiagnostic(strpos($analysis, "($baseline['status'] ?? null) === 'found'") !== false,
+assertHistoryDiagnostic(strpos($analysis, '($baseline[\'status\'] ?? null) === \'found\'') !== false,
 	'Only found historical baselines may be analyzed as valid comparisons.');
 assertHistoryDiagnostic(strpos($history, "'status' => 'ambiguous'") !== false
 		&& strpos($history, "'status' => 'time_budget_reached'") !== false,
