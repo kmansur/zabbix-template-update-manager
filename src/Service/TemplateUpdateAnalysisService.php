@@ -375,6 +375,21 @@ final class TemplateUpdateAnalysisService {
 			$data['historical_baseline'] = $baseline;
 			// Keep fail-closed behavior, but record enough provenance to distinguish
 			// unavailable, ambiguous, truncated and time-budget-limited scans.
+			if (($baseline['status'] ?? null) === 'ambiguous') {
+				foreach ((array) ($baseline['candidate_audit'] ?? []) as $candidate) {
+					if (!is_array($candidate)) {
+						continue;
+					}
+					error_log(sprintf(
+						'[Zabbix Template Update Manager] Historical candidate for template %s: commit=%s sha256=%s revisions=%d semantic_changes=%s (diagnostic only)',
+						$templateId,
+						(string) ($candidate['commit'] ?? ''),
+						(string) ($candidate['source_sha256'] ?? ''),
+						(int) ($candidate['commit_count'] ?? 0),
+						isset($candidate['semantic_distance']) ? (string) $candidate['semantic_distance'] : 'unknown'
+					));
+				}
+			}
 			if (($baseline['status'] ?? null) !== 'found') {
 				error_log(sprintf(
 					'[Zabbix Template Update Manager] Historical baseline unresolved for template %s: status=%s selection=%s examined=%d candidates=%d distinct=%d truncated=%s cache=%s',
