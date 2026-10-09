@@ -146,6 +146,20 @@ assertBaseline(2, $categorized['candidate_audit'][0]['semantic_distance'], 'Cand
 assertBaseline(1, $categorized['candidate_audit'][0]['change_categories']['items']['added'],
 	'Native change-category counts must be present in read-only candidate audit.');
 assertBaseline(null, $categorized['source'], 'Change categorization cannot authorize a candidate source.');
+$redactor = new ReflectionMethod(HistoricalTemplateBaselineService::class, 'safeFieldNames');
+$safeFields = $redactor->invoke(null, [
+	'details' => [
+		['field' => 'description', 'before' => 'secret-before', 'after' => 'secret-after'],
+		['field' => 'password', 'before' => 'private'],
+		['field' => '{$TOKEN}', 'after' => 'secret']
+	],
+	'details_truncated' => false
+]);
+assertBaseline(1, $safeFields['description'], 'Safe field metadata must be counted.');
+assertBaseline(2, $safeFields['other_or_sensitive'], 'Unapproved field names must be redacted.');
+assertBaseline(false, isset($safeFields['password']), 'Sensitive field names must not be logged.');
+assertBaseline(false, isset($safeFields['{$TOKEN}']), 'Macro names must not be exposed.');
+
 
 assertBaseline(2, count($ambiguous['candidate_audit'] ?? []),
 	'Ambiguous baselines must expose both candidates for read-only provenance review.');
