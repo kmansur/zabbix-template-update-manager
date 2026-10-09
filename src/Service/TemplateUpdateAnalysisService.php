@@ -388,6 +388,18 @@ final class TemplateUpdateAnalysisService {
 						(int) ($candidate['commit_count'] ?? 0),
 						isset($candidate['semantic_distance']) ? (string) $candidate['semantic_distance'] : 'unknown'
 					));
+					foreach ((array) ($candidate['field_names'] ?? []) as $field => $count) {
+						if (!is_string($field) || !is_int($count) || $count < 0) {
+							continue;
+						}
+						error_log(sprintf(
+							'[Zabbix Template Update Manager] Historical candidate safe field for template %s: commit=%s field=%s changes=%d (diagnostic only; values withheld)',
+							$templateId,
+							(string) ($candidate['commit'] ?? ''),
+							$field,
+							$count
+						));
+					}
 					foreach ((array) ($candidate['change_categories'] ?? []) as $entity => $counts) {
 						if (!is_string($entity) || !is_array($counts)) {
 							continue;
