@@ -7,6 +7,8 @@ $executeOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchExe
 $prepareView = (string) file_get_contents($root.'/views/ztum.template.install.batch.prepare.php');
 $prepareAsset = (string) file_get_contents($root.'/assets/js/ztum-install-batch.js');
 $prepareBehavior = $prepareView.$prepareAsset;
+assertBatchContract(strpos($prepareAsset, 'ZTUM batch configuration error: missing or invalid ') !== false,
+	'Batch network calls must reject missing or invalid endpoint URLs.');
 $listView = (string) file_get_contents($root.'/views/ztum.template.list.php');
 $manifest = (string) file_get_contents($root.'/manifest.json');
 
@@ -49,7 +51,7 @@ assertInstallBatchContract(
 
 assertInstallBatchContract(
 	strpos($prepareBehavior, "CCsrfTokenHelper::get('ztum.templates.install_execute_one')") !== false
-		&& strpos($prepareBehavior, 'fetch(config.executeOneUrl') !== false
+		&& strpos($prepareBehavior, 'fetch(requireBatchEndpoint('executeOneUrl')') !== false
 		&& strpos($prepareBehavior, 'for (let index = 0; index < entries.length; index++)') !== false,
 	'Batch install execution must use one bounded HTTP request per Ready UUID.'
 );
@@ -91,8 +93,8 @@ assertInstallBatchContract(strpos($executeOne, "'confirm' => 'required|in 1'") !
 	'Each request-bounded installation write must require explicit confirmation.');
 assertInstallBatchContract(strpos($executeOne, "'operation_id' => 'required|string'") !== false
 		&& strpos($prepareBehavior, "body.append('operation_id', operationId)") !== false
-		&& strpos($prepareBehavior, 'fetch(config.batchCreateUrl') !== false
-		&& strpos($prepareBehavior, 'fetch(config.batchStateUrl') !== false,
+		&& strpos($prepareBehavior, 'fetch(requireBatchEndpoint('batchCreateUrl')') !== false
+		&& strpos($prepareBehavior, 'fetch(requireBatchEndpoint('batchStateUrl')') !== false,
 	'Batch installation writes must be bound to a durable server-side reviewed batch plan.');
 
 assertInstallBatchContract(strpos($executeOne, 'TemplateControlledInstallService') !== false,
