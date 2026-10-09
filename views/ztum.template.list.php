@@ -1,8 +1,10 @@
 <?php
 
 use Modules\ZabbixTemplateUpdateManager\Support\FrontendUi;
+use Modules\ZabbixTemplateUpdateManager\Support\RuntimeEnvironmentDiagnostics;
 
 require_once dirname(__DIR__).'/src/Support/FrontendUi.php';
+require_once dirname(__DIR__).'/src/Support/RuntimeEnvironmentDiagnostics.php';
 
 $compatibility = $data['zabbix_supported'] ? _('Supported') : _('Unsupported or undetected');
 
@@ -471,6 +473,32 @@ $page->addItem(FrontendUi::message(
 if ($data['inventory_error'] !== null) {
 	$page->addItem(FrontendUi::message((string) $data['inventory_error'], FrontendUi::DANGER))->show();
 	return;
+}
+
+// The runtime diagnostics are read-only and visible only to Zabbix super administrators.
+if (CWebUser::getType() === USER_TYPE_SUPER_ADMIN) {
+	$runtime = RuntimeEnvironmentDiagnostics::check();
+	if (!$runtime['ok']) {
+		$page->addItem(FrontendUi::section(_('ZTUM runtime environment')));
+		$page->addItem(FrontendUi::message(
+			_('Private runtime storage is not ready. Template writes are blocked until backup, batch and lock directories are secured.'),
+			FrontendUi::DANGER
+		));
+		foreach ($runtime['problems'] as $problem) {
+			$page->addItem(FrontendUi::description($problem));
+		}
+		$page->addItem(FrontendUi::description(
+			_('On the Zabbix frontend host, from the ZTUM module directory, run:')
+		));
+		$page->addItem(new CTag('pre', true,
+			"sudo bash tools/ztum-runtime-setup.sh --check\n".
+			"sudo bash tools/ztum-runtime-setup.sh --apply\n".
+			"sudo bash tools/ztum-runtime-setup.sh --check"
+		));
+		$page->addItem(FrontendUi::description(
+			_('Review the script output and PHP-FPM account before applying. The web interface never runs these commands.')
+		));
+	}
 }
 
 $page
