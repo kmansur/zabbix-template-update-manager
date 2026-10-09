@@ -49,6 +49,16 @@ final class TemplateConfigurationImportService {
 		 * The original wrapper is always restored.
 		 */
 		$wrapper = API::getWrapper();
+		// Zabbix 8 changed the internal client authentication argument type.
+		// Delegate 8.x writes to the frontend API wrapper; never retry a write.
+		$majorVersion = defined('ZABBIX_VERSION')
+			? (int) explode('.', (string) constant('ZABBIX_VERSION'))[0]
+			: 0;
+		if ($majorVersion >= 8) {
+			$this->importViaFrontendWrapper($params);
+			return;
+		}
+
 		if (is_object($wrapper) && method_exists($wrapper, 'getClient')
 				&& isset($wrapper->auth) && is_array($wrapper->auth)) {
 			$client = $wrapper->getClient();
@@ -99,6 +109,10 @@ final class TemplateConfigurationImportService {
 		 * Messages are scoped to this API call and are never the primary diagnostic
 		 * path on supported Zabbix 7.x/8.x frontend wrappers.
 		 */
+		$this->importViaFrontendWrapper($params);
+	}
+
+	private function importViaFrontendWrapper(array $params): void {
 		$messagesBefore = CMessageHelper::getMessages();
 
 		try {
