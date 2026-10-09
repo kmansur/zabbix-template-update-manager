@@ -7,8 +7,7 @@ $executeOne = (string) file_get_contents($root.'/actions/TemplateInstallBatchExe
 $prepareView = (string) file_get_contents($root.'/views/ztum.template.install.batch.prepare.php');
 $prepareAsset = (string) file_get_contents($root.'/assets/js/ztum-install-batch.js');
 $prepareBehavior = $prepareView.$prepareAsset;
-assertBatchContract(strpos($prepareAsset, 'ZTUM batch configuration error: missing or invalid ') !== false,
-	'Batch network calls must reject missing or invalid endpoint URLs.');
+
 $listView = (string) file_get_contents($root.'/views/ztum.template.list.php');
 $manifest = (string) file_get_contents($root.'/manifest.json');
 
@@ -18,6 +17,9 @@ function assertInstallBatchContract(bool $condition, string $message): void {
 		exit(1);
 	}
 }
+
+assertInstallBatchContract(strpos($prepareAsset, 'ZTUM batch configuration error: missing or invalid ') !== false,
+	'Batch network calls must reject missing or invalid endpoint URLs.');
 
 foreach ([$prepare, $prepareOne, $executeOne] as $controller) {
 	assertInstallBatchContract(strpos($controller, 'disableCsrfValidation') === false,
