@@ -54,7 +54,7 @@ assertBatchContract(strpos($prepareBehavior, 'Stop after current template') !== 
 	'Batch preparation queue must be cancellable between templates.');
 assertBatchContract(strpos($prepareBehavior, "CCsrfTokenHelper::get('ztum.templates.batch_update_one')") !== false,
 	'Request-bounded batch execution must carry its per-template action CSRF token.');
-assertBatchContract(strpos($prepareBehavior, 'fetch(requireBatchEndpoint('executeOneUrl')') !== false,
+assertBatchContract(strpos($prepareBehavior, "fetch(requireBatchEndpoint('executeOneUrl')") !== false,
 	'Batch update execution must use one bounded HTTP request per Ready template.');
 foreach (['batchCreateUrl' => 'ztum.batch.create', 'batchStateUrl' => 'ztum.batch.state'] as $urlKey => $action) {
 	assertBatchContract(
@@ -162,8 +162,8 @@ assertBatchContract(strpos($updateOne, "'evidence_sha256' => 'required|string'")
 	'Request-bounded execution must require bound evidence plus one explicit confirmation while retaining reviewed-mode binding.');
 assertBatchContract(strpos($updateOne, "'operation_id' => 'required|string'") !== false
 		&& strpos($prepareBehavior, "body.append('operation_id', operationId)") !== false
-		&& strpos($prepareBehavior, 'fetch(requireBatchEndpoint('batchCreateUrl')') !== false
-		&& strpos($prepareBehavior, 'fetch(requireBatchEndpoint('batchStateUrl')') !== false,
+		&& strpos($prepareBehavior, "fetch(requireBatchEndpoint('batchCreateUrl')") !== false
+		&& strpos($prepareBehavior, "fetch(requireBatchEndpoint('batchStateUrl')") !== false,
 	'Request-bounded update execution must be bound to a durable server-side reviewed batch plan.');
 
 assertBatchContract(strpos($updateOne, 'TemplateControlledUpdateService') !== false,
