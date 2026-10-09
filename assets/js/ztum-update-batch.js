@@ -271,7 +271,7 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 			body.append('manual_override', '1');
 		}
 
-		const response = await fetch(config.executeOneUrl, {
+		const response = await fetch(requireBatchEndpoint('executeOneUrl'), {
 			method: 'POST',
 			body,
 			credentials: 'same-origin',
@@ -290,6 +290,14 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		return payload.result;
 	};
 
+	const requireBatchEndpoint = (name) => {
+		const value = config[name];
+		if (typeof value !== 'string' || !/^zabbix\.php\?/.test(value) || !value.includes('action=ztum.')) {
+			throw new Error('ZTUM batch configuration error: missing or invalid ' + name);
+		}
+		return value;
+	};
+
 	const persistedEntries = (entries) => entries.map((entry) => ({
 		subject: 'template-' + entry.templateId,
 		evidence_sha256: entry.evidence,
@@ -302,7 +310,7 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		body.append('operation_id', operationId);
 		body.append('recover_stale', '1');
 
-		const response = await fetch(config.batchStateUrl, {
+		const response = await fetch(requireBatchEndpoint('batchStateUrl'), {
 			method: 'POST',
 			body,
 			credentials: 'same-origin',
@@ -361,7 +369,7 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		body.append(config.csrfName, config.batchCreateCsrfToken);
 		body.append('type', 'update');
 		body.append('entries', JSON.stringify(persistedEntries(entries)));
-		const response = await fetch(config.batchCreateUrl, {
+		const response = await fetch(requireBatchEndpoint('batchCreateUrl'), {
 			method: 'POST',
 			body,
 			credentials: 'same-origin',
