@@ -51,7 +51,7 @@ assertInstallBatchContract(
 
 assertInstallBatchContract(
 	strpos($prepareBehavior, "CCsrfTokenHelper::get('ztum.templates.install_execute_one')") !== false
-		&& strpos($prepareBehavior, 'fetch(requireBatchEndpoint('executeOneUrl')') !== false
+		&& strpos($prepareBehavior, "fetch(requireBatchEndpoint('executeOneUrl')") !== false
 		&& strpos($prepareBehavior, 'for (let index = 0; index < entries.length; index++)') !== false,
 	'Batch install execution must use one bounded HTTP request per Ready UUID.'
 );
@@ -93,8 +93,8 @@ assertInstallBatchContract(strpos($executeOne, "'confirm' => 'required|in 1'") !
 	'Each request-bounded installation write must require explicit confirmation.');
 assertInstallBatchContract(strpos($executeOne, "'operation_id' => 'required|string'") !== false
 		&& strpos($prepareBehavior, "body.append('operation_id', operationId)") !== false
-		&& strpos($prepareBehavior, 'fetch(requireBatchEndpoint('batchCreateUrl')') !== false
-		&& strpos($prepareBehavior, 'fetch(requireBatchEndpoint('batchStateUrl')') !== false,
+		&& strpos($prepareBehavior, "fetch(requireBatchEndpoint('batchCreateUrl')") !== false
+		&& strpos($prepareBehavior, "fetch(requireBatchEndpoint('batchStateUrl')") !== false,
 	'Batch installation writes must be bound to a durable server-side reviewed batch plan.');
 
 assertInstallBatchContract(strpos($executeOne, 'TemplateControlledInstallService') !== false,
