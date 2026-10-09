@@ -263,6 +263,13 @@ final class HistoricalTemplateBaselineService {
 			'selection' => 'no_exact_local_match',
 			'closest_commit' => $closest['commit'] ?? '',
 			'closest_changes' => $closest['semantic_distance'] ?? null,
+			// Audit-only candidate identities; never feed a guessed source to import.
+			'candidate_audit' => array_map(static fn(array $candidate): array => [
+				'commit' => $candidate['commit'],
+				'source_sha256' => $candidate['source_sha256'],
+				'commit_count' => $candidate['commit_count'],
+				'semantic_distance' => $candidate['semantic_distance']
+			], $candidates),
 			'source' => null
 		];
 	}
