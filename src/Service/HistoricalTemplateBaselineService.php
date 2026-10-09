@@ -102,7 +102,7 @@ final class HistoricalTemplateBaselineService {
 				&& class_exists(TemplateImportCompareService::class)
 				&& class_exists(ImportCompareSummary::class)) {
 			$compareService = new TemplateImportCompareService();
-			$candidateEvaluator = static function (string $source, string $commit) use ($compareService): int {
+			$candidateEvaluator = static function (string $source, string $commit) use ($compareService): array {
 				$summary = ImportCompareSummary::summarize($compareService->compare($source));
 				return [
 					'total' => max(0, (int) ($summary['total'] ?? 0)),
