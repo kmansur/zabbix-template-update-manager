@@ -373,6 +373,21 @@ final class TemplateUpdateAnalysisService {
 			unset($baseline['source']);
 			$baseline['cache_status'] = $cacheStatus;
 			$data['historical_baseline'] = $baseline;
+			// Keep fail-closed behavior, but record enough provenance to distinguish
+			// unavailable, ambiguous, truncated and time-budget-limited scans.
+			if (($baseline['status'] ?? null) !== 'found') {
+				error_log(sprintf(
+					'[Zabbix Template Update Manager] Historical baseline unresolved for template %s: status=%s selection=%s examined=%d candidates=%d distinct=%d truncated=%s cache=%s',
+					$templateId,
+					(string) ($baseline['status'] ?? 'unknown'),
+					(string) ($baseline['selection'] ?? 'unknown'),
+					(int) ($baseline['commits_examined'] ?? 0),
+					(int) ($baseline['candidate_count'] ?? 0),
+					(int) ($baseline['distinct_candidate_count'] ?? 0),
+					!empty($baseline['history_truncated']) ? 'yes' : 'no',
+					$cacheStatus
+				));
+			}
 
 			if (($baseline['status'] ?? null) === 'found' && is_string($baselineSource)) {
 				$historicalDiff = $compareService->compare($baselineSource);
