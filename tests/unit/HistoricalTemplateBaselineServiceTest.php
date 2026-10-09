@@ -128,6 +128,25 @@ assertBaseline('', $ambiguous['commit'], 'An ambiguous baseline must not claim a
 assertBaseline(2, $ambiguous['distinct_candidate_count'], 'Ambiguous result must expose the number of distinct candidates.');
 assertBaseline(4, $ambiguous['closest_changes'], 'Closest semantic distance may be shown diagnostically without becoming authoritative.');
 assertBaseline(null, $ambiguous['source'], 'An ambiguous baseline must not feed a guessed source into three-way analysis.');
+
+$categorized = $sameVersionService->find(
+	'templates/test/template_test.yaml',
+	str_repeat('f', 40),
+	$uuid,
+	'7.0-0',
+	'Zabbix',
+	75,
+	static fn(string $source, string $commit): array => [
+		'total' => $commit === $sameVersionCommits[0] ? 2 : 5,
+		'by_entity' => ['items' => ['added' => 1, 'updated' => 1, 'removed' => 0]]
+	]
+);
+assertBaseline('ambiguous', $categorized['status'], 'Categorized ambiguous baselines must remain blocked.');
+assertBaseline(2, $categorized['candidate_audit'][0]['semantic_distance'], 'Candidate semantic distance must remain numeric.');
+assertBaseline(1, $categorized['candidate_audit'][0]['change_categories']['items']['added'],
+	'Native change-category counts must be present in read-only candidate audit.');
+assertBaseline(null, $categorized['source'], 'Change categorization cannot authorize a candidate source.');
+
 assertBaseline(2, count($ambiguous['candidate_audit'] ?? []),
 	'Ambiguous baselines must expose both candidates for read-only provenance review.');
 foreach ($ambiguous['candidate_audit'] as $candidate) {
