@@ -104,7 +104,10 @@ final class HistoricalTemplateBaselineService {
 			$compareService = new TemplateImportCompareService();
 			$candidateEvaluator = static function (string $source, string $commit) use ($compareService): int {
 				$summary = ImportCompareSummary::summarize($compareService->compare($source));
-				return max(0, (int) ($summary['total'] ?? 0));
+				return [
+					'total' => max(0, (int) ($summary['total'] ?? 0)),
+					'by_entity' => $summary['by_entity'] ?? []
+				];
 			};
 		}
 
@@ -173,7 +176,8 @@ final class HistoricalTemplateBaselineService {
 					'source' => $isolated['source'],
 					'source_sha256' => $sourceHash,
 					'commit_count' => 1,
-					'semantic_distance' => null
+					'semantic_distance' => null,
+					'change_categories' => []
 				];
 			}
 			else {
@@ -205,11 +209,17 @@ final class HistoricalTemplateBaselineService {
 		$closest = null;
 		if ($candidateEvaluator !== null) {
 			foreach ($candidates as $index => $candidate) {
-				$distance = ($candidateEvaluator)($candidate['source'], $candidate['commit']);
+				$evaluation = ($candidateEvaluator)($candidate['source'], $candidate['commit']);
+				$distance = is_array($evaluation) ? ($evaluation['total'] ?? null) : $evaluation;
 				if (!is_int($distance) || $distance < 0) {
 					throw new RuntimeException('The historical baseline candidate evaluator returned an invalid distance.');
 				}
 				$candidates[$index]['semantic_distance'] = $distance;
+				$categories = is_array($evaluation) ? ($evaluation['by_entity'] ?? []) : [];
+				if (!is_array($categories)) {
+					throw new RuntimeException('Historical candidate change categories must be an array.');
+				}
+				$candidates[$index]['change_categories'] = $categories;
 				if ($distance === 0) {
 					$exactMatches[] = $candidates[$index];
 				}
@@ -268,7 +278,8 @@ final class HistoricalTemplateBaselineService {
 				'commit' => $candidate['commit'],
 				'source_sha256' => $candidate['source_sha256'],
 				'commit_count' => $candidate['commit_count'],
-				'semantic_distance' => $candidate['semantic_distance']
+				'semantic_distance' => $candidate['semantic_distance'],
+				'change_categories' => $candidate['change_categories']
 			], $candidates),
 			'source' => null
 		];
