@@ -128,6 +128,17 @@ assertBaseline('', $ambiguous['commit'], 'An ambiguous baseline must not claim a
 assertBaseline(2, $ambiguous['distinct_candidate_count'], 'Ambiguous result must expose the number of distinct candidates.');
 assertBaseline(4, $ambiguous['closest_changes'], 'Closest semantic distance may be shown diagnostically without becoming authoritative.');
 assertBaseline(null, $ambiguous['source'], 'An ambiguous baseline must not feed a guessed source into three-way analysis.');
+assertBaseline(2, count($ambiguous['candidate_audit'] ?? []),
+	'Ambiguous baselines must expose both candidates for read-only provenance review.');
+foreach ($ambiguous['candidate_audit'] as $candidate) {
+	assertBaseline(true, preg_match('/^[a-f0-9]{40}$/', $candidate['commit']) === 1,
+		'Candidate audit commits must be immutable IDs.');
+	assertBaseline(true, preg_match('/^[a-f0-9]{64}$/', $candidate['source_sha256']) === 1,
+		'Candidate audit content must carry a SHA-256 fingerprint.');
+	assertBaseline(false, array_key_exists('source', $candidate),
+		'Candidate audit must not disclose or pass a candidate import source.');
+}
+
 
 $renameCommits = [str_repeat('4', 40), str_repeat('5', 40)];
 $renameNewPath = 'templates/cloud/AWS/aws_http/template_cloud_aws_http.yaml';
