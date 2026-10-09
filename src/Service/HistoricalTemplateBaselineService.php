@@ -103,10 +103,13 @@ final class HistoricalTemplateBaselineService {
 				&& class_exists(ImportCompareSummary::class)) {
 			$compareService = new TemplateImportCompareService();
 			$candidateEvaluator = static function (string $source, string $commit) use ($compareService): array {
-				$summary = ImportCompareSummary::summarize($compareService->compare($source));
+				$diff = $compareService->compare($source);
+				$summary = ImportCompareSummary::summarize($diff);
+				$preview = UpdatePreviewAnalyzer::analyze($diff, 100);
 				return [
 					'total' => max(0, (int) ($summary['total'] ?? 0)),
-					'by_entity' => $summary['by_entity'] ?? []
+					'by_entity' => $summary['by_entity'] ?? [],
+					'field_names' => self::safeFieldNames($preview)
 				];
 			};
 		}
@@ -177,7 +180,8 @@ final class HistoricalTemplateBaselineService {
 					'source_sha256' => $sourceHash,
 					'commit_count' => 1,
 					'semantic_distance' => null,
-					'change_categories' => []
+					'change_categories' => [],
+					'field_names' => []
 				];
 			}
 			else {
@@ -220,6 +224,8 @@ final class HistoricalTemplateBaselineService {
 					throw new RuntimeException('Historical candidate change categories must be an array.');
 				}
 				$candidates[$index]['change_categories'] = $categories;
+				$candidates[$index]['field_names'] = is_array($evaluation) && is_array($evaluation['field_names'] ?? null)
+					? $evaluation['field_names'] : [];
 				if ($distance === 0) {
 					$exactMatches[] = $candidates[$index];
 				}
@@ -279,10 +285,37 @@ final class HistoricalTemplateBaselineService {
 				'source_sha256' => $candidate['source_sha256'],
 				'commit_count' => $candidate['commit_count'],
 				'semantic_distance' => $candidate['semantic_distance'],
-				'change_categories' => $candidate['change_categories']
+				'change_categories' => $candidate['change_categories'],
+				'field_names' => $candidate['field_names']
 			], $candidates),
 			'source' => null
 		];
+	}
+
+
+	/**
+	 * Diagnostic metadata only: fixed allow-list prevents logging arbitrary field
+	 * names, entity identifiers, macros, URLs or before/after configuration values.
+	 */
+	private static function safeFieldNames(array $preview): array {
+		$allowed = ['name', 'description', 'template', 'vendor', 'version', 'status', 'type', 'delay', 'history', 'trends', 'units', 'value_type', 'priority', 'width', 'height', 'display_period', 'auto_start'];
+		$counts = [];
+		foreach ((array) ($preview['details'] ?? []) as $detail) {
+			if (!is_array($detail)) {
+				continue;
+			}
+			$field = (string) ($detail['field'] ?? '');
+			if (!in_array($field, $allowed, true)) {
+				$counts['other_or_sensitive'] = ($counts['other_or_sensitive'] ?? 0) + 1;
+				continue;
+			}
+			$counts[$field] = ($counts[$field] ?? 0) + 1;
+		}
+		if (!empty($preview['details_truncated'])) {
+			$counts['details_truncated'] = 1;
+		}
+		ksort($counts, SORT_STRING);
+		return $counts;
 	}
 
 	private function runtimeBudgetReached(float $startedAt, float $maxRuntimeSeconds): bool {
