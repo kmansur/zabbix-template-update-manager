@@ -19,7 +19,7 @@ assertImportCompatibility(
 	'Zabbix 8 must use the supported frontend wrapper rather than the legacy auth-array call.'
 );
 assertImportCompatibility(
-	strpos($service, "if ($result === true)") !== false
+	strpos($service, 'if ($result === true)') !== false
 		&& strpos($service, 'throw new ConfigurationImportException($message)') !== false,
 	'Frontend import must fail closed unless the API reports strict boolean success.'
 );
