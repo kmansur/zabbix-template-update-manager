@@ -388,6 +388,20 @@ final class TemplateUpdateAnalysisService {
 						(int) ($candidate['commit_count'] ?? 0),
 						isset($candidate['semantic_distance']) ? (string) $candidate['semantic_distance'] : 'unknown'
 					));
+					foreach ((array) ($candidate['change_categories'] ?? []) as $entity => $counts) {
+						if (!is_string($entity) || !is_array($counts)) {
+							continue;
+						}
+						error_log(sprintf(
+							'[Zabbix Template Update Manager] Historical candidate category for template %s: commit=%s entity=%s added=%d updated=%d removed=%d (diagnostic only)',
+							$templateId,
+							(string) ($candidate['commit'] ?? ''),
+							$entity,
+							(int) ($counts['added'] ?? 0),
+							(int) ($counts['updated'] ?? 0),
+							(int) ($counts['removed'] ?? 0)
+						));
+					}
 				}
 			}
 			if (($baseline['status'] ?? null) !== 'found') {
