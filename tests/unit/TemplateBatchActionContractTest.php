@@ -54,6 +54,13 @@ assertBatchContract(strpos($prepareBehavior, "CCsrfTokenHelper::get('ztum.templa
 	'Request-bounded batch execution must carry its per-template action CSRF token.');
 assertBatchContract(strpos($prepareBehavior, 'fetch(config.executeOneUrl') !== false,
 	'Batch update execution must use one bounded HTTP request per Ready template.');
+foreach (['batchCreateUrl' => 'ztum.batch.create', 'batchStateUrl' => 'ztum.batch.state'] as $urlKey => $action) {
+	assertBatchContract(
+		strpos($prepareView, "'".$urlKey."' => $".$urlKey) !== false
+			&& strpos($prepareView, "->setArgument('action', '".$action."')") !== false,
+		'Batch update view must provide '. $urlKey .' for action '. $action .'.'
+	);
+}
 assertBatchContract(strpos($prepareBehavior, 'for (let index = 0; index < entries.length; index++)') !== false,
 	'Batch update execution queue must remain sequential in the browser.');
 assertBatchContract(strpos($prepareBehavior, "result.status !== 'updated'") !== false
