@@ -120,7 +120,8 @@ verify_tree() {
   [[ "$actual" == "$expected" ]]
 }
 verified_backup() {
-  local id="$1" folder="$BACKUP_BASE/$id" expected
+  local id="$1" folder expected
+  folder="$BACKUP_BASE/$id"
   [[ "$id" =~ ^[0-9]{8}T[0-9]{6}Z-[0-9a-f]{8}$ ]] || die "Invalid backup ID"
   [[ -d "$folder" && ! -L "$folder" ]] || die "Backup not found"
   [[ "$(stat -c '%U:%a' "$folder")" == "root:700" ]] || die "Unsafe backup permissions"
@@ -156,7 +157,9 @@ do_upgrade_or_rollback() {
   exec 9>/run/lock/ztum-installer.lock
   flock -n 9 || die "Another installer is running"
 
-  local stage old id folder saved original_hash stage_hash current_version new_version failed_dir
+  stage=""
+  old=""
+  local id="" folder="" saved="" original_hash="" stage_hash="" current_version="" new_version="" failed_dir=""
   stage="$(mktemp -d "$MODULES_DIR/.ztum-stage.XXXXXXXX")"
   old=""
   cleanup_upgrade() {
