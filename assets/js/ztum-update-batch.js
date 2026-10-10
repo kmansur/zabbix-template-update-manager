@@ -468,7 +468,8 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 			const review = reviewEvidence.get(entry.templateId);
 			return review?.requiresLocalOverwriteAck === true
 				|| review?.reasons?.includes('local_customization_overwrite')
-				|| review?.reasons?.includes('confirmed_three_way_conflict');
+				|| review?.reasons?.includes('confirmed_three_way_conflict')
+				|| review?.reasons?.includes('unverified_historical_baseline');
 		}).length;
 		const lossWarning = byId('ztum-batch-loss-warning');
 		if (lossWarning !== null) {
