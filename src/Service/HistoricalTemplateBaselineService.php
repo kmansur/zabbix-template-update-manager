@@ -113,7 +113,8 @@ final class HistoricalTemplateBaselineService {
 					'by_entity' => $summary['by_entity'] ?? [],
 					'field_names' => self::safeFieldNames($preview),
 					'change_structure' => self::safeChangeStructure($preview),
-					'auto_start_diagnostic' => HistoricalDashboardNormalizationDiagnostic::summarizePreview($preview)
+					'auto_start_diagnostic' => HistoricalDashboardNormalizationDiagnostic::summarizePreview($preview),
+					'auto_start_unknown_shapes' => HistoricalDashboardNormalizationDiagnostic::describeUnknownPreview($preview)
 				];
 			};
 		}
@@ -187,7 +188,8 @@ final class HistoricalTemplateBaselineService {
 					'change_categories' => [],
 					'field_names' => [],
 					'change_structure' => [],
-					'auto_start_diagnostic' => []
+					'auto_start_diagnostic' => [],
+					'auto_start_unknown_shapes' => []
 				];
 			}
 			else {
@@ -236,6 +238,8 @@ final class HistoricalTemplateBaselineService {
 					? $evaluation['change_structure'] : [];
 				$candidates[$index]['auto_start_diagnostic'] = is_array($evaluation) && is_array($evaluation['auto_start_diagnostic'] ?? null)
 					? $evaluation['auto_start_diagnostic'] : [];
+				$candidates[$index]['auto_start_unknown_shapes'] = is_array($evaluation) && is_array($evaluation['auto_start_unknown_shapes'] ?? null)
+					? $evaluation['auto_start_unknown_shapes'] : [];
 				if ($distance === 0) {
 					$exactMatches[] = $candidates[$index];
 				}
@@ -298,7 +302,8 @@ final class HistoricalTemplateBaselineService {
 				'change_categories' => $candidate['change_categories'],
 				'field_names' => $candidate['field_names'],
 				'change_structure' => $candidate['change_structure'],
-				'auto_start_diagnostic' => $candidate['auto_start_diagnostic']
+				'auto_start_diagnostic' => $candidate['auto_start_diagnostic'],
+				'auto_start_unknown_shapes' => $candidate['auto_start_unknown_shapes']
 			], $candidates),
 			'source' => null
 		];
