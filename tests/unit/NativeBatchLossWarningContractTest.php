@@ -2,7 +2,7 @@
 $root = dirname(__DIR__, 2);
 $view = file_get_contents($root.'/views/ztum.template.batch.prepare.php');
 $js = file_get_contents($root.'/assets/js/ztum-update-batch.js');
-foreach (['new CHtmlPage()', 'new CCheckBox(', 'FrontendUi::message(', 'ztum-batch-loss-warning-text', 'local_loss_warning', 'identified local-customization losses'] as $needle) {
+foreach (['new CHtmlPage()', 'new CCheckBox(', 'FrontendUi::message(', 'ztum-batch-loss-warning-text', 'local_loss_warning', 'Possible loss of installed local settings', 'existing settings or unknown local customizations may be overwritten.'] as $needle) {
     if (!str_contains($view, $needle)) {
         throw new RuntimeException('Batch native UI missing: '.$needle);
     }
