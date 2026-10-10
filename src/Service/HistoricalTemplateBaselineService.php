@@ -109,7 +109,8 @@ final class HistoricalTemplateBaselineService {
 				return [
 					'total' => max(0, (int) ($summary['total'] ?? 0)),
 					'by_entity' => $summary['by_entity'] ?? [],
-					'field_names' => self::safeFieldNames($preview)
+					'field_names' => self::safeFieldNames($preview),
+					'change_structure' => self::safeChangeStructure($preview)
 				];
 			};
 		}
@@ -181,7 +182,8 @@ final class HistoricalTemplateBaselineService {
 					'commit_count' => 1,
 					'semantic_distance' => null,
 					'change_categories' => [],
-					'field_names' => []
+					'field_names' => [],
+					'change_structure' => []
 				];
 			}
 			else {
@@ -226,6 +228,8 @@ final class HistoricalTemplateBaselineService {
 				$candidates[$index]['change_categories'] = $categories;
 				$candidates[$index]['field_names'] = is_array($evaluation) && is_array($evaluation['field_names'] ?? null)
 					? $evaluation['field_names'] : [];
+				$candidates[$index]['change_structure'] = is_array($evaluation) && is_array($evaluation['change_structure'] ?? null)
+					? $evaluation['change_structure'] : [];
 				if ($distance === 0) {
 					$exactMatches[] = $candidates[$index];
 				}
@@ -286,7 +290,8 @@ final class HistoricalTemplateBaselineService {
 				'commit_count' => $candidate['commit_count'],
 				'semantic_distance' => $candidate['semantic_distance'],
 				'change_categories' => $candidate['change_categories'],
-				'field_names' => $candidate['field_names']
+				'field_names' => $candidate['field_names'],
+				'change_structure' => $candidate['change_structure']
 			], $candidates),
 			'source' => null
 		];
@@ -297,6 +302,28 @@ final class HistoricalTemplateBaselineService {
 	 * Diagnostic metadata only: fixed allow-list prevents logging arbitrary field
 	 * names, entity identifiers, macros, URLs or before/after configuration values.
 	 */
+	/**
+	 * Aggregate direct field operations separately from structural wrappers.
+	 * Do not emit entity identities, paths, field values or untrusted labels.
+	 */
+	private static function safeChangeStructure(array $preview): array {
+		$totals = ['direct_fields' => 0, 'entity_additions' => 0,
+			'entity_removals' => 0, 'unresolved_identity' => 0];
+		foreach ((array) ($preview['details'] ?? []) as $detail) {
+			if (!is_array($detail)) {
+				continue;
+			}
+			switch ($detail['change_type'] ?? '') {
+				case 'updated': $totals['direct_fields']++; break;
+				case 'added': $totals['entity_additions']++; break;
+				case 'removed': $totals['entity_removals']++; break;
+				default: $totals['unresolved_identity']++; break;
+			}
+		}
+		$totals['details_truncated'] = !empty($preview['details_truncated']) ? 1 : 0;
+		return $totals;
+	}
+
 	private static function safeFieldNames(array $preview): array {
 		$allowed = ['name', 'description', 'template', 'vendor', 'version', 'status', 'type', 'delay', 'history', 'trends', 'units', 'value_type', 'priority', 'width', 'height', 'display_period', 'auto_start'];
 		$counts = [];
