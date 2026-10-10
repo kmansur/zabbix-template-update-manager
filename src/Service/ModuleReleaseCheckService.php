@@ -43,7 +43,21 @@ final class ModuleReleaseCheckService {
         return preg_match('/^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-(?:0|[1-9A-Za-z-][0-9A-Za-z-]*)(?:\\.[0-9A-Za-z-]+)*)?$/D', $version) === 1;
     }
 
+    /** @var callable|null Test-only transport injection; normal runtime uses HTTPS cURL. */
+    private $transport;
+
+    public function __construct(?callable $transport = null) {
+        $this->transport = $transport;
+    }
+
     public function check(string $installed): array {
+        if ($this->transport !== null) {
+            $response = ($this->transport)();
+            if (!is_array($response)) {
+                throw new RuntimeException('Invalid transport response.');
+            }
+            return self::decodeResponse($installed, $response['status'] ?? 0, $response['body'] ?? false);
+        }
         if (!function_exists('curl_init')) {
             throw new RuntimeException('PHP cURL extension is unavailable.');
         }
@@ -65,12 +79,16 @@ final class ModuleReleaseCheckService {
         try {
             $payload = curl_exec($ch);
             $status = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
-            if (!is_string($payload) || $status !== 200 || strlen($payload) > 524288) {
-                throw new RuntimeException('GitHub release API unavailable or response too large.');
-            }
+            return self::decodeResponse($installed, $status, $payload);
         }
         finally {
             curl_close($ch);
+        }
+    }
+
+    private static function decodeResponse(string $installed, $status, $payload): array {
+        if (!is_int($status) || !is_string($payload) || $status !== 200 || strlen($payload) > 524288) {
+            throw new RuntimeException('GitHub release API unavailable or response too large.');
         }
         $releases = json_decode($payload, true, 64, JSON_THROW_ON_ERROR);
         if (!is_array($releases) || !array_is_list($releases)) {
