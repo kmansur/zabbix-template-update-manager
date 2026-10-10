@@ -650,6 +650,10 @@ final class TemplateUpdateAnalysisService {
 		$targetVersion = trim((string) ($template['vendor_version'] ?? ''));
 		$uuid = strtolower(str_replace('-', '', trim((string) ($template['uuid'] ?? ''))));
 
+		if (ZabbixVersion::isPrerelease($zabbixVersion)) {
+			return null;
+		}
+
 		if ($line === null
 				|| $targetVersion !== $line.'-0'
 				|| preg_match('/^[a-f0-9]{32}$/', $uuid) !== 1) {
