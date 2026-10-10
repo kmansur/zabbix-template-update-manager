@@ -10,7 +10,7 @@ use Zabbix\Core\CModule;
 class Module extends CModule {
 
 	public function init(): void {
-		if (!in_array(CWebUser::getType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true)) {
+		if (CWebUser::getType() !== USER_TYPE_SUPER_ADMIN) {
 			return;
 		}
 
