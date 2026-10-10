@@ -325,7 +325,9 @@ final class UpstreamIndexRepository {
 	}
 
 	private function readCache(string $cacheFile): ?array {
-		if (!$this->cacheDirectoryIsPrivate() || is_link($cacheFile) || !is_file($cacheFile)) {
+		if (!$this->cacheDirectoryIsPrivate() || is_link($cacheFile) || !is_file($cacheFile)
+				|| @fileowner($cacheFile) !== posix_geteuid()
+				|| (@fileperms($cacheFile) & 0777) !== 0600) {
 			return null;
 		}
 
@@ -342,7 +344,7 @@ final class UpstreamIndexRepository {
 	}
 
 	private function writeCache(string $cacheFile, string $content): void {
-		if (!$this->cacheDirectoryIsPrivate()) {
+		if (!$this->cacheDirectoryIsPrivate() || is_link($cacheFile)) {
 			return;
 		}
 
