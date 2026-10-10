@@ -102,6 +102,10 @@ ZTUM currently provides:
 
 Batch execution does not create a second write path. Each executable template is processed through `TemplateControlledUpdateService`, which reruns fresh preflight in the bound standard/reviewed mode, verifies the page evidence has not changed, rebuilds the immutable upstream candidate and then uses the same single configuration-import service already used by individual update/rollback flows.
 
+## Official appliance acceptance
+
+The separate [Zabbix 7 and 8 appliance acceptance checklist](docs/official-appliance-acceptance-7-and-8.md) covers native UI, safe preparation, reviewed batch, rollback and failure-injection tests. A successful fixture suite alone is not production approval; restore drills on disposable appliances remain required.
+
 ## Individual update workflow
 
 The native comparison screen provides **Prepare and review update** for an eligible official template. One preparation request creates a local rollback artifact when required, re-runs a fresh template analysis, verifies that the newest artifact exactly matches the installed export, and runs a fresh normal/reviewed preflight. Preparation **never imports** Zabbix configuration. The next native screen displays the independent acknowledgement and **Update official template** action, which triggers another fresh server-side preflight and the existing single approved import boundary. Failed backup verification, unresolved preview or changed evidence block import. When the historical baseline is not verified, the individual reviewed path explicitly discloses that local customizations cannot be distinguished from older official differences.
