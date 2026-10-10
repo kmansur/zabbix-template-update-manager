@@ -1,52 +1,46 @@
 # Production readiness
 
-ZTUM tracks four independent states:
+Updated: 2026-10-10
 
-1. **Implementation readiness** — required functionality exists.
-2. **Automation validation** — deterministic CI/security/quality gates pass.
-3. **Field validation** — the exact build has been exercised on real supported Zabbix environments.
-4. **Release readiness** — licensing, compatibility notes, release assets and final gates are complete.
+**Current decision: not production-ready.** The published laboratory prerelease is `v0.1.0-beta.61`. `v0.2.0-beta.1` is a proposed community-testing milestone only; it has not been validated, tagged or published.
 
-A green workflow does not by itself make the module production-ready.
+Readiness comprises four independent gates: implementation, automated verification, real field validation, and immutable release artifacts/documentation. No percentage for implementation can substitute for a controlled failure-recovery test.
 
-## Current posture
+## Current evidence
 
-- Core implementation: **100% engineering-complete for the declared scope**; no known repository-side implementation blocker remains.
-- Automated validation: strong, including PHP 8.2/8.3/8.4, Zabbix 7/8 frontend-symbol compatibility, disposable official Zabbix 7/8 Chromium frontend smoke, batch-asset smoke, accessibility contracts and minimum coverage/reachability floors.
-- Zabbix 7.x field evidence: beta.61 has recorded the read-only/UI path, light/dark themes, policy lifecycle, operation-history persistence, historical BASE/three-way analysis, reviewed controlled update, controlled installation, rollback/recovery backup, post-write validation and successful reviewed multi-template batch execution. Stop-on-first-failure, resilience/offline/serialization and negative-security paths remain open.
-- Zabbix 8.x field evidence: partial; full controlled write/rollback/offline validation remains open.
+- Core functionality is implemented for the declared engineering scope. Controlled configuration imports share a single write boundary.
+- Automated CI includes PHP 8.2/8.3/8.4, security checks, cross-Zabbix frontend compatibility, Chromium/full-stack read-only smoke, and packaging checks. Results need checking against each intended release commit.
+- Zabbix 7.0.31 laboratory evidence includes controlled updates, installation, rollback/recovery backup and successful reviewed multi-template batch execution. Full fault-injection and security-negative testing remains open.
+- Zabbix 8.0 RC1 laboratory UI reported four manually reviewed batch updates completed and validated on 2026-10-10, each with zero linked hosts. This evidence does **not** establish rollback, customization preservation, or production suitability. See [field record](lab-validation-2026-10-10.md).
+- PR #114 (upstream index publication resilience) was merged into main; a post-merge successful index publication remains to be confirmed.
 - License: AGPL-3.0-only.
-- Formal laboratory prerelease target: `v0.1.0-beta.61`, to be published with `.tar.gz`, `.zip` and `SHA256SUMS` after the release-runtime gates pass.
-- Engineering readiness handoff: [`audits/2026-09-29-engineering-readiness-handoff.md`](audits/2026-09-29-engineering-readiness-handoff.md).
-- RC validation: pending by design; tracked separately from implementation readiness.
-- Production recommendation: not yet.
 
-## Stable 1.0 gates
+## Mandatory gates before RC / production recommendation
 
-Before stable 1.0:
+- All relevant CI/security/quality/package gates green on the exact immutable candidate.
+- No unresolved high-severity security, configuration corruption, or data-loss defect.
+- Full supported Zabbix 7.x and 8.x controlled-write matrix documented.
+- Standard and reviewed update; local-overwrite acceptance; batch stop-on-first-failure.
+- Controlled installation, failure diagnostics and uncertain-write stop handling.
+- Verified backup, recovery backup, and a successful controlled rollback on both generations.
+- Offline-only bundle and global serialization checks.
+- Permission, CSRF, stale/tampered evidence, tampered-backup and integrity failure tests.
+- Interrupted/resumed batch without unsafe duplicate import.
+- Clean install and in-place upgrade from checksummed public artifacts.
+- Native light/dark UI passes on both Zabbix generations.
+- Independent reproducible field validation by another tester.
+- Final security and release review.
 
-- CI, security, quality and runtime smoke gates green;
-- no unresolved high-severity safety/data-loss issue;
-- Zabbix 7.x and 8.x field matrix recorded;
-- fresh install and in-place module upgrade validated;
-- standard update, reviewed update, local-overwrite acknowledgement and batch stop-on-failure validated;
-- controlled installation and failure handling validated;
-- rollback + recovery backup validated;
-- offline-only and serialization behavior validated;
-- light/dark UI pass recorded for both supported generations;
-- compatibility documentation current;
-- license/notice present;
-- a formal prerelease built and installed from its generated release artifacts;
-- checksums verified;
-- interrupted/resumed batch behavior validated;
-- an independent reviewer has returned a reproducible validation bundle for the candidate.
+## Release staging
 
-## Non-blocking enhancements
+1. Maintain the immutable `v0.1.0-beta.61` laboratory release and its checksum evidence.
+2. Complete priority-1 field and security gates before promoting a new community candidate.
+3. After passing gates, update VERSION, manifest, changelog and guides consistently; validate an immutable `v0.2.0-beta.1` archive before advertising it.
+4. Publish a community-testing beta with explicit laboratory-only warning. RC and production approval remain separate decisions.
 
-The following improve maintainability/operations but do not independently prove release safety:
+## Non-blocking improvements
 
-- deepen disposable full-Zabbix smoke beyond read-only catalog/history rendering when a safe deterministic write fixture is available;
-- drill-down/filtering for very large three-way comparisons;
-- deeper second-party/third-party penetration review beyond the reproducible independent validation gate.
+- More interactive diff inspection for very large three-way comparisons.
+- Broader third-party code and penetration review beyond the minimum independent evidence gate.
 
-Operation history, inherited host-impact presentation and batch JavaScript extraction are implemented. Write-path safety and real field evidence still take precedence over additional UI automation.
+Refer to [project status](project-status.md), [compatibility](compatibility.md) and [lab test plan](lab-test-plan.md).
