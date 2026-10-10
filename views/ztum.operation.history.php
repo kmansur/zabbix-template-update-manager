@@ -47,7 +47,8 @@ foreach ($data['entries'] as $entry) {
 	$table->addRow([
 		(string) ($entry['created_at'] ?? ''),
 		ucfirst(str_replace(['_', '-'], ' ', (string) ($entry['operation'] ?? ''))),
-		(string) ($entry['subject'] ?? ''),
+		(new CSpan((string) ($entry['display_subject'] ?? $entry['subject'] ?? '')))
+			->setAttribute('title', (string) ($entry['subject'] ?? '')),
 		FrontendUi::status(
 			ucfirst(str_replace(['_', '-'], ' ', (string) ($entry['status'] ?? 'unknown'))),
 			in_array((string) ($entry['status'] ?? ''), ['updated', 'installed', 'rolled_back', 'completed'], true)
