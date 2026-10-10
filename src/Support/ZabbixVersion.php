@@ -34,6 +34,12 @@ final class ZabbixVersion {
 		return (int) $matches[1].'.'.(int) $matches[2];
 	}
 
+	/** Beta/RC/alpha source trees must not inherit stable initial-release baselines. */
+	public static function isPrerelease(?string $version = null): bool {
+		$version = $version ?? self::current();
+		return preg_match('/^\\d+\\.\\d+\\.\\d+(?:[-._~]?(?:alpha|beta|rc|pre|dev)\\d*)/i', trim($version)) === 1;
+	}
+
 	public static function isSupported(?string $version = null): bool {
 		$major = self::major($version);
 
