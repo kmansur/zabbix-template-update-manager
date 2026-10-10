@@ -14,6 +14,8 @@ Current version: **0.1.0-beta.61**
 
 This version is intended for **laboratory testing**.
 
+**Validation update (2026-10-10):** Zabbix 7.0.31 has partial controlled-update/install/rollback field evidence, and a Zabbix 8.0 RC1 laboratory reviewed batch reported 4 updated/validated templates with 0 linked hosts. Zabbix 8 rollback, interruption/failure injection, offline/serialization, and negative-security checks remain open. PR #114 was merged to harden upstream-index publication, but a successful post-merge index refresh is not yet confirmed. **`v0.2.0-beta.1` is a proposed future community beta, not a published or approved release.** See [current project status](docs/project-status.md), [compatibility](docs/compatibility.md) and [production readiness](docs/production-readiness.md).
+
 - Implementation: ready for end-to-end laboratory validation.
 - Automation validation: must be green for the beta snapshot commit.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
