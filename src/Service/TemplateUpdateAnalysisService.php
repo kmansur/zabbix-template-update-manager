@@ -388,6 +388,18 @@ final class TemplateUpdateAnalysisService {
 						(int) ($candidate['commit_count'] ?? 0),
 						isset($candidate['semantic_distance']) ? (string) $candidate['semantic_distance'] : 'unknown'
 					));
+					$representation = $candidate['auto_start_diagnostic'] ?? [];
+					if (is_array($representation) && $representation !== []) {
+						error_log(sprintf(
+							'[Zabbix Template Update Manager] Historical dashboard auto_start diagnostic for template %s: commit=%s equivalent=%d different=%d unknown=%d truncated=%s (read-only; baseline remains blocked)',
+							$templateId,
+							(string) ($candidate['commit'] ?? ''),
+							(int) ($representation['equivalent'] ?? 0),
+							(int) ($representation['different'] ?? 0),
+							(int) ($representation['unknown'] ?? 0),
+							!empty($representation['truncated']) ? 'yes' : 'no'
+						));
+					}
 					$structure = $candidate['change_structure'] ?? [];
 					if (is_array($structure) && $structure !== []) {
 						error_log(sprintf(
