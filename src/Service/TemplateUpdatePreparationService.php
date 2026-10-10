@@ -77,8 +77,20 @@ final class TemplateUpdatePreparationService {
 
         $manual = $freshStatus === 'review_backup_verified';
         $preflight = ($this->preflight)($templateId, $manual);
-        if (!is_array($preflight)) {
-            throw new RuntimeException('Fresh update preflight returned invalid evidence.');
+        if (!is_array($preflight)
+            || ($preflight['status'] ?? null) !== 'passed'
+            || !empty($preflight['write_enabled'])
+            || (string) ($preflight['template']['templateid'] ?? '') !== $templateId
+            || !is_array($preflight['candidate'] ?? null)
+            || !is_array($preflight['rollback'] ?? null)
+            || !preg_match('/^[a-f0-9]{64}$/', (string) ($preflight['evidence_sha256'] ?? ''))
+            || (bool) ($preflight['manual_override'] ?? false) !== $manual) {
+            throw new RuntimeException('Fresh preflight did not provide valid, non-write confirmation evidence.');
+        }
+        if ($manual && !in_array('unverified_historical_baseline',
+                (array) ($fresh['update_readiness']['manual_reasons'] ?? []), true)
+                && empty($fresh['update_readiness']['manual_confirmation_required'])) {
+            throw new RuntimeException('Reviewed update reasons are not consistent with fresh readiness.');
         }
         return $preflight;
     }
