@@ -22,7 +22,7 @@ if (str_contains($plan, 'verify against the published GitHub Release')
 // Development candidates may move VERSION forward without fabricating a tag,
 // commit hash or checksums. A tagged release must still provide matching metadata.
 $publishedVersion = null;
-if (preg_match('/^# Laboratory test plan — ([0-9]+\\.[0-9]+\\.[0-9]+-beta\\.[0-9]+)/m', $plan, $matches) === 1) {
+if (preg_match('/^# Laboratory test plan — ([0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+)/m', $plan, $matches) === 1) {
     $publishedVersion = $matches[1];
 }
 if ($publishedVersion === null) {
@@ -30,6 +30,9 @@ if ($publishedVersion === null) {
 }
 if (version_compare($version, $publishedVersion, '<')) {
     failLabMetadata('Current VERSION cannot be older than the immutable laboratory plan.');
+}
+if (in_array('--require-published', $argv, true) && $version !== $publishedVersion) {
+    failLabMetadata('Cannot publish: candidate VERSION does not match the immutable release plan.');
 }
 if ($version !== $publishedVersion) {
     $status = (string) file_get_contents($root.'/docs/project-status.md');
