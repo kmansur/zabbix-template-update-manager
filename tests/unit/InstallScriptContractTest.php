@@ -13,6 +13,8 @@ $requirements = [
     'assets included' => 'for d in actions assets src views;',
     'registered update JavaScript verification' => 'assets/js/ztum-update-batch.js',
     'registered install JavaScript verification' => 'assets/js/ztum-install-batch.js',
+    'backup id assigned before use' => 'folder="$BACKUP_BASE/$id"',
+    'cleanup old initialized outside local scope' => '  old=""',
     'upgrade flag' => '--upgrade) UPGRADE=1',
     'rollback flag' => '--rollback) (($# >= 2))',
     'version-gated upgrade' => 'version_compare($argv[1],$argv[2], ">")',
