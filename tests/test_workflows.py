@@ -32,7 +32,7 @@ def main() -> int:
             if not isinstance(value, str) or not value.startswith("actions/"):
                 continue
             assert re.fullmatch(r"actions/[A-Za-z0-9_.-]+@v\d+", value), (
-                f"{workflow}: first-party action must be pinned to an explicit major version: {value}"
+                f"{workflow}: first-party action must be pinned to an immutable 40-character SHA: {value}"
             )
 
 
