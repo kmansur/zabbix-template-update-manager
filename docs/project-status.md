@@ -19,6 +19,29 @@ This page separates implemented functionality, automated checks, operator-observ
 - **Check:** Added `ModuleReleaseCheckServiceTest.php` fixtures for newer beta, current version, stable version, drafts, external URL and empty releases. CI executes all `tests/unit/*Test.php` and PHP lint. Additional injected-transport negative tests cover HTTP 403/429/500, connection failure, malformed/oversized JSON and empty releases. **New tests and CI must be verified against the final commit.** The user has validated the normal UI case on Zabbix 7 and 8, and verified the new route denies Admin on Zabbix 8.
 - **Act:** Keep operation manual and read-only. Validate the button with GitHub reachable, inaccessible and no releases; verify Super Admin-only access, PHP cURL and compatibility. Update production-readiness evidence only after field tests. No new release tag published.
 
+## PDCA reassessment — 2026-10-10, commit a97aae7
+
+### Plan
+Keep ZTUM restricted to Super Admin on every registered action; maintain the manual, read-only release checker; verify safe update/rollback and release gates in both supported frontend generations. Continue the feature freeze.
+
+### Do
+Authorization was restricted across 24 registered routes. Legacy contract tests were updated to match the Super Admin-only policy. A read-only GitHub release checker and bounded negative-transport tests were added. Production implementation of template import, backup and rollback was not changed in the contract-fix cycle.
+
+### Check — confirmed evidence
+- On the Zabbix 8 test machine, **88/88 PHP unit/contract tests passed** at commit `a97aae7`.
+- The operator confirmed all three main-branch GitHub Actions workflows green on the same commit: **CI** run `38076317676`, **Security** run `38076317614`, and **Quality Metrics** run `38076317646`.
+- The release-checker normal path was observed in the Zabbix 7 and Zabbix 8 UI; its negative HTTP/transport cases passed via injected test transport, *not* by blocking the real GitHub service.
+- Zabbix 8 Admin was denied navigation and direct access to the catalog/release checker; Super Admin remained functional. Static contracts cover all 24 actions; they are not equivalent to HTTP tests of every action.
+- Controlled positive batch update and Acronis rollback/re-update were observed in Zabbix 8 with zero linked hosts. Preparation stop, persistent failure-blocking and isolated JavaScript failure cases passed.
+- Missing/invalid CSRF requests were rejected. **The valid-CSRF-token + malformed input differential HTTP test remains outstanding**; no claim of full CSRF certification is made.
+
+### Act — gate decisions
+- **Automated regression gate: PASS for `a97aae7`.** Recheck after any subsequent code change.
+- **Normal release-checker feature: accepted for lab use**, without auto-update or web-process code-writing privileges.
+- **Broader laboratory field/safety gate: OPEN.** Priority checks: (1) valid-token CSRF differential; (2) interruption/uncertain-write recovery through HTTP; (3) tampered evidence/backup negatives; (4) offline serialization; (5) post-merge index publication; (6) clean install/upgrade and independent reproducibility on immutable artifacts.
+- **Community beta `v0.2.0-beta.1`: HOLD until its documented candidate gates are met.**
+- **RC / production: NOT APPROVED.** No release, tag or version change was made as part of this PDCA.
+
 ## Engineering and evidence status
 
 | Workstream | Status | Evidence and limits |
