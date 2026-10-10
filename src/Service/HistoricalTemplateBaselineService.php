@@ -8,6 +8,7 @@ use RuntimeException;
 
 require_once __DIR__.'/HistoricalDashboardNormalizationDiagnostic.php';
 require_once __DIR__.'/HistoricalDashboardCandidateCorrelation.php';
+require_once __DIR__.'/HistoricalCandidateProvenanceAudit.php';
 
 final class HistoricalTemplateBaselineService {
 
@@ -260,6 +261,11 @@ final class HistoricalTemplateBaselineService {
 			}
 		}
 
+		$provenanceAudit = HistoricalCandidateProvenanceAudit::evaluate($candidates, $historyTruncated);
+		if ($provenanceAudit['status'] === 'integrity_failed') {
+			throw new RuntimeException('Historical candidate isolated-source integrity verification failed.');
+		}
+
 		if ($distinctCandidateCount === 1) {
 			$selected = $candidates[0];
 			return $this->foundResult(
@@ -305,6 +311,7 @@ final class HistoricalTemplateBaselineService {
 			'closest_commit' => $closest['commit'] ?? '',
 			'closest_changes' => $closest['semantic_distance'] ?? null,
 			// Audit-only candidate identities; never feed a guessed source to import.
+			'provenance_audit' => $provenanceAudit,
 			'candidate_audit' => array_map(static fn(array $candidate): array => [
 				'commit' => $candidate['commit'],
 				'source_sha256' => $candidate['source_sha256'],
