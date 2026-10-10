@@ -31,7 +31,7 @@ def main() -> int:
         for value in walk(data):
             if not isinstance(value, str) or not value.startswith("actions/"):
                 continue
-            assert re.fullmatch(r"actions/[A-Za-z0-9_.-]+@v\d+", value), (
+            assert re.fullmatch(r"actions/[A-Za-z0-9_.-]+@[a-f0-9]{40}", value), (
                 f"{workflow}: first-party action must be pinned to an immutable 40-character SHA: {value}"
             )
 
