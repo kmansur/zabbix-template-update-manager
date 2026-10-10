@@ -1,59 +1,45 @@
-# Compatibility
+# Compatibility and field-validation status
 
-This matrix separates declared support from recorded field evidence. A supported code path is not automatically considered fully field-validated.
+Updated: 2026-10-10
 
-## Supported generations
+The supported runtime policy is separate from **observed laboratory results**. A successful integration smoke or individual field operation does not establish full compatibility.
 
-| Zabbix generation | Runtime policy | Current field status | Notes |
-|---|---|---|---|
-| 7.x | Supported | Partially field-validated | Catalog, upstream identity, comparison, controlled update and multiple install/batch paths have real laboratory evidence. Current UI pass includes native pagination and Name + Status filtering. |
-| 8.x | Supported | Partial / validation in progress | Real Zabbix 8.0.0beta2 + PHP 8.4.24 exposed the pager-constant incompatibility fixed in beta.53. Catalog loading and native pagination were then confirmed. Full write-path/rollback/offline matrix remains open. |
+| Zabbix generation | Runtime policy | Observed field evidence | Still required |
+| --- | --- | --- | --- |
+| 7.x | Supported code path, pending full field matrix | Native catalog, pagination/filter, official identity and comparison; controlled update, installation, recovery backup/rollback and reviewed batch recorded on Zabbix 7.0.31 | Interruption and fault injection, security-negative cases, offline-only, serialization, installation/upgrade reproducibility |
+| 8.x | Supported code path, pending full field matrix | Earlier Zabbix 8.0.0beta2/PHP 8.4.24 exposed a pager-symbol mismatch fixed in beta.53. On 2026-10-10 a Zabbix 8.0 RC1 laboratory UI reported four manually reviewed batch updates validated (zero linked hosts) | Controlled rollback/recovery backup, negative/failure paths, wider template and host-impact coverage, full installation and upgrade tests |
 
-ZTUM detects the running frontend through `ZABBIX_VERSION` and fails closed for unsupported/unknown major generations.
+See [observed Zabbix 8 field evidence](lab-validation-2026-10-10.md). The snapshot does not prove local customization preservation or host/item behavior.
 
-## One package
+## Runtime behavior
 
-ZTUM intentionally ships one source tree and one module package for Zabbix 7.x and 8.x. Native Zabbix APIs/helpers are preferred so version-specific frontend implementation details remain inside Zabbix wherever possible.
+The module reads `ZABBIX_VERSION` and fails closed for unsupported or unknown major generations. One package targets Zabbix 7.x and 8.x with native frontend conventions and compatibility checks.
 
-## Field-validation dimensions
+PHP syntax/unit checks run on PHP 8.2, 8.3 and 8.4. The final supported combinations depend on the PHP versions supported by each target Zabbix frontend, and exact tested pairs must be recorded.
 
-The 1.0 readiness matrix records these dimensions independently:
+## Automated checks are not field certification
 
-- module discovery and enablement;
-- catalog and upstream-index retrieval;
-- Name + Status filtering and native pagination;
-- read-only comparison and historical BASE resolution;
-- three-way analysis and risk/readiness;
-- rollback-backup creation and integrity verification;
-- standard controlled update;
-- reviewed update;
-- local-overwrite acknowledgement;
-- request-bounded batch update and stop-on-failure;
-- controlled missing-template installation and batch installation;
-- Never update / Allow updates policy;
-- rollback review, recovery backup and controlled rollback;
-- offline-only bundle mode;
-- controlled-operation serialization;
-- light/dark theme presentation;
-- permission, CSRF, evidence-tamper and backup-tamper negative checks.
+Repository automation includes native frontend-symbol verification for Zabbix 7 and 8, browser and accessibility smoke, controlled-write boundary/security guards and release package checks. Full-stack browser smoke is read-only; it does not replace real configuration-write/rollback testing.
 
-See [lab-test-plan.md](lab-test-plan.md) and the current GitHub 1.0 readiness issue for evidence capture.
+## Minimum real-world matrix
 
-## PHP
-
-ZTUM runtime code is expected to work with PHP versions supported by the target Zabbix frontend. Repository CI executes syntax and unit tests on PHP 8.2, 8.3 and 8.4. It also checks ZTUM native frontend classes/constants against the Zabbix 7.0 source tree and the current Zabbix 8.0 source line. Real field evidence remains tied to the exact Zabbix/PHP pair recorded during validation.
-
-## Automated compatibility evidence
-
-The cross-Zabbix frontend-symbol gate was added after real Zabbix 8 testing exposed a renamed pager constant that repository-only tests had missed. Guarded optional constants are permitted, while unguarded native class/constant references must exist in both supported frontend source trees.
-
-Chromium smoke tests exercise both the extracted update/install batch orchestration assets and disposable official Zabbix 7.x/8.x frontend stacks. The full-stack smoke registers the module through the Zabbix API, logs into the real frontend, renders the catalog in dark and light themes, applies a native Name filter, and opens operation history. It remains read-only and does not replace controlled-write field validation.
+- Clean module discovery/enabling and in-place upgrade
+- Catalog, upstream access, native filtering, themes and pagination
+- Official UUID matching and BASE / LOCAL / UPSTREAM comparison
+- Standard and explicit reviewed updates, local-overwrite warnings
+- Missing-template installation and bounded batch installation
+- Persistent Never update policy and operation history
+- Verified backups, recovery backup, explicit rollback and final consistency checks
+- Batch first-failure stop, interruption and durable resume
+- Offline-only bundles and global write serialization
+- Admin access, CSRF, tampered backup/source and stale evidence rejection
 
 ## Known limitations
 
+- Production use is not recommended.
+- Missing historical BASE does not prove an absence of local changes; explicitly reviewed writes can still overwrite customizations.
+- No automatic rollback after ambiguous writes.
+- Multi-frontend deployments require a shared private lock location with reliable cross-node `flock()`.
+- Host-impact completeness depends on the runtime API's ability to resolve the inheritance graph.
 
-- Full Zabbix 8.x write-path field validation is not yet complete.
-- Disposable full-stack browser smoke proves module registration/rendering against official container images, but it intentionally does not execute configuration writes.
-- Multi-node serialization requires `ZTUM_LOCK_DIR` to point to shared private storage with reliable cross-node `flock()` semantics.
-- Operation impact distinguishes direct and inherited template-to-host reach only when the runtime API can resolve the inheritance graph authoritatively.
-- Production recommendation remains gated by the documented release/field criteria, not by CI alone.
+For promotion criteria see [production readiness](production-readiness.md) and [lab test plan](lab-test-plan.md).
