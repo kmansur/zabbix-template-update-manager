@@ -19,6 +19,7 @@ final class UpstreamTemplateHistoryRepository {
 	private const MAX_COMMITS = 75;
 	private const MAX_RESPONSE_BYTES = 2097152;
 	private const CHANGES_LIMIT = 1000;
+	private const HISTORY_REQUEST_TIMEOUT_SECONDS = 12;
 
 	public function __construct(?OfflineBundleRepository $offlineBundle = null) {
 		$this->offlineBundle = $offlineBundle ?? new OfflineBundleRepository();
@@ -277,7 +278,7 @@ final class UpstreamTemplateHistoryRepository {
 				CURLOPT_FOLLOWLOCATION => true,
 				CURLOPT_MAXREDIRS => 3,
 				CURLOPT_CONNECTTIMEOUT => 3,
-				CURLOPT_TIMEOUT => 6,
+				CURLOPT_TIMEOUT => self::HISTORY_REQUEST_TIMEOUT_SECONDS,
 				CURLOPT_USERAGENT => ProjectVersion::userAgent(),
 				CURLOPT_SSL_VERIFYPEER => true,
 				CURLOPT_SSL_VERIFYHOST => 2,
@@ -317,7 +318,7 @@ final class UpstreamTemplateHistoryRepository {
 		$context = stream_context_create([
 			'http' => [
 				'method' => 'GET',
-				'timeout' => 6,
+				'timeout' => self::HISTORY_REQUEST_TIMEOUT_SECONDS,
 				'follow_location' => 0,
 				'header' => 'User-Agent: '.ProjectVersion::userAgent()."\r\n"
 			],
