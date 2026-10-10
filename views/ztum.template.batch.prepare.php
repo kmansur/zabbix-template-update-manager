@@ -132,12 +132,19 @@ $page
 	]))
 	->addItem($table);
 
+$lossWarning = (new CDiv())->setId('ztum-batch-loss-warning');
+$lossWarning->addItem(FrontendUi::message(
+	_('Selected updates with confirmed local-overwrite risk will be reported here. Review their differences before confirming.'),
+	FrontendUi::WARNING
+));
+$lossWarning->setAttribute('hidden', 'hidden');
+
 $executionState = (new CSpan(_('Waiting for preparation.')))
 	->setId('ztum-batch-execution-state');
 
 $confirm = (new CCheckBox('confirm', '1'))
 	->setId('ztum-batch-confirm')
-	->setLabel(_('I reviewed the completed plan and accept the Manual review reasons for the selected templates.'))
+	->setLabel(_('I reviewed the selected updates, including any identified local-customization losses, and accept the risks of overwriting installed settings.'))
 	->setEnabled(false);
 
 $submit = (new CButton('ztum-batch-update-submit', _('Update eligible templates')))
@@ -160,6 +167,7 @@ $page
 		'Ready templates can be updated after preparation completes. Eligible Manual review rows require explicit selection. Each template receives a fresh preflight immediately before import; execution stops on the first failure and rollback is never automatic.'
 	)))
 	->addItem(FrontendUi::description($executionState))
+	->addItem($lossWarning)
 	->addItem(new CDiv([$confirm]))
 	->addItem(new CDiv([$submit]))
 	->addItem($executionSummary);
@@ -231,6 +239,7 @@ $jsLabels = json_encode([
 	'retrying_failed' => _('Retrying failed preparation...'),
 	'retry_complete' => _('Failed preparation retry complete.'),
 	'execution_ready' => _('Ready for execution'),
+	'local_loss_warning' => _('Warning: {count} selected template(s) may overwrite or remove identified local customizations. Open Review details for every affected template before confirming. A rollback backup does not prevent this loss.'),
 	'select_reviewed' => _('Include reviewed update'),
 	'select_all_reviewed' => _('Select all eligible reviewed updates'),
 	'clear_all_reviewed' => _('Clear reviewed selection'),
