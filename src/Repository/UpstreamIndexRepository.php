@@ -348,8 +348,15 @@ final class UpstreamIndexRepository {
 			return;
 		}
 
-		$tmpFile = $cacheFile.'.tmp-'.getmypid();
-		if (@file_put_contents($tmpFile, $content, LOCK_EX) === false) {
+		$tmpFile = $cacheFile.'.tmp-'.bin2hex(random_bytes(12));
+		$oldUmask = umask(0077);
+		try {
+			$written = @file_put_contents($tmpFile, $content, LOCK_EX);
+		}
+		finally {
+			umask($oldUmask);
+		}
+		if ($written === false) {
 			return;
 		}
 
