@@ -126,8 +126,11 @@ verified_backup() {
   [[ -d "$folder" && ! -L "$folder" ]] || die "Backup not found"
   [[ "$(stat -c '%U:%a' "$folder")" == "root:700" ]] || die "Unsafe backup permissions"
   [[ -f "$folder/SHA256SUMS" && ! -L "$folder/SHA256SUMS" ]] || die "Missing checksum manifest"
+  log "Rollback preflight: checking backup $id" >&2
   expected="$(cat "$folder/SHA256SUMS")"
-  verify_tree "$folder/module" "$expected" || die "Backup integrity failure; no changes made"
+  [[ -n "$expected" ]] || die "Empty backup checksum manifest; rollback aborted before changes"
+  verify_tree "$folder/module" "$expected" || die "Backup integrity failure (missing, changed or extra files); rollback aborted before changes"
+  log "Rollback preflight: SHA-256 inventory verified; no missing, changed or extra files" >&2
   printf '%s\n' "$folder/module"
 }
 prepare_stage() {
@@ -178,6 +181,7 @@ do_upgrade_or_rollback() {
     saved="$(verified_backup "$ROLLBACK")"
     log "Restoring verified backup: $ROLLBACK"
     prepare_stage "$saved" "$stage"
+    log "Rollback preflight: staged files validated; backup integrity confirmed"
   else
     new_version="$(cat "$SOURCE_DIR/VERSION")"
     [[ -n "$current_version" ]] || die "Cannot identify installed version"
