@@ -321,7 +321,7 @@ final class UpstreamIndexRepository {
 		$mode = @fileperms($this->cacheDir);
 		$owner = @fileowner($this->cacheDir);
 		return $mode !== false && ($mode & 0777) === 0700
-			&& $owner !== false && $owner === @posix_geteuid();
+			&& $owner !== false && function_exists('posix_geteuid') && $owner === posix_geteuid();
 	}
 
 	private function readCache(string $cacheFile): ?array {
