@@ -24,6 +24,7 @@ require_once dirname(__DIR__).'/Repository/UpstreamTemplateSourceRepository.php'
 require_once __DIR__.'/ContentComparisonClassifier.php';
 require_once __DIR__.'/HistoricalTemplateBaselineService.php';
 require_once __DIR__.'/HistoricalDashboardCandidateCorrelation.php';
+require_once __DIR__.'/HistoricalDashboardResidualDiagnostic.php';
 require_once __DIR__.'/ImportCompareSummary.php';
 require_once __DIR__.'/TemplateBackupVerificationService.php';
 require_once __DIR__.'/TemplateExportService.php';
@@ -369,7 +370,11 @@ final class TemplateUpdateAnalysisService {
 									return ['unverified' => 1, 'complete' => false];
 								}
 							}
-							return HistoricalDashboardCandidateCorrelation::compare($source, $rows);
+							$correlation = HistoricalDashboardCandidateCorrelation::compare($source, $rows);
+							$nativeDiff = (new TemplateImportCompareService())->compare($source);
+							$preview = UpdatePreviewAnalyzer::analyze($nativeDiff, 100);
+							$correlation['residual'] = HistoricalDashboardResidualDiagnostic::assess($preview, $correlation);
+							return $correlation;
 						}
 					);
 				}
@@ -417,6 +422,20 @@ final class TemplateUpdateAnalysisService {
 				}
 				foreach ((array) ($baseline['candidate_audit'] ?? []) as $candidate) {
 					$correlation = $candidate['dashboard_correlation'] ?? [];
+					$residual = is_array($correlation) ? ($correlation['residual'] ?? []) : [];
+					if (is_array($residual) && $residual !== []) {
+						error_log(sprintf(
+							'[Zabbix Template Update Manager] Historical dashboard residual for template %s: commit=%s status=%s direct_changes=%d target_missing_to_no=%d other_changes=%d truncated=%s (diagnostic only; baseline remains blocked)',
+							$templateId,
+							(string) ($candidate['commit'] ?? ''),
+							in_array($residual['status'] ?? '', ['unverified', 'dashboard_snapshot_omission_correlated'], true) ? $residual['status'] : 'unverified',
+							(int) ($residual['direct_changes'] ?? 0),
+							(int) ($residual['target_missing_to_no'] ?? 0),
+							(int) ($residual['other_changes'] ?? 0),
+							!empty($residual['details_truncated']) ? 'yes' : 'no'
+						));
+					}
+
 					if (is_array($correlation) && $correlation !== []) {
 						error_log(sprintf(
 							'[Zabbix Template Update Manager] Historical dashboard candidate correlation for template %s: commit=%s candidate=%d local=%d matched=%d unverified=%d complete=%s (diagnostic only; baseline remains blocked)',
