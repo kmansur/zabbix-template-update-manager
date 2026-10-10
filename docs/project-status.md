@@ -12,6 +12,13 @@ This page separates implemented functionality, automated checks, operator-observ
 - Feature freeze: prioritize test evidence, defect fixes and documentation over new features.
 - Production use: **not recommended**.
 
+## 2026-10-10 PDCA — manual ZTUM release check
+
+- **Plan:** Provide Super Admin-only manual visibility into published GitHub releases (including betas and RCs), without granting PHP filesystem write privileges or introducing auto-update.
+- **Do:** Added a dedicated read-only route, an explicit header link, strict HTTPS GitHub API URL, timeout, TLS peer verification, no redirects, bounded JSON response, release tag/version comparison and GitHub-host allowlist for release links.
+- **Check:** Added `ModuleReleaseCheckServiceTest.php` fixtures for newer beta, current version, stable version, drafts, external URL and empty releases. CI executes all `tests/unit/*Test.php` and PHP lint. **CI outcome and live Zabbix 7/8 UI/API behavior must be verified against the final commit; no live success is asserted.**
+- **Act:** Keep operation manual and read-only. Validate the button with GitHub reachable, inaccessible and no releases; verify Super Admin-only access, PHP cURL and compatibility. Update production-readiness evidence only after field tests. No new release tag published.
+
 ## Engineering and evidence status
 
 | Workstream | Status | Evidence and limits |
