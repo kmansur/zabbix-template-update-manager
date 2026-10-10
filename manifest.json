@@ -71,6 +71,10 @@
             "class": "TemplateBackupList",
             "view": "ztum.template.backup.list"
         },
+        "ztum.template.prepare": {
+            "class": "TemplateUpdatePrepare",
+            "view": "ztum.template.preflight"
+        },
         "ztum.template.preflight": {
             "class": "TemplatePreflight",
             "view": "ztum.template.preflight"
