@@ -388,6 +388,19 @@ final class TemplateUpdateAnalysisService {
 						(int) ($candidate['commit_count'] ?? 0),
 						isset($candidate['semantic_distance']) ? (string) $candidate['semantic_distance'] : 'unknown'
 					));
+					$structure = $candidate['change_structure'] ?? [];
+					if (is_array($structure) && $structure !== []) {
+						error_log(sprintf(
+							'[Zabbix Template Update Manager] Historical candidate structure for template %s: commit=%s direct_fields=%d entity_additions=%d entity_removals=%d unresolved_identity=%d truncated=%s (diagnostic only)',
+							$templateId,
+							(string) ($candidate['commit'] ?? ''),
+							(int) ($structure['direct_fields'] ?? 0),
+							(int) ($structure['entity_additions'] ?? 0),
+							(int) ($structure['entity_removals'] ?? 0),
+							(int) ($structure['unresolved_identity'] ?? 0),
+							!empty($structure['details_truncated']) ? 'yes' : 'no'
+						));
+					}
 					foreach ((array) ($candidate['field_names'] ?? []) as $field => $count) {
 						if (!is_string($field) || !is_int($count) || $count < 0) {
 							continue;
