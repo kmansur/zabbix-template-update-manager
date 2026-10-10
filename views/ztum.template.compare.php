@@ -340,6 +340,13 @@ if (is_array($data['historical_baseline'])) {
 		]);
 
 	$page->addItem(FrontendUi::section(_('Historical baseline')))->addItem($baselineTable);
+	if ($baselineStatus !== 'found') {
+		$page->addItem(FrontendUi::message(
+			_('The historical baseline is not verified. The differences below compare the installed template with the proposed official version; ZTUM cannot determine which differences are local customizations. Review every proposed overwrite or removal before proceeding.'),
+			FrontendUi::WARNING
+		));
+	}
+
 
 	if ($baselineStatus === 'found') {
 		$historical = $data['historical_summary'];
@@ -387,6 +394,13 @@ if (is_array($data['three_way_analysis'])) {
 			$threeWaySummary['entities_affected']
 		]);
 
+
+	if ((int) ($threeWaySummary['local_only_overwrite'] ?? 0) > 0 || (int) ($threeWaySummary['conflict'] ?? 0) > 0) {
+		$page->addItem(FrontendUi::message(
+			_('Warning: the official update will overwrite or remove the local customizations identified below. Compare the LOCAL and UPSTREAM values carefully before confirming the update.'),
+			FrontendUi::WARNING
+		));
+	}
 	$page
 		->addItem(FrontendUi::section(_('Three-way analysis')))
 		->addItem($threeWayStatusTable)
