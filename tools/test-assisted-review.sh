@@ -10,6 +10,9 @@ for file in \
   src/Service/TemplateUpdateAnalysisService.php \
   src/Service/TemplateUpdatePreparationService.php \
   actions/TemplateUpdatePrepare.php \
+  actions/TemplateOperationHistory.php \
+  src/Service/TemplateHistorySubjectResolver.php \
+  views/ztum.operation.history.php \
   views/ztum.template.compare.php \
   views/ztum.template.preflight.php; do
   php -l "$file"
@@ -19,6 +22,7 @@ for test in \
   tests/unit/BaselineFreeAssistedReadinessTest.php \
   tests/unit/BaselineFreeAssistedFlowTest.php \
   tests/unit/TemplateUpdatePreparationServiceTest.php \
+  tests/unit/TemplateHistorySubjectResolverTest.php \
   tests/unit/NativeAutomaticPreparationContractTest.php \
   tests/unit/BaselineFreeBatchRestrictionTest.php \
   tests/unit/UpdateReadinessEvaluatorTest.php \
