@@ -146,6 +146,21 @@ assertBaseline(2, $categorized['candidate_audit'][0]['semantic_distance'], 'Cand
 assertBaseline(1, $categorized['candidate_audit'][0]['change_categories']['items']['added'],
 	'Native change-category counts must be present in read-only candidate audit.');
 assertBaseline(null, $categorized['source'], 'Change categorization cannot authorize a candidate source.');
+$structureMethod = new ReflectionMethod(HistoricalTemplateBaselineService::class, 'safeChangeStructure');
+$structure = $structureMethod->invoke(null, [
+	'details' => [
+		['change_type' => 'updated', 'path' => 'private'],
+		['change_type' => 'added', 'before' => 'secret'],
+		['change_type' => 'unresolved', 'entity' => 'confidential']
+	],
+	'details_truncated' => false
+]);
+assertBaseline(1, $structure['direct_fields'], 'Direct field differences must be identified separately.');
+assertBaseline(1, $structure['entity_additions'], 'Entity additions must be counted.');
+assertBaseline(1, $structure['unresolved_identity'], 'Unresolved identities must remain explicit.');
+assertBaseline(false, isset($structure['path']), 'Diagnostic must not expose entity paths.');
+assertBaseline(false, isset($structure['before']), 'Diagnostic must not expose field values.');
+
 $redactor = new ReflectionMethod(HistoricalTemplateBaselineService::class, 'safeFieldNames');
 $safeFields = $redactor->invoke(null, [
 	'details' => [
