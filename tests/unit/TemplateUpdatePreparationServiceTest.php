@@ -85,4 +85,55 @@ catch (RuntimeException $error) {
     checkPreparation(str_contains($error->getMessage(),'not eligible'),
         'Blocked readiness must not bypass safety gates.');
 }
+
+// Reusing an already verified backup must not create another artifact.
+$reused = 0;
+$existing = new TemplateUpdatePreparationService(
+    static fn(string $id): array => [
+        'template'=>['templateid'=>$id],
+        'update_readiness'=>['status'=>'backup_verified','backup_verified'=>true],
+        'backup_verification'=>['status'=>'current_match','current_match'=>true]
+    ],
+    static function (array $template) use (&$reused): array {
+        $reused++;
+        return [];
+    },
+    static fn(string $id,bool $manual): array => [
+        'status'=>'passed','write_enabled'=>false,'manual_override'=>false,
+        'template'=>['templateid'=>$id],
+        'candidate'=>['commit'=>str_repeat('a',40)],
+        'rollback'=>['sha256'=>hash('sha256','rollback')],
+        'evidence_sha256'=>hash('sha256','approved')
+    ]
+);
+checkPreparation($existing->prepare('10773')['status'] === 'passed',
+    'Previously verified backup should pass after fresh preflight.');
+checkPreparation($reused === 0, 'Do not create redundant rollback backups.');
+
+// A plausible but incomplete preflight must never reach the confirmation page.
+foreach ([
+    ['status'=>'blocked_candidate'],
+    ['status'=>'passed','write_enabled'=>true],
+    ['status'=>'passed','write_enabled'=>false,'manual_override'=>true,
+        'template'=>['templateid'=>'999'], 'candidate'=>[], 'rollback'=>[],
+        'evidence_sha256'=>hash('sha256','invalid')]
+] as $invalid) {
+    $broken = new TemplateUpdatePreparationService(
+        static fn(string $id): array => [
+            'template'=>['templateid'=>$id],
+            'update_readiness'=>['status'=>'backup_verified','backup_verified'=>true],
+            'backup_verification'=>['status'=>'current_match','current_match'=>true]
+        ],
+        static fn(array $template): array => throw new RuntimeException('No backup needed'),
+        static fn(string $id,bool $manual): array => $invalid
+    );
+    $rejected = false;
+    try {
+        $broken->prepare('10773');
+    }
+    catch (RuntimeException $error) {
+        $rejected = true;
+    }
+    checkPreparation($rejected, 'Missing or inconsistent preflight evidence must be rejected.');
+}
 echo "Automatic individual update preparation tests passed (no Zabbix import).\n";
