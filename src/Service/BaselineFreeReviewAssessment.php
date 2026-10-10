@@ -43,7 +43,7 @@ final class BaselineFreeReviewAssessment {
                 || trim($detail['path']) === ''
                 || !is_string($detail['field'] ?? null)
                 || !array_key_exists('before', $detail)
-                || !array_key_exists('after', $detail) {
+                || !array_key_exists('after', $detail)) {
                 return $result;
             }
         }
