@@ -3,6 +3,8 @@
 $root = dirname(__DIR__, 2);
 $manifest = json_decode(file_get_contents($root.'/manifest.json'), true);
 $action = file_get_contents($root.'/actions/TemplatePreflight.php');
+$prepareAction = file_get_contents($root.'/actions/TemplateUpdatePrepare.php');
+$preparationService = file_get_contents($root.'/src/Service/TemplateUpdatePreparationService.php');
 $view = file_get_contents($root.'/views/ztum.template.preflight.php');
 $compareView = file_get_contents($root.'/views/ztum.template.compare.php');
 $listView = file_get_contents($root.'/views/ztum.template.list.php');
@@ -35,7 +37,8 @@ assertPreflightActionContract(
 );
 assertPreflightActionContract(
 	strpos($action, "'manual_override' => 'in 1'") !== false
-		&& strpos($compareView, "new CVar('manual_override', '1')") !== false,
+		&& strpos($preparationService, '$manual = $freshStatus === \'review_backup_verified\';') !== false
+		&& strpos($preparationService, '($this->preflight)($templateId, $manual)') !== false,
 	'Reviewed preflight mode must be explicit in both the comparison form and controller input validation.'
 );
 assertPreflightActionContract(
@@ -49,10 +52,14 @@ assertPreflightActionContract(
 );
 
 assertPreflightActionContract(
-	strpos($compareView, "CCsrfTokenHelper::get('ztum.template.preflight')") !== false
+	strpos($compareView, "CCsrfTokenHelper::get('ztum.template.prepare')") !== false
+		&& strpos($compareView, "setArgument('action', 'ztum.template.prepare')") !== false
+		&& strpos($prepareAction, 'TemplateUpdatePreparationService') !== false
+		&& strpos($prepareAction, 'USER_TYPE_SUPER_ADMIN') !== false
+		&& strpos($prepareAction, 'disableCsrfValidation') === false
 		&& strpos($compareView, "new CForm('post')") !== false
 		&& strpos($compareView, "'backup_verified'") !== false,
-	'Comparison must invoke preflight through a CSRF-protected POST form only after backup verification.'
+	'Comparison must invoke verified preparation and fresh preflight through a CSRF-protected POST form.'
 );
 assertPreflightActionContract(
 	strpos($listView, "ztum.template.compare") !== false
