@@ -12,4 +12,14 @@ foreach (['reviewEvidence.get(entry.templateId)', 'requiresLocalOverwriteAck', '
         throw new RuntimeException('Batch selection protection missing: '.$needle);
     }
 }
+foreach (['Local customization risk', 'ztum-local-risk-', 'local_risk_known', 'local_risk_unknown', 'local_risk_not_reported'] as $needle) {
+    if (!str_contains($view, $needle)) {
+        throw new RuntimeException('Batch per-row risk labeling missing: '.$needle);
+    }
+}
+foreach (['hasKnownLocalRisk', 'ztum-local-risk-', 'labels.local_risk_unknown', 'labels.local_risk_not_reported'] as $needle) {
+    if (!str_contains($js, $needle)) {
+        throw new RuntimeException('Batch per-row risk behavior missing: '.$needle);
+    }
+}
 echo "Native batch loss-warning contract tests passed.\n";
