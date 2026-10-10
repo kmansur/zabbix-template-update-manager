@@ -19,8 +19,8 @@ foreach (['CPagerHelper', 'CUrl', 'CProfile'] as $class) {
 }
 
 assertCatalogControllerContract(
-	strpos($controller, 'return in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true);') !== false,
-	'Catalog access must be limited to Zabbix administrators and super administrators.'
+	strpos($controller, 'return $this->getUserType() === USER_TYPE_SUPER_ADMIN;') !== false,
+	'Catalog access must be restricted to Super Admin.'
 );
 
 assertCatalogControllerContract(
