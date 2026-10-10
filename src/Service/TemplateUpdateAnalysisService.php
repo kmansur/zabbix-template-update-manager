@@ -424,6 +424,19 @@ final class TemplateUpdateAnalysisService {
 						get_class($exception)
 					));
 				}
+				$audit = $baseline['provenance_audit'] ?? [];
+				if (is_array($audit) && $audit !== []) {
+					error_log(sprintf(
+						'[Zabbix Template Update Manager] Historical candidate provenance audit for template %s: status=%s candidates=%d integrity_verified=%d representation_candidates=%d exact_native_candidates=%d truncated=%s (audit only; no baseline selection)',
+						$templateId,
+						in_array($audit['status'] ?? '', ['inconclusive', 'integrity_failed', 'single_representational_candidate_not_proven'], true) ? $audit['status'] : 'inconclusive',
+						(int) ($audit['candidate_count'] ?? 0),
+						(int) ($audit['integrity_verified'] ?? 0),
+						(int) ($audit['representation_candidates'] ?? 0),
+						(int) ($audit['exact_native_candidates'] ?? 0),
+						!empty($audit['history_truncated']) ? 'yes' : 'no'
+					));
+				}
 				foreach ((array) ($baseline['candidate_audit'] ?? []) as $candidate) {
 					$correlation = $candidate['dashboard_correlation'] ?? [];
 					$residual = is_array($correlation) ? ($correlation['residual'] ?? []) : [];
