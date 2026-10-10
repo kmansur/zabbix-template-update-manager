@@ -7,7 +7,7 @@ $requirements = [
     'automatic PHP-FPM detection' => 'PHP_USER="${users[0]}"',
     'readonly existing-install report' => 'CHECK: installed directory detected; no files were changed.',
     'readonly new-install report' => 'CHECK: READY for a new installation. No files were changed.',
-    'existing-install overwrite protection' => 'Refusing overwrite; use a dedicated upgrade procedure.',
+    'existing-install overwrite protection' => 'Refusing overwrite; use --upgrade only after validation.',
     'root-owned staged module' => 'chown -R root:root "$STAGE"',
     'private runtime setup' => 'ztum-runtime-setup.sh" --apply',
     'assets included' => 'for d in actions assets src views;',
