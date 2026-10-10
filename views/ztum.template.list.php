@@ -49,6 +49,7 @@ $versionLabels = [
 ];
 
 $catalogUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.templates');
+$backupOverviewUrl = (new CUrl('zabbix.php'))->setArgument('action', 'ztum.template.backup_overview');
 
 $filter = (new CFilter())
 	->setResetUrl($catalogUrl)
@@ -441,6 +442,8 @@ if ($selectionForm !== null) {
 
 	$selectionForm->addItem([$templateTable, $actionButtons]);
 }
+
+$backupOverviewLink = new CLink(_('Templates with backups / Rollback'), $backupOverviewUrl);
 
 $page = (new CHtmlPage())
 	->setTitle($data['title'])
