@@ -4,6 +4,13 @@ Updated: 2026-10-10
 
 This page separates implemented functionality, automated checks, operator-observed field results and outstanding release gates. It does not declare RC or production readiness.
 
+## 2026-10-10 PDCA — beta.62 release preparation
+
+- **Plan:** Publish `v0.1.0-beta.62` as a GitHub laboratory prerelease only, not as production-ready.
+- **Do:** Align `VERSION`, manifest and changelog, and let the tag-triggered release workflow validate the exact tag/version, run runtime-smoke and security checks, generate archives and produce `SHA256SUMS`.
+- **Check:** The existing beta.61 laboratory plan retains its immutable tag commit and published archive SHA-256 hashes. Final beta.62 commit and archive SHA-256 fingerprints cannot be pinned before the tag's release artifacts exist; verify them after publication and record them in a separate beta.62 report.
+- **Act:** Publish only after branch CI, Security and Quality Metrics are green for the final commit and Zabbix 8 laboratory frontend smoke is confirmed. Mark as prerelease, maintain the production-use warning and keep multisystem installer validation for a later cycle.
+
 ## Current release
 
 - Published laboratory prerelease: `v0.1.0-beta.61`.
