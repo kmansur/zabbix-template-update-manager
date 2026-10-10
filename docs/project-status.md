@@ -8,13 +8,13 @@ This page separates implemented functionality, automated checks, operator-observ
 
 - **Plan:** Publish `v0.1.0-beta.62` as a GitHub laboratory prerelease only, not as production-ready.
 - **Do:** Align `VERSION`, manifest and changelog, and let the tag-triggered release workflow validate the exact tag/version, run runtime-smoke and security checks, generate archives and produce `SHA256SUMS`.
-- **Check:** The existing beta.61 laboratory plan retains its immutable tag commit and published archive SHA-256 hashes. Final beta.62 commit and archive SHA-256 fingerprints cannot be pinned before the tag's release artifacts exist; verify them after publication and record them in a separate beta.62 report.
+- **Check:** The existing beta.61 laboratory plan retains its immutable tag commit and published archive SHA-256 hashes. Beta.62 was tagged at `54fb6a3e994629801f62ddfcdc31c562ede70b69`; release workflow `38082038614` completed successfully. Operator downloaded the ZIP and TAR.GZ and verified both against published `SHA256SUMS`; record their exact fingerprints in the beta.62 release report.
 - **Act:** Publish only after branch CI, Security and Quality Metrics are green for the final commit and Zabbix 8 laboratory frontend smoke is confirmed. Mark as prerelease, maintain the production-use warning and keep multisystem installer validation for a later cycle.
 
 ## Current release
 
-- Published laboratory prerelease: `v0.1.0-beta.61`.
-- Current development VERSION/manifest: `0.1.0-beta.62` (**candidate only; not tagged or released**).
+- Latest published laboratory prerelease: `v0.1.0-beta.62` (2026-10-10); `v0.1.0-beta.61` is retained as immutable prior release.
+- Current VERSION/manifest: `0.1.0-beta.62` (**tagged and published as laboratory prerelease**, not production-approved).
 - Proposed next community-testing milestone: `v0.2.0-beta.1` (**not yet tagged or published**).
 - Main development branch: `main`. Generated official catalog indexes are published through `upstream-index`.
 - Feature freeze: prioritize test evidence, defect fixes and documentation over new features.
@@ -24,8 +24,8 @@ This page separates implemented functionality, automated checks, operator-observ
 
 - **Plan:** Provide Super Admin-only manual visibility into published GitHub releases (including betas and RCs), without granting PHP filesystem write privileges or introducing auto-update.
 - **Do:** Added a dedicated read-only route, an explicit header link, strict HTTPS GitHub API URL, timeout, TLS peer verification, no redirects, bounded JSON response, release tag/version comparison and GitHub-host allowlist for release links.
-- **Check:** Added `ModuleReleaseCheckServiceTest.php` fixtures for newer beta, current version, stable version, drafts, external URL and empty releases. CI executes all `tests/unit/*Test.php` and PHP lint. Additional injected-transport negative tests cover HTTP 403/429/500, connection failure, malformed/oversized JSON and empty releases. **New tests and CI must be verified against the final commit.** The user has validated the normal UI case on Zabbix 7 and 8, and verified the new route denies Admin on Zabbix 8.
-- **Act:** Keep operation manual and read-only. Validate the button with GitHub reachable, inaccessible and no releases; verify Super Admin-only access, PHP cURL and compatibility. Update production-readiness evidence only after field tests. No new release tag published.
+- **Check:** Added `ModuleReleaseCheckServiceTest.php` fixtures for newer beta, current version, stable version, drafts, external URL and empty releases. CI executes all `tests/unit/*Test.php` and PHP lint. Additional injected-transport negative tests cover HTTP 403/429/500, connection failure, malformed/oversized JSON and empty releases. **The beta.62 release workflow passed; some specialized HTTP/security field tests remain pending.** The user has validated the normal UI case on Zabbix 7 and 8, and verified the new route denies Admin on Zabbix 8.
+- **Act:** Keep operation manual and read-only. Validate the button with GitHub reachable, inaccessible and no releases; verify Super Admin-only access, PHP cURL and compatibility. Update production-readiness evidence only after field tests. The beta.62 tag has now been published; manual release checking remains read-only.
 
 ## PDCA reassessment — 2026-10-10, commit a97aae7
 
