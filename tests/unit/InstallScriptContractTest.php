@@ -10,6 +10,7 @@ $requirements = [
     'existing-install overwrite protection' => 'Refusing overwrite; use --upgrade only after validation.',
     'root-owned staged module' => 'chown -R root:root "$STAGE"',
     'private runtime setup' => 'prepare_runtime',
+    'safe runtime-check option guard' => 'if ((RUNTIME_CHECK)) && { ((DRY_RUN || UPGRADE)) || [[ -n "$ROLLBACK" ]]; }; then',
     'assets included' => 'for d in actions assets src views;',
     'registered update JavaScript verification' => 'assets/js/ztum-update-batch.js',
     'registered install JavaScript verification' => 'assets/js/ztum-install-batch.js',
