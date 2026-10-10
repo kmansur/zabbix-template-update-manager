@@ -408,6 +408,19 @@ final class TemplateUpdateAnalysisService {
 							(int) ($shape['after_count'] ?? 0)
 						));
 					}
+					$missing = $candidate['auto_start_missing_transitions'] ?? [];
+					if (is_array($missing) && $missing !== []) {
+						error_log(sprintf(
+							'[Zabbix Template Update Manager] Historical auto_start missing transition for template %s: commit=%s missing_before_to_no=%d missing_before_to_yes=%d missing_before_to_unknown=%d missing_after=%d truncated=%s (snapshot absence is NOT a verified API default; baseline remains blocked)',
+							$templateId,
+							(string) ($candidate['commit'] ?? ''),
+							(int) ($missing['missing_before_to_no'] ?? 0),
+							(int) ($missing['missing_before_to_yes'] ?? 0),
+							(int) ($missing['missing_before_to_unknown'] ?? 0),
+							(int) ($missing['missing_after'] ?? 0),
+							!empty($missing['truncated']) ? 'yes' : 'no'
+						));
+					}
 					$representation = $candidate['auto_start_diagnostic'] ?? [];
 					if (is_array($representation) && $representation !== []) {
 						error_log(sprintf(
