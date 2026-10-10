@@ -9,6 +9,9 @@ MODULES_DIR=""
 PHP_USER=""
 ZABBIX_VERSION=""
 DRY_RUN=0
+UPGRADE=0
+ROLLBACK=""
+BACKUP_BASE="/var/backups/zabbix-template-update-manager"
 RUNTIME_BASE="/var/lib/zabbix-template-update-manager"
 STAGE=""
 
@@ -16,11 +19,16 @@ log() { printf '[ZTUM] %s\n' "$*"; }
 die() { printf '[ZTUM] ERROR: %s\n' "$*" >&2; exit 1; }
 usage() {
   cat <<'HELP'
-Usage: sudo bash install.sh [--check] [--modules-dir /path/to/modules] [--php-user USER]
+Usage: sudo bash install.sh [--check] [--modules-dir DIR] [--php-user USER]
+       sudo bash install.sh --upgrade [--modules-dir DIR] [--php-user USER]
+       sudo bash install.sh --rollback BACKUP_ID [--modules-dir DIR]
        bash install.sh --check [--modules-dir /path/to/modules] [--php-user USER]
 
 Installs from the local Git checkout, copying only runtime files.
---check is read-only. Existing installations are NEVER overwritten.
+--check is read-only. Existing installations are never overwritten by install.
+--upgrade makes a verified code backup, then replaces only frontend code.
+--rollback restores a verified code backup by its local BACKUP_ID.
+Runtime data under /var/lib/zabbix-template-update-manager is untouched.
 For Zabbix 7/8 use the frontend's actual modules directory.
 HELP
 }
@@ -29,10 +37,14 @@ while (($#)); do
     --modules-dir) (($# >= 2)) || die "Missing --modules-dir value"; MODULES_DIR="$2"; shift 2;;
     --php-user) (($# >= 2)) || die "Missing --php-user value"; PHP_USER="$2"; shift 2;;
     --check) DRY_RUN=1; shift;;
+    --upgrade) UPGRADE=1; shift;;
+    --rollback) (($# >= 2)) || die "Missing backup ID"; ROLLBACK="$2"; shift 2;;
     -h|--help) usage; exit 0;;
     *) die "Unknown argument: $1";;
   esac
 done
+((UPGRADE == 0 || DRY_RUN == 0)) || die "--upgrade and --check cannot be combined"
+[[ -z "$ROLLBACK" || ( "$UPGRADE" -eq 0 && "$DRY_RUN" -eq 0 ) ]] || die "--rollback cannot be combined with --upgrade/--check"
 
 for file in Module.php manifest.json VERSION; do
   [[ -f "$SOURCE_DIR/$file" && ! -L "$SOURCE_DIR/$file" ]] || die "Missing or linked source file: $file"
@@ -91,13 +103,131 @@ fi
 log "Zabbix frontend: $ZABBIX_VERSION"
 
 TARGET="$MODULES_DIR/$MODULE_NAME"
+
+# All backup metadata is private, off-web and owned by root. Lock prevents two
+# cooperating installer processes from racing each other.
+hash_tree() {
+  local dir="$1"
+  ( cd "$dir"
+    find . -type l -print -quit | grep -q . && return 2
+    find . -type f -print0 | LC_ALL=C sort -z | xargs -0 -r sha256sum
+  )
+}
+verify_tree() {
+  local dir="$1" expected="$2" actual
+  [[ -d "$dir" && ! -L "$dir" ]] || return 1
+  actual="$(hash_tree "$dir")" || return 1
+  [[ "$actual" == "$expected" ]]
+}
+verified_backup() {
+  local id="$1" folder="$BACKUP_BASE/$id" expected
+  [[ "$id" =~ ^[0-9]{8}T[0-9]{6}Z-[0-9a-f]{8}$ ]] || die "Invalid backup ID"
+  [[ -d "$folder" && ! -L "$folder" ]] || die "Backup not found"
+  [[ "$(stat -c '%U:%a' "$folder")" == "root:700" ]] || die "Unsafe backup permissions"
+  [[ -f "$folder/SHA256SUMS" && ! -L "$folder/SHA256SUMS" ]] || die "Missing checksum manifest"
+  expected="$(cat "$folder/SHA256SUMS")"
+  verify_tree "$folder/module" "$expected" || die "Backup integrity failure; no changes made"
+  printf '%s\n' "$folder/module"
+}
+prepare_stage() {
+  local origin="$1" stage="$2"
+  for item in Module.php manifest.json VERSION actions assets src views; do
+    [[ -e "$origin/$item" && ! -L "$origin/$item" ]] || die "Missing or linked runtime component: $item"
+    cp -a -- "$origin/$item" "$stage/"
+  done
+  find "$stage" -type l -print -quit | grep -q . && die "Symlink found in staged module"
+  chown -R root:root "$stage"
+  find "$stage" -type d -exec chmod 0755 {} +
+  find "$stage" -type f -exec chmod 0644 {} +
+  php -r '
+    $m=json_decode(file_get_contents($argv[1]."/manifest.json"), true);
+    $v=trim(file_get_contents($argv[1]."/VERSION"));
+    if (!is_array($m) || ($m["version"] ?? null) !== $v) exit(1);
+  ' "$stage" || die "Staged version/manifest mismatch"
+  [[ -f "$stage/assets/js/ztum-update-batch.js" && -f "$stage/assets/js/ztum-install-batch.js" ]] || die "Staged assets missing"
+}
+do_upgrade_or_rollback() {
+  (( EUID == 0 )) || die "Upgrade/rollback requires root"
+  for tool in flock sha256sum stat mktemp; do command -v "$tool" >/dev/null || die "Missing tool: $tool"; done
+  [[ -d "$TARGET" && ! -L "$TARGET" ]] || die "Existing installation required; refusing upgrade/rollback"
+  [[ ! -L "$BACKUP_BASE" ]] || die "Unsafe backup root symlink"
+  install -d -o root -g root -m 0700 "$BACKUP_BASE"
+  [[ "$(stat -c '%U:%a' "$BACKUP_BASE")" == "root:700" ]] || die "Unsafe backup root"
+  exec 9>/run/lock/ztum-installer.lock
+  flock -n 9 || die "Another installer is running"
+
+  local stage old id folder saved original_hash stage_hash current_version new_version
+  stage="$(mktemp -d "$MODULES_DIR/.ztum-stage.XXXXXXXX")"
+  old=""
+  cleanup_upgrade() {
+    if [[ -n "$old" && -d "$old" && ! -e "$TARGET" ]]; then
+      mv -T -- "$old" "$TARGET" || true
+    fi
+    [[ -z "$old" || ! -e "$old" ]] || rm -rf -- "$old"
+    [[ ! -e "$stage" ]] || rm -rf -- "$stage"
+  }
+  trap cleanup_upgrade EXIT
+
+  current_version="$(cat "$TARGET/VERSION" 2>/dev/null || true)"
+  if [[ -n "$ROLLBACK" ]]; then
+    saved="$(verified_backup "$ROLLBACK")"
+    log "Restoring verified backup: $ROLLBACK"
+    prepare_stage "$saved" "$stage"
+  else
+    new_version="$(cat "$SOURCE_DIR/VERSION")"
+    [[ -n "$current_version" ]] || die "Cannot identify installed version"
+    php -r 'exit(version_compare($argv[1],$argv[2], ">") ? 0 : 1);' "$new_version" "$current_version" || die "Upgrade requires a newer version (current: $current_version; source: $new_version)"
+    prepare_stage "$SOURCE_DIR" "$stage"
+  fi
+  stage_hash="$(hash_tree "$stage")" || die "Unable to hash staged files"
+  [[ -n "$stage_hash" ]] || die "Empty staging inventory"
+
+  # Preserve every original code file, including legacy files, in a private backup.
+  id="$(date -u +%Y%m%dT%H%M%SZ)-$(od -An -N4 -tx1 /dev/urandom | tr -d ' \n')"
+  folder="$BACKUP_BASE/$id"
+  install -d -o root -g root -m 0700 "$folder"
+  cp -a -- "$TARGET" "$folder/module"
+  original_hash="$(hash_tree "$TARGET")" || die "Existing installation has unsafe symlinks; backup rejected"
+  [[ "$original_hash" == "$(hash_tree "$folder/module")" ]] || die "Existing code backup verification failed"
+  printf '%s\n' "$original_hash" > "$folder/SHA256SUMS"
+  chmod 0600 "$folder/SHA256SUMS"
+  [[ "$stage_hash" == "$(hash_tree "$stage")" ]] || die "Staged source changed during preparation"
+  old="$(mktemp -d "$MODULES_DIR/.ztum-previous.XXXXXXXX")"
+  rmdir "$old"
+  mv -T -- "$TARGET" "$old" || die "Unable to park original code"
+  if ! mv -T -- "$stage" "$TARGET"; then
+    mv -T -- "$old" "$TARGET" || die "CRITICAL: restore manually from $old"
+    old=""
+    die "Activation failed; original restored"
+  fi
+  stage=""
+  if [[ "$stage_hash" != "$(hash_tree "$TARGET")" ]]; then
+    # Restore immediately if deployed contents were unexpectedly modified.
+    mv -T -- "$TARGET" "$stage"
+    mv -T -- "$old" "$TARGET"
+    old=""
+    die "Deployed content verification failed; original restored"
+  fi
+  rm -rf -- "$old"
+  old=""
+  trap - EXIT
+  log "Operation completed: $(cat "$TARGET/VERSION")"
+  log "Verified rollback backup ID: $id"
+  log "Restore command: sudo bash install.sh --rollback $id"
+  log "Private runtime state untouched. Confirm web UI, menu and PHP-FPM cache."
+}
+
+if ((UPGRADE)) || [[ -n "$ROLLBACK" ]]; then
+  do_upgrade_or_rollback
+  exit 0
+fi
 if [[ -e "$TARGET" || -L "$TARGET" ]]; then
   if ((DRY_RUN)); then
     log "Existing module: $TARGET"
     log "CHECK: installed directory detected; no files were changed."
     exit 0
   fi
-  die "ZTUM already installed: $TARGET. Refusing overwrite; use a dedicated upgrade procedure."
+  die "ZTUM already installed: $TARGET. Refusing overwrite; use --upgrade only after validation."
 fi
 
 if [[ -z "$PHP_USER" ]]; then
