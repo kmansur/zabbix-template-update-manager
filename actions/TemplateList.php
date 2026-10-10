@@ -56,11 +56,11 @@ class TemplateList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true);
+		return $this->getUserType() === USER_TYPE_SUPER_ADMIN;
 	}
 
 	protected function doAction(): void {
-		$canAdminister = in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true);
+		$canAdminister = $this->getUserType() === USER_TYPE_SUPER_ADMIN;
 		$zabbixVersion = ZabbixVersion::current();
 
 		if ($this->hasInput('filter_set')) {
