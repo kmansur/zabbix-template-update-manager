@@ -275,15 +275,24 @@ final class UpstreamTemplateSourceRepository {
 			throw new RuntimeException('Unable to encode the immutable source cache identity.');
 		}
 
-		return rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
-			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager'
-			.DIRECTORY_SEPARATOR.'historical-sources'
+		return '/var/lib/zabbix-template-update-manager/cache/historical-sources'
 			.DIRECTORY_SEPARATOR.'source-'.hash('sha256', $identity).'.yaml';
+	}
+
+	private function privateCacheDirectory(string $directory): bool {
+		if (is_link($directory) || !is_dir($directory)) {
+			return false;
+		}
+		$permissions = @fileperms($directory);
+		$owner = @fileowner($directory);
+		return function_exists('posix_geteuid') && $permissions !== false
+			&& ($permissions & 0777) === 0700 && $owner === posix_geteuid();
 	}
 
 	private function readImmutableCache(string $commit, string $path): ?string {
 		$file = $this->immutableCacheFile($commit, $path);
-		if (!is_file($file)) {
+		if (!$this->privateCacheDirectory('/var/lib/zabbix-template-update-manager/cache')
+				|| !$this->privateCacheDirectory(dirname($file)) || is_link($file) || !is_file($file)) {
 			return null;
 		}
 
@@ -305,9 +314,13 @@ final class UpstreamTemplateSourceRepository {
 
 		$file = $this->immutableCacheFile($commit, $path);
 		$directory = dirname($file);
-		if (!is_dir($directory)
-				&& !@mkdir($directory, 0700, true)
-				&& !is_dir($directory)) {
+		if (!$this->privateCacheDirectory('/var/lib/zabbix-template-update-manager/cache')) {
+			return;
+		}
+		if (!is_dir($directory) && !@mkdir($directory, 0700)) {
+			return;
+		}
+		if (!$this->privateCacheDirectory($directory)) {
 			return;
 		}
 
