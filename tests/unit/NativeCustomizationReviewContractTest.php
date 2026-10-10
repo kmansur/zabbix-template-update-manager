@@ -23,4 +23,15 @@ foreach ([
         throw new RuntimeException('Missing native confirmation requirement: '.$needle);
     }
 }
+foreach ([
+    "Local customizations at risk",
+    "The detailed change list may not contain every at-risk customization.",
+    "Installed value",
+    "Incoming value",
+    "new CTableInfo()"
+] as $needle) {
+    if (!str_contains($compare, $needle)) {
+        throw new RuntimeException('Missing prioritized native loss preview: '.$needle);
+    }
+}
 echo "Native customization review contract tests passed.\n";
