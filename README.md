@@ -230,12 +230,11 @@ Instead of cloning into the frontend's web-served `modules/` directory, keep the
 
 ```bash
 cd /usr/local/src
-sudo git clone https://github.com/kmansur/zabbix-template-update-manager.git
-cd zabbix-template-update-manager
-sudo chmod 750 install.sh
-sudo bash install.sh --check --modules-dir /usr/share/zabbix/ui/modules --php-user www-data
-sudo bash install.sh --modules-dir /usr/share/zabbix/ui/modules --php-user www-data
+git clone https://github.com/kmansur/zabbix-template-update-manager.git
+sudo bash zabbix-template-update-manager/install.sh
 ```
+
+The installer automatically detects the Zabbix frontend and PHP-FPM account when unambiguous. To inspect without changing anything, use `sudo bash zabbix-template-update-manager/install.sh --check`. If multiple frontends or PHP-FPM users exist, use `--modules-dir DIR` and/or `--php-user USER` (see the detailed guide).
 
 Use the actual frontend modules path, which might be `/usr/share/zabbix/modules` on Zabbix 7. The installer checks that the installed frontend is version 7.x/8.x; it creates/validates private runtime directories and copies only `Module.php`, `manifest.json`, `VERSION`, `actions/`, `assets/`, `src/` and `views/`. Existing installations are **not overwritten**. Do not run this installer on an existing lab checkout to upgrade it. This is a laboratory beta, not production approval.
 
