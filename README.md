@@ -17,6 +17,7 @@ This version is intended for **laboratory testing**.
 - Implementation: ready for end-to-end laboratory validation.
 - Automation validation: must be green for the beta snapshot commit.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
+- Observed Zabbix 8.0 RC1 reviewed batch: **4 updated and validated, 0 failed**, per laboratory UI; [field evidence and remaining rollback/runtime gates](docs/lab-validation-2026-10-10.md).
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
 - Formal laboratory prerelease: **v0.1.0-beta.61** is published with checksummed `.tar.gz` and `.zip` assets.
