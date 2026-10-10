@@ -741,12 +741,20 @@ if (is_array($data['update_readiness'])
 			break;
 
 		case 'review_required':
+			if (in_array('unverified_historical_baseline', (array) ($readiness['manual_reasons'] ?? []), true)) {
+				$readinessText = _('A full direct preview is available, but the historical baseline is unverified. A rollback backup and explicit review of possible local-setting losses are required before preflight.');
+				break;
+			}
 			$readinessText = _(
 				'The comparison is authoritative and has no unresolved identities. One or more known conflicts, local-overwrite conditions and/or medium/high technical-risk conditions require explicit administrator review. A rollback backup may be created next; no configuration write is authorized yet.'
 			);
 			break;
 
 		case 'review_backup_verified':
+			if (in_array('unverified_historical_baseline', (array) ($readiness['manual_reasons'] ?? []), true)) {
+				$readinessText = _('The rollback backup matches the installed template. Review the installed and proposed values, then run a fresh reviewed preflight. An explicit confirmation is still required before import.');
+				break;
+			}
 			$readinessText = _(
 				'The reviewed update path has an exact rollback backup matching the current installed template. The next step is a fresh reviewed preflight; the final import still requires explicit super-administrator acknowledgement of the reported conflict, overwrite and/or technical-risk conditions.'
 			);
