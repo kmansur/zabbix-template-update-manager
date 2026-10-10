@@ -82,7 +82,9 @@ final class TemplateUpdatePreparationService {
             || !empty($preflight['write_enabled'])
             || (string) ($preflight['template']['templateid'] ?? '') !== $templateId
             || !is_array($preflight['candidate'] ?? null)
+            || $preflight['candidate'] === []
             || !is_array($preflight['rollback'] ?? null)
+            || $preflight['rollback'] === []
             || !preg_match('/^[a-f0-9]{64}$/', (string) ($preflight['evidence_sha256'] ?? ''))
             || (bool) ($preflight['manual_override'] ?? false) !== $manual) {
             throw new RuntimeException('Fresh preflight did not provide valid, non-write confirmation evidence.');
