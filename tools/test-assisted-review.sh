@@ -16,6 +16,7 @@ for test in \
   tests/unit/BaselineFreeReviewAssessmentTest.php \
   tests/unit/BaselineFreeAssistedReadinessTest.php \
   tests/unit/BaselineFreeAssistedFlowTest.php \
+  tests/unit/BaselineFreeBatchRestrictionTest.php \
   tests/unit/UpdateReadinessEvaluatorTest.php \
   tests/unit/TemplateUpdatePreflightServiceTest.php \
   tests/unit/TemplateControlledUpdateServiceTest.php \
