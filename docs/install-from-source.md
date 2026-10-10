@@ -1,6 +1,6 @@
 # Local Git checkout installation (Zabbix 7 and 8)
 
-**Status:** laboratory beta only; not a production approval. The local-source installer is new-install-only. The existing quickinstall scripts remain separate distribution paths.
+**Status:** laboratory beta only; not a production approval. The local-source installer is new-install-only. The root-level `install.sh` is the only active installer; retired quickinstall scripts are not supported on `main`.
 
 ## Requirements
 
