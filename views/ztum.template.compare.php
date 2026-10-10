@@ -362,6 +362,22 @@ if (is_array($data['historical_baseline'])) {
 	}
 }
 
+if (is_array($data['assisted_review_assessment'] ?? null)) {
+	$assessment = $data['assisted_review_assessment'];
+	if (($assessment['status'] ?? '') === 'candidate_for_assisted_review') {
+		$page->addItem(FrontendUi::message(
+			_('The proposed changes have a fully identified direct preview, but their origin as local customizations is unknown. This assessment is informational: the update remains blocked until all assisted-review safeguards are implemented.'),
+			FrontendUi::WARNING
+		));
+	}
+	elseif (($assessment['status'] ?? '') === 'unverified') {
+		$page->addItem(FrontendUi::message(
+			_('Assisted review is not available: the detailed preview is incomplete, unresolved or cannot be reconciled with its summary. No update is authorized.'),
+			FrontendUi::WARNING
+		));
+	}
+}
+
 if ($data['historical_error'] !== null) {
 	$page->addItem(FrontendUi::message((string) $data['historical_error'], FrontendUi::DANGER));
 }
