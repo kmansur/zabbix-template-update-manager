@@ -292,7 +292,9 @@ final class UpstreamTemplateSourceRepository {
 	private function readImmutableCache(string $commit, string $path): ?string {
 		$file = $this->immutableCacheFile($commit, $path);
 		if (!$this->privateCacheDirectory('/var/lib/zabbix-template-update-manager/cache')
-				|| !$this->privateCacheDirectory(dirname($file)) || is_link($file) || !is_file($file)) {
+				|| !$this->privateCacheDirectory(dirname($file)) || is_link($file) || !is_file($file)
+				|| @fileowner($file) !== posix_geteuid()
+				|| (@fileperms($file) & 0777) !== 0600) {
 			return null;
 		}
 
@@ -320,7 +322,7 @@ final class UpstreamTemplateSourceRepository {
 		if (!is_dir($directory) && !@mkdir($directory, 0700)) {
 			return;
 		}
-		if (!$this->privateCacheDirectory($directory)) {
+		if (!$this->privateCacheDirectory($directory) || is_link($file)) {
 			return;
 		}
 
