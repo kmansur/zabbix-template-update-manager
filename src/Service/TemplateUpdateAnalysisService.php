@@ -393,15 +393,19 @@ final class TemplateUpdateAnalysisService {
 							continue;
 						}
 						error_log(sprintf(
-							'[Zabbix Template Update Manager] Historical auto_start shape for template %s: commit=%s before_present=%s before_type=%s before_known=%s after_present=%s after_type=%s after_known=%s (values withheld; diagnostic only)',
+							'[Zabbix Template Update Manager] Historical auto_start shape for template %s: commit=%s before_present=%s before_type=%s before_known=%s before_shape=%s before_count=%d after_present=%s after_type=%s after_known=%s after_shape=%s after_count=%d (values withheld; diagnostic only)',
 							$templateId,
 							(string) ($candidate['commit'] ?? ''),
 							!empty($shape['before_present']) ? 'yes' : 'no',
 							(string) ($shape['before_type'] ?? 'other'),
 							!empty($shape['before_known']) ? 'yes' : 'no',
+							(string) ($shape['before_shape'] ?? 'not_array'),
+							(int) ($shape['before_count'] ?? 0),
 							!empty($shape['after_present']) ? 'yes' : 'no',
 							(string) ($shape['after_type'] ?? 'other'),
-							!empty($shape['after_known']) ? 'yes' : 'no'
+							!empty($shape['after_known']) ? 'yes' : 'no',
+							(string) ($shape['after_shape'] ?? 'not_array'),
+							(int) ($shape['after_count'] ?? 0)
 						));
 					}
 					$representation = $candidate['auto_start_diagnostic'] ?? [];
