@@ -42,6 +42,13 @@ Authorization was restricted across 24 registered routes. Legacy contract tests 
 - **Community beta `v0.2.0-beta.1`: HOLD until its documented candidate gates are met.**
 - **RC / production: NOT APPROVED.** No release, tag or version change was made as part of this PDCA.
 
+## 2026-10-10 PDCA — installer consolidation
+
+- **Plan:** Keep one canonical and safe local-source installer for Zabbix 7.x/8.x with automatic frontend/PHP-FPM detection and minimal runtime file installation.
+- **Do:** Retired `tools/quickinstall.sh` and `tools/quickinstall-pt-br.sh` on `main`. Kept the dedicated `tools/ztum-runtime-setup.sh` helper. Aligned the CI shell syntax check with root-level `install.sh`; revised the English and Brazilian Portuguese quick-install documents to reference it.
+- **Check:** Operator previously validated clean installation of the earlier installer revision on Zabbix 8, including 0700 runtime directories and root-owned minimal module contents; verified `--check` and Zabbix 7/8 detection. **The consolidated final commit CI/security/quality workflows and clean install must be revalidated.**
+- **Act:** The three-command `install.sh` workflow is the single installation documentation path. Existing installs are never overwritten; no `--upgrade` implementation yet. Immutable historical releases are not rewritten. Production remains unapproved.
+
 ## Engineering and evidence status
 
 | Workstream | Status | Evidence and limits |
