@@ -40,7 +40,7 @@ done
 for dir in actions assets src views; do
   [[ -d "$SOURCE_DIR/$dir" && ! -L "$SOURCE_DIR/$dir" ]] || die "Missing or linked source directory: $dir"
 done
-[[ -f "$SOURCE_DIR/assets/ztum-update-batch.js" && -f "$SOURCE_DIR/assets/ztum-install-batch.js" ]] || die "Missing registered JavaScript assets"
+[[ -f "$SOURCE_DIR/assets/js/ztum-update-batch.js" && -f "$SOURCE_DIR/assets/js/ztum-install-batch.js" ]] || die "Missing registered JavaScript assets"
 [[ -f "$SOURCE_DIR/tools/ztum-runtime-setup.sh" ]] || die "Runtime setup helper is missing"
 if find "$SOURCE_DIR/actions" "$SOURCE_DIR/assets" "$SOURCE_DIR/src" "$SOURCE_DIR/views" -type l -print -quit | grep -q .; then
   die "Refusing symlinks inside runtime source directories"
@@ -132,7 +132,7 @@ for f in Module.php manifest.json VERSION; do cp -- "$SOURCE_DIR/$f" "$STAGE/"; 
 chown -R root:root "$STAGE"
 find "$STAGE" -type d -exec chmod 0755 {} +
 find "$STAGE" -type f -exec chmod 0644 {} +
-[[ -r "$STAGE/Module.php" && -r "$STAGE/manifest.json" && -r "$STAGE/assets/ztum-update-batch.js" && -r "$STAGE/assets/ztum-install-batch.js" ]] || die "Staging verification failed"
+[[ -r "$STAGE/Module.php" && -r "$STAGE/manifest.json" && -r "$STAGE/assets/js/ztum-update-batch.js" && -r "$STAGE/assets/js/ztum-install-batch.js" ]] || die "Staging verification failed"
 [[ ! -e "$TARGET" && ! -L "$TARGET" ]] || die "Target appeared during installation; refusing overwrite"
 mv -T -- "$STAGE" "$TARGET"
 STAGE=""
