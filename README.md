@@ -240,6 +240,13 @@ Use the actual frontend modules path, which might be `/usr/share/zabbix/modules`
 
 Detailed prerequisites, failure behavior and post-install steps: [install from Git source](docs/install-from-source.md).
 
+### Experimental code-only upgrade and rollback
+
+After reviewing and pinning the source revision, a root administrator can run `sudo bash install.sh --upgrade` on an existing module. It backs up and checksum-verifies the original module in a root-private directory, installs only runtime files, and prints a rollback ID for `sudo bash install.sh --rollback BACKUP_ID`. Neither operation modifies `/var/lib/zabbix-template-update-manager` nor reverses Zabbix configuration imports.
+
+**Laboratory only:** These new operations require disposable end-to-end and forced-failure validation before real use. See [upgrade precautions, limitations and recovery](docs/install-from-source.md#controlled-upgrades-and-code-rollback-new-experimental).
+
+
 ## Installation guidance
 
 **The only supported installer in the active development branch is `install.sh`.** See [Install from source](docs/install-from-source.md) for the automated three-command procedure and `--check` diagnostics. The previously distributed `tools/quickinstall*.sh` entry points are retired on `main`; immutable older releases remain unchanged.
