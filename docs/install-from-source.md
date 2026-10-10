@@ -42,7 +42,7 @@ Zabbix 7 deployments may use `/usr/share/zabbix/modules`; the actual installatio
 1. Checks that the source contains `manifest.json`, `Module.php`, `VERSION`, `actions/`, `assets/`, `src/` and `views/`, and rejects source symlinks. It verifies that `manifest.json` agrees with `VERSION`.
 2. Resolves the actual Zabbix frontend directory and verifies version 7.x/8.x, stopping when verification is inconclusive; detects the PHP-FPM user or asks for `--php-user`.
 3. **Refuses to replace an existing installation**, including the development checkout currently deployed in the laboratories. In `--check` mode, existing installation is reported as a non-destructive diagnostic.
-4. Uses the existing `tools/ztum-runtime-setup.sh` helper to create/validate private `0700` runtime directories under `/var/lib/zabbix-template-update-manager/` for `backups`, `offline`, `locks` and `batches`. It does not reset or remove stored backup, policy, history or batch data.
+4. Uses integrated `install.sh` runtime setup to create/validate private `0700` directories under `/var/lib/zabbix-template-update-manager/` for `backups`, `offline`, `locks`, `batches` and `cache`. It does not reset or remove stored backup, policy, history or batch data.
 5. Stages and installs only `Module.php`, `manifest.json`, `VERSION`, `actions/`, `assets/`, `src/`, `views/` as root-owned, web-readable files (directories `0755`, files `0644`). Git metadata, test harnesses, scripts, docs and release machinery are not copied.
 6. Does not modify Nginx, Apache, PHP-FPM, the Zabbix database or template configuration and does not restart services.
 
@@ -53,8 +53,8 @@ In the Zabbix UI, sign in as **Super Admin**, open **Administration → General 
 ```bash
 sudo find /usr/share/zabbix/ui/modules/zabbix-template-update-manager \
   -maxdepth 1 -mindepth 1 -printf '%f\n' | sort
-sudo bash /usr/local/src/zabbix-template-update-manager/tools/ztum-runtime-setup.sh \
-  --check --user www-data
+sudo bash /usr/local/src/zabbix-template-update-manager/install.sh \
+  --runtime-check --php-user www-data
 ```
 
 The installed module root should contain only `Module.php`, `manifest.json`, `VERSION`, `actions`, `assets`, `src` and `views`. Private runtime state remains outside the web tree. No `.git`, `tests`, `tools`, or `docs` directory should be present inside the module.
