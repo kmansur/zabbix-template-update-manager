@@ -502,6 +502,42 @@ if (is_array($data['three_way_analysis'])) {
 	)));
 }
 
+// Without a proven BASE the direct import preview is the administrator's source of truth.
+if (is_array($data['assisted_review_assessment'] ?? null)
+		&& ($data['assisted_review_assessment']['status'] ?? '') === 'candidate_for_assisted_review'
+		&& is_array($data['update_preview'] ?? null)) {
+	$preview = $data['update_preview'];
+	$page->addItem(FrontendUi::section(_('Proposed changes — installed vs official')));
+	$page->addItem(FrontendUi::message(
+		_('The installed values may contain local customizations. Their origin cannot be established without a verified historical baseline. Review all differences before accepting possible overwrites and removals.'),
+		FrontendUi::WARNING
+	));
+	$proposedTable = (new CTableInfo())->setHeader([
+		_('Entity type'), _('Entity'), _('Field'), _('Action'), _('Installed value'), _('Proposed value')
+	]);
+	$displayValue = static function ($value): string {
+		if (is_array($value) && ($value['__state'] ?? null) === 'missing') {
+			return '∅';
+		}
+		if (is_scalar($value) || $value === null) {
+			return $value === null ? 'null' : (is_bool($value) ? ($value ? 'true' : 'false') : (string) $value);
+		}
+		$json = json_encode($value, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		return is_string($json) ? $json : _('Unable to display value');
+	};
+	foreach ($preview['details'] as $detail) {
+		$proposedTable->addRow([
+			$entityLabels[$detail['entity_type']] ?? $detail['entity_type'],
+			(string) ($detail['entity'] ?? '—'),
+			(string) $detail['field'],
+			(string) $detail['change_type'],
+			$displayValue($detail['before']),
+			$displayValue($detail['after'])
+		]);
+	}
+	$page->addItem($proposedTable);
+}
+
 if ($data['three_way_error'] !== null) {
 	$page->addItem(FrontendUi::message((string) $data['three_way_error'], FrontendUi::DANGER));
 }
