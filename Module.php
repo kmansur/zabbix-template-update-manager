@@ -24,14 +24,5 @@ class Module extends CModule {
 					->setAction('ztum.templates')
 			);
 
-		APP::Component()
-			->get('menu.main')
-			->findOrAdd(_('Data collection'))
-			->getSubmenu()
-			->insertAfter(
-				_('Template updates'),
-				(new CMenuItem(_('Templates with backups')))
-					->setAction('ztum.template.backup_overview')
-			);
 	}
 }
