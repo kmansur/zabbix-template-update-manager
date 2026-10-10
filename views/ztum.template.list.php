@@ -343,9 +343,12 @@ foreach ($data['templates'] as $template) {
 		? (string) ($data['updated_history'][(string) ($template['templateid'] ?? '')] ?? '')
 		: '';
 	if ($lastUpdatedAt !== '') {
-		$historyCell = (new CSpan('✓ '._('Updated')))
+		$historyUrl = (new CUrl('zabbix.php'))
+			->setArgument('action', 'ztum.template.backups')
+			->setArgument('templateid', $template['templateid']);
+		$historyCell = (new CLink('✓ '._('Updated'), $historyUrl))
 			->addClass(ZBX_STYLE_GREEN)
-			->setAttribute('title', _('Updated by ZTUM (recorded history): ').$lastUpdatedAt);
+			->setAttribute('title', _('Updated by ZTUM (recorded history): ').$lastUpdatedAt.' — '._('View rollback backups'));
 	}
 
 	$backupCell = '—';
