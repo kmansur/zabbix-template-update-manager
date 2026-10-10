@@ -127,4 +127,50 @@ $blockedService = new TemplateRollbackService(
 $result = $blockedService->execute('12345', $manifest, $evidence);
 assertRollbackService('blocked_preflight', $result['status'], 'Non-ready rollback preflight must block write.');
 
+
+$preflightCalls = 0;
+$driftImport = false;
+$driftService = new TemplateRollbackService(
+    static function (string $id, string $file) use (&$preflightCalls, $preflight): array {
+        $preflightCalls++;
+        if ($preflightCalls > 1) {
+            $changed = $preflight;
+            $changed['evidence_sha256'] = hash('sha256', 'drift-after-confirmation');
+            return $changed;
+        }
+        return $preflight;
+    },
+    static fn(array $currentTemplate): array => throw new RuntimeException('Recovery backup must not be created for drift'),
+    static fn(string $id, string $file): array => throw new RuntimeException('Target must not load after drift'),
+    static function (array $target) use (&$driftImport): void { $driftImport = true; },
+    static fn(string $id, array $target): array => ['valid'=>true]
+);
+$driftResult = $driftService->execute('12345', $manifest, $evidence);
+assertRollbackService('blocked_evidence_changed', $driftResult['status'],
+    'Changed second preflight must block rollback.');
+assertRollbackService(false, $driftImport,
+    'Importer must never run when repeated preflight changes.');
+
+$targetChanged = $artifact;
+$targetChanged['vendor_version'] = '7.0-99';
+$targetImport = false;
+$targetService = new TemplateRollbackService(
+    static fn(string $id,string $file): array => $preflight,
+    static fn(array $currentTemplate): array => throw new RuntimeException('Do not create recovery backup for changed target'),
+    static fn(string $id,string $file): array => $targetChanged,
+    static function (array $target) use (&$targetImport): void { $targetImport = true; },
+    static fn(string $id,array $target): array => ['valid'=>true]
+);
+$targetRejected = false;
+try {
+    $targetService->execute('12345', $manifest, $evidence);
+}
+catch (RuntimeException $exception) {
+    $targetRejected = str_contains($exception->getMessage(), 'target changed');
+}
+assertRollbackService(true, $targetRejected,
+    'Changed rollback target must be rejected before recovery backup and import.');
+assertRollbackService(false, $targetImport,
+    'Changed target must never reach the configuration importer.');
+
 echo "TemplateRollbackService tests passed.\n";
