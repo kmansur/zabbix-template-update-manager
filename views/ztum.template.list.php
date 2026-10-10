@@ -233,6 +233,7 @@ $templateTable = (new CTableInfo())
 		_('Available'),
 		_('Upstream updated'),
 		_('Status'),
+		_('History'),
 		_('Upstream identity'),
 		_('Update policy'),
 		_('Linked hosts'),
@@ -337,6 +338,16 @@ foreach ($data['templates'] as $template) {
 		$upstreamUpdated = $dateParts[3].'/'.$dateParts[2].'/'.$dateParts[1];
 	}
 
+	$historyCell = '—';
+	$lastUpdatedAt = $isInstalled
+		? (string) ($data['updated_history'][(string) ($template['templateid'] ?? '')] ?? '')
+		: '';
+	if ($lastUpdatedAt !== '') {
+		$historyCell = (new CSpan('✓ '._('Updated')))
+			->addClass(ZBX_STYLE_GREEN)
+			->setAttribute('title', _('Updated by ZTUM (recorded history): ').$lastUpdatedAt);
+	}
+
 	$backupCell = '—';
 	if ($isInstalled && $data['can_compare'] && ($template['templateid'] ?? '') !== '') {
 		$backupCell = new CLink(
@@ -358,6 +369,7 @@ foreach ($data['templates'] as $template) {
 			$versionLabels[$template['version_status'] ?? 'not_applicable'] ?? _('Unknown'),
 			$versionTones[$template['version_status'] ?? 'not_applicable'] ?? FrontendUi::MUTED
 		),
+		$historyCell,
 		FrontendUi::status(
 			$upstreamLabels[$template['upstream_status'] ?? 'repository_unavailable'] ?? _('Unknown'),
 			$upstreamTones[$template['upstream_status'] ?? 'repository_unavailable'] ?? FrontendUi::MUTED
