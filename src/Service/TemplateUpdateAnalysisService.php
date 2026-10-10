@@ -27,6 +27,7 @@ require_once __DIR__.'/ImportCompareSummary.php';
 require_once __DIR__.'/TemplateBackupVerificationService.php';
 require_once __DIR__.'/TemplateExportService.php';
 require_once __DIR__.'/TemplateImportCompareService.php';
+require_once __DIR__.'/TemplateDashboardEffectiveStateDiagnostic.php';
 require_once __DIR__.'/TemplateInventoryService.php';
 require_once __DIR__.'/TemplateHostImpactService.php';
 require_once __DIR__.'/TemplateVersionComparator.php';
@@ -376,6 +377,28 @@ final class TemplateUpdateAnalysisService {
 			// Keep fail-closed behavior, but record enough provenance to distinguish
 			// unavailable, ambiguous, truncated and time-budget-limited scans.
 			if (($baseline['status'] ?? null) === 'ambiguous') {
+				// Independently inspect effective values via the native read-only API.
+				// This evidence never affects baseline selection or write readiness.
+				try {
+					$effective = TemplateDashboardEffectiveStateDiagnostic::inspect($templateId);
+					error_log(sprintf(
+						'[Zabbix Template Update Manager] Historical effective dashboard state for template %s: count=%d auto_start_no=%d auto_start_yes=%d auto_start_unknown=%d display_period_known=%d identity_complete=%s (read-only; baseline remains blocked)',
+						$templateId,
+						(int) $effective['count'],
+						(int) $effective['auto_start_no'],
+						(int) $effective['auto_start_yes'],
+						(int) $effective['auto_start_unknown'],
+						(int) $effective['display_period_known'],
+						!empty($effective['identity_complete']) ? 'yes' : 'no'
+					));
+				}
+				catch (Throwable $exception) {
+					error_log(sprintf(
+						'[Zabbix Template Update Manager] Historical effective dashboard state unavailable for template %s: %s (baseline remains blocked)',
+						$templateId,
+						get_class($exception)
+					));
+				}
 				foreach ((array) ($baseline['candidate_audit'] ?? []) as $candidate) {
 					if (!is_array($candidate)) {
 						continue;
