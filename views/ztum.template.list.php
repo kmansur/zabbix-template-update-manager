@@ -476,6 +476,7 @@ $page = (new CHtmlPage())
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
+				->addItem(new CLink(_('Check for ZTUM updates'), (new CUrl('zabbix.php'))->setArgument('action', 'ztum.module.release_check')))
 				->addItem(new CLink(_('Templates with backups / Rollback'), $backupOverviewUrl))
 				->addItem(
 					new CLink(
