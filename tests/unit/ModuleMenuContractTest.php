@@ -13,8 +13,9 @@ function assertModuleMenuContract(bool $condition, string $message): void {
 assertModuleMenuContract(
 	strpos($module, 'use CWebUser;') !== false
 		&& strpos($module, 'CWebUser::getType()') !== false
-		&& strpos($module, '[USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]') !== false,
-	'ZTUM menu registration must be limited to Zabbix administrators and super administrators.'
+		&& strpos($module, 'CWebUser::getType() !== USER_TYPE_SUPER_ADMIN') !== false
+		&& strpos($module, 'USER_TYPE_ZABBIX_ADMIN') === false,
+	'ZTUM menu registration must be limited exclusively to Zabbix super administrators.'
 );
 
 assertModuleMenuContract(
