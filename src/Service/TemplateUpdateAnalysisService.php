@@ -483,6 +483,22 @@ final class TemplateUpdateAnalysisService {
 					if (!is_array($candidate)) {
 						continue;
 					}
+					$historicalPath = (string) ($candidate['historical_path'] ?? '');
+					if (preg_match('#^templates/[a-zA-Z0-9_./-]+\\.ya?ml$#', $historicalPath) !== 1) {
+						$historicalPath = 'unverified';
+					}
+					$transport = (string) ($candidate['source_transport'] ?? 'unknown');
+					if (!in_array($transport, ['https', 'runtime_cache', 'offline_bundle'], true)) {
+						$transport = 'unknown';
+					}
+					error_log(sprintf(
+						'[Zabbix Template Update Manager] Historical raw source provenance for template %s: commit=%s path=%s raw_sha256=%s transport=%s (digest of retrieved YAML; original installation revision unverified)',
+						$templateId,
+						(string) ($candidate['commit'] ?? ''),
+						$historicalPath,
+						preg_match('/^[a-f0-9]{64}$/', (string) ($candidate['raw_source_sha256'] ?? '')) ? $candidate['raw_source_sha256'] : 'unverified',
+						$transport
+					));
 					error_log(sprintf(
 						'[Zabbix Template Update Manager] Historical candidate for template %s: commit=%s sha256=%s revisions=%d semantic_changes=%s (diagnostic only)',
 						$templateId,
