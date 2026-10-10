@@ -16,7 +16,7 @@ log() { printf '[ZTUM] %s\n' "$*"; }
 die() { printf '[ZTUM] ERROR: %s\n' "$*" >&2; exit 1; }
 usage() {
   cat <<'HELP'
-Usage: sudo bash install.sh [--modules-dir /path/to/modules] [--php-user USER] [--check]
+Usage: sudo bash install.sh [--check] [--modules-dir /path/to/modules] [--php-user USER]
        bash install.sh --check [--modules-dir /path/to/modules] [--php-user USER]
 
 Installs from the local Git checkout, copying only runtime files.
@@ -61,8 +61,12 @@ if [[ -z "$MODULES_DIR" ]]; then
   for d in /usr/share/zabbix/ui/modules /usr/share/zabbix/modules /usr/local/share/zabbix/ui/modules /usr/local/share/zabbix/modules /var/www/html/zabbix/modules /var/www/zabbix/modules; do
     [[ -d "$d" ]] && candidates+=("$d")
   done
-  (("${#candidates[@]}" == 1)) || die "Expected exactly one frontend modules path; use --modules-dir DIR (detected: ${candidates[*]:-none})"
-  MODULES_DIR="${candidates[0]}"
+  valid_candidates=()
+  for d in "${candidates[@]}"; do
+    [[ -f "$(dirname "$d")/index.php" ]] && valid_candidates+=("$d")
+  done
+  (("${#valid_candidates[@]}" == 1)) || die "Unable to select a unique Zabbix frontend; specify --modules-dir DIR (candidates: ${valid_candidates[*]:-none})"
+  MODULES_DIR="${valid_candidates[0]}"
 fi
 [[ -d "$MODULES_DIR" && ! -L "$MODULES_DIR" ]] || die "Invalid or linked modules directory: $MODULES_DIR"
 MODULES_DIR="$(cd "$MODULES_DIR" && pwd -P)"
@@ -84,10 +88,17 @@ if [[ -z "$ZABBIX_VERSION" ]] && command -v dpkg-query >/dev/null 2>&1; then
   done
 fi
 [[ "$ZABBIX_VERSION" =~ ^([78])\.[0-9]+(\.[0-9]+)?$ ]] || die "Could not safely verify frontend version 7.x or 8.x; inspect the frontend installation first"
-log "Detected Zabbix frontend: $ZABBIX_VERSION"
+log "Zabbix frontend: $ZABBIX_VERSION"
 
 TARGET="$MODULES_DIR/$MODULE_NAME"
-[[ ! -e "$TARGET" && ! -L "$TARGET" ]] || die "ZTUM already installed: $TARGET. Refusing overwrite; use a dedicated upgrade procedure."
+if [[ -e "$TARGET" || -L "$TARGET" ]]; then
+  if ((DRY_RUN)); then
+    log "Existing module: $TARGET"
+    log "CHECK: installed directory detected; no files were changed."
+    exit 0
+  fi
+  die "ZTUM already installed: $TARGET. Refusing overwrite; use a dedicated upgrade procedure."
+fi
 
 if [[ -z "$PHP_USER" ]]; then
   files=()
@@ -113,7 +124,7 @@ log "Destination: $TARGET"
 log "PHP-FPM account: $PHP_USER"
 log "Runtime directory: $RUNTIME_BASE"
 if ((DRY_RUN)); then
-  log "Read-only validation successful. No files were changed."
+  log "CHECK: READY for a new installation. No files were changed."
   exit 0
 fi
 
@@ -136,7 +147,16 @@ find "$STAGE" -type f -exec chmod 0644 {} +
 [[ ! -e "$TARGET" && ! -L "$TARGET" ]] || die "Target appeared during installation; refusing overwrite"
 mv -T -- "$STAGE" "$TARGET"
 STAGE=""
-log "Installed ZTUM $(cat "$SOURCE_DIR/VERSION") (laboratory release)."
+log "----------------------------------------"
+log "ZTUM Installer — completed"
+log "Zabbix:          $ZABBIX_VERSION"
+log "PHP-FPM:         $PHP_USER"
+log "ZTUM:            $(cat "$SOURCE_DIR/VERSION")"
+log "Files:           OK"
+log "Permissions:     root:root (directories 0755, files 0644)"
+log "Private runtime: OK"
+log "Installation:    COMPLETE (laboratory beta)"
+log "----------------------------------------"
 log "Next: Administration > General > Modules > Scan directory > Enable module."
 log "Access: Data collection > Template updates (Super Admin only)."
 log "No Zabbix database, template, Nginx or PHP-FPM configuration was changed."
