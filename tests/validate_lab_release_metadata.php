@@ -18,9 +18,29 @@ if (str_contains($plan, 'verify against the published GitHub Release')
 	failLabMetadata('Laboratory release metadata must not contain publication placeholders.');
 }
 
-if (str_contains($version, '-beta.')) {
-	$tag = 'v'.$version;
-	if (!str_contains($plan, '# Laboratory test plan — '.$version)
+// The plan pins the last *published* immutable laboratory release.
+// Development candidates may move VERSION forward without fabricating a tag,
+// commit hash or checksums. A tagged release must still provide matching metadata.
+$publishedVersion = null;
+if (preg_match('/^# Laboratory test plan — ([0-9]+\\.[0-9]+\\.[0-9]+-beta\\.[0-9]+)/m', $plan, $matches) === 1) {
+    $publishedVersion = $matches[1];
+}
+if ($publishedVersion === null) {
+    failLabMetadata('Laboratory plan must identify a published beta version.');
+}
+if (version_compare($version, $publishedVersion, '<')) {
+    failLabMetadata('Current VERSION cannot be older than the immutable laboratory plan.');
+}
+if ($version !== $publishedVersion) {
+    $status = (string) file_get_contents($root.'/docs/project-status.md');
+    if (!str_contains($status, 'Current development VERSION/manifest: `'.$version.'`')
+            || !str_contains($status, 'candidate only; not tagged or released')) {
+        failLabMetadata('Unpublished version must be explicitly labeled as an untagged candidate.');
+    }
+}
+if (str_contains($publishedVersion, '-beta.')) {
+	$tag = 'v'.$publishedVersion;
+	if (!str_contains($plan, '# Laboratory test plan — '.$publishedVersion)
 			|| !str_contains($plan, 'Tag:        '.$tag)) {
 		failLabMetadata('The laboratory plan must identify the current beta VERSION and immutable tag.');
 	}
