@@ -42,9 +42,9 @@ assertPreflightActionContract(
 	'Reviewed preflight mode must be explicit in input validation and derived from fresh verified readiness during preparation.'
 );
 assertPreflightActionContract(
-	strpos($action, 'USER_TYPE_ZABBIX_ADMIN') !== false
-		&& strpos($action, 'USER_TYPE_SUPER_ADMIN') !== false,
-	'Preflight action must be restricted to Zabbix administrators and super administrators.'
+	strpos($action, '$this->getUserType() === USER_TYPE_SUPER_ADMIN') !== false
+		&& strpos($action, 'USER_TYPE_ZABBIX_ADMIN') === false,
+	'Preflight action must be restricted to Super Admin.'
 );
 assertPreflightActionContract(
 	preg_match('/Configuration\(\)->import\s*\(/', $action) !== 1,
