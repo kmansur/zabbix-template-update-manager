@@ -230,6 +230,10 @@ prepare_stage() {
 }
 do_upgrade_or_rollback() {
   (( EUID == 0 )) || die "Upgrade/rollback requires root"
+  if [[ -z "$ROLLBACK" ]]; then
+    detect_php_user
+    prepare_runtime
+  fi
   for tool in flock sha256sum stat mktemp; do command -v "$tool" >/dev/null || die "Missing tool: $tool"; done
   [[ -d "$TARGET" && ! -L "$TARGET" ]] || die "Existing installation required; refusing upgrade/rollback"
   [[ ! -L "$BACKUP_BASE" ]] || die "Unsafe backup root symlink"
@@ -317,6 +321,7 @@ if [[ -e "$TARGET" || -L "$TARGET" ]]; then
   if ((DRY_RUN)); then
     log "Existing module: $TARGET"
     log "CHECK: installed directory detected; no files were changed."
+    log "Use --runtime-check to validate private runtime storage."
     exit 0
   fi
   die "ZTUM already installed: $TARGET. Refusing overwrite; use --upgrade only after validation."
@@ -329,7 +334,7 @@ log "Destination: $TARGET"
 log "PHP-FPM account: $PHP_USER"
 log "Runtime directory: $RUNTIME_BASE"
 if ((DRY_RUN)); then
-  log "CHECK: READY for a new installation. No files were changed."
+  log "CHECK: READY for a new installation. Runtime directories will be secured during install; no files changed."
   exit 0
 fi
 
