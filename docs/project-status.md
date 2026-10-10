@@ -26,7 +26,7 @@ This page separates implemented functionality, automated checks, operator-observ
 | Declared core functionality | Implemented | Catalog, official identity, comparison, risk analysis, controlled install/update, policies, backups and rollback, batch orchestration |
 | CI and release tooling | Implemented | PHP 8.2/8.3/8.4, cross-frontend checks, security contracts and packaging workflows; green results must be confirmed on the precise candidate commit |
 | Zabbix 7 laboratory | Partially validated | Real catalog, native UI, policies, analysis, reviewed updates, installation, rollback/recovery backup and batch execution recorded; fault injection and negative-security matrix remain incomplete |
-| Zabbix 8 laboratory | Partially validated | A 2026-10-10 Zabbix 8.0 RC1 screenshot recorded four reviewed templates updated and validated, with zero linked hosts; this does not prove rollback or interruption safety |
+| Zabbix 8 laboratory | Partially validated | Four reviewed templates updated and validated, with zero linked hosts; later Acronis rollback to 8.0-1 and re-update to 8.0-2 validated with recovery backup. Batch preparation stopped safely in UI. Persisted fault and JS orchestration checks passed in isolation; HTTP interruption and host-linked safety remain open |
 | Index publication | Pending post-merge verification | PR #114 was squash-merged to main on 2026-10-10 to tolerate history lookup HTTP 429; a fresh successful publication must still be verified |
 | Public beta packaging | Pending | Do not change public install commands or claim a new tag until artifacts and checksums are published |
 | RC / production | Not approved | Requires field and independent validation |
@@ -37,9 +37,9 @@ See [October 10 Zabbix 8 evidence](lab-validation-2026-10-10.md), [lab test plan
 
 ### P1 — mandatory safety gates
 
-1. Demonstrate a controlled backup, recovery backup and rollback on a disposable Zabbix 8 installation, including identity, version and content validation.
-2. Exercise batch stop-on-first-failure and interrupted/resumed batch behavior. Never blindly retry an uncertain write.
-3. Confirm negative access and data-integrity paths: privileges, CSRF, stale/tampered evidence, modified/missing backup, source identity and hashes.
+1. **Partially satisfied:** Acronis Zabbix 8 rollback with recovery backup and re-update validated. Expand across different templates and verify linked-host/customization impact separately.
+2. **Partially satisfied:** preparation stop observed, persistent state and JS stop-on-first-failure simulated. Complete HTTP failure/in-flight interruption, recovery of uncertain operations; never blindly retry an uncertain write.
+3. **Partially satisfied:** Zabbix 8 Admin denied catalog/release-check URLs; all 24 actions pass static Super Admin contract. Missing/invalid CSRF rejected, but valid-token differential and further tampered-evidence/backup negative HTTP tests remain open.
 4. Validate offline-only behavior, operation serialization and service/network failure diagnostics.
 5. Confirm successful index publication after PR #114, without disabling hash or transport verification.
 
