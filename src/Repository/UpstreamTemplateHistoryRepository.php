@@ -342,15 +342,24 @@ final class UpstreamTemplateHistoryRepository {
 			throw new RuntimeException('Unable to encode the immutable history cache identity.');
 		}
 
-		return rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
-			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager'
-			.DIRECTORY_SEPARATOR.'historical-history'
+		return '/var/lib/zabbix-template-update-manager/cache/historical-history'
 			.DIRECTORY_SEPARATOR.'history-'.hash('sha256', $identity).'.json';
+	}
+
+	private function privateHistoryCacheDirectory(string $directory): bool {
+		if (!function_exists('posix_geteuid') || is_link($directory) || !is_dir($directory)) {
+			return false;
+		}
+		$mode = @fileperms($directory);
+		$owner = @fileowner($directory);
+		return $mode !== false && ($mode & 0777) === 0700 && $owner === posix_geteuid();
 	}
 
 	private function readImmutableHistoryCache(string $path, string $until, int $maxCommits): ?array {
 		$file = $this->immutableHistoryCacheFile($path, $until, $maxCommits);
-		if (!is_file($file)) {
+		if (!$this->privateHistoryCacheDirectory('/var/lib/zabbix-template-update-manager/cache')
+				|| !$this->privateHistoryCacheDirectory(dirname($file))
+				|| is_link($file) || !is_file($file)) {
 			return null;
 		}
 
@@ -395,9 +404,13 @@ final class UpstreamTemplateHistoryRepository {
 
 		$file = $this->immutableHistoryCacheFile($path, $until, $maxCommits);
 		$directory = dirname($file);
-		if (!is_dir($directory)
-				&& !@mkdir($directory, 0700, true)
-				&& !is_dir($directory)) {
+		if (!$this->privateHistoryCacheDirectory('/var/lib/zabbix-template-update-manager/cache')) {
+			return;
+		}
+		if (!is_dir($directory) && !@mkdir($directory, 0700)) {
+			return;
+		}
+		if (!$this->privateHistoryCacheDirectory($directory) || is_link($file)) {
 			return;
 		}
 
