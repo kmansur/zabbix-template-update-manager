@@ -23,6 +23,7 @@ require_once dirname(__DIR__).'/Repository/UpstreamTemplateHistoryRepository.php
 require_once dirname(__DIR__).'/Repository/UpstreamTemplateSourceRepository.php';
 require_once __DIR__.'/ContentComparisonClassifier.php';
 require_once __DIR__.'/HistoricalTemplateBaselineService.php';
+require_once __DIR__.'/HistoricalDashboardCandidateCorrelation.php';
 require_once __DIR__.'/ImportCompareSummary.php';
 require_once __DIR__.'/TemplateBackupVerificationService.php';
 require_once __DIR__.'/TemplateExportService.php';
@@ -354,7 +355,22 @@ final class TemplateUpdateAnalysisService {
 						75,
 						null,
 						true,
-						12.0
+						12.0,
+						static function (string $source, string $commit) use ($templateId): array {
+							$rows = \API::TemplateDashboard()->get([
+								'templateids' => [$templateId],
+								'output' => ['dashboardid', 'templateid', 'uuid', 'auto_start', 'display_period']
+							]);
+							if (!is_array($rows)) {
+								return ['unverified' => 1, 'complete' => false];
+							}
+							foreach ($rows as $row) {
+								if (!is_array($row) || (string) ($row['templateid'] ?? '') !== $templateId) {
+									return ['unverified' => 1, 'complete' => false];
+								}
+							}
+							return HistoricalDashboardCandidateCorrelation::compare($source, $rows);
+						}
 					);
 				}
 
@@ -400,6 +416,19 @@ final class TemplateUpdateAnalysisService {
 					));
 				}
 				foreach ((array) ($baseline['candidate_audit'] ?? []) as $candidate) {
+					$correlation = $candidate['dashboard_correlation'] ?? [];
+					if (is_array($correlation) && $correlation !== []) {
+						error_log(sprintf(
+							'[Zabbix Template Update Manager] Historical dashboard candidate correlation for template %s: commit=%s candidate=%d local=%d matched=%d unverified=%d complete=%s (diagnostic only; baseline remains blocked)',
+							$templateId, (string) ($candidate['commit'] ?? ''),
+							(int) ($correlation['candidate'] ?? 0),
+							(int) ($correlation['local'] ?? 0),
+							(int) ($correlation['matched'] ?? 0),
+							(int) ($correlation['unverified'] ?? 0),
+							!empty($correlation['complete']) ? 'yes' : 'no'
+						));
+					}
+
 					if (!is_array($candidate)) {
 						continue;
 					}
