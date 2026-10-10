@@ -79,4 +79,9 @@ catch (RuntimeException $exception) {
 }
 assertHistory(true, $rejected, 'History path traversal must be rejected.');
 
+$historyRepositorySource = (string) file_get_contents(dirname(__DIR__, 2).'/src/Repository/UpstreamTemplateHistoryRepository.php');
+assertHistory(true, str_contains($historyRepositorySource, "'/var/lib/zabbix-template-update-manager/cache/historical-history'"), 'Historical commit cache must use private runtime storage.');
+assertHistory(false, str_contains($historyRepositorySource, 'sys_get_temp_dir()'), 'History must never fall back to global temporary storage.');
+assertHistory(true, str_contains($historyRepositorySource, 'privateHistoryCacheDirectory'), 'Historical cache must check private ownership and mode.');
+assertHistory(true, str_contains($historyRepositorySource, 'HISTORY_REQUEST_TIMEOUT_SECONDS = 12'), 'History timeout must remain bounded.');
 echo "UpstreamTemplateHistoryRepository tests passed.\n";
