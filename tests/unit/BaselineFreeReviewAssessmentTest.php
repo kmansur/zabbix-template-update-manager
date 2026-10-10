@@ -6,7 +6,7 @@ function expectReview(string $expected, array $actual): void {
         throw new RuntimeException('Unexpected assisted review evidence: '.var_export($actual, true));
     }
 }
-$detail = ['path' => 'templates/0/items/0', 'entity_type' => 'items', 'change_type' => 'updated'];
+$detail = ['path' => 'templates/0/items/0', 'entity_type' => 'items', 'change_type' => 'updated', 'field' => 'delay', 'before' => '30s', 'after' => '1m'];
 $preview = ['summary' => ['total' => 1, 'unresolved' => 0], 'details' => [$detail], 'details_truncated' => false];
 expectReview('candidate_for_assisted_review', Review::evaluate(['status' => 'ambiguous'], $preview));
 expectReview('baseline_available', Review::evaluate(['status' => 'found'], $preview));
