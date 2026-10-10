@@ -53,7 +53,7 @@ The module detects the frontend `ZABBIX_VERSION` at runtime and fails closed for
 
 The module keeps one codebase for both supported major generations and prefers native Zabbix abstractions so each frontend generation can apply its own internal UI implementation.
 
-The catalog and read-only review surfaces are available to Zabbix Administrators and Super Admins. Configuration-changing operations and update-policy changes remain Super-Admin-only.
+All ZTUM screens and operations currently require Zabbix Super Admin. Configuration-changing actions and update-policy changes also require valid CSRF evidence.
 
 The catalog filter follows the native Zabbix list pattern with **Name** and **Status** fields, **Apply / Reset** actions and automatic return to page 1 whenever filtering changes.
 
@@ -210,16 +210,14 @@ sudo install -d -o www-data -g www-data -m 0700 \
   /var/lib/zabbix-template-update-manager/backups
 ```
 
-The module intentionally does not fall back to a world-writable or temporary backup location.
+The module intentionally does not fall back to a world-writable or temporary backup location. Catalog and source caches are also kept under a private `cache/` directory.
 
 Operation history is supplemental and bounded. It is never used as authorization, update evidence or proof that a Zabbix configuration write succeeded; fresh preflight/post-validation and the actual Zabbix state remain authoritative.
 
-A fail-closed helper can validate or create the private runtime directories after resolving the PHP-FPM account:
+The installer prepares runtime directories on first installation and controlled upgrades. To validate them later without making changes:
 
 ```bash
-sudo tools/ztum-runtime-setup.sh --check
-sudo tools/ztum-runtime-setup.sh --apply
-sudo tools/ztum-runtime-setup.sh --check
+sudo bash install.sh --runtime-check
 ```
 
 See [`docs/runtime-setup.md`](docs/runtime-setup.md).
@@ -462,7 +460,7 @@ PHP 8.2 / 8.3 / 8.4 compatibility matrix
 Zabbix 7.0 / current 8.0 frontend-symbol compatibility
 Chromium batch-asset smoke regression
 release archive/checksum/content smoke
-runtime setup helper validation
+integrated installer runtime validation
 upstream-index generator validation
 offline-bundle generator validation
 GitHub workflow structure/action-pin validation
