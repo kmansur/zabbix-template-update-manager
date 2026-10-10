@@ -808,57 +808,29 @@ if (is_array($data['update_readiness'])
 			'This page is read-only. Configuration changes are available only after a fresh preflight and explicit confirmation.'
 		)));
 
-	if (!empty($readiness['candidate_for_backup']) && is_array($data['template'])) {
-		$backupAction = (new CUrl('zabbix.php'))
-			->setArgument('action', 'ztum.template.backup')
+
+	if ((!empty($readiness['candidate_for_backup']) || !empty($readiness['backup_verified']))
+			&& is_array($data['template'])) {
+		$prepareAction = (new CUrl('zabbix.php'))
+			->setArgument('action', 'ztum.template.prepare')
 			->getUrl();
-		$backupForm = (new CForm('post'))
-			->setId('ztum-template-backup-form')
-			->setAction($backupAction)
+		$prepareForm = (new CForm('post'))
+			->setId('ztum-template-prepare-form')
+			->setAction($prepareAction)
 			->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 			->addItem([
-				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.backup')))->removeId(),
+				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.prepare')))->removeId(),
 				(new CVar('templateid', (string) $data['template']['templateid']))->removeId()
 			])
-			->addItem(makeFormFooter(new CSubmitButton(_('Create rollback backup'))));
-
+			->addItem(makeFormFooter(new CSubmitButton(_('Prepare and review update'))));
 		$page
-			->addItem(FrontendUi::section(_('Rollback backup')))
+			->addItem(FrontendUi::section(_('Prepare update')))
 			->addItem(FrontendUi::description(_(
-				'Creates a private backup of the current installed template. No Zabbix configuration is changed.'
+				'Automatically creates a rollback backup when needed, verifies it against the installed template and runs fresh update preflight. No template import occurs until you explicitly confirm on the next screen.'
 			)))
-			->addItem($backupForm);
+			->addItem($prepareForm);
 	}
-	elseif (!empty($readiness['backup_verified']) && is_array($data['template'])) {
-		$preflightAction = (new CUrl('zabbix.php'))
-			->setArgument('action', 'ztum.template.preflight')
-			->getUrl();
-		$preflightForm = (new CForm('post'))
-			->setId('ztum-template-preflight-form')
-			->setAction($preflightAction)
-			->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-			->addItem(array_values(array_filter([
-				(new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('ztum.template.preflight')))->removeId(),
-				(new CVar('templateid', (string) $data['template']['templateid']))->removeId(),
-				!empty($readiness['manual_confirmation_required'])
-					? (new CVar('manual_override', '1'))->removeId()
-					: null
-			], static fn($item): bool => $item !== null)))
-			->addItem(makeFormFooter(
-				new CSubmitButton(
-					!empty($readiness['manual_confirmation_required'])
-						? _('Run reviewed controlled preflight')
-						: _('Run controlled preflight')
-				)
-			));
 
-		$page
-			->addItem(FrontendUi::section(_('Update preflight')))
-			->addItem(FrontendUi::description(_(
-				'Recomputes the authoritative comparison and rollback match before any update confirmation is shown.'
-			)))
-			->addItem($preflightForm);
-	}
 }
 
 switch ($data['content_status']) {
