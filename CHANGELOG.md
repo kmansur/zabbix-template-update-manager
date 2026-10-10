@@ -9,7 +9,7 @@ All notable changes to Template Update Manager will be documented in this file.
 - Added per-template upstream vendor-version provenance metadata (`version_commit` / `version_date`) derived from the exact `vendor.version` YAML line, with previous-index reuse and shallow-history fallback.
 - Added an **Upstream updated** date column to the template catalog without introducing per-row runtime network requests.
 
-## [0.1.0-beta.62] - Candidate (unpublished, 2026-10-10)
+## [0.1.0-beta.62] - 2026-10-10 (laboratory prerelease)
 
 ### Added
 
@@ -25,9 +25,10 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ### Security and validation
 
+- Added local code-only `install.sh --upgrade` with root-private backups, SHA-256 inventory verification and explicit `--rollback BACKUP_ID`. The Zabbix 8 laboratory completed upgrade → rollback → upgrade and rejected two adulterated test backups. This does not reverse Zabbix template imports.
 - Preserve native CSRF on mutation endpoints, root-owned module files and private runtime storage.
 - Validated the previous installer revision in Zabbix 7.0.31 and Zabbix 8.0.0 labs; regression CI, Security and Quality Metrics were green before this version bump.
-- The beta.62 candidate is **not tagged or released**. Authenticated CSRF differential, uncertain-write recovery and final candidate workflows remain release gates.
+- The beta.62 prerelease was published with signed-in GitHub workflow checks and checksummed archives; it is **not approved for production**. Authenticated CSRF differential, uncertain-write recovery and activation-failure injection remain open.
 
 ## [0.1.0-beta.61] - 2026-09-30
 
