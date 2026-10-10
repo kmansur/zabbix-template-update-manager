@@ -7,6 +7,7 @@ use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateSourceReposit
 use RuntimeException;
 
 require_once __DIR__.'/HistoricalDashboardNormalizationDiagnostic.php';
+require_once __DIR__.'/HistoricalDashboardCandidateCorrelation.php';
 
 final class HistoricalTemplateBaselineService {
 
@@ -73,7 +74,8 @@ final class HistoricalTemplateBaselineService {
 		int $maxCommits = 75,
 		?callable $candidateEvaluator = null,
 		bool $allowExternalTemplateReferences = false,
-		float $maxRuntimeSeconds = 0.0
+		float $maxRuntimeSeconds = 0.0,
+		?callable $dashboardCandidateEvaluator = null
 	): array {
 		$startedAt = microtime(true);
 		$targetVendorVersion = trim($targetVendorVersion);
@@ -191,7 +193,8 @@ final class HistoricalTemplateBaselineService {
 					'change_structure' => [],
 					'auto_start_diagnostic' => [],
 					'auto_start_unknown_shapes' => [],
-					'auto_start_missing_transitions' => []
+					'auto_start_missing_transitions' => [],
+					'dashboard_correlation' => []
 				];
 			}
 			else {
@@ -229,6 +232,10 @@ final class HistoricalTemplateBaselineService {
 					throw new RuntimeException('The historical baseline candidate evaluator returned an invalid distance.');
 				}
 				$candidates[$index]['semantic_distance'] = $distance;
+				if ($dashboardCandidateEvaluator !== null) {
+					$correlation = $dashboardCandidateEvaluator($candidate['source'], $candidate['commit']);
+					$candidates[$index]['dashboard_correlation'] = is_array($correlation) ? $correlation : [];
+				}
 				$categories = is_array($evaluation) ? ($evaluation['by_entity'] ?? []) : [];
 				if (!is_array($categories)) {
 					throw new RuntimeException('Historical candidate change categories must be an array.');
@@ -308,7 +315,8 @@ final class HistoricalTemplateBaselineService {
 				'change_structure' => $candidate['change_structure'],
 				'auto_start_diagnostic' => $candidate['auto_start_diagnostic'],
 				'auto_start_unknown_shapes' => $candidate['auto_start_unknown_shapes'],
-				'auto_start_missing_transitions' => $candidate['auto_start_missing_transitions']
+				'auto_start_missing_transitions' => $candidate['auto_start_missing_transitions'],
+				'dashboard_correlation' => $candidate['dashboard_correlation']
 			], $candidates),
 			'source' => null
 		];
