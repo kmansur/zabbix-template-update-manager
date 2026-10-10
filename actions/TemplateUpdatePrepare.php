@@ -5,10 +5,13 @@ namespace Modules\ZabbixTemplateUpdateManager\Actions;
 use CController;
 use CControllerResponseData;
 use CControllerResponseFatal;
+use CWebUser;
+use Modules\ZabbixTemplateUpdateManager\Service\TemplateOperationHistoryService;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateUpdatePreparationService;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Service/TemplateUpdatePreparationService.php';
+require_once dirname(__DIR__).'/src/Service/TemplateOperationHistoryService.php';
 
 /**
  * POST-only preparation: may create local rollback evidence, but never imports.
@@ -36,6 +39,7 @@ class TemplateUpdatePrepare extends CController {
             'preflight_error' => null,
             'can_update' => true
         ];
+        $operationException = null;
         try {
             $data['preflight'] = (new TemplateUpdatePreparationService())->prepare($id);
             if (($data['preflight']['status'] ?? '') !== 'passed') {
@@ -43,6 +47,7 @@ class TemplateUpdatePrepare extends CController {
             }
         }
         catch (Throwable $exception) {
+            $operationException = $exception;
             error_log(sprintf(
                 '[Zabbix Template Update Manager] Individual preparation failed for template %s: %s',
                 $id, $exception->getMessage()
@@ -51,6 +56,18 @@ class TemplateUpdatePrepare extends CController {
                 'Unable to prepare and verify the rollback backup or fresh preflight. No Zabbix configuration import was attempted.'
             );
         }
+        (new TemplateOperationHistoryService())->recordBestEffort(
+            'update_prepare',
+            'template-'.$id,
+            [
+                'status' => ($data['preflight']['status'] ?? '') === 'passed'
+                    && $data['preflight_error'] === null ? 'prepared' : 'blocked',
+                'write_performed' => false,
+                'detail' => (string) ($data['preflight']['reason'] ?? 'no_import')
+            ],
+            $operationException,
+            (string) (CWebUser::$data['userid'] ?? '')
+        );
         $this->setResponse(new CControllerResponseData($data));
     }
 }
