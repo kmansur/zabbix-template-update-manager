@@ -84,4 +84,6 @@ assertHistory(true, str_contains($historyRepositorySource, "'/var/lib/zabbix-tem
 assertHistory(false, str_contains($historyRepositorySource, 'sys_get_temp_dir()'), 'History must never fall back to global temporary storage.');
 assertHistory(true, str_contains($historyRepositorySource, 'privateHistoryCacheDirectory'), 'Historical cache must check private ownership and mode.');
 assertHistory(true, str_contains($historyRepositorySource, 'HISTORY_REQUEST_TIMEOUT_SECONDS = 12'), 'History timeout must remain bounded.');
+assertHistory(true, str_contains($historyRepositorySource, 'bin2hex(random_bytes(12))'), 'History cache temporary name must be unpredictable.');
+assertHistory(true, str_contains($historyRepositorySource, 'umask(0077)'), 'History cache temporary file creation must be private.');
 echo "UpstreamTemplateHistoryRepository tests passed.\n";
