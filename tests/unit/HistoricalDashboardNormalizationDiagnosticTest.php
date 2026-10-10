@@ -50,6 +50,23 @@ assertDashboardDiagnostic(false, $shapes[1]['before_known'], 'Unknown string mus
 assertDashboardDiagnostic(false, isset($shapes[0]['before']), 'Raw values must not appear in shape diagnostic');
 assertDashboardDiagnostic(false, str_contains(json_encode($shapes), 'UNRECOGNIZED_SECRET'), 'No raw secret in diagnostic');
 
+$missingShapes = Diagnostic::describeUnknownPreview([
+	'details' => [
+		['entity_type' => 'dashboards', 'field' => 'auto_start', 'change_type' => 'updated',
+			'before' => ['__state' => 'missing'], 'after' => 'NO'],
+		['entity_type' => 'dashboards', 'field' => 'auto_start', 'change_type' => 'updated',
+			'before' => ['other' => 'secret'], 'after' => 'NO'],
+		['entity_type' => 'dashboards', 'field' => 'auto_start', 'change_type' => 'updated',
+			'before' => ['secret'], 'after' => 'NO']
+	]
+]);
+assertDashboardDiagnostic('missing_marker', $missingShapes[0]['before_shape'], 'Sentinel must be detected exactly');
+assertDashboardDiagnostic('associative', $missingShapes[1]['before_shape'], 'Unknown associative arrays stay unknown');
+assertDashboardDiagnostic('list', $missingShapes[2]['before_shape'], 'Lists stay unknown');
+assertDashboardDiagnostic(1, $missingShapes[0]['before_count'], 'Safe bounded element count');
+assertDashboardDiagnostic(false, str_contains(json_encode($missingShapes), 'secret'), 'Unknown values must not leak');
+assertDashboardDiagnostic('unknown', Diagnostic::compare(['__state' => 'missing'], 'NO'), 'Missing cannot be treated as equivalent to NO');
+
 $baselineService = (string) file_get_contents(dirname(__DIR__, 2).'/src/Service/HistoricalTemplateBaselineService.php');
 assertDashboardDiagnostic(true, str_contains($baselineService, "'status' => 'ambiguous'"),
 	'Ambiguous historical candidates must continue to fail closed');
