@@ -49,7 +49,9 @@ while (($#)); do
   esac
 done
 ((UPGRADE == 0 || DRY_RUN == 0)) || die "--upgrade and --check cannot be combined"
-((RUNTIME_CHECK == 0 || (DRY_RUN == 0 && UPGRADE == 0 && -z "$ROLLBACK"))) || die "Conflicting runtime-check options"
+if ((RUNTIME_CHECK)) && { ((DRY_RUN || UPGRADE)) || [[ -n "$ROLLBACK" ]]; }; then
+  die "Conflicting runtime-check options"
+fi
 [[ -z "$ROLLBACK" || ( "$UPGRADE" -eq 0 && "$DRY_RUN" -eq 0 ) ]] || die "--rollback cannot be combined with --upgrade/--check"
 
 for file in Module.php manifest.json VERSION; do
