@@ -224,6 +224,23 @@ sudo tools/ztum-runtime-setup.sh --check
 
 See [`docs/runtime-setup.md`](docs/runtime-setup.md).
 
+## Install from a local Git checkout (Zabbix 7/8 laboratory)
+
+Instead of cloning into the frontend's web-served `modules/` directory, keep the full repository under `/usr/local/src` and install only the runtime module files:
+
+```bash
+cd /usr/local/src
+sudo git clone https://github.com/kmansur/zabbix-template-update-manager.git
+cd zabbix-template-update-manager
+sudo chmod 750 install.sh
+sudo bash install.sh --check --modules-dir /usr/share/zabbix/ui/modules --php-user www-data
+sudo bash install.sh --modules-dir /usr/share/zabbix/ui/modules --php-user www-data
+```
+
+Use the actual frontend modules path, which might be `/usr/share/zabbix/modules` on Zabbix 7. The installer checks that the installed frontend is version 7.x/8.x; it creates/validates private runtime directories and copies only `Module.php`, `manifest.json`, `VERSION`, `actions/`, `assets/`, `src/` and `views/`. Existing installations are **not overwritten**. Do not run this installer on an existing lab checkout to upgrade it. This is a laboratory beta, not production approval.
+
+Detailed prerequisites, failure behavior and post-install steps: [install from Git source](docs/install-from-source.md).
+
 ## Quick install
 
 For a new laboratory installation, use the beginner-friendly installer:
