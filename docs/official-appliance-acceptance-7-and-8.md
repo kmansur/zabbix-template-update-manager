@@ -9,7 +9,7 @@ version, database type and ZTUM commit before beginning.
 
 1. Snapshot each VM/appliance before installing ZTUM; keep network access to the
    upstream official repository controlled and HTTPS-enabled.
-2. Before installing, check **Zabbix/PHP/package compatibility independently** for each Debian 13 VM. A successful OS installation is not proof that the chosen Zabbix 7.x package and Debian 13 PHP/runtime combination are officially supported. Record any version/repository exceptions instead of disguising them as passing validation.\n3. Install the same ZTUM commit on both, enable the module and sign in with an
+2. Before installing, check **Zabbix/PHP/package compatibility independently** for each Debian 13 VM. Official Zabbix 7.0 Debian 13 (trixie) repository metadata is available, but the exact installed packages, PHP/frontend requirements, and module runtime still must be verified. Record any version/repository exceptions instead of disguising them as passing validation.\n3. Install the same ZTUM commit on both, enable the module and sign in with an
    authorized super administrator.
 4. Run `sh tools/diagnose-debian-lab.sh` and `sh tools/test-assisted-review.sh` on each appliance/VM. These checks use
    synthetic fixtures and must not import configuration.
