@@ -38,25 +38,29 @@ assertTemplateBackupAction(true, is_array($backupAction), 'Backup action must be
 assertTemplateBackupAction('TemplateBackup', $backupAction['class'] ?? null, 'Backup action class must be TemplateBackup.');
 assertTemplateBackupAction(false, array_key_exists('view', $backupAction), 'Backup POST action must not register a view.');
 
-assertTemplateBackupAction(
-	true,
-	str_contains($view, "setArgument('action', 'ztum.template.backup')"),
-	'Comparison view must post to the registered backup action.'
-);
+$prepareAction = $manifest['actions']['ztum.template.prepare'] ?? null;
+assertTemplateBackupAction(true, is_array($prepareAction), 'Controlled update preparation must be registered.');
+assertTemplateBackupAction('TemplateUpdatePrepare', $prepareAction['class'] ?? null, 'Preparation must use the reviewed controller.');
+assertTemplateBackupAction('ztum.template.preflight', $prepareAction['view'] ?? null, 'Preparation must lead to native preflight review.');
+$prepareController = (string) file_get_contents($root.'/actions/TemplateUpdatePrepare.php');
+assertTemplateBackupAction(true, str_contains($prepareController, 'USER_TYPE_SUPER_ADMIN'), 'Preparation must require Super Admin.');
+assertTemplateBackupAction(false, str_contains($prepareController, 'disableCsrfValidation'), 'Preparation must keep native CSRF validation.');
+assertTemplateBackupAction(true, str_contains($prepareController, 'TemplateUpdatePreparationService'), 'Preparation must delegate to verified backup and fresh preflight.');
+assertTemplateBackupAction(true, str_contains($view, "setArgument('action', 'ztum.template.prepare')"), 'Comparison view must post to the controlled preparation action.');
 assertTemplateBackupAction(
 	true,
 	str_contains($view, "new CForm('post')"),
-	'Rollback backup form must explicitly use POST.'
+	'Preparation form must explicitly use POST.'
 );
 assertTemplateBackupAction(
 	true,
-	str_contains($view, "CCsrfTokenHelper::get('ztum.template.backup')"),
-	'Rollback backup form must carry the native module CSRF token for the exact action name.'
+	str_contains($view, "CCsrfTokenHelper::get('ztum.template.prepare')"),
+	'Preparation form must carry the native module CSRF token for the exact action name.'
 );
 assertTemplateBackupAction(
 	true,
 	str_contains($view, "new CVar('templateid'"),
-	'Rollback backup form must submit only the selected template ID as business input.'
+	'Preparation form must submit the selected template ID as business input.'
 );
 
 echo "TemplateBackup action contract tests passed.\n";
