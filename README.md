@@ -10,11 +10,11 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Development candidate version: **0.1.0-beta.62** (not yet published).
+Latest published laboratory prerelease: **v0.1.0-beta.62** (2026-10-10).
 
 This version is intended for **laboratory testing**.
 
-**Validation update (2026-10-10):** Zabbix 7.0.31 has partial controlled-update/install/rollback field evidence, and a Zabbix 8.0 RC1 laboratory reviewed batch reported 4 updated/validated templates with 0 linked hosts. Zabbix 8 rollback, interruption/failure injection, offline/serialization, and negative-security checks remain open. PR #114 was merged to harden upstream-index publication, but a successful post-merge index refresh is not yet confirmed. **`v0.2.0-beta.1` is a proposed future community beta, not a published or approved release.** See [current project status](docs/project-status.md), [compatibility](docs/compatibility.md) and [production readiness](docs/production-readiness.md).
+**Validation update (2026-10-10):** Zabbix 7.0.31 has partial controlled-update/install/rollback field evidence, and a Zabbix 8.0 RC1 laboratory reviewed batch reported 4 updated/validated templates with 0 linked hosts. Zabbix 8 code upgrade/rollback and two negative backup-integrity tests passed; interrupted HTTP imports, activation-failure injection, offline/serialization, and remaining negative-security checks remain open. PR #114 was merged to harden upstream-index publication, but a successful post-merge index refresh is not yet confirmed. **`v0.2.0-beta.1` is a proposed future community beta, not a published or approved release.** See [current project status](docs/project-status.md), [compatibility](docs/compatibility.md) and [production readiness](docs/production-readiness.md).
 
 - Implementation: ready for end-to-end laboratory validation.
 - Automation validation: must be green for the beta snapshot commit.
@@ -22,11 +22,11 @@ This version is intended for **laboratory testing**.
 - Observed Zabbix 8.0 RC1 reviewed batch: **4 updated and validated, 0 failed**, per laboratory UI; [field evidence and remaining rollback/runtime gates](docs/lab-validation-2026-10-10.md).
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
-- Last published laboratory prerelease: **v0.1.0-beta.61** is published with checksummed `.tar.gz` and `.zip` assets.
+- Published laboratory prerelease: **v0.1.0-beta.62** with checksummed `.tar.gz` and `.zip` assets.
 
-Beta.62 is the next untagged laboratory candidate; beta.61 remains the last published prerelease. It keeps the beta.60 three-way normalization and changes known-risk handling so complete, fully identified conflicts/local-overwrite conditions use an explicit reviewed path instead of an absolute block. Reviewed single and batch updates use one acknowledgement while unknown/unresolved, integrity, security and uncertain-write conditions remain hard blockers.
+Beta.62 is the published laboratory prerelease; beta.61 remains an immutable historical release. It keeps the beta.60 three-way normalization and changes known-risk handling so complete, fully identified conflicts/local-overwrite conditions use an explicit reviewed path instead of an absolute block. Reviewed single and batch updates use one acknowledgement while unknown/unresolved, integrity, security and uncertain-write conditions remain hard blockers.
 
-Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.61 is the current immutable laboratory prerelease** for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
+Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.62 is the current immutable laboratory prerelease** for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
 
 For a new laboratory installation, use the quick installer below. For validation work, always record the exact installed version and commit/source ref.
 
@@ -236,7 +236,7 @@ sudo bash zabbix-template-update-manager/install.sh
 
 The installer automatically detects the Zabbix frontend and PHP-FPM account when unambiguous. To inspect without changing anything, use `sudo bash zabbix-template-update-manager/install.sh --check`. If multiple frontends or PHP-FPM users exist, use `--modules-dir DIR` and/or `--php-user USER` (see the detailed guide).
 
-Use the actual frontend modules path, which might be `/usr/share/zabbix/modules` on Zabbix 7. The installer checks that the installed frontend is version 7.x/8.x; it creates/validates private runtime directories and copies only `Module.php`, `manifest.json`, `VERSION`, `actions/`, `assets/`, `src/` and `views/`. Existing installations are **not overwritten**. Do not run this installer on an existing lab checkout to upgrade it. This is a laboratory beta, not production approval.
+Use the actual frontend modules path, which might be `/usr/share/zabbix/modules` on Zabbix 7. The installer checks that the installed frontend is version 7.x/8.x; it creates/validates private runtime directories and copies only `Module.php`, `manifest.json`, `VERSION`, `actions/`, `assets/`, `src/` and `views/`. Normal installation refuses overwriting existing modules; use the explicit laboratory-only `--upgrade` workflow after reviewing and pinning the source revision. This is a laboratory beta, not production approval.
 
 Detailed prerequisites, failure behavior and post-install steps: [install from Git source](docs/install-from-source.md).
 
@@ -244,7 +244,7 @@ Detailed prerequisites, failure behavior and post-install steps: [install from G
 
 After reviewing and pinning the source revision, a root administrator can run `sudo bash install.sh --upgrade` on an existing module. It backs up and checksum-verifies the original module in a root-private directory, installs only runtime files, and prints a rollback ID for `sudo bash install.sh --rollback BACKUP_ID`. Neither operation modifies `/var/lib/zabbix-template-update-manager` nor reverses Zabbix configuration imports.
 
-**Laboratory only:** These new operations require disposable end-to-end and forced-failure validation before real use. See [upgrade precautions, limitations and recovery](docs/install-from-source.md#controlled-upgrades-and-code-rollback-new-experimental).
+**Laboratory only:** The normal upgrade → rollback → upgrade cycle and backup integrity rejection were observed on Zabbix 8; activation-failure injection and broader platform tests remain pending. See [upgrade precautions, limitations and recovery](docs/install-from-source.md#controlled-upgrades-and-code-rollback-new-experimental).
 
 
 ## Installation guidance
@@ -259,15 +259,15 @@ Clone the current laboratory branch and record the exact commit used:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git checkout main
+git checkout v0.1.0-beta.62
 cat VERSION
 git rev-parse HEAD
 ```
 
-Expected `VERSION` for the current laboratory build:
+Expected `VERSION` for this published laboratory release:
 
 ```text
-0.1.0-beta.61
+0.1.0-beta.62
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -277,13 +277,13 @@ find /usr/share/zabbix /usr/local/share/zabbix /var/www \
   -type d -name modules 2>/dev/null
 ```
 
-Install the complete ZTUM directory below the correct `modules` directory. Then use:
+Do not copy the full Git checkout into the web-served modules directory. Use `sudo bash install.sh` from the checked-out release to deploy only the required runtime files. Then use:
 
 ```text
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.61**, enable the module and open:
+Confirm version **0.1.0-beta.62**, enable the module and open:
 
 ```text
 Data collection → Template updates
