@@ -6,8 +6,9 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
  * Evaluates whether an official template update has enough proven comparison
  * evidence to advance through review, backup and controlled preflight.
  *
- * Hard blockers (missing/ambiguous baseline, unresolved identities, unknown
- * risk/coverage or integrity prerequisites) remain fail-closed. Proven
+ * Missing/ambiguous baselines may only enter individual assisted review when
+ * the native preview is fully enumerated and technical risk is known. Unknown
+ * identities, incomplete previews and integrity prerequisites fail closed. Proven
  * BASE/LOCAL/UPSTREAM conflicts, known local-overwrite differences and high
  * technical risk enter an explicitly reviewed manual
  * path. Medium technical impact remains manual by default, except for narrowly
