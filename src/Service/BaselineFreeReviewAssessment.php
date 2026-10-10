@@ -40,7 +40,10 @@ final class BaselineFreeReviewAssessment {
                 || !is_string($detail['entity_type'] ?? null)
                 || trim($detail['entity_type']) === ''
                 || !is_string($detail['path'] ?? null)
-                || trim($detail['path']) === '') {
+                || trim($detail['path']) === ''
+                || !is_string($detail['field'] ?? null)
+                || !array_key_exists('before', $detail)
+                || !array_key_exists('after', $detail) {
                 return $result;
             }
         }
