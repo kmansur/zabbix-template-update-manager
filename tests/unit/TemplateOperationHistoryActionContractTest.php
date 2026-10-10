@@ -20,10 +20,10 @@ assertOperationHistoryContract(
 );
 
 assertOperationHistoryContract(
-	strpos($historyAction, '[USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]') !== false
+	strpos($historyAction, '$this->getUserType() === USER_TYPE_SUPER_ADMIN') !== false
 		&& strpos($historyAction, 'TemplateOperationHistoryRepository') !== false
 		&& strpos($historyAction, 'CPagerHelper::paginate') !== false,
-	'Operation history must be administrator-only, private-repository backed and natively paginated.'
+	'Operation history must be Super Admin-only, private-repository backed and natively paginated.'
 );
 
 assertOperationHistoryContract(
