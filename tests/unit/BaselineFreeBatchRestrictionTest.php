@@ -23,8 +23,9 @@ $service = new TemplateBatchPlanService(
 );
 $item = $service->build(['10773'])['items'][0];
 if ($item['category'] !== 'review'
-    || $item['batch_manual_eligible']
-    || $item['manual_evidence_sha256'] !== '') {
-    throw new RuntimeException('Unknown baseline must never be eligible for automatic batch execution.');
+    || !$item['batch_manual_eligible']
+    || !$item['batch_manual_requires_local_overwrite_ack']
+    || !preg_match('/^[a-f0-9]{64}$/', $item['manual_evidence_sha256'])) {
+    throw new RuntimeException('Unverified baseline must require explicit reviewed batch execution and overwrite acknowledgement.');
 }
-echo "Baseline-free batch restriction tests passed.\n";
+echo "Baseline-free reviewed batch gating tests passed.\\n";
