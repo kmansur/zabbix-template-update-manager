@@ -36,9 +36,13 @@ if (in_array('--require-published', $argv, true) && $version !== $publishedVersi
 }
 if ($version !== $publishedVersion) {
     $status = (string) file_get_contents($root.'/docs/project-status.md');
-    if (!str_contains($status, 'Current development VERSION/manifest: `'.$version.'`')
-            || !str_contains($status, 'candidate only; not tagged or released')) {
-        failLabMetadata('Unpublished version must be explicitly labeled as an untagged candidate.');
+    $isCandidate = str_contains($status, 'Current development VERSION/manifest: `'.$version.'`')
+        && str_contains($status, 'candidate only; not tagged or released');
+    $isPublished = str_contains($status, 'Latest published laboratory prerelease: `v'.$version.'`')
+        && str_contains($status, 'Current VERSION/manifest: `'.$version.'`')
+        && str_contains($status, 'tagged and published as laboratory prerelease');
+    if (!$isCandidate && !$isPublished) {
+        failLabMetadata('VERSION must be identified consistently as candidate or published laboratory beta.');
     }
 }
 if (str_contains($publishedVersion, '-beta.')) {
