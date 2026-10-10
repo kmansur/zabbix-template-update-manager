@@ -156,15 +156,17 @@ do_upgrade_or_rollback() {
   exec 9>/run/lock/ztum-installer.lock
   flock -n 9 || die "Another installer is running"
 
-  local stage old id folder saved original_hash stage_hash current_version new_version
+  local stage old id folder saved original_hash stage_hash current_version new_version failed_dir
   stage="$(mktemp -d "$MODULES_DIR/.ztum-stage.XXXXXXXX")"
   old=""
   cleanup_upgrade() {
     if [[ -n "$old" && -d "$old" && ! -e "$TARGET" ]]; then
       mv -T -- "$old" "$TARGET" || true
     fi
-    [[ -z "$old" || ! -e "$old" ]] || rm -rf -- "$old"
-    [[ ! -e "$stage" ]] || rm -rf -- "$stage"
+    if [[ -n "$old" && -e "$old" ]]; then
+      printf '[ZTUM] CRITICAL: original module preserved for manual recovery: %s\n' "$old" >&2
+    fi
+    [[ -z "$stage" || ! -e "$stage" ]] || rm -rf -- "$stage"
   }
   trap cleanup_upgrade EXIT
 
@@ -203,10 +205,15 @@ do_upgrade_or_rollback() {
   stage=""
   if [[ "$stage_hash" != "$(hash_tree "$TARGET")" ]]; then
     # Restore immediately if deployed contents were unexpectedly modified.
-    mv -T -- "$TARGET" "$stage"
-    mv -T -- "$old" "$TARGET"
-    old=""
-    die "Deployed content verification failed; original restored"
+    failed_dir="$(mktemp -d "$MODULES_DIR/.ztum-failed.XXXXXXXX")"
+    rmdir "$failed_dir"
+    mv -T -- "$TARGET" "$failed_dir" || die "CRITICAL: deployed module could not be parked; original preserved: $old"
+    if mv -T -- "$old" "$TARGET"; then
+      old=""
+      rm -rf -- "$failed_dir"
+      die "Deployed content verification failed; original restored"
+    fi
+    die "CRITICAL: original preserved at $old; inspect manually before retry"
   fi
   rm -rf -- "$old"
   old=""
