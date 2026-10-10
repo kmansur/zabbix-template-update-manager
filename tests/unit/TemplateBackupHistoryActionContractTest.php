@@ -30,8 +30,8 @@ assertBackupHistoryContract(
 );
 assertBackupHistoryContract(
 	true,
-	str_contains($controller, 'USER_TYPE_ZABBIX_ADMIN') && str_contains($controller, 'USER_TYPE_SUPER_ADMIN'),
-	'Rollback backup history must remain restricted to administrators and super administrators.'
+	str_contains($controller, '$this->getUserType() === USER_TYPE_SUPER_ADMIN') && !str_contains($controller, 'USER_TYPE_ZABBIX_ADMIN'),
+	'Rollback backup history must be restricted to Super Admin.'
 );
 assertBackupHistoryContract(
 	true,
