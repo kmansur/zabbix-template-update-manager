@@ -35,6 +35,21 @@ assertDashboardDiagnostic(1, $summary['unknown'], 'Unknown dashboard representat
 assertDashboardDiagnostic(1, $summary['truncated'], 'Truncated evidence');
 assertDashboardDiagnostic(false, isset($summary['details']), 'No configuration values in report');
 
+$shapes = Diagnostic::describeUnknownPreview([
+	'details' => [
+		['entity_type' => 'dashboards', 'field' => 'auto_start', 'change_type' => 'updated', 'before' => ['secret' => 'value'], 'after' => 'NO'],
+		['entity_type' => 'dashboards', 'field' => 'auto_start', 'change_type' => 'updated', 'before' => 'UNRECOGNIZED_SECRET', 'after' => 0]
+	]
+]);
+assertDashboardDiagnostic(2, count($shapes), 'Only unknown dashboard values should be diagnosed');
+assertDashboardDiagnostic('array', $shapes[0]['before_type'], 'Array representation type');
+assertDashboardDiagnostic('string', $shapes[0]['after_type'], 'String representation type');
+assertDashboardDiagnostic(false, $shapes[0]['before_known'], 'Unknown array must remain unknown');
+assertDashboardDiagnostic(true, $shapes[0]['after_known'], 'NO should be recognized');
+assertDashboardDiagnostic(false, $shapes[1]['before_known'], 'Unknown string must remain unknown');
+assertDashboardDiagnostic(false, isset($shapes[0]['before']), 'Raw values must not appear in shape diagnostic');
+assertDashboardDiagnostic(false, str_contains(json_encode($shapes), 'UNRECOGNIZED_SECRET'), 'No raw secret in diagnostic');
+
 $baselineService = (string) file_get_contents(dirname(__DIR__, 2).'/src/Service/HistoricalTemplateBaselineService.php');
 assertDashboardDiagnostic(true, str_contains($baselineService, "'status' => 'ambiguous'"),
 	'Ambiguous historical candidates must continue to fail closed');
