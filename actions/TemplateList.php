@@ -9,6 +9,7 @@ use CPagerHelper;
 use CProfile;
 use CUrl;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\TemplateBackupRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateOperationHistoryRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateUpdatePolicyRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
@@ -21,6 +22,7 @@ use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Repository/TemplateRepository.php';
+require_once dirname(__DIR__).'/src/Repository/TemplateBackupRepository.php';
 require_once dirname(__DIR__).'/src/Repository/TemplateOperationHistoryRepository.php';
 require_once dirname(__DIR__).'/src/Repository/TemplateUpdatePolicyRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
@@ -98,6 +100,7 @@ class TemplateList extends CController {
 			'show_diagnostics' => $canAdminister,
 			'templates' => [],
 			'updated_history' => [],
+			'backup_summary' => [],
 			'summary' => TemplateInventoryService::emptySummary(),
 			'upstream_summary' => UpstreamMatcher::emptySummary(),
 			'catalog_summary' => UpstreamCatalogService::emptySummary(),
@@ -298,6 +301,37 @@ class TemplateList extends CController {
 			ZBX_SORT_UP,
 			$listUrl
 		);
+
+		// Bounded integrity checks for the currently displayed page only.
+		// Counts cover at most the newest ten artifacts, not the entire repository.
+		try {
+			$backupRepository = new TemplateBackupRepository();
+			foreach ($data['templates'] as $template) {
+				if (($template['installation_status'] ?? 'installed') !== 'installed') {
+					continue;
+				}
+				$id = (string) ($template['templateid'] ?? '');
+				if (!ctype_digit($id) || (int) $id < 1) {
+					continue;
+				}
+				try {
+					$inspection = $backupRepository->inspectForTemplate($id, 10);
+					$data['backup_summary'][$id] = [
+						'valid' => (int) ($inspection['valid'] ?? 0),
+						'invalid' => (int) ($inspection['invalid'] ?? 0),
+						'truncated' => !empty($inspection['truncated']),
+						'unavailable' => ($inspection['status'] ?? '') === 'repository_unavailable'
+					];
+				}
+				catch (Throwable $exception) {
+					$data['backup_summary'][$id] = ['valid' => 0, 'invalid' => 0, 'truncated' => false, 'unavailable' => true];
+					error_log('[Zabbix Template Update Manager] Backup summary inspection failed: '.$exception->getMessage());
+				}
+			}
+		}
+		catch (Throwable $exception) {
+			error_log('[Zabbix Template Update Manager] Backup summary unavailable: '.$exception->getMessage());
+		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
