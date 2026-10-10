@@ -9,6 +9,7 @@ use CPagerHelper;
 use CProfile;
 use CUrl;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateRepository;
+use Modules\ZabbixTemplateUpdateManager\Repository\TemplateOperationHistoryRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\TemplateUpdatePolicyRepository;
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamIndexRepository;
 use Modules\ZabbixTemplateUpdateManager\Service\TemplateInventoryService;
@@ -20,6 +21,7 @@ use Modules\ZabbixTemplateUpdateManager\Support\ZabbixVersion;
 use Throwable;
 
 require_once dirname(__DIR__).'/src/Repository/TemplateRepository.php';
+require_once dirname(__DIR__).'/src/Repository/TemplateOperationHistoryRepository.php';
 require_once dirname(__DIR__).'/src/Repository/TemplateUpdatePolicyRepository.php';
 require_once dirname(__DIR__).'/src/Repository/UpstreamIndexRepository.php';
 require_once dirname(__DIR__).'/src/Service/TemplateInventoryService.php';
@@ -95,6 +97,7 @@ class TemplateList extends CController {
 			'can_manage_policy' => $this->getUserType() === USER_TYPE_SUPER_ADMIN,
 			'show_diagnostics' => $canAdminister,
 			'templates' => [],
+			'updated_history' => [],
 			'summary' => TemplateInventoryService::emptySummary(),
 			'upstream_summary' => UpstreamMatcher::emptySummary(),
 			'catalog_summary' => UpstreamCatalogService::emptySummary(),
@@ -174,6 +177,34 @@ class TemplateList extends CController {
 			if ($data['show_diagnostics']) {
 				$data['upstream_diagnostics']['detail'] = self::diagnosticMessage($exception);
 			}
+		}
+
+		// Supplemental display only. This history is not authorization or proof of current template content.
+		// Process newest first and suppress the badge if a newer rollback exists.
+		try {
+			$seen = [];
+			foreach ((new TemplateOperationHistoryRepository())->recent(1000) as $entry) {
+				if (!in_array((string) ($entry['operation'] ?? ''), ['update', 'rollback'], true)) {
+					continue;
+				}
+				$subject = (string) ($entry['subject'] ?? '');
+				if (preg_match('/^template-([1-9][0-9]*)$/', $subject, $matches) !== 1) {
+					continue;
+				}
+				$id = $matches[1];
+				if (isset($seen[$id])) {
+					continue;
+				}
+				$seen[$id] = true;
+				if (($entry['operation'] ?? '') === 'update'
+					&& ($entry['status'] ?? '') === 'updated'
+					&& ($entry['write_performed'] ?? null) === true) {
+					$data['updated_history'][$id] = (string) ($entry['created_at'] ?? '');
+				}
+			}
+		}
+		catch (Throwable $exception) {
+			error_log('[Zabbix Template Update Manager] Update history badge lookup failed: '.$exception->getMessage());
 		}
 
 		$versionComparison = TemplateVersionComparator::attach($data['templates']);
