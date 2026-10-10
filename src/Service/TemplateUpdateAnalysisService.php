@@ -25,6 +25,7 @@ require_once __DIR__.'/ContentComparisonClassifier.php';
 require_once __DIR__.'/HistoricalTemplateBaselineService.php';
 require_once __DIR__.'/HistoricalDashboardCandidateCorrelation.php';
 require_once __DIR__.'/HistoricalDashboardResidualDiagnostic.php';
+require_once __DIR__.'/HistoricalDashboardSemanticReconciliation.php';
 require_once __DIR__.'/ImportCompareSummary.php';
 require_once __DIR__.'/TemplateBackupVerificationService.php';
 require_once __DIR__.'/TemplateExportService.php';
@@ -374,6 +375,9 @@ final class TemplateUpdateAnalysisService {
 							$nativeDiff = (new TemplateImportCompareService())->compare($source);
 							$preview = UpdatePreviewAnalyzer::analyze($nativeDiff, 100);
 							$correlation['residual'] = HistoricalDashboardResidualDiagnostic::assess($preview, $correlation);
+							$correlation['semantic_reconciliation'] = HistoricalDashboardSemanticReconciliation::assess(
+								ImportCompareSummary::summarize($nativeDiff), $preview, $correlation
+							);
 							return $correlation;
 						}
 					);
@@ -423,6 +427,21 @@ final class TemplateUpdateAnalysisService {
 				foreach ((array) ($baseline['candidate_audit'] ?? []) as $candidate) {
 					$correlation = $candidate['dashboard_correlation'] ?? [];
 					$residual = is_array($correlation) ? ($correlation['residual'] ?? []) : [];
+					$semantic = is_array($correlation) ? ($correlation['semantic_reconciliation'] ?? []) : [];
+					if (is_array($semantic) && $semantic !== []) {
+						error_log(sprintf(
+							'[Zabbix Template Update Manager] Historical semantic reconciliation for template %s: commit=%s status=%s native_changes=%s preview_operations=%d reconciled_operations=%d remaining_operations=%s truncated=%s (diagnostic only; no baseline selection)',
+							$templateId,
+							(string) ($candidate['commit'] ?? ''),
+							in_array($semantic['status'] ?? '', ['unverified', 'representation_only_candidate'], true) ? $semantic['status'] : 'unverified',
+							isset($semantic['native_changes']) ? (string) $semantic['native_changes'] : 'unknown',
+							(int) ($semantic['preview_operations'] ?? 0),
+							(int) ($semantic['reconciled_operations'] ?? 0),
+							isset($semantic['remaining_operations']) ? (string) $semantic['remaining_operations'] : 'unknown',
+							!empty($semantic['truncated']) ? 'yes' : 'no'
+						));
+					}
+
 					if (is_array($residual) && $residual !== []) {
 						error_log(sprintf(
 							'[Zabbix Template Update Manager] Historical dashboard residual for template %s: commit=%s status=%s direct_changes=%d target_missing_to_no=%d other_changes=%d truncated=%s (diagnostic only; baseline remains blocked)',
