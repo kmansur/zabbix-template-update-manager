@@ -97,7 +97,7 @@ id "$PHP_USER" >/dev/null 2>&1 || die "Unknown web runtime account: $PHP_USER"
 
 # Runtime storage is private and is never removed or recursively chowned.
 runtime_dirs() {
-  printf '%s\\n' "$RUNTIME_BASE" "$RUNTIME_BASE/backups" "$RUNTIME_BASE/offline" "$RUNTIME_BASE/locks" "$RUNTIME_BASE/batches" "$RUNTIME_BASE/cache"
+  printf '%s\n' "$RUNTIME_BASE" "$RUNTIME_BASE/backups" "$RUNTIME_BASE/offline" "$RUNTIME_BASE/locks" "$RUNTIME_BASE/batches" "$RUNTIME_BASE/cache"
 }
 check_runtime() {
   local dir owner mode failed=0
