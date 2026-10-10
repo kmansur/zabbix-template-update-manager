@@ -154,6 +154,11 @@ final class HistoricalTemplateBaselineService {
 			$examined++;
 			$loaded = $this->loadRevision($id, $historicalPath, $previousCommit, $uuid);
 			$source = $loaded['source'];
+			$rawSourceSha256 = hash('sha256', $source['content']);
+			$sourceOrigin = (string) ($source['url'] ?? '');
+			$sourceTransport = str_starts_with($sourceOrigin, 'https://') ? 'https' :
+				(str_starts_with($sourceOrigin, 'runtime-cache://') ? 'runtime_cache' :
+				(str_starts_with($sourceOrigin, 'offline-bundle://') ? 'offline_bundle' : 'unknown'));
 			$document = $loaded['document'];
 			$metadata = $loaded['metadata'];
 			$historicalPath = $loaded['path'];
@@ -187,6 +192,9 @@ final class HistoricalTemplateBaselineService {
 					'commit' => $id,
 					'source' => $isolated['source'],
 					'source_sha256' => $sourceHash,
+					'raw_source_sha256' => $rawSourceSha256,
+					'historical_path' => $historicalPath,
+					'source_transport' => $sourceTransport,
 					'commit_count' => 1,
 					'semantic_distance' => null,
 					'change_categories' => [],
@@ -315,6 +323,9 @@ final class HistoricalTemplateBaselineService {
 			'candidate_audit' => array_map(static fn(array $candidate): array => [
 				'commit' => $candidate['commit'],
 				'source_sha256' => $candidate['source_sha256'],
+				'raw_source_sha256' => $candidate['raw_source_sha256'],
+				'historical_path' => $candidate['historical_path'],
+				'source_transport' => $candidate['source_transport'],
 				'commit_count' => $candidate['commit_count'],
 				'semantic_distance' => $candidate['semantic_distance'],
 				'change_categories' => $candidate['change_categories'],
