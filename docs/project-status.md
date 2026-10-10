@@ -16,7 +16,7 @@ This page separates implemented functionality, automated checks, operator-observ
 
 - **Plan:** Provide Super Admin-only manual visibility into published GitHub releases (including betas and RCs), without granting PHP filesystem write privileges or introducing auto-update.
 - **Do:** Added a dedicated read-only route, an explicit header link, strict HTTPS GitHub API URL, timeout, TLS peer verification, no redirects, bounded JSON response, release tag/version comparison and GitHub-host allowlist for release links.
-- **Check:** Added `ModuleReleaseCheckServiceTest.php` fixtures for newer beta, current version, stable version, drafts, external URL and empty releases. CI executes all `tests/unit/*Test.php` and PHP lint. **CI outcome and live Zabbix 7/8 UI/API behavior must be verified against the final commit; no live success is asserted.**
+- **Check:** Added `ModuleReleaseCheckServiceTest.php` fixtures for newer beta, current version, stable version, drafts, external URL and empty releases. CI executes all `tests/unit/*Test.php` and PHP lint. Additional injected-transport negative tests cover HTTP 403/429/500, connection failure, malformed/oversized JSON and empty releases. **New tests and CI must be verified against the final commit.** The user has validated the normal UI case on Zabbix 7 and 8, and verified the new route denies Admin on Zabbix 8.
 - **Act:** Keep operation manual and read-only. Validate the button with GitHub reachable, inaccessible and no releases; verify Super Admin-only access, PHP cURL and compatibility. Update production-readiness evidence only after field tests. No new release tag published.
 
 ## Engineering and evidence status
