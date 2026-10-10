@@ -57,6 +57,7 @@ foreach ($expected as $key => $value) {
 
 $expectedActions = [
 	'ztum.templates' => ['class' => 'TemplateList', 'view' => 'ztum.template.list'],
+	'ztum.module.release_check' => ['class' => 'ModuleReleaseCheck', 'view' => 'ztum.module.release.check'],
 	'ztum.operations' => ['class' => 'TemplateOperationHistory', 'view' => 'ztum.operation.history'],
 	'ztum.templates.prepare_selected' => ['class' => 'TemplateBatchPrepare', 'view' => 'ztum.template.batch.prepare'],
 	'ztum.batch.create' => ['class' => 'BatchOperationCreate', 'layout' => 'layout.json', 'view' => null],
