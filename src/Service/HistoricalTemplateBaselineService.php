@@ -6,6 +6,8 @@ use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateHistoryReposi
 use Modules\ZabbixTemplateUpdateManager\Repository\UpstreamTemplateSourceRepository;
 use RuntimeException;
 
+require_once __DIR__.'/HistoricalDashboardNormalizationDiagnostic.php';
+
 final class HistoricalTemplateBaselineService {
 
 	private $historyLoader;
@@ -110,7 +112,8 @@ final class HistoricalTemplateBaselineService {
 					'total' => max(0, (int) ($summary['total'] ?? 0)),
 					'by_entity' => $summary['by_entity'] ?? [],
 					'field_names' => self::safeFieldNames($preview),
-					'change_structure' => self::safeChangeStructure($preview)
+					'change_structure' => self::safeChangeStructure($preview),
+					'auto_start_diagnostic' => HistoricalDashboardNormalizationDiagnostic::summarizePreview($preview)
 				];
 			};
 		}
@@ -183,7 +186,8 @@ final class HistoricalTemplateBaselineService {
 					'semantic_distance' => null,
 					'change_categories' => [],
 					'field_names' => [],
-					'change_structure' => []
+					'change_structure' => [],
+					'auto_start_diagnostic' => []
 				];
 			}
 			else {
@@ -230,6 +234,8 @@ final class HistoricalTemplateBaselineService {
 					? $evaluation['field_names'] : [];
 				$candidates[$index]['change_structure'] = is_array($evaluation) && is_array($evaluation['change_structure'] ?? null)
 					? $evaluation['change_structure'] : [];
+				$candidates[$index]['auto_start_diagnostic'] = is_array($evaluation) && is_array($evaluation['auto_start_diagnostic'] ?? null)
+					? $evaluation['auto_start_diagnostic'] : [];
 				if ($distance === 0) {
 					$exactMatches[] = $candidates[$index];
 				}
@@ -291,7 +297,8 @@ final class HistoricalTemplateBaselineService {
 				'semantic_distance' => $candidate['semantic_distance'],
 				'change_categories' => $candidate['change_categories'],
 				'field_names' => $candidate['field_names'],
-				'change_structure' => $candidate['change_structure']
+				'change_structure' => $candidate['change_structure'],
+				'auto_start_diagnostic' => $candidate['auto_start_diagnostic']
 			], $candidates),
 			'source' => null
 		];
