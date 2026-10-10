@@ -46,13 +46,34 @@ final class HistoricalDashboardNormalizationDiagnostic {
 				'before_type' => self::safeType($before),
 				'after_type' => self::safeType($after),
 				'before_known' => self::canonical($before) !== null,
-				'after_known' => self::canonical($after) !== null
+				'after_known' => self::canonical($after) !== null,
+				'before_shape' => self::safeArrayShape($before),
+				'after_shape' => self::safeArrayShape($after),
+				'before_count' => is_array($before) ? min(count($before), 100) : 0,
+				'after_count' => is_array($after) ? min(count($after), 100) : 0
 			];
 			if (count($results) >= 5) {
 				break;
 			}
 		}
 		return $results;
+	}
+
+	/** Classifies shape using fixed labels only; no arbitrary keys or values escape. */
+	private static function safeArrayShape(mixed $value): string {
+		if (!is_array($value)) {
+			return 'not_array';
+		}
+		if ($value === ['__state' => 'missing']) {
+			return 'missing_marker';
+		}
+		if ($value === []) {
+			return 'empty_array';
+		}
+		if (array_is_list($value)) {
+			return 'list';
+		}
+		return 'associative';
 	}
 
 	private static function safeType(mixed $value): string {
