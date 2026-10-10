@@ -24,8 +24,8 @@ assertTemplateBackupAction(
 );
 assertTemplateBackupAction(
 	true,
-	str_contains($action, 'USER_TYPE_ZABBIX_ADMIN') && str_contains($action, 'USER_TYPE_SUPER_ADMIN'),
-	'Backup action must remain restricted to Zabbix administrators and super administrators.'
+	str_contains($action, '$this->getUserType() === USER_TYPE_SUPER_ADMIN') && !str_contains($action, 'USER_TYPE_ZABBIX_ADMIN'),
+	'Backup action must be restricted exclusively to Zabbix Super Admin.'
 );
 assertTemplateBackupAction(
 	true,
