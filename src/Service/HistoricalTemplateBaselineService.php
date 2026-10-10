@@ -114,7 +114,8 @@ final class HistoricalTemplateBaselineService {
 					'field_names' => self::safeFieldNames($preview),
 					'change_structure' => self::safeChangeStructure($preview),
 					'auto_start_diagnostic' => HistoricalDashboardNormalizationDiagnostic::summarizePreview($preview),
-					'auto_start_unknown_shapes' => HistoricalDashboardNormalizationDiagnostic::describeUnknownPreview($preview)
+					'auto_start_unknown_shapes' => HistoricalDashboardNormalizationDiagnostic::describeUnknownPreview($preview),
+					'auto_start_missing_transitions' => HistoricalDashboardNormalizationDiagnostic::missingTransitionSummary($preview)
 				];
 			};
 		}
@@ -189,7 +190,8 @@ final class HistoricalTemplateBaselineService {
 					'field_names' => [],
 					'change_structure' => [],
 					'auto_start_diagnostic' => [],
-					'auto_start_unknown_shapes' => []
+					'auto_start_unknown_shapes' => [],
+					'auto_start_missing_transitions' => []
 				];
 			}
 			else {
@@ -240,6 +242,8 @@ final class HistoricalTemplateBaselineService {
 					? $evaluation['auto_start_diagnostic'] : [];
 				$candidates[$index]['auto_start_unknown_shapes'] = is_array($evaluation) && is_array($evaluation['auto_start_unknown_shapes'] ?? null)
 					? $evaluation['auto_start_unknown_shapes'] : [];
+				$candidates[$index]['auto_start_missing_transitions'] = is_array($evaluation) && is_array($evaluation['auto_start_missing_transitions'] ?? null)
+					? $evaluation['auto_start_missing_transitions'] : [];
 				if ($distance === 0) {
 					$exactMatches[] = $candidates[$index];
 				}
@@ -303,7 +307,8 @@ final class HistoricalTemplateBaselineService {
 				'field_names' => $candidate['field_names'],
 				'change_structure' => $candidate['change_structure'],
 				'auto_start_diagnostic' => $candidate['auto_start_diagnostic'],
-				'auto_start_unknown_shapes' => $candidate['auto_start_unknown_shapes']
+				'auto_start_unknown_shapes' => $candidate['auto_start_unknown_shapes'],
+				'auto_start_missing_transitions' => $candidate['auto_start_missing_transitions']
 			], $candidates),
 			'source' => null
 		];
