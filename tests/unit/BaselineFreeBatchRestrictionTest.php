@@ -28,4 +28,43 @@ if ($item['category'] !== 'review'
     || !preg_match('/^[a-f0-9]{64}$/', $item['manual_evidence_sha256'])) {
     throw new RuntimeException('Unverified baseline must require explicit reviewed batch execution and overwrite acknowledgement.');
 }
-echo "Baseline-free reviewed batch gating tests passed.\\n";
+$blockedService = new TemplateBatchPlanService(
+    static fn(string $id): array => [
+        'template'=>['templateid'=>$id, 'name'=>'Lab RDAP'],
+        'update_readiness'=>[
+            'status'=>'review_backup_verified',
+            'manual_reasons'=>['unverified_historical_baseline'],
+            'manual_confirmation_required'=>true,
+            'backup_verified'=>true
+        ]
+    ],
+    static fn(array $template): array => throw new RuntimeException('Backup already verified'),
+    static fn(string $id,bool $reviewed): array => [
+        'status'=>'blocked_candidate', 'manual_override'=>$reviewed
+    ]
+);
+$blockedItem = $blockedService->build(['10773'])['items'][0];
+if ($blockedItem['batch_manual_eligible']
+    || $blockedItem['manual_evidence_sha256'] !== '') {
+    throw new RuntimeException('Failed reviewed preflight must not authorize batch update.');
+}
+$wrongMode = new TemplateBatchPlanService(
+    static fn(string $id): array => [
+        'template'=>['templateid'=>$id, 'name'=>'Lab RDAP'],
+        'update_readiness'=>[
+            'status'=>'review_backup_verified',
+            'manual_reasons'=>['unverified_historical_baseline'],
+            'manual_confirmation_required'=>true,
+            'backup_verified'=>true
+        ]
+    ],
+    static fn(array $template): array => throw new RuntimeException('Backup already verified'),
+    static fn(string $id,bool $reviewed): array => [
+        'status'=>'passed','manual_override'=>false,
+        'evidence_sha256'=>hash('sha256','invalid-mode')
+    ]
+);
+if ($wrongMode->build(['10773'])['items'][0]['batch_manual_eligible']) {
+    throw new RuntimeException('Preflight without manual mode must not enable reviewed batch.');
+}
+echo "Baseline-free reviewed batch gating tests passed.\n";
