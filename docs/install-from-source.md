@@ -1,6 +1,6 @@
 # Local Git checkout installation (Zabbix 7 and 8)
 
-**Status:** laboratory beta only; not a production approval. The local-source installer is new-install-only. The root-level `install.sh` is the only active installer; retired quickinstall scripts are not supported on `main`.
+**Status:** laboratory beta only; not a production approval. Without flags, the local-source installer is new-install-only; explicit `--upgrade` and `--rollback BACKUP_ID` operations are available for laboratory testing. The root-level `install.sh` is the only active installer; retired quickinstall scripts are not supported on `main`.
 
 ## Requirements
 
@@ -85,7 +85,7 @@ Before changing the installed module, rollback now prints an explicit **Rollback
 
 Existing clones inside `modules/` must not be removed manually. They can have extra source-only files; upgrade makes a private copy of the entire old tree before installing only the runtime set. The old `tools/quickinstall*` scripts were retired. A new installation continues to reject overwriting an existing module.
 
-**Limitations:** backup SHA-256 is integrity evidence within a root-controlled local backup, not a cryptographic signature from an external trusted party. The installer does not automatically update Git, drain PHP-FPM connections, inspect in-flight ZTUM jobs, migrate databases or roll back Zabbix configuration imports. End-to-end upgrade, forced-failure and rollback validation remain mandatory for beta.62 approval.
+**Limitations:** backup SHA-256 is integrity evidence within a root-controlled local backup, not a cryptographic signature from an external trusted party. The installer does not automatically update Git, drain PHP-FPM connections, inspect in-flight ZTUM jobs, migrate databases or roll back Zabbix configuration imports. The normal Zabbix 8 upgrade → rollback → upgrade cycle, SHA-256 verification and two negative integrity cases were operator-tested; activation-failure injection, Zabbix 7 rollback and independent platform testing remain open.
 
 ## Security notes
 
