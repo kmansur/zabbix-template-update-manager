@@ -14,7 +14,8 @@ All notable changes to Template Update Manager will be documented in this file.
 ### Changed
 
 - Consolidated runtime directory provisioning and validation into `install.sh`, with a read-only `--runtime-check` mode; retired the separate runtime setup helper.
-- Migrated upstream index and immutable source caches from temporary storage to the private `/var/lib/zabbix-template-update-manager/cache` directory.
+- Migrated upstream index, immutable source and immutable history caches from temporary storage to the private `/var/lib/zabbix-template-update-manager/cache` directory.
+- Increased the bounded history request timeout from 6 to 12 seconds following observed Zabbix API latency of 4.8–8.6 seconds; incomplete history remains non-authoritative.
 - Restricted custom lock directories to safe absolute paths.
 - Updated Super Admin permission and confidential rollback artifact documentation.
 
