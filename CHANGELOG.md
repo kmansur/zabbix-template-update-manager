@@ -9,6 +9,22 @@ All notable changes to Template Update Manager will be documented in this file.
 - Added per-template upstream vendor-version provenance metadata (`version_commit` / `version_date`) derived from the exact `vendor.version` YAML line, with previous-index reuse and shallow-history fallback.
 - Added an **Upstream updated** date column to the template catalog without introducing per-row runtime network requests.
 
+## [0.1.0-beta.63] - 2026-10-10 (laboratory prerelease candidate)
+
+### Changed
+
+- Consolidated runtime directory provisioning and validation into `install.sh`, with a read-only `--runtime-check` mode; retired the separate runtime setup helper.
+- Migrated upstream index and immutable source caches from temporary storage to the private `/var/lib/zabbix-template-update-manager/cache` directory.
+- Restricted custom lock directories to safe absolute paths.
+- Updated Super Admin permission and confidential rollback artifact documentation.
+
+### Security and validation
+
+- Pinned first-party GitHub Actions to immutable full commit SHAs and enforced the policy in the workflow contract test.
+- Added negative tests for unsafe lock paths and installer contracts.
+- Preserved verified code-only upgrade/rollback behavior, Zabbix API write boundary, explicit template rollback and offline fail-closed behavior.
+- Field validation of this candidate on Zabbix 7 and Zabbix 8 is still required; **not approved for production**.
+
 ## [0.1.0-beta.62] - 2026-10-10 (laboratory prerelease)
 
 ### Added
