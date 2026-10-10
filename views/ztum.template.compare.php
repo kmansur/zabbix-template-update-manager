@@ -401,6 +401,45 @@ if (is_array($data['three_way_analysis'])) {
 			FrontendUi::WARNING
 		));
 	}
+	// Keep potentially destructive, verified changes visible before the full technical diff.
+	$lossDetails = [];
+	foreach ((array) ($analysis['details'] ?? []) as $detail) {
+		if (!is_array($detail)) {
+			continue;
+		}
+		if (in_array($detail['classification'] ?? '', ['local_only_overwrite', 'conflict'], true)) {
+			$lossDetails[] = $detail;
+		}
+	}
+	$knownLossCount = (int) ($threeWaySummary['local_only_overwrite'] ?? 0)
+		+ (int) ($threeWaySummary['conflict'] ?? 0);
+	if ($knownLossCount > 0) {
+		$page->addItem(FrontendUi::section(_('Local customizations at risk')));
+		if (!empty($analysis['details_truncated']) || count($lossDetails) < $knownLossCount) {
+			$page->addItem(FrontendUi::message(
+					_('The detailed change list may not contain every at-risk customization. This is a partial display, not a complete list of potential losses.'),
+					FrontendUi::WARNING
+			));
+		}
+		if ($lossDetails !== []) {
+			$lossTable = (new CTableInfo())->setHeader([
+				_('Entity type'), _('Entity'), _('Field'), _('Risk'),
+				_('Installed value'), _('Incoming value')
+			]);
+			foreach ($lossDetails as $detail) {
+				$lossTable->addRow([
+					$entityLabels[$detail['entity_type'] ?? ''] ?? (string) ($detail['entity_type'] ?? '—'),
+					(string) ($detail['entity'] ?? '—'),
+					(string) ($detail['field'] ?? '—'),
+					$threeWayClassLabels[$detail['classification']] ?? _('Unknown'),
+					$formatThreeWayValue($detail['local'] ?? null),
+					$formatThreeWayValue($detail['upstream'] ?? null)
+				]);
+			}
+			$page->addItem($lossTable);
+		}
+	}
+
 	$page
 		->addItem(FrontendUi::section(_('Three-way analysis')))
 		->addItem($threeWayStatusTable)
