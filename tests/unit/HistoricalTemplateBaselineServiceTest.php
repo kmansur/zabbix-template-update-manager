@@ -312,4 +312,17 @@ $notFoundService = new HistoricalTemplateBaselineService(
 $notFound = $notFoundService->find('templates/os/linux/template_os_linux.yaml', str_repeat('f', 40), $uuid, '7.0-1');
 assertBaseline('history_limit_reached', $notFound['status'], 'A truncated scan must not claim that a historical version does not exist.');
 
+
+// Immutable raw revision evidence is audit-only: never use these metadata
+// fields as a substitute for exact native comparison or installation proof.
+$serviceSource = (string) file_get_contents(dirname(__DIR__, 2).'/src/Service/HistoricalTemplateBaselineService.php');
+assertBaseline(true, str_contains($serviceSource, "'raw_source_sha256' => \$rawSourceSha256"),
+    'Candidate audit must record raw historical YAML SHA-256.');
+assertBaseline(true, str_contains($serviceSource, "'historical_path' => \$historicalPath"),
+    'Candidate audit must identify the historical source path.');
+assertBaseline(true, str_contains($serviceSource, "'source_transport' => \$sourceTransport"),
+    'Candidate audit must classify the retrieval origin.');
+assertBaseline(true, str_contains($serviceSource, "'status' => 'ambiguous'"),
+    'Historical ambiguity must remain fail-closed.');
+
 echo "HistoricalTemplateBaselineService tests passed.\n";
