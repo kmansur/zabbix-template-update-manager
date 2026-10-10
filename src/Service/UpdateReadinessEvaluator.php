@@ -17,6 +17,8 @@ namespace Modules\ZabbixTemplateUpdateManager\Service;
  *
  * This evaluator never authorizes a configuration write by itself.
  */
+require_once __DIR__.'/BaselineFreeReviewAssessment.php';
+
 final class UpdateReadinessEvaluator {
 
 	public static function evaluate(
@@ -55,6 +57,32 @@ final class UpdateReadinessEvaluator {
 		}
 
 		if (!is_array($historicalBaseline) || ($historicalBaseline['status'] ?? null) !== 'found') {
+			$assisted = BaselineFreeReviewAssessment::evaluate($historicalBaseline, $updatePreview);
+			if (($assisted['status'] ?? '') === 'candidate_for_assisted_review') {
+				if (!is_array($updateRisk) || !in_array(($updateRisk['technical_level'] ?? ''), ['none', 'low', 'medium', 'high'], true)) {
+					return self::blocked($result, 'blocked_unresolved', 'resolve_risk_analysis', 'assisted_risk_unavailable');
+				}
+				$summary = $updatePreview['summary'];
+				if (($summary['total'] ?? 0) < 1) {
+					return self::blocked($result, 'blocked_unresolved', 'resolve_update_preview', 'assisted_no_changes');
+				}
+				$result['manual_confirmation_required'] = true;
+				$result['manual_reasons'] = ['unverified_historical_baseline'];
+				$result['review_flags'] = $result['manual_reasons'];
+				if (is_array($backupVerification)
+						&& ($backupVerification['status'] ?? null) === 'current_match'
+						&& !empty($backupVerification['current_match'])) {
+					$result['status'] = 'review_backup_verified';
+					$result['next_step'] = 'run_manual_preflight';
+					$result['backup_verified'] = true;
+					return $result;
+				}
+				$result['status'] = 'review_required';
+				$result['next_step'] = 'create_and_verify_backup';
+				$result['candidate_for_backup'] = true;
+				return $result;
+			}
+
 			$baselineStatus = is_array($historicalBaseline)
 				? (string) ($historicalBaseline['status'] ?? 'unavailable')
 				: 'unavailable';
