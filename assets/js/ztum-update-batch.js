@@ -438,6 +438,7 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		return entries;
 	};
 
+	let confirmedSelectionFingerprint = '';
 	const updateExecutionState = () => {
 		const confirm = byId('ztum-batch-confirm');
 		const submit = byId('ztum-batch-update-submit');
@@ -445,6 +446,14 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		const reviewedEntries = selectedReviewedEntries();
 		const selectedReviewed = reviewedEntries.length;
 		const executionCount = readyEvidence.size + selectedReviewed;
+		const selectionFingerprint = JSON.stringify(executionEntries());
+		if (selectionFingerprint !== confirmedSelectionFingerprint) {
+			confirmedSelectionFingerprint = selectionFingerprint;
+			if (!executionStarted) {
+				confirm.checked = false;
+			}
+		}
+
 		const lossCount = reviewedEntries.filter((entry) => {
 			const review = reviewEvidence.get(entry.templateId);
 			return review?.requiresLocalOverwriteAck === true
