@@ -445,11 +445,12 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		const reviewedEntries = selectedReviewedEntries();
 		const selectedReviewed = reviewedEntries.length;
 		const executionCount = readyEvidence.size + selectedReviewed;
-		const lossCount = reviewedEntries.filter((entry) =>
-			entry.requiresLocalOverwriteAck === true
-			|| entry.reasons?.includes('local_customization_overwrite')
-			|| entry.reasons?.includes('confirmed_three_way_conflict')
-		).length;
+		const lossCount = reviewedEntries.filter((entry) => {
+			const review = reviewEvidence.get(entry.templateId);
+			return review?.requiresLocalOverwriteAck === true
+				|| review?.reasons?.includes('local_customization_overwrite')
+				|| review?.reasons?.includes('confirmed_three_way_conflict');
+		}).length;
 		const lossWarning = byId('ztum-batch-loss-warning');
 		if (lossWarning !== null) {
 			lossWarning.hidden = lossCount === 0;
