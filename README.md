@@ -37,6 +37,10 @@ ZTUM is licensed under the **GNU Affero General Public License v3.0 only (AGPL-3
 
 The license choice deliberately aligns with the AGPLv3 licensing of Zabbix 7.0 and later and with Zabbix's published guidance for third-party modules/plugins using AGPLv3-compatible licenses.
 
+## Native UI and administrator review
+
+ZTUM must use the running Zabbix frontend's native components, themes and interaction patterns. Known local customizations at risk of overwrite require a detailed, explicit administrator warning. Missing historical provenance is disclosed rather than presented as proof of no customizations; reviewed updates must still pass source integrity, complete preview, verified backup and fresh server-side preflight. See [Native Zabbix UI and administrator review contract](docs/native-ui-and-review-contract.md).
+
 ## Supported Zabbix generations
 
 - Zabbix 7.x
