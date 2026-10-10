@@ -50,6 +50,13 @@ Authorization was restricted across 24 registered routes. Legacy contract tests 
 - **Check:** Operator previously validated clean installation of the earlier installer revision on Zabbix 8, including 0700 runtime directories and root-owned minimal module contents; verified `--check` and Zabbix 7/8 detection. **The consolidated final commit CI/security/quality workflows and clean install must be revalidated.**
 - **Act:** The three-command `install.sh` workflow is the single installation documentation path. Existing installs are never overwritten; no `--upgrade` implementation yet. Immutable historical releases are not rewritten. Production remains unapproved.
 
+## 2026-10-10 PDCA — experimental local code upgrade/rollback
+
+- **Plan:** Add a root-only `install.sh --upgrade` path with a private, checksum-verified snapshot of existing code, serial operation locking and an explicit `--rollback BACKUP_ID` recovery path; never modify persistent ZTUM state.
+- **Do:** Implemented strictly increasing-version requirement for upgrades, source/staged asset checks, backup under `/var/backups/zabbix-template-update-manager`, SHA-256 manifest verification, private ownership checks, same-filesystem staged activation and fail-safe preservation of the previous code.
+- **Check:** Static installer contract updated; syntax, regression workflows, actual upgrade and forced-failure rollback **must be validated on disposable Zabbix 7/8 labs**. This record is not evidence of successful end-to-end execution.
+- **Act:** Do not run upgrade on production or tag/publish beta.62 on the basis of this implementation. After controlled testing, verify versions, frontend navigation, backups and absence of duplicated imports. Code rollback does not undo Zabbix database/configuration writes.
+
 ## Engineering and evidence status
 
 | Workstream | Status | Evidence and limits |
