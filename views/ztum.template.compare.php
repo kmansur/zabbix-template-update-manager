@@ -366,7 +366,7 @@ if (is_array($data['assisted_review_assessment'] ?? null)) {
 	$assessment = $data['assisted_review_assessment'];
 	if (($assessment['status'] ?? '') === 'candidate_for_assisted_review') {
 		$page->addItem(FrontendUi::message(
-			_('The proposed changes have a fully identified direct preview, but their origin as local customizations is unknown. This assessment is informational: the update remains blocked until all assisted-review safeguards are implemented.'),
+			_('The proposed changes have a fully identified direct preview, but their origin as local customizations is unknown. This requires explicit administrator review and a verified rollback backup before fresh preflight; no unattended update is authorized.'),
 			FrontendUi::WARNING
 		));
 	}
