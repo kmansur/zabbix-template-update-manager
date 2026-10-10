@@ -240,34 +240,10 @@ Use the actual frontend modules path, which might be `/usr/share/zabbix/modules`
 
 Detailed prerequisites, failure behavior and post-install steps: [install from Git source](docs/install-from-source.md).
 
-## Quick install
+## Installation guidance
 
-For a new laboratory installation, use the beginner-friendly installer:
+**The only supported installer in the active development branch is `install.sh`.** See [Install from source](docs/install-from-source.md) for the automated three-command procedure and `--check` diagnostics. The previously distributed `tools/quickinstall*.sh` entry points are retired on `main`; immutable older releases remain unchanged.
 
-- [Quick Install — English](QUICK_INSTALL.md)
-- [Instalação Rápida — Português do Brasil](QUICK_INSTALL_PT-BR.md)
-
-English:
-
-```bash
-curl -fsSL \
-  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/v0.1.0-beta.61/tools/quickinstall.sh \
-  -o /tmp/ztum-quickinstall.sh
-
-sudo bash /tmp/ztum-quickinstall.sh
-```
-
-Português do Brasil:
-
-```bash
-curl -fsSL \
-  https://raw.githubusercontent.com/kmansur/zabbix-template-update-manager/v0.1.0-beta.61/tools/quickinstall-pt-br.sh \
-  -o /tmp/ztum-quickinstall-pt-br.sh
-
-sudo bash /tmp/ztum-quickinstall-pt-br.sh
-```
-
-The quick installer is intentionally **new-install only**. It will not overwrite an existing ZTUM installation and it does not modify Nginx, Apache, PHP-FPM configuration, the Zabbix database or Zabbix templates.
 
 ## Manual installation for laboratory testing
 
