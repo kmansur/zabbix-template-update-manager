@@ -145,6 +145,15 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 				: (readinessStatus.includes('verified') || readinessStatus.includes('passed') ? 'success' : 'muted'));
 		setStateText('ztum-readiness-' + templateId, formatCode(readinessStatus), readinessTone);
 		setStateText('ztum-category-' + templateId, labels[category] || labels.blocked, categoryTone);
+		const hasKnownLocalRisk = requiresLocalOverwriteAck
+			|| (Array.isArray(item.manual_reasons) && item.manual_reasons.some((reason) =>
+				['local_customization_overwrite', 'confirmed_three_way_conflict'].includes(reason)
+			));
+		const localRiskLabel = hasKnownLocalRisk ? labels.local_risk_known
+			: (category === 'ready' ? labels.local_risk_not_reported : labels.local_risk_unknown);
+		setStateText('ztum-local-risk-' + templateId, localRiskLabel,
+			hasKnownLocalRisk ? 'warning' : (category === 'ready' ? 'success' : 'muted'));
+
 		setText('ztum-reason-' + templateId, formatCode(reason));
 		const manualState = {
 			eligible: manualEligible,
@@ -184,6 +193,7 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		reviewEvidence.delete(templateId);
 		setStateText('ztum-readiness-' + templateId, labels.request_failed, 'danger');
 		setStateText('ztum-category-' + templateId, labels.blocked, 'danger');
+		setStateText('ztum-local-risk-' + templateId, labels.local_risk_unknown, 'warning');
 		setText('ztum-reason-' + templateId, error?.message || labels.request_failed);
 		setReviewedSelection(templateId, 'blocked');
 		setExecutionState(templateId, 'blocked', labels.blocked);
