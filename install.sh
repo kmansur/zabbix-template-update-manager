@@ -73,17 +73,17 @@ FRONTEND="$(dirname "$MODULES_DIR")"
 for f in "$FRONTEND/include/defines.inc.php" "$FRONTEND/include/version.inc.php" "$FRONTEND/include/classes/core/ZBase.php"; do
   [[ -f "$f" ]] || continue
   if [[ -z "$ZABBIX_VERSION" ]]; then
-    ZABBIX_VERSION="$(sed -nE "s/.*(define\\(['\"]ZABBIX_VERSION['\"],[[:space:]]*['\"]|const[[:space:]]+ZABBIX_VERSION[[:space:]]*=[[:space:]]*['\"])([0-9]+\\.[0-9]+(\\.[0-9]+)?).*/\\2/p" "$f" | head -n1)"
+    ZABBIX_VERSION="$(sed -nE "s/.*(define\\(['\"]ZABBIX_VERSION['\"],[[:space:]]*['\"]|const[[:space:]]+ZABBIX_VERSION[[:space:]]*=[[:space:]]*['\"])([0-9]+\.[0-9]+(\.[0-9]+)?).*/\\2/p" "$f" | head -n1)"
   fi
 done
 if [[ -z "$ZABBIX_VERSION" ]] && command -v dpkg-query >/dev/null 2>&1; then
   for pkg in zabbix-frontend-php zabbix-frontend-php-mysql zabbix-frontend-php-pgsql; do
     v="$(dpkg-query -W -f='${Version}' "$pkg" 2>/dev/null || true)"
     if [[ "$v" =~ ^[0-9]+:[0-9]+ ]]; then v="${v#*:}"; fi
-    if [[ "$v" =~ ^([78])\\.([0-9]+)\\. ]]; then ZABBIX_VERSION="${BASH_REMATCH[0]%.}"; break; fi
+    if [[ "$v" =~ ^([78])\.([0-9]+)\. ]]; then ZABBIX_VERSION="${BASH_REMATCH[0]%.}"; break; fi
   done
 fi
-[[ "$ZABBIX_VERSION" =~ ^([78])\\.[0-9]+(\\.[0-9]+)?$ ]] || die "Could not safely verify frontend version 7.x or 8.x; inspect the frontend installation first"
+[[ "$ZABBIX_VERSION" =~ ^([78])\.[0-9]+(\.[0-9]+)?$ ]] || die "Could not safely verify frontend version 7.x or 8.x; inspect the frontend installation first"
 log "Detected Zabbix frontend: $ZABBIX_VERSION"
 
 TARGET="$MODULES_DIR/$MODULE_NAME"
