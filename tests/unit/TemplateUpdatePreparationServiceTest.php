@@ -38,7 +38,10 @@ $service = new TemplateUpdatePreparationService(
         $freshPreflights++;
         checkPreparation($manual, 'Baseline-free review must use reviewed preflight.');
         return ['status'=>'passed','write_enabled'=>false,
-            'manual_override'=>true,'evidence_sha256'=>hash('sha256','review')];
+            'manual_override'=>true,'evidence_sha256'=>hash('sha256','review'),
+            'template'=>['templateid'=>$id],
+            'candidate'=>['commit'=>str_repeat('a',40)],
+            'rollback'=>['sha256'=>hash('sha256','rollback')]];
     }
 );
 $result = $service->prepare('10773');
