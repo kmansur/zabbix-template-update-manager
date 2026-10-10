@@ -360,7 +360,9 @@ final class UpstreamTemplateHistoryRepository {
 		$file = $this->immutableHistoryCacheFile($path, $until, $maxCommits);
 		if (!$this->privateHistoryCacheDirectory('/var/lib/zabbix-template-update-manager/cache')
 				|| !$this->privateHistoryCacheDirectory(dirname($file))
-				|| is_link($file) || !is_file($file)) {
+				|| is_link($file) || !is_file($file)
+				|| @fileowner($file) !== posix_geteuid()
+				|| (@fileperms($file) & 0777) !== 0600) {
 			return null;
 		}
 
