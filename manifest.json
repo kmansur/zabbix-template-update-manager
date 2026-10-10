@@ -13,6 +13,10 @@
         ]
     },
     "actions": {
+        "ztum.module.release_check": {
+            "class": "ModuleReleaseCheck",
+            "view": "ztum.module.release.check"
+        },
         "ztum.templates": {
             "class": "TemplateList",
             "view": "ztum.template.list"
