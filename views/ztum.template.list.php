@@ -449,18 +449,19 @@ $page = (new CHtmlPage())
 	->setTitle($data['title'])
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())->addItem(
-				new CLink(
-					_('Operation history'),
-					(new CUrl('zabbix.php'))->setArgument('action', 'ztum.operations')
+			(new CList())
+				->addItem(new CLink(_('Templates with backups / Rollback'), $backupOverviewUrl))
+				->addItem(
+					new CLink(
+						_('Operation history'),
+						(new CUrl('zabbix.php'))->setArgument('action', 'ztum.operations')
+					)
 				)
-			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem(
 		(new CList())
 			->addClass(ZBX_STYLE_HOR_LIST)
-			->addItem($backupOverviewLink)
 			->addItem('ZTUM '.$data['version'])
 			->addItem(_('Zabbix').' '.$data['zabbix_version'])
 			->addItem(FrontendUi::status(
