@@ -7,6 +7,7 @@ This page separates implemented functionality, automated checks, operator-observ
 ## Current release
 
 - Published laboratory prerelease: `v0.1.0-beta.61`.
+- Current development VERSION/manifest: `0.1.0-beta.62` (**candidate only; not tagged or released**).
 - Proposed next community-testing milestone: `v0.2.0-beta.1` (**not yet tagged or published**).
 - Main development branch: `main`. Generated official catalog indexes are published through `upstream-index`.
 - Feature freeze: prioritize test evidence, defect fixes and documentation over new features.
