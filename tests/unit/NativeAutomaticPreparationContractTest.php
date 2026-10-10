@@ -23,7 +23,10 @@ foreach ([
     'USER_TYPE_SUPER_ADMIN',
     'TemplateUpdatePreparationService',
     'CControllerResponseData',
-    'validateInput'
+    'validateInput',
+    'TemplateOperationHistoryService',
+    "'update_prepare'",
+    "'write_performed' => false"
 ] as $needle) {
     if (!str_contains($action, $needle)) {
         throw new RuntimeException('Preparation action authorization missing: '.$needle);
