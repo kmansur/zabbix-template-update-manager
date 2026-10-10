@@ -97,7 +97,7 @@ if [[ -z "$PHP_USER" ]]; then
   users=()
   for f in "${files[@]}"; do
     while IFS= read -r user; do [[ -n "$user" && "$user" != root ]] && users+=("$user"); done < <(
-      sed -nE 's/^[[:space:]]*user[[:space:]]*=[[:space:]]*([a-z_][a-z0-9_-]*).*$/\\1/p' "$f")
+      sed -nE 's/^[[:space:]]*user[[:space:]]*=[[:space:]]*([a-z_][a-z0-9_-]*).*$/\1/p' "$f")
   done
   if (("${#users[@]}")); then
     mapfile -t users < <(printf '%s\n' "${users[@]}" | sort -u)
