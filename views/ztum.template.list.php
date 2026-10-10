@@ -233,12 +233,11 @@ $templateTable = (new CTableInfo())
 		_('Available'),
 		_('Upstream updated'),
 		_('Status'),
-		_('History'),
+		_('History / Rollback'),
 		_('Upstream identity'),
 		_('Update policy'),
 		_('Linked hosts'),
 		_('Action'),
-		_('Backups'),
 		_('UUID')
 	])
 	->setPageNavigation($data['paging']);
@@ -339,26 +338,39 @@ foreach ($data['templates'] as $template) {
 	}
 
 	$historyCell = '—';
-	$lastUpdatedAt = $isInstalled
-		? (string) ($data['updated_history'][(string) ($template['templateid'] ?? '')] ?? '')
-		: '';
-	if ($lastUpdatedAt !== '') {
-		$historyUrl = (new CUrl('zabbix.php'))
+	$templateId = (string) ($template['templateid'] ?? '');
+	$lastUpdatedAt = $isInstalled ? (string) ($data['updated_history'][$templateId] ?? '') : '';
+	$backupInfo = $isInstalled ? ($data['backup_summary'][$templateId] ?? null) : null;
+	if ($isInstalled && is_array($backupInfo)) {
+		$valid = (int) ($backupInfo['valid'] ?? 0);
+		$invalid = (int) ($backupInfo['invalid'] ?? 0);
+		$truncated = !empty($backupInfo['truncated']);
+		$unavailable = !empty($backupInfo['unavailable']);
+		$backupsUrl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'ztum.template.backups')
-			->setArgument('templateid', $template['templateid']);
-		$historyCell = (new CLink('✓ '._('Updated'), $historyUrl))
-			->addClass(ZBX_STYLE_GREEN)
-			->setAttribute('title', _('Updated by ZTUM (recorded history): ').$lastUpdatedAt.' — '._('View rollback backups'));
-	}
-
-	$backupCell = '—';
-	if ($isInstalled && $data['can_compare'] && ($template['templateid'] ?? '') !== '') {
-		$backupCell = new CLink(
-			_('View'),
-			(new CUrl('zabbix.php'))
-				->setArgument('action', 'ztum.template.backups')
-				->setArgument('templateid', $template['templateid'])
-		);
+			->setArgument('templateid', $templateId);
+		if ($unavailable || ($invalid > 0 && $valid === 0)) {
+			$historyCell = (new CLink('⚠ '._('Backup issue'), $backupsUrl))
+				->setAttribute('title', _('Backup integrity or repository access needs inspection. Rollback is not authorized by this indicator.'));
+		}
+		elseif ($valid > 0 && $lastUpdatedAt !== '') {
+			$historyCell = (new CLink('✓ '._('Updated'), $backupsUrl))
+				->addClass(ZBX_STYLE_GREEN)
+				->setAttribute('title', _('Updated by ZTUM: ').$lastUpdatedAt.'. '._('Verified backup(s) among ten newest: ').$valid.'. '._('Review required before rollback.'));
+		}
+		elseif ($valid > 0) {
+			$historyCell = (new CLink(_('Backups').' ('.$valid.($truncated ? '+' : '').')', $backupsUrl))
+				->setAttribute('title', _('Integrity-verified backups among the newest ten. Review required before rollback.'));
+		}
+		elseif ($lastUpdatedAt !== '') {
+			$historyCell = (new CLink('✓ '._('Updated'), $backupsUrl))
+				->addClass(ZBX_STYLE_GREEN)
+				->setAttribute('title', _('ZTUM update recorded: ').$lastUpdatedAt.'. '._('No verified rollback backup found in the ten newest records; do not assume rollback is available.'));
+		}
+		elseif ($invalid > 0) {
+			$historyCell = (new CLink('⚠ '._('Backup issue'), $backupsUrl))
+				->setAttribute('title', _('No verified rollback backup among the newest ten records.'));
+		}
 	}
 
 	$templateTable->addRow([
@@ -392,7 +404,6 @@ foreach ($data['templates'] as $template) {
 		),
 		$isInstalled ? (int) $template['host_count'] : '—',
 		$actionCell,
-		$backupCell,
 		$template['uuid'] !== '' ? FrontendUi::fingerprint($template['uuid'], 12) : '—'
 	]);
 }
