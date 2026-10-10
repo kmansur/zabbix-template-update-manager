@@ -460,6 +460,7 @@ $page = (new CHtmlPage())
 	->addItem(
 		(new CList())
 			->addClass(ZBX_STYLE_HOR_LIST)
+			->addItem($backupOverviewLink)
 			->addItem('ZTUM '.$data['version'])
 			->addItem(_('Zabbix').' '.$data['zabbix_version'])
 			->addItem(FrontendUi::status(
