@@ -23,8 +23,7 @@ final class UpstreamIndexRepository {
 	private OfflineBundleRepository $offlineBundle;
 
 	public function __construct(?string $cacheDir = null, ?OfflineBundleRepository $offlineBundle = null) {
-		$this->cacheDir = $cacheDir ?? rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
-			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager';
+		$this->cacheDir = $cacheDir ?? '/var/lib/zabbix-template-update-manager/cache';
 		$this->offlineBundle = $offlineBundle ?? new OfflineBundleRepository();
 	}
 
@@ -315,8 +314,18 @@ final class UpstreamIndexRepository {
 		return $this->cacheDir.DIRECTORY_SEPARATOR.'upstream-'.str_replace('.', '-', $line).'.json';
 	}
 
+	private function cacheDirectoryIsPrivate(): bool {
+		if (is_link($this->cacheDir) || !is_dir($this->cacheDir)) {
+			return false;
+		}
+		$mode = @fileperms($this->cacheDir);
+		$owner = @fileowner($this->cacheDir);
+		return $mode !== false && ($mode & 0777) === 0700
+			&& $owner !== false && $owner === @posix_geteuid();
+	}
+
 	private function readCache(string $cacheFile): ?array {
-		if (!is_file($cacheFile)) {
+		if (!$this->cacheDirectoryIsPrivate() || is_link($cacheFile) || !is_file($cacheFile)) {
 			return null;
 		}
 
@@ -333,7 +342,7 @@ final class UpstreamIndexRepository {
 	}
 
 	private function writeCache(string $cacheFile, string $content): void {
-		if (!is_dir($this->cacheDir) && !@mkdir($this->cacheDir, 0700, true) && !is_dir($this->cacheDir)) {
+		if (!$this->cacheDirectoryIsPrivate()) {
 			return;
 		}
 
