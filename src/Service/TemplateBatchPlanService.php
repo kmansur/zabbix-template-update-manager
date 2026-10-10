@@ -142,10 +142,9 @@ final class TemplateBatchPlanService {
 						&& !empty($preflight['manual_override'])
 						&& preg_match('/^[a-f0-9]{64}$/', $evidence)) {
 					$item['batch_manual_eligible'] = true;
-					$item['batch_manual_requires_local_overwrite_ack'] = in_array(
-						'local_customization_overwrite',
-						$manualReasons,
-						true
+					$item['batch_manual_requires_local_overwrite_ack'] = (bool) array_intersect(
+						['local_customization_overwrite', 'confirmed_three_way_conflict', 'unverified_historical_baseline'],
+						$manualReasons
 					);
 					$item['manual_evidence_sha256'] = $evidence;
 				}
@@ -225,7 +224,7 @@ final class TemplateBatchPlanService {
 			return false;
 		}
 
-		$allowed = ['confirmed_three_way_conflict', 'medium_technical_risk', 'high_technical_risk', 'local_customization_overwrite'];
+		$allowed = ['confirmed_three_way_conflict', 'medium_technical_risk', 'high_technical_risk', 'local_customization_overwrite', 'unverified_historical_baseline'];
 		foreach ($manualReasons as $reason) {
 			if (!in_array($reason, $allowed, true)) {
 				return false;
