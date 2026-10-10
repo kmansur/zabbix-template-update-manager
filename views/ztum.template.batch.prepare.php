@@ -134,9 +134,12 @@ $page
 
 $lossWarning = (new CDiv())->setId('ztum-batch-loss-warning');
 $lossWarning->addItem(FrontendUi::message(
-	_('Selected updates with confirmed local-overwrite risk will be reported here. Review their differences before confirming.'),
+	_('Local customization overwrite risk: review the affected templates before confirming.'),
 	FrontendUi::WARNING
 ));
+$lossWarning->addItem(
+	(new CSpan(''))->setId('ztum-batch-loss-warning-text')
+);
 $lossWarning->setAttribute('hidden', 'hidden');
 
 $executionState = (new CSpan(_('Waiting for preparation.')))
