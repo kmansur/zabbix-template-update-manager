@@ -25,7 +25,8 @@ The default persistent root is:
 ├── locks/
 ├── batches/
 ├── cache/
-│   └── historical-sources/  # created privately on demand
+│   ├── historical-sources/  # created privately on demand
+│   └── historical-history/  # created privately on demand
 ├── update-policy.json
 └── operation-history.json
 ```
