@@ -26,6 +26,7 @@ require_once __DIR__.'/HistoricalTemplateBaselineService.php';
 require_once __DIR__.'/HistoricalDashboardCandidateCorrelation.php';
 require_once __DIR__.'/HistoricalDashboardResidualDiagnostic.php';
 require_once __DIR__.'/HistoricalDashboardSemanticReconciliation.php';
+require_once __DIR__.'/BaselineFreeReviewAssessment.php';
 require_once __DIR__.'/ImportCompareSummary.php';
 require_once __DIR__.'/TemplateBackupVerificationService.php';
 require_once __DIR__.'/TemplateExportService.php';
@@ -399,6 +400,9 @@ final class TemplateUpdateAnalysisService {
 			unset($baseline['source']);
 			$baseline['cache_status'] = $cacheStatus;
 			$data['historical_baseline'] = $baseline;
+			$data['assisted_review_assessment'] = BaselineFreeReviewAssessment::evaluate(
+				$baseline, is_array($data['update_preview'] ?? null) ? $data['update_preview'] : null
+			);
 			// Keep fail-closed behavior, but record enough provenance to distinguish
 			// unavailable, ambiguous, truncated and time-budget-limited scans.
 			if (($baseline['status'] ?? null) === 'ambiguous') {
@@ -715,6 +719,7 @@ final class TemplateUpdateAnalysisService {
 			'three_way_analysis' => null,
 			'three_way_error' => null,
 			'update_preview' => null,
+			'assisted_review_assessment' => null,
 			'update_risk' => null,
 			'update_risk_error' => null,
 			'host_impact' => null,
