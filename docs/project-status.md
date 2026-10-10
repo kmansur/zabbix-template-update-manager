@@ -1,90 +1,63 @@
-# Project status — engineering handoff before RC validation
+# Project status — community beta validation
 
-Date: 2026-09-30
+Updated: 2026-10-10
 
-This document separates repository-side engineering completion from field validation and RC promotion.
+This page separates implemented functionality, automated checks, operator-observed field results and outstanding release gates. It does not declare RC or production readiness.
 
-## Current state
+## Current release
 
-**Repository-side RC hardening: active.**
+- Published laboratory prerelease: `v0.1.0-beta.61`.
+- Proposed next community-testing milestone: `v0.2.0-beta.1` (**not yet tagged or published**).
+- Main development branch: `main`. Generated official catalog indexes are published through `upstream-index`.
+- Feature freeze: prioritize test evidence, defect fixes and documentation over new features.
+- Production use: **not recommended**.
 
-The declared ZTUM core scope is implemented. RC hardening now additionally covers durable/resumable batch state and stronger validation evidence; real Zabbix field validation remains a separate gate.
+## Engineering and evidence status
 
-This is **not** an RC or production-readiness declaration. Real controlled-write validation remains a separate gate.
+| Workstream | Status | Evidence and limits |
+| --- | --- | --- |
+| Declared core functionality | Implemented | Catalog, official identity, comparison, risk analysis, controlled install/update, policies, backups and rollback, batch orchestration |
+| CI and release tooling | Implemented | PHP 8.2/8.3/8.4, cross-frontend checks, security contracts and packaging workflows; green results must be confirmed on the precise candidate commit |
+| Zabbix 7 laboratory | Partially validated | Real catalog, native UI, policies, analysis, reviewed updates, installation, rollback/recovery backup and batch execution recorded; fault injection and negative-security matrix remain incomplete |
+| Zabbix 8 laboratory | Partially validated | A 2026-10-10 Zabbix 8.0 RC1 screenshot recorded four reviewed templates updated and validated, with zero linked hosts; this does not prove rollback or interruption safety |
+| Index publication | Pending post-merge verification | PR #114 was squash-merged to main on 2026-10-10 to tolerate history lookup HTTP 429; a fresh successful publication must still be verified |
+| Public beta packaging | Pending | Do not change public install commands or claim a new tag until artifacts and checksums are published |
+| RC / production | Not approved | Requires field and independent validation |
 
-| State | Status | Notes |
-|---|---|---|
-| Implementation ready | **RC hardening in progress** | Core scope is complete; durable batch state and validation hardening are being promoted through the validation gates before the next immutable candidate. |
-| Automation infrastructure | **Complete** | CI, security guards, PHP matrix, Zabbix 7/8 frontend checks, Chromium/full-stack read-only smoke, accessibility, coverage floors and release-package gates are implemented. |
-| Release engineering | **Complete** | Formal prerelease/tag workflow, runtime smoke, archives and SHA256SUMS are implemented; `v0.1.0-beta.61` is the next immutable laboratory artifact for the remaining RC matrix. |
-| Field validation | **In progress** | Zabbix 7.0.31 has recorded read-only/UI, policy/history, BASE/three-way analysis, reviewed update, install, rollback/recovery backup, post-write validation and successful reviewed multi-template batch execution. Stop-on-first-failure, resilience/offline/serialization and negative-security paths remain open, followed by the corresponding Zabbix 8 matrix. |
-| RC status | **Not declared** | Promotion occurs only after the validation matrix is reviewed. |
-| Production recommendation | **Not declared** | Requires successful RC validation and final security/release review. |
+See [October 10 Zabbix 8 evidence](lab-validation-2026-10-10.md), [lab test plan](lab-test-plan.md) and [production readiness](production-readiness.md).
 
-## What 100% means here
+## PDCA priorities before the next community beta
 
-The 100% figure applies to engineering work that can be completed and reviewed in the repository without pretending that real field evidence already exists.
+### P1 — mandatory safety gates
 
-Completed areas include:
+1. Demonstrate a controlled backup, recovery backup and rollback on a disposable Zabbix 8 installation, including identity, version and content validation.
+2. Exercise batch stop-on-first-failure and interrupted/resumed batch behavior. Never blindly retry an uncertain write.
+3. Confirm negative access and data-integrity paths: privileges, CSRF, stale/tampered evidence, modified/missing backup, source identity and hashes.
+4. Validate offline-only behavior, operation serialization and service/network failure diagnostics.
+5. Confirm successful index publication after PR #114, without disabling hash or transport verification.
 
-- discovery/catalog/upstream identity;
-- historical BASE and three-way analysis;
-- risk/readiness/dependency/host-impact analysis;
-- controlled update/install/rollback flows;
-- backup integrity and fresh preflight evidence;
-- bounded batch behavior and stop-on-failure semantics;
-- Never update policy;
-- offline-only mode and global operation serialization;
-- private operation history;
-- native Zabbix UI integration;
-- Zabbix 7.x/8.x compatibility infrastructure;
-- PHP 8.2/8.3/8.4 validation;
-- browser/accessibility/runtime smoke;
-- security guards and dependency audits;
-- release packaging/checksums;
-- documentation and field-evidence tooling.
+### P2 — reproducibility and compatibility
 
-## RC validation gate
+1. Complete the Zabbix 7.x/8.x field matrix, recording precise frontend, PHP, ZTUM version/commit and test results.
+2. Verify a fresh install from a published, checksummed archive and an in-place upgrade in disposable environments.
+3. Align README, installation instructions, changelog, compatibility and readiness documents with actual evidence.
 
-The following must now be validated against the immutable field-test artifact and recorded before RC promotion:
+### P3 — community publication
 
-1. real Zabbix 7.x controlled update/install/rollback matrix;
-2. real Zabbix 8.x controlled update/install/rollback matrix;
-3. standard, reviewed and local-overwrite update paths;
-4. request-bounded batch stop-on-first-failure behavior;
-5. install failure diagnostics and uncertain-state stop behavior;
-6. recovery backup and controlled rollback;
-7. offline-only bundle behavior;
-8. operation serialization;
-9. permission, CSRF, stale/tampered evidence and tampered-backup negative paths;
-10. real operator light/dark workflow on Zabbix 8.x (Zabbix 7.0.31 is already recorded on beta.60);
-11. fresh module installation and in-place upgrade;
-12. interrupted/resumed durable batch validation;
-13. independent reproducible validation bundle returned by a reviewer before any production recommendation.
+1. Choose and consistently apply the version only after P1 gates are approved; `v0.2.0-beta.1` is a proposal, not the current release.
+2. Build and verify ZIP/TAR.GZ and SHA256SUMS from an immutable tag.
+3. Invite independent laboratory testers with sanitized, reproducible feedback instructions.
 
-The authoritative execution checklist remains GitHub issue #64 and `docs/lab-test-plan.md`.
+## Release decision rule
 
-## Change-control rule during validation
+A successful UI operation is evidence only for the scenario observed. It is not proof of all supported versions or configurations. Failed or ambiguous writes must be inspected, not automatically rolled back or retried.
 
-The engineering scope is now in feature freeze.
-
-If validation exposes a defect:
-
-1. stop the affected write scenario;
-2. classify the failure and preserve sanitized evidence;
-3. return to implementation;
-4. add a deterministic regression guard where practical;
-5. publish a new immutable beta artifact;
-6. repeat the affected validation;
-7. only then reconsider RC promotion.
-
-No new feature should enter the RC candidate path unless it is required to correct a validation blocker.
+Do not promote to RC or production until the required field gates and release review are independently recorded.
 
 ## References
 
-- [Engineering readiness handoff — 2026-09-29](audits/2026-09-29-engineering-readiness-handoff.md)
-- [Pre-RC engineering audit — beta.59](audits/2026-09-24-beta59-pre-rc-audit.md)
 - [Production readiness](production-readiness.md)
 - [Compatibility](compatibility.md)
 - [Laboratory test plan](lab-test-plan.md)
-- [Release policy](release-policy.md)
+- [Zabbix 8 laboratory evidence (2026-10-10)](lab-validation-2026-10-10.md)
+- [Engineering readiness handoff (2026-09-29)](audits/2026-09-29-engineering-readiness-handoff.md)
