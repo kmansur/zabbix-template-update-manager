@@ -417,8 +417,15 @@ final class UpstreamTemplateHistoryRepository {
 			return;
 		}
 
-		$tmp = $file.'.tmp-'.getmypid();
-		if (@file_put_contents($tmp, $encoded, LOCK_EX) === false) {
+		$tmp = $file.'.tmp-'.bin2hex(random_bytes(12));
+		$oldUmask = umask(0077);
+		try {
+			$written = @file_put_contents($tmp, $encoded, LOCK_EX);
+		}
+		finally {
+			umask($oldUmask);
+		}
+		if ($written === false) {
 			return;
 		}
 		@chmod($tmp, 0600);
