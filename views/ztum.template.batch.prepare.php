@@ -93,6 +93,7 @@ $table = (new CTableInfo())
 		_('Linked hosts'),
 		_('Readiness'),
 		_('Review class'),
+		_('Local customization risk'),
 		_('Reason'),
 		_('Execution')
 	]);
@@ -117,6 +118,7 @@ foreach ($data['templateids'] as $templateId) {
 			$hostCount,
 			(new CSpan(_('Pending')))->setId('ztum-readiness-'.$templateId),
 			(new CSpan(_('Pending')))->setId('ztum-category-'.$templateId),
+			(new CSpan(_('Pending')))->setId('ztum-local-risk-'.$templateId),
 			(new CSpan('—'))->setId('ztum-reason-'.$templateId),
 			(new CSpan(_('Pending')))->setId('ztum-execution-'.$templateId)
 		]))->setId('ztum-row-'.$templateId)
@@ -242,6 +244,9 @@ $jsLabels = json_encode([
 	'retrying_failed' => _('Retrying failed preparation...'),
 	'retry_complete' => _('Failed preparation retry complete.'),
 	'execution_ready' => _('Ready for execution'),
+	'local_risk_known' => _('Overwrite risk identified — open Review details'),
+	'local_risk_unknown' => _('Unverified — inspect differences'),
+	'local_risk_not_reported' => _('No identified local-overwrite risk'),
 	'local_loss_warning' => _('Warning: {count} selected template(s) may overwrite or remove identified local customizations. Open Review details for every affected template before confirming. A rollback backup does not prevent this loss.'),
 	'select_reviewed' => _('Include reviewed update'),
 	'select_all_reviewed' => _('Select all eligible reviewed updates'),
