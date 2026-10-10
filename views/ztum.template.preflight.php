@@ -142,6 +142,14 @@ if ($manualOverride) {
 		$labels[] = $manualReasonLabels[$reason] ?? $reason;
 	}
 
+
+	if (in_array('local_customization_overwrite', $manualReasons, true)
+			|| in_array('confirmed_three_way_conflict', $manualReasons, true)) {
+		$page->addItem(FrontendUi::message(
+			_('Warning: this update may overwrite or remove identified local customizations. Review the BASE / LOCAL / UPSTREAM differences in the comparison before accepting the change. The rollback backup does not prevent the overwrite.'),
+			FrontendUi::WARNING
+		));
+	}
 	$page
 		->addItem(FrontendUi::section(_('Manual review')))
 		->addItem(FrontendUi::message(
@@ -167,12 +175,13 @@ if ($status === 'passed') {
 		$updateAction = (new CUrl('zabbix.php'))
 			->setArgument('action', 'ztum.template.update')
 			->getUrl();
+		$confirmationLabel = $manualOverride
+			? _('I reviewed the identified changes and possible loss of local customizations, verified the rollback backup, and explicitly accept the official update.')
+			: _('I reviewed the proposed changes, verified rollback evidence, and accept applying the official upstream template.');
 		$confirmationList = (new CFormList())
 			->addRow(
 				_('Confirmation'),
-				(new CCheckBox('confirm', '1'))->setLabel(_(
-					'I reviewed the risks shown above, verified rollback evidence, and accept applying the official upstream template.'
-				))
+				(new CCheckBox('confirm', '1'))->setLabel($confirmationLabel)
 			);
 
 		$hiddenItems = [
