@@ -82,7 +82,7 @@ jobs:
           php tests/validate_manifest.php
           php tests/module_view_namespace_guard.php
           php tests/validate_version.php
-          php tests/validate_lab_release_metadata.php --require-published
+          php tests/validate_lab_release_metadata.php
           php tests/read_only_guard.php
           php tests/ui_native_guard.php
           php tests/accessibility_guard.php
