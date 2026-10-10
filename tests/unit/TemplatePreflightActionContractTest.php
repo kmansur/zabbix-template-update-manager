@@ -39,7 +39,7 @@ assertPreflightActionContract(
 	strpos($action, "'manual_override' => 'in 1'") !== false
 		&& strpos($preparationService, '$manual = $freshStatus === \'review_backup_verified\';') !== false
 		&& strpos($preparationService, '($this->preflight)($templateId, $manual)') !== false,
-	'Reviewed preflight mode must be explicit in both the comparison form and controller input validation.'
+	'Reviewed preflight mode must be explicit in input validation and derived from fresh verified readiness during preparation.'
 );
 assertPreflightActionContract(
 	strpos($action, 'USER_TYPE_ZABBIX_ADMIN') !== false
