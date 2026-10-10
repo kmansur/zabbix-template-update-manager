@@ -94,8 +94,7 @@ jobs:
           set -euo pipefail
           bash -n tools/ztum-runtime-setup.sh
           bash -n tools/ztum-field-evidence.sh
-          bash -n tools/quickinstall.sh
-          bash -n tools/quickinstall-pt-br.sh
+          bash -n install.sh
           bash -n tests/test_runtime_setup.sh
           bash -n tests/test_field_evidence.sh
           bash -n tools/ztum-validation-bundle.sh
