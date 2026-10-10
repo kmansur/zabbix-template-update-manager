@@ -388,6 +388,22 @@ final class TemplateUpdateAnalysisService {
 						(int) ($candidate['commit_count'] ?? 0),
 						isset($candidate['semantic_distance']) ? (string) $candidate['semantic_distance'] : 'unknown'
 					));
+					foreach ((array) ($candidate['auto_start_unknown_shapes'] ?? []) as $shape) {
+						if (!is_array($shape)) {
+							continue;
+						}
+						error_log(sprintf(
+							'[Zabbix Template Update Manager] Historical auto_start shape for template %s: commit=%s before_present=%s before_type=%s before_known=%s after_present=%s after_type=%s after_known=%s (values withheld; diagnostic only)',
+							$templateId,
+							(string) ($candidate['commit'] ?? ''),
+							!empty($shape['before_present']) ? 'yes' : 'no',
+							(string) ($shape['before_type'] ?? 'other'),
+							!empty($shape['before_known']) ? 'yes' : 'no',
+							!empty($shape['after_present']) ? 'yes' : 'no',
+							(string) ($shape['after_type'] ?? 'other'),
+							!empty($shape['after_known']) ? 'yes' : 'no'
+						));
+					}
 					$representation = $candidate['auto_start_diagnostic'] ?? [];
 					if (is_array($representation) && $representation !== []) {
 						error_log(sprintf(
