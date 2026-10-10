@@ -67,6 +67,26 @@ assertDashboardDiagnostic(1, $missingShapes[0]['before_count'], 'Safe bounded el
 assertDashboardDiagnostic(false, str_contains(json_encode($missingShapes), 'secret'), 'Unknown values must not leak');
 assertDashboardDiagnostic('unknown', Diagnostic::compare(['__state' => 'missing'], 'NO'), 'Missing cannot be treated as equivalent to NO');
 
+$missingTransitions = Diagnostic::missingTransitionSummary([
+	'details' => [
+		['entity_type' => 'dashboards', 'field' => 'auto_start', 'change_type' => 'updated',
+			'before' => ['__state' => 'missing'], 'after' => 'NO'],
+		['entity_type' => 'dashboards', 'field' => 'auto_start', 'change_type' => 'updated',
+			'before' => ['__state' => 'missing'], 'after' => 'YES'],
+		['entity_type' => 'dashboards', 'field' => 'auto_start', 'change_type' => 'updated',
+			'before' => ['__state' => 'missing'], 'after' => 'secret'],
+		['entity_type' => 'dashboards', 'field' => 'auto_start', 'change_type' => 'updated',
+			'before' => 'NO', 'after' => ['__state' => 'missing']]
+	],
+	'details_truncated' => false
+]);
+assertDashboardDiagnostic(1, $missingTransitions['missing_before_to_no'], 'Missing to NO must be distinct');
+assertDashboardDiagnostic(1, $missingTransitions['missing_before_to_yes'], 'Missing to YES must be distinct');
+assertDashboardDiagnostic(1, $missingTransitions['missing_before_to_unknown'], 'Unknown missing transitions must not normalize');
+assertDashboardDiagnostic(1, $missingTransitions['missing_after'], 'Missing after must be explicit');
+assertDashboardDiagnostic(false, str_contains(json_encode($missingTransitions), 'secret'), 'Missing diagnostics must not disclose values');
+assertDashboardDiagnostic('unknown', Diagnostic::compare(['__state' => 'missing'], 'NO'), 'Missing to NO cannot authorize equality');
+
 $baselineService = (string) file_get_contents(dirname(__DIR__, 2).'/src/Service/HistoricalTemplateBaselineService.php');
 assertDashboardDiagnostic(true, str_contains($baselineService, "'status' => 'ambiguous'"),
 	'Ambiguous historical candidates must continue to fail closed');
