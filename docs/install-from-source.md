@@ -59,11 +59,33 @@ sudo bash /usr/local/src/zabbix-template-update-manager/tools/ztum-runtime-setup
 
 The installed module root should contain only `Module.php`, `manifest.json`, `VERSION`, `actions`, `assets`, `src` and `views`. Private runtime state remains outside the web tree. No `.git`, `tests`, `tools`, or `docs` directory should be present inside the module.
 
-## Existing cloned installations and updates
+## Controlled upgrades and code rollback (new, experimental)
 
-The installer **will refuse** to act if `.../modules/zabbix-template-update-manager` already exists. Do not run `rm -rf` or overwrite it just to make the installer pass. The laboratories Zabbix 7/8 presently use in-place Git checkouts; migrate them only during a dedicated maintenance/upgrade procedure that first captures installed revision, records/backs up the runtime state and verifies rollback. Running this new-install script is **not** an upgrade procedure.
+**Laboratory only:** `--upgrade` and `--rollback` have not yet passed disposable end-to-end failure injection. Do not use these operations on production until that validation is complete. Schedule a maintenance window, suspend ZTUM operations, verify no active batches or imports, and capture a separate backup of `/var/lib/zabbix-template-update-manager` and of the Zabbix database as appropriate before upgrading. A code rollback cannot reverse Zabbix template changes.
 
-For this prerelease, there is no automatic installer-to-installer update and no download/write path in the ZTUM frontend. Reproducible, checksum-verified packaging and upgrade tests remain release gates.
+The update source is the current local checkout; no frontend request or GitHub release checker writes the filesystem. Check and pin the intended source commit before running:
+
+```bash
+cd /usr/local/src/zabbix-template-update-manager
+git pull --ff-only origin main
+git rev-parse HEAD
+cat VERSION
+sudo bash install.sh --upgrade
+```
+
+The updater requires an already-installed module and a **strictly newer** source version. It checks the source, stages only runtime components, serializes installer operations with an exclusive `flock`, copies the entire original module tree to a private backup under `/var/backups/zabbix-template-update-manager/BACKUP_ID/module`, records a SHA-256 inventory and verifies it before activation. The installed code is root-owned and read-only to PHP-FPM. It does not rewrite or delete the private runtime directory.
+
+The command prints an exact **BACKUP_ID**, for example `20261010T180000Z-8a1b2c3d`. Preserve this identifier and operational logs. For a requested code rollback, run:
+
+```bash
+sudo bash install.sh --rollback BACKUP_ID
+```
+
+This command verifies the backup ID, private ownership/mode and stored checksums, stages the saved code, makes a fresh backup of the version being replaced and restores the selected code. Refuse to continue if checksum verification fails. The code activation uses two renames in the same modules filesystem; there can be a short interval with no active directory, so do not execute it while users are operating the ZTUM frontend. On failure, the updater attempts automatic code recovery and preserves the prior copy if recovery cannot complete. Verify the active version and native interface after any change; inspect PHP-FPM opcode caching if an old version remains visible.
+
+Existing clones inside `modules/` must not be removed manually. They can have extra source-only files; upgrade makes a private copy of the entire old tree before installing only the runtime set. The old `tools/quickinstall*` scripts were retired. A new installation continues to reject overwriting an existing module.
+
+**Limitations:** backup SHA-256 is integrity evidence within a root-controlled local backup, not a cryptographic signature from an external trusted party. The installer does not automatically update Git, drain PHP-FPM connections, inspect in-flight ZTUM jobs, migrate databases or roll back Zabbix configuration imports. End-to-end upgrade, forced-failure and rollback validation remain mandatory for beta.62 approval.
 
 ## Security notes
 
