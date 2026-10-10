@@ -2,7 +2,7 @@
 
 Updated: 2026-10-10
 
-**Current decision: not production-ready.** The published laboratory prerelease is `v0.1.0-beta.61`; the main-branch version is now the **unpublished** `0.1.0-beta.62` candidate. `v0.2.0-beta.1` is a proposed community-testing milestone only; it has not been validated, tagged or published.
+**Current decision: not production-ready.** The published laboratory prerelease is `v0.1.0-beta.62` (2026-10-10), still **not production-ready**. `v0.2.0-beta.1` is a proposed community-testing milestone only; it has not been validated, tagged or published.
 
 Readiness comprises four independent gates: implementation, automated verification, real field validation, and immutable release artifacts/documentation. No percentage for implementation can substitute for a controlled failure-recovery test.
 
@@ -34,9 +34,17 @@ Readiness comprises four independent gates: implementation, automated verificati
 - Independent reproducible field validation by another tester.
 - Final security and release review.
 
+## ZTUM code-installer laboratory evidence (2026-10-10)
+
+- On Zabbix 8.0, the operator executed beta.61 → beta.62 upgrade, beta.62 → beta.61 code rollback, and another beta.61 → beta.62 upgrade. Three historical code backups passed their SHA-256 inventory checks.
+- Two deliberately invalid backup copies (one modified file, one extra file) were rejected before replacement; the installed beta.62 remained unchanged.
+- On Zabbix 7.0.31, beta.62 catalogue and operation history rendered, and an earlier beta.61 code backup passed SHA-256 verification. This does not prove the Zabbix 7 code rollback path.
+- The beta.62 release job `38082038614` passed Zabbix 7/8 runtime smoke, validation and package publication. The user verified downloaded ZIP and TAR.GZ using the published `SHA256SUMS`.
+- Remaining: controlled activation-failure recovery, other Linux distributions, complete authenticated CSRF differential and interrupted-write behavior. The code rollback does not undo Zabbix template imports.
+
 ## Release staging
 
-1. Maintain the immutable `v0.1.0-beta.61` laboratory release and its checksum evidence.
+1. Preserve the immutable `v0.1.0-beta.61` historical release and its checksum evidence; validate the published `v0.1.0-beta.62` release and SHA256SUMS separately.
 2. Complete priority-1 field and security gates before promoting a new community candidate.
 3. After passing gates, update VERSION, manifest, changelog and guides consistently; validate an immutable `v0.2.0-beta.1` archive before advertising it.
 4. Publish a community-testing beta with explicit laboratory-only warning. RC and production approval remain separate decisions.
