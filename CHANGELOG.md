@@ -9,6 +9,25 @@ All notable changes to Template Update Manager will be documented in this file.
 - Added per-template upstream vendor-version provenance metadata (`version_commit` / `version_date`) derived from the exact `vendor.version` YAML line, with previous-index reuse and shallow-history fallback.
 - Added an **Upstream updated** date column to the template catalog without introducing per-row runtime network requests.
 
+## [0.1.0-beta.62] - Candidate (unpublished, 2026-10-10)
+
+### Added
+
+- One root-level `install.sh` with automatic Zabbix 7/8 frontend and PHP-FPM user detection, minimal runtime-only file installation and explicit read-only checking.
+- Manual Super Admin-only ZTUM GitHub release checking, including prereleases and negative transport handling.
+- Contract tests for the installer, release checker and access control.
+
+### Changed
+
+- Restricted all module actions and navigation to Super Admin, including read-only views.
+- Retired the duplicate quickinstall scripts on the development branch; `tools/ztum-runtime-setup.sh` remains the private runtime helper.
+- Updated installer documentation in English and Brazilian Portuguese.
+
+### Security and validation
+
+- Preserve native CSRF on mutation endpoints, root-owned module files and private runtime storage.
+- Validated the previous installer revision in Zabbix 7.0.31 and Zabbix 8.0.0 labs; regression CI, Security and Quality Metrics were green before this version bump.
+- The beta.62 candidate is **not tagged or released**. Authenticated CSRF differential, uncertain-write recovery and final candidate workflows remain release gates.
 
 ## [0.1.0-beta.61] - 2026-09-30
 
