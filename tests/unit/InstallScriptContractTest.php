@@ -13,6 +13,15 @@ $requirements = [
     'assets included' => 'for d in actions assets src views;',
     'registered update JavaScript verification' => 'assets/js/ztum-update-batch.js',
     'registered install JavaScript verification' => 'assets/js/ztum-install-batch.js',
+    'upgrade flag' => '--upgrade) UPGRADE=1',
+    'rollback flag' => '--rollback) (($# >= 2))',
+    'version-gated upgrade' => 'version_compare($argv[1],$argv[2], ">")',
+    'private backup directory' => '/var/backups/zabbix-template-update-manager',
+    'upgrade lock' => 'flock -n 9',
+    'backup integrity validation' => 'verify_tree "$folder/module" "$expected"',
+    'code only staging' => 'prepare_stage "$SOURCE_DIR" "$stage"',
+    'explicit rollback staging' => 'prepare_stage "$saved" "$stage"',
+    'rollback does not mutate runtime state' => 'Private runtime state untouched.',
 ];
 foreach ($requirements as $name => $needle) {
     if (!str_contains($source, $needle)) {
