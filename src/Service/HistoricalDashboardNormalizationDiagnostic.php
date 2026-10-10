@@ -27,6 +27,29 @@ final class HistoricalDashboardNormalizationDiagnostic {
 		return null;
 	}
 
+	/** Missing snapshot fields are not API defaults or authoritative local values. */
+	public static function missingTransitionSummary(array $preview): array {
+		$result = ['missing_before_to_no' => 0, 'missing_before_to_yes' => 0,
+			'missing_before_to_unknown' => 0, 'missing_after' => 0];
+		foreach ((array) ($preview['details'] ?? []) as $detail) {
+			if (!is_array($detail) || ($detail['entity_type'] ?? null) !== 'dashboards'
+					|| ($detail['field'] ?? null) !== 'auto_start'
+					|| ($detail['change_type'] ?? null) !== 'updated') {
+				continue;
+			}
+			if (($detail['before'] ?? null) === ['__state' => 'missing']) {
+				$after = self::canonical($detail['after'] ?? null);
+				$result[$after === 0 ? 'missing_before_to_no'
+					: ($after === 1 ? 'missing_before_to_yes' : 'missing_before_to_unknown')]++;
+			}
+			if (($detail['after'] ?? null) === ['__state' => 'missing']) {
+				$result['missing_after']++;
+			}
+		}
+		$result['truncated'] = !empty($preview['details_truncated']) ? 1 : 0;
+		return $result;
+	}
+
 	/** Only fixed vocabulary is returned, never raw values or field identifiers. */
 	public static function describeUnknownPreview(array $preview): array {
 		$results = [];
