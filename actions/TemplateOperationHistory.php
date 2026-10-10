@@ -26,7 +26,7 @@ class TemplateOperationHistory extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return in_array($this->getUserType(), [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN], true);
+		return $this->getUserType() === USER_TYPE_SUPER_ADMIN;
 	}
 
 	protected function doAction(): void {
