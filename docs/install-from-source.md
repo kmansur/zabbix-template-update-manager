@@ -9,46 +9,39 @@
 - `git`, `bash`, `install`, `cp`, `mv`, `find`, `sed` and standard GNU/Linux commands
 - Review the repository revision/tag before executing a script as root. `main` is a moving development branch; use the immutable tagged, checksummed beta for formal reproducibility
 
-### Get the source code outside the web root
+### Simple installation: three commands
+
+Keep the full Git repository outside the web root. On a fresh Zabbix 7.x or 8.x frontend:
 
 ```bash
 cd /usr/local/src
-sudo git clone https://github.com/kmansur/zabbix-template-update-manager.git
-cd zabbix-template-update-manager
-git rev-parse HEAD
-cat VERSION
-sudo chmod 750 install.sh
+git clone https://github.com/kmansur/zabbix-template-update-manager.git
+sudo bash zabbix-template-update-manager/install.sh
 ```
 
-To run the experimental installer using only checks:
+The installer identifies the frontend modules directory and PHP-FPM account when they are unambiguous. Review the source revision before invoking a root-owned script. Use an immutable tagged release and validate its checksums when producing formal field-test evidence; `main` is a moving branch.
+
+Optional **read-only diagnostic**:
 
 ```bash
-sudo bash install.sh --check
+sudo bash zabbix-template-update-manager/install.sh --check
 ```
 
-If more than one `modules` directory or PHP-FPM user is present, specify them explicitly. For example, for Debian 13 / Zabbix 8:
+When a module already exists, `--check` reports it without altering anything; an actual installation still refuses replacement. For a special environment with multiple frontends or PHP-FPM users, pass the appropriate overrides:
 
 ```bash
-sudo bash install.sh --check \
+sudo bash zabbix-template-update-manager/install.sh \
   --modules-dir /usr/share/zabbix/ui/modules \
   --php-user www-data
 ```
 
-When the check passes and **no ZTUM directory exists** in the selected modules directory:
-
-```bash
-sudo bash install.sh \
-  --modules-dir /usr/share/zabbix/ui/modules \
-  --php-user www-data
-```
-
-For a Zabbix 7 installation with frontend modules in `/usr/share/zabbix/modules`, pass that path instead. **Do not assume the path from the major version alone; use the frontend's actual location.**
+Zabbix 7 deployments may use `/usr/share/zabbix/modules`; the actual installation layout controls the choice, not the major version alone.
 
 ## What install.sh does
 
 1. Checks that the source contains `manifest.json`, `Module.php`, `VERSION`, `actions/`, `assets/`, `src/` and `views/`, and rejects source symlinks. It verifies that `manifest.json` agrees with `VERSION`.
 2. Resolves the actual Zabbix frontend directory and verifies version 7.x/8.x, stopping when verification is inconclusive; detects the PHP-FPM user or asks for `--php-user`.
-3. **Refuses to replace an existing installation**, including the development checkout currently deployed in the laboratories.
+3. **Refuses to replace an existing installation**, including the development checkout currently deployed in the laboratories. In `--check` mode, existing installation is reported as a non-destructive diagnostic.
 4. Uses the existing `tools/ztum-runtime-setup.sh` helper to create/validate private `0700` runtime directories under `/var/lib/zabbix-template-update-manager/` for `backups`, `offline`, `locks` and `batches`. It does not reset or remove stored backup, policy, history or batch data.
 5. Stages and installs only `Module.php`, `manifest.json`, `VERSION`, `actions/`, `assets/`, `src/`, `views/` as root-owned, web-readable files (directories `0755`, files `0644`). Git metadata, test harnesses, scripts, docs and release machinery are not copied.
 6. Does not modify Nginx, Apache, PHP-FPM, the Zabbix database or template configuration and does not restart services.
