@@ -27,6 +27,46 @@ final class HistoricalDashboardNormalizationDiagnostic {
 		return null;
 	}
 
+	/** Only fixed vocabulary is returned, never raw values or field identifiers. */
+	public static function describeUnknownPreview(array $preview): array {
+		$results = [];
+		foreach ((array) ($preview['details'] ?? []) as $detail) {
+			if (!is_array($detail)
+					|| ($detail['entity_type'] ?? null) !== 'dashboards'
+					|| ($detail['field'] ?? null) !== 'auto_start'
+					|| ($detail['change_type'] ?? null) !== 'updated'
+					|| self::compare($detail['before'] ?? null, $detail['after'] ?? null) !== 'unknown') {
+				continue;
+			}
+			$before = $detail['before'] ?? null;
+			$after = $detail['after'] ?? null;
+			$results[] = [
+				'before_present' => array_key_exists('before', $detail),
+				'after_present' => array_key_exists('after', $detail),
+				'before_type' => self::safeType($before),
+				'after_type' => self::safeType($after),
+				'before_known' => self::canonical($before) !== null,
+				'after_known' => self::canonical($after) !== null
+			];
+			if (count($results) >= 5) {
+				break;
+			}
+		}
+		return $results;
+	}
+
+	private static function safeType(mixed $value): string {
+		return match (gettype($value)) {
+			'integer' => 'integer',
+			'string' => 'string',
+			'boolean' => 'boolean',
+			'array' => 'array',
+			'NULL' => 'null',
+			'double' => 'float',
+			default => 'other'
+		};
+	}
+
 	public static function summarizePreview(array $preview): array {
 		$result = ['equivalent' => 0, 'different' => 0, 'unknown' => 0];
 		foreach ((array) ($preview['details'] ?? []) as $detail) {
