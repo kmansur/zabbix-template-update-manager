@@ -9,6 +9,8 @@ for file in \
   src/Service/TemplateUpdatePreflightService.php \
   src/Service/TemplateUpdateAnalysisService.php \
   src/Service/TemplateUpdatePreparationService.php \
+  src/Service/TemplateRollbackPreflightService.php \
+  src/Service/TemplateRollbackService.php \
   actions/TemplateUpdatePrepare.php \
   actions/TemplateOperationHistory.php \
   src/Service/TemplateHistorySubjectResolver.php \
@@ -22,6 +24,8 @@ for test in \
   tests/unit/BaselineFreeAssistedReadinessTest.php \
   tests/unit/BaselineFreeAssistedFlowTest.php \
   tests/unit/TemplateUpdatePreparationServiceTest.php \
+  tests/unit/TemplateRollbackPreflightServiceTest.php \
+  tests/unit/TemplateRollbackServiceTest.php \
   tests/unit/TemplateHistorySubjectResolverTest.php \
   tests/unit/NativeAutomaticPreparationContractTest.php \
   tests/unit/BaselineFreeBatchRestrictionTest.php \
