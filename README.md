@@ -10,7 +10,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Current version: **0.1.0-beta.61**
+Development candidate version: **0.1.0-beta.62** (not yet published).
 
 This version is intended for **laboratory testing**.
 
@@ -22,9 +22,9 @@ This version is intended for **laboratory testing**.
 - Observed Zabbix 8.0 RC1 reviewed batch: **4 updated and validated, 0 failed**, per laboratory UI; [field evidence and remaining rollback/runtime gates](docs/lab-validation-2026-10-10.md).
 - Production use: not yet recommended.
 - Community testing: feedback and reproducible field-validation reports are welcome.
-- Formal laboratory prerelease: **v0.1.0-beta.61** is published with checksummed `.tar.gz` and `.zip` assets.
+- Last published laboratory prerelease: **v0.1.0-beta.61** is published with checksummed `.tar.gz` and `.zip` assets.
 
-Beta.61 is the current pre-RC laboratory candidate. It keeps the beta.60 three-way normalization and changes known-risk handling so complete, fully identified conflicts/local-overwrite conditions use an explicit reviewed path instead of an absolute block. Reviewed single and batch updates use one acknowledgement while unknown/unresolved, integrity, security and uncertain-write conditions remain hard blockers.
+Beta.62 is the next untagged laboratory candidate; beta.61 remains the last published prerelease. It keeps the beta.60 three-way normalization and changes known-risk handling so complete, fully identified conflicts/local-overwrite conditions use an explicit reviewed path instead of an absolute block. Reviewed single and batch updates use one acknowledgement while unknown/unresolved, integrity, security and uncertain-write conditions remain hard blockers.
 
 Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.61 is the current immutable laboratory prerelease** for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
 
