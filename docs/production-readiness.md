@@ -2,7 +2,7 @@
 
 Updated: 2026-10-10
 
-**Current decision: not production-ready.** The published laboratory prerelease is `v0.1.0-beta.61`. `v0.2.0-beta.1` is a proposed community-testing milestone only; it has not been validated, tagged or published.
+**Current decision: not production-ready.** The published laboratory prerelease is `v0.1.0-beta.61`; the main-branch version is now the **unpublished** `0.1.0-beta.62` candidate. `v0.2.0-beta.1` is a proposed community-testing milestone only; it has not been validated, tagged or published.
 
 Readiness comprises four independent gates: implementation, automated verification, real field validation, and immutable release artifacts/documentation. No percentage for implementation can substitute for a controlled failure-recovery test.
 
