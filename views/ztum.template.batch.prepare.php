@@ -136,7 +136,7 @@ $page
 
 $lossWarning = (new CDiv())->setId('ztum-batch-loss-warning');
 $lossWarning->addItem(FrontendUi::message(
-	_('Local customization overwrite risk: review the affected templates before confirming.'),
+	_('Possible loss of installed local settings: when the historical baseline is unverified, the module cannot distinguish local customizations from older official values. Review each affected template before confirming.'),
 	FrontendUi::WARNING
 ));
 $lossWarning->addItem(
@@ -149,7 +149,7 @@ $executionState = (new CSpan(_('Waiting for preparation.')))
 
 $confirm = (new CCheckBox('confirm', '1'))
 	->setId('ztum-batch-confirm')
-	->setLabel(_('I reviewed the selected updates, including any identified local-customization losses, and accept the risks of overwriting installed settings.'))
+	->setLabel(_('I opened Review details for every selected manual-review template, checked installed and proposed values, verified rollback protection, and explicitly accept that existing settings or unknown local customizations may be overwritten.'))
 	->setEnabled(false);
 
 $submit = (new CButton('ztum-batch-update-submit', _('Update eligible templates')))
@@ -247,7 +247,7 @@ $jsLabels = json_encode([
 	'local_risk_known' => _('Overwrite risk identified — open Review details'),
 	'local_risk_unknown' => _('Unverified — inspect differences'),
 	'local_risk_not_reported' => _('No identified local-overwrite risk'),
-	'local_loss_warning' => _('Warning: {count} selected template(s) may overwrite or remove identified local customizations. Open Review details for every affected template before confirming. A rollback backup does not prevent this loss.'),
+	'local_loss_warning' => _('Warning: {count} selected template(s) may overwrite local settings, including customizations whose origin cannot be verified without an historical baseline. Open Review details and inspect installed vs proposed values for EACH affected template. A verified rollback backup does not prevent changes from being overwritten.'),
 	'select_reviewed' => _('Include reviewed update'),
 	'select_all_reviewed' => _('Select all eligible reviewed updates'),
 	'clear_all_reviewed' => _('Clear reviewed selection'),
