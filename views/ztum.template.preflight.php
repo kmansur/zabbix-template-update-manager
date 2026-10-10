@@ -135,7 +135,8 @@ if ($manualOverride) {
 		'confirmed_three_way_conflict' => _('Confirmed BASE / LOCAL / UPSTREAM conflict'),
 		'local_customization_overwrite' => _('Known local customization would be overwritten or removed'),
 		'medium_technical_risk' => _('Medium technical review priority'),
-		'high_technical_risk' => _('High technical review priority')
+		'high_technical_risk' => _('High technical review priority'),
+		'unverified_historical_baseline' => _('Historical baseline cannot establish which changes are local customizations')
 	];
 	$labels = [];
 	foreach ($manualReasons as $reason) {
@@ -143,6 +144,12 @@ if ($manualOverride) {
 	}
 
 
+	if (in_array('unverified_historical_baseline', $manualReasons, true)) {
+		$page->addItem(FrontendUi::message(
+			_('The baseline is unverified: the incoming template may overwrite local settings that cannot be distinguished from older official values. Review the installed and incoming values in the template comparison.'),
+			FrontendUi::WARNING
+		));
+	}
 	if (in_array('local_customization_overwrite', $manualReasons, true)
 			|| in_array('confirmed_three_way_conflict', $manualReasons, true)) {
 		$page->addItem(FrontendUi::message(
