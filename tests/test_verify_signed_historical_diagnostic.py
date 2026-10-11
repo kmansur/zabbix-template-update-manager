@@ -63,6 +63,13 @@ class VerifySignedHistoricalDiagnosticTest(unittest.TestCase):
             signed_schema = sign(corrupted_schema, private, "test-only")
             self.assertTrue(any("evidence list" in error for error in
                                 verify_signed_diagnostic(corrupted_schema, signed_schema, public, "test-only", repo)))
+            forged_vendor = copy.deepcopy(report)
+            forged_vendor["candidates"][0]["vendor_version"] = "7.0-99"
+            forged_signed = sign(forged_vendor, private, "test-only")
+            self.assertTrue(any("vendor metadata differs" in error for error in
+                                verify_signed_diagnostic(
+                                    forged_vendor, forged_signed, public, "test-only", repo
+                                )))
             unsigned_change = copy.deepcopy(report)
             unsigned_change["candidates"][0]["vendor_version"] = "7.0-1"
             self.assertTrue(any("signature" in error.lower() for error in
