@@ -21,10 +21,11 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Observed Zabbix 8.0 RC1 reviewed batch: **4 updated and validated, 0 failed**, per laboratory UI; [field evidence and remaining rollback/runtime gates](docs/lab-validation-2026-10-10.md).
 - Production use: not yet recommended.
+- Critical-analysis remediation: [evidence-based closure ledger](docs/critical-analysis-remediation.md). This explicitly records unresolved external-validation and offline/history risks.
 - Community testing: feedback and reproducible field-validation reports are welcome.
 - Published laboratory prerelease: **v0.1.0-beta.63** with checksummed `.tar.gz` and `.zip` assets.
 
-Beta.62 is the published laboratory prerelease; beta.61 remains an immutable historical release. It keeps the beta.60 three-way normalization and changes known-risk handling so complete, fully identified conflicts/local-overwrite conditions use an explicit reviewed path instead of an absolute block. Reviewed single and batch updates use one acknowledgement while unknown/unresolved, integrity, security and uncertain-write conditions remain hard blockers.
+Beta.63 is the current published laboratory prerelease; beta.62 and beta.61 remain immutable historical releases. It keeps the beta.60 three-way normalization and changes known-risk handling so complete, fully identified conflicts/local-overwrite conditions use an explicit reviewed path instead of an absolute block. Reviewed single and batch updates use one acknowledgement while unknown/unresolved, integrity, security and uncertain-write conditions remain hard blockers.
 
 Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.63 is the current immutable laboratory prerelease** for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
 
