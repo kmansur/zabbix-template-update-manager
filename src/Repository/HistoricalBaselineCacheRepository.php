@@ -19,9 +19,7 @@ final class HistoricalBaselineCacheRepository {
 	private string $cacheDir;
 
 	public function __construct(?string $cacheDir = null) {
-		$this->cacheDir = $cacheDir ?? rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
-			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager'
-			.DIRECTORY_SEPARATOR.'historical-baselines';
+		$this->cacheDir = $cacheDir ?? '/var/lib/zabbix-template-update-manager/cache/historical-baselines';
 	}
 
 	public function load(
@@ -34,7 +32,9 @@ final class HistoricalBaselineCacheRepository {
 		$key = $this->validatedKey($path, $currentCommit, $uuid, $targetVendorVersion, $expectedVendorName);
 		$file = $this->cacheFile($key);
 
-		if (!is_file($file)) {
+		if (!$this->cacheDirectoryIsPrivate() || is_link($file) || !is_file($file)
+				|| @fileowner($file) !== posix_geteuid()
+				|| (@fileperms($file) & 0777) !== 0600) {
 			return null;
 		}
 
@@ -156,15 +156,30 @@ final class HistoricalBaselineCacheRepository {
 			throw new RuntimeException('The historical baseline cache record exceeds the size limit.');
 		}
 
-		if (!is_dir($this->cacheDir)
-				&& !@mkdir($this->cacheDir, 0700, true)
-				&& !is_dir($this->cacheDir)) {
+		$parent = dirname($this->cacheDir);
+		if (!$this->privateDirectory($parent)) {
+			return false;
+		}
+		if (!is_dir($this->cacheDir) && !@mkdir($this->cacheDir, 0700)) {
+			return false;
+		}
+		if (!$this->cacheDirectoryIsPrivate()) {
 			return false;
 		}
 
 		$file = $this->cacheFile($key);
-		$tmp = $file.'.tmp-'.getmypid();
-		if (@file_put_contents($tmp, $json, LOCK_EX) === false) {
+		if (is_link($file)) {
+			return false;
+		}
+		$tmp = $file.'.tmp-'.bin2hex(random_bytes(12));
+		$oldUmask = umask(0077);
+		try {
+			$written = @file_put_contents($tmp, $json, LOCK_EX);
+		}
+		finally {
+			umask($oldUmask);
+		}
+		if ($written === false) {
 			return false;
 		}
 
@@ -175,6 +190,19 @@ final class HistoricalBaselineCacheRepository {
 		}
 
 		return true;
+	}
+
+	private function privateDirectory(string $directory): bool {
+		if (!function_exists('posix_geteuid') || is_link($directory) || !is_dir($directory)) {
+			return false;
+		}
+		$mode = @fileperms($directory);
+		return $mode !== false && ($mode & 0777) === 0700
+			&& @fileowner($directory) === posix_geteuid();
+	}
+
+	private function cacheDirectoryIsPrivate(): bool {
+		return $this->privateDirectory($this->cacheDir);
 	}
 
 	private function cacheFile(array $key): string {

@@ -4,10 +4,37 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Reject malformed historical diagnostic revision entries, fingerprints and paths with explicit validation errors, including NUL and backslash paths, before unsafe Git argument handling or set operations.
+- Correct signed-history regression coverage: a forged truncation flag is rejected, while an actual bounded ancestry window remains a valid non-authoritative diagnostic.
+
 ### Added
 
 - Added per-template upstream vendor-version provenance metadata (`version_commit` / `version_date`) derived from the exact `vendor.version` YAML line, with previous-index reuse and shallow-history fallback.
 - Added an **Upstream updated** date column to the template catalog without introducing per-row runtime network requests.
+
+## [0.1.0-beta.63] - 2026-10-10 (laboratory prerelease candidate)
+
+### Changed
+
+- Consolidated runtime directory provisioning and validation into `install.sh`, with a read-only `--runtime-check` mode; retired the separate runtime setup helper.
+- Added explicit `install.sh --reinstall` for laboratory-only, same-version code refresh with private verified backup, unchanged runtime and explicit rollback; rejects identical trees and version mismatch.
+- Migrated upstream index, immutable source, immutable history and proven historical baseline caches from temporary storage to the private `/var/lib/zabbix-template-update-manager/cache` directory.
+- Increased the bounded history request timeout from 6 to 12 seconds following observed Zabbix API latency of 4.8–8.6 seconds; incomplete history remains non-authoritative.
+- Restricted custom lock directories to safe absolute paths.
+- Updated Super Admin permission and confidential rollback artifact documentation.
+
+### Historical index pipeline (diagnostic only)
+
+- Added an offline candidate report generator and synthetic Git-history regression tests. The resulting JSON explicitly marks itself non-authoritative and is not consumed by the frontend; merge/rename completeness and signed index trust remain prerequisites to use.
+
+### Security and validation
+
+- Pinned first-party GitHub Actions to immutable full commit SHAs and enforced the policy in the workflow contract test.
+- Added negative tests for unsafe lock paths and installer contracts.
+- Preserved verified code-only upgrade/rollback behavior, Zabbix API write boundary, explicit template rollback and offline fail-closed behavior.
+- Field validation of this candidate on Zabbix 7 and Zabbix 8 is still required; **not approved for production**.
 
 ## [0.1.0-beta.62] - 2026-10-10 (laboratory prerelease)
 

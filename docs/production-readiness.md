@@ -1,8 +1,8 @@
 # Production readiness
 
-Updated: 2026-10-10
+Updated: 2026-10-10 (critical-analysis remediation audit)
 
-**Current decision: not production-ready.** The published laboratory prerelease is `v0.1.0-beta.62` (2026-10-10), still **not production-ready**. `v0.2.0-beta.1` is a proposed community-testing milestone only; it has not been validated, tagged or published.
+**Current decision: not production-ready.** The published laboratory prerelease is `v0.1.0-beta.63` (2026-10-10), still **not production-ready**. `v0.2.0-beta.1` is a proposed community-testing milestone only; it has not been validated, tagged or published.
 
 Readiness comprises four independent gates: implementation, automated verification, real field validation, and immutable release artifacts/documentation. No percentage for implementation can substitute for a controlled failure-recovery test.
 
@@ -55,3 +55,7 @@ Readiness comprises four independent gates: implementation, automated verificati
 - Broader third-party code and penetration review beyond the minimum independent evidence gate.
 
 Refer to [project status](project-status.md), [compatibility](compatibility.md) and [lab test plan](lab-test-plan.md).
+
+## External critical-analysis closure
+
+The issue-by-issue acceptance ledger is [critical-analysis-remediation.md](critical-analysis-remediation.md). **A green CI or a signed historical diagnostic is not proof of production readiness.** The upstream historical lookup issue remains open until complete and reproducible provenance is independently validated and tested on real Zabbix 7 and 8 labs. Independent third-party assessment and soak testing cannot be manufactured by automation; record them as not verified until evidence exists.

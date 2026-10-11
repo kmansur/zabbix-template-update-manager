@@ -10,7 +10,7 @@ It does not modify Zabbix core files and is not an official Zabbix LLC product.
 
 ## Status
 
-Latest published laboratory prerelease: **v0.1.0-beta.62** (2026-10-10).
+Latest published laboratory prerelease: **v0.1.0-beta.63** (2026-10-10).
 
 This version is intended for **laboratory testing**.
 
@@ -21,12 +21,13 @@ This version is intended for **laboratory testing**.
 - Field validation: in progress on real Zabbix 7.x and 8.x lab instances.
 - Observed Zabbix 8.0 RC1 reviewed batch: **4 updated and validated, 0 failed**, per laboratory UI; [field evidence and remaining rollback/runtime gates](docs/lab-validation-2026-10-10.md).
 - Production use: not yet recommended.
+- Critical-analysis remediation: [evidence-based closure ledger](docs/critical-analysis-remediation.md). This explicitly records unresolved external-validation and offline/history risks.
 - Community testing: feedback and reproducible field-validation reports are welcome.
-- Published laboratory prerelease: **v0.1.0-beta.62** with checksummed `.tar.gz` and `.zip` assets.
+- Published laboratory prerelease: **v0.1.0-beta.63** with checksummed `.tar.gz` and `.zip` assets.
 
-Beta.62 is the published laboratory prerelease; beta.61 remains an immutable historical release. It keeps the beta.60 three-way normalization and changes known-risk handling so complete, fully identified conflicts/local-overwrite conditions use an explicit reviewed path instead of an absolute block. Reviewed single and batch updates use one acknowledgement while unknown/unresolved, integrity, security and uncertain-write conditions remain hard blockers.
+Beta.63 is the current published laboratory prerelease; beta.62 and beta.61 remain immutable historical releases. It keeps the beta.60 three-way normalization and changes known-risk handling so complete, fully identified conflicts/local-overwrite conditions use an explicit reviewed path instead of an absolute block. Reviewed single and batch updates use one acknowledgement while unknown/unresolved, integrity, security and uncertain-write conditions remain hard blockers.
 
-Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.62 is the current immutable laboratory prerelease** for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
+Formal tag/GitHub Release automation, release-package smoke validation and disposable Zabbix 7/8 runtime gates are in place. **v0.1.0-beta.63 is the current immutable laboratory prerelease** for the remaining real Zabbix 7.x/8.x controlled-write field matrix. Production use remains unsupported.
 
 For a new laboratory installation, use the quick installer below. For validation work, always record the exact installed version and commit/source ref.
 
@@ -53,7 +54,7 @@ The module detects the frontend `ZABBIX_VERSION` at runtime and fails closed for
 
 The module keeps one codebase for both supported major generations and prefers native Zabbix abstractions so each frontend generation can apply its own internal UI implementation.
 
-The catalog and read-only review surfaces are available to Zabbix Administrators and Super Admins. Configuration-changing operations and update-policy changes remain Super-Admin-only.
+All ZTUM screens and operations currently require Zabbix Super Admin. Configuration-changing actions and update-policy changes also require valid CSRF evidence.
 
 The catalog filter follows the native Zabbix list pattern with **Name** and **Status** fields, **Apply / Reset** actions and automatic return to page 1 whenever filtering changes.
 
@@ -210,16 +211,14 @@ sudo install -d -o www-data -g www-data -m 0700 \
   /var/lib/zabbix-template-update-manager/backups
 ```
 
-The module intentionally does not fall back to a world-writable or temporary backup location.
+The module intentionally does not fall back to a world-writable or temporary backup location. Catalog and source caches are also kept under a private `cache/` directory.
 
 Operation history is supplemental and bounded. It is never used as authorization, update evidence or proof that a Zabbix configuration write succeeded; fresh preflight/post-validation and the actual Zabbix state remain authoritative.
 
-A fail-closed helper can validate or create the private runtime directories after resolving the PHP-FPM account:
+The installer prepares runtime directories on first installation and controlled upgrades. To validate them later without making changes:
 
 ```bash
-sudo tools/ztum-runtime-setup.sh --check
-sudo tools/ztum-runtime-setup.sh --apply
-sudo tools/ztum-runtime-setup.sh --check
+sudo bash install.sh --runtime-check
 ```
 
 See [`docs/runtime-setup.md`](docs/runtime-setup.md).
@@ -259,15 +258,15 @@ Clone the current laboratory branch and record the exact commit used:
 ```bash
 git clone https://github.com/kmansur/zabbix-template-update-manager.git
 cd zabbix-template-update-manager
-git checkout v0.1.0-beta.62
+git switch fix/installer-runtime-hardening
 cat VERSION
 git rev-parse HEAD
 ```
 
-Expected `VERSION` for this published laboratory release:
+Expected `VERSION` for this laboratory candidate:
 
 ```text
-0.1.0-beta.62
+0.1.0-beta.63
 ```
 
 Zabbix frontend modules are installed as one directory under the frontend `modules` directory. The package-specific path can vary, so locate it first rather than assuming a path:
@@ -283,7 +282,7 @@ Do not copy the full Git checkout into the web-served modules directory. Use `su
 Administration → General → Modules → Scan directory
 ```
 
-Confirm version **0.1.0-beta.62**, enable the module and open:
+Confirm version **0.1.0-beta.63**, enable the module and open:
 
 ```text
 Data collection → Template updates
@@ -462,7 +461,7 @@ PHP 8.2 / 8.3 / 8.4 compatibility matrix
 Zabbix 7.0 / current 8.0 frontend-symbol compatibility
 Chromium batch-asset smoke regression
 release archive/checksum/content smoke
-runtime setup helper validation
+integrated installer runtime validation
 upstream-index generator validation
 offline-bundle generator validation
 GitHub workflow structure/action-pin validation

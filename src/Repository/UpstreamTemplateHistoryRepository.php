@@ -19,6 +19,7 @@ final class UpstreamTemplateHistoryRepository {
 	private const MAX_COMMITS = 75;
 	private const MAX_RESPONSE_BYTES = 2097152;
 	private const CHANGES_LIMIT = 1000;
+	private const HISTORY_REQUEST_TIMEOUT_SECONDS = 12;
 
 	public function __construct(?OfflineBundleRepository $offlineBundle = null) {
 		$this->offlineBundle = $offlineBundle ?? new OfflineBundleRepository();
@@ -277,7 +278,7 @@ final class UpstreamTemplateHistoryRepository {
 				CURLOPT_FOLLOWLOCATION => true,
 				CURLOPT_MAXREDIRS => 3,
 				CURLOPT_CONNECTTIMEOUT => 3,
-				CURLOPT_TIMEOUT => 6,
+				CURLOPT_TIMEOUT => self::HISTORY_REQUEST_TIMEOUT_SECONDS,
 				CURLOPT_USERAGENT => ProjectVersion::userAgent(),
 				CURLOPT_SSL_VERIFYPEER => true,
 				CURLOPT_SSL_VERIFYHOST => 2,
@@ -317,7 +318,7 @@ final class UpstreamTemplateHistoryRepository {
 		$context = stream_context_create([
 			'http' => [
 				'method' => 'GET',
-				'timeout' => 6,
+				'timeout' => self::HISTORY_REQUEST_TIMEOUT_SECONDS,
 				'follow_location' => 0,
 				'header' => 'User-Agent: '.ProjectVersion::userAgent()."\r\n"
 			],
@@ -342,15 +343,26 @@ final class UpstreamTemplateHistoryRepository {
 			throw new RuntimeException('Unable to encode the immutable history cache identity.');
 		}
 
-		return rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR)
-			.DIRECTORY_SEPARATOR.'zabbix-template-update-manager'
-			.DIRECTORY_SEPARATOR.'historical-history'
+		return '/var/lib/zabbix-template-update-manager/cache/historical-history'
 			.DIRECTORY_SEPARATOR.'history-'.hash('sha256', $identity).'.json';
+	}
+
+	private function privateHistoryCacheDirectory(string $directory): bool {
+		if (!function_exists('posix_geteuid') || is_link($directory) || !is_dir($directory)) {
+			return false;
+		}
+		$mode = @fileperms($directory);
+		$owner = @fileowner($directory);
+		return $mode !== false && ($mode & 0777) === 0700 && $owner === posix_geteuid();
 	}
 
 	private function readImmutableHistoryCache(string $path, string $until, int $maxCommits): ?array {
 		$file = $this->immutableHistoryCacheFile($path, $until, $maxCommits);
-		if (!is_file($file)) {
+		if (!$this->privateHistoryCacheDirectory('/var/lib/zabbix-template-update-manager/cache')
+				|| !$this->privateHistoryCacheDirectory(dirname($file))
+				|| is_link($file) || !is_file($file)
+				|| @fileowner($file) !== posix_geteuid()
+				|| (@fileperms($file) & 0777) !== 0600) {
 			return null;
 		}
 
@@ -395,14 +407,25 @@ final class UpstreamTemplateHistoryRepository {
 
 		$file = $this->immutableHistoryCacheFile($path, $until, $maxCommits);
 		$directory = dirname($file);
-		if (!is_dir($directory)
-				&& !@mkdir($directory, 0700, true)
-				&& !is_dir($directory)) {
+		if (!$this->privateHistoryCacheDirectory('/var/lib/zabbix-template-update-manager/cache')) {
+			return;
+		}
+		if (!is_dir($directory) && !@mkdir($directory, 0700)) {
+			return;
+		}
+		if (!$this->privateHistoryCacheDirectory($directory) || is_link($file)) {
 			return;
 		}
 
-		$tmp = $file.'.tmp-'.getmypid();
-		if (@file_put_contents($tmp, $encoded, LOCK_EX) === false) {
+		$tmp = $file.'.tmp-'.bin2hex(random_bytes(12));
+		$oldUmask = umask(0077);
+		try {
+			$written = @file_put_contents($tmp, $encoded, LOCK_EX);
+		}
+		finally {
+			umask($oldUmask);
+		}
+		if ($written === false) {
 			return;
 		}
 		@chmod($tmp, 0600);
