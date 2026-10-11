@@ -12,9 +12,13 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
 COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 PATH_RE = re.compile(r"^templates/(?:[A-Za-z0-9._+\-]+/)*[A-Za-z0-9._+\-]+\.yaml$")
 MAX_HISTORY = 75
+SIGNATURE_SCHEMA = "ztum-offline-manifest-signature-v1"
 
 
 def die(message: str) -> None:
@@ -46,6 +50,27 @@ def write_file(root: Path, relative: str, data: bytes, manifest: dict[str, str])
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_bytes(data)
     manifest[relative] = hashlib.sha256(data).hexdigest()
+
+
+def canonical_manifest(manifest: dict) -> bytes:
+    unsigned = {key: value for key, value in manifest.items() if key != "signature"}
+    return (json.dumps(unsigned, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
+
+
+def sign_manifest(manifest: dict, key_path: Path, key_id: str) -> None:
+    if not re.fullmatch(r"[A-Za-z0-9._-]{1,128}", key_id):
+        raise RuntimeError("--key-id must contain only letters, numbers, dot, underscore or hyphen")
+    try:
+        key = serialization.load_pem_private_key(key_path.read_bytes(), password=None)
+    except Exception as exc:
+        raise RuntimeError(f"Unable to load Ed25519 signing key: {exc}") from exc
+    if not isinstance(key, Ed25519PrivateKey):
+        raise RuntimeError("--signing-private-key must contain an Ed25519 private PEM")
+    manifest["signature"] = {
+        "schema": SIGNATURE_SCHEMA,
+        "key_id": key_id,
+        "signature": __import__("base64").b64encode(key.sign(canonical_manifest(manifest))).decode("ascii"),
+    }
 
 
 def load_index(path: Path) -> tuple[bytes, dict]:
@@ -106,17 +131,37 @@ def build_history(repo: Path, root: Path, commit: str, path: str, limit: int, ma
     truncated = len(ids) > limit
     ids = ids[:limit]
     records = []
+    tracked_path = path
 
     for item in ids:
         try:
-            source = run_git(repo, "show", f"{item}:{path}")
+            source = run_git(repo, "show", f"{item}:{tracked_path}")
         except RuntimeError:
-            # The remote runtime currently fetches historical content by current path.
-            # Stop at the same safety boundary rather than inventing a renamed path.
             truncated = True
             break
-        write_file(root, f"sources/{item}/{path}", source, manifest)
-        records.append({"id": item, "message": ""})
+        source_path = tracked_path
+        write_file(root, f"sources/{item}/{source_path}", source, manifest)
+        previous_paths = []
+        changes = run_git(repo, "diff-tree", "--no-commit-id", "--name-status", "-r", "--find-renames=0%", "-m", item, text=True)
+        for line in changes.splitlines():
+            fields = line.split("\t")
+            if len(fields) == 3 and re.fullmatch(r"R[0-9]{1,3}", fields[0]) and fields[2] == tracked_path:
+                if valid_path(fields[1]):
+                    previous_paths.append(fields[1])
+        if len(set(previous_paths)) > 1:
+            raise RuntimeError(f"Ambiguous rename provenance for {item}:{tracked_path}")
+        previous_path = previous_paths[0] if previous_paths else None
+        if previous_path is not None:
+            rename = {
+                "schema_version": 1,
+                "commit": item,
+                "path": tracked_path,
+                "previous_path": previous_path,
+            }
+            rename_bytes = (json.dumps(rename, sort_keys=True, separators=(",", ":")) + "\n").encode()
+            write_file(root, f"renames/{item}/{hashlib.sha256(tracked_path.encode()).hexdigest()}.json", rename_bytes, manifest)
+            tracked_path = previous_path
+        records.append({"id": item, "message": "", "path": source_path})
 
     history = {
         "schema_version": 1,
@@ -136,6 +181,8 @@ def main() -> int:
     parser.add_argument("--index", required=True, action="append", type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--history-limit", type=int, default=MAX_HISTORY)
+    parser.add_argument("--signing-private-key", required=True, type=Path)
+    parser.add_argument("--key-id", required=True)
     args = parser.parse_args()
 
     if args.history_limit < 1 or args.history_limit > MAX_HISTORY:
@@ -183,6 +230,7 @@ def main() -> int:
         "generator": "tools/build_offline_bundle.py",
         "files": dict(sorted(manifest_files.items())),
     }
+    sign_manifest(manifest, args.signing_private_key, args.key_id)
     (output / "manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",

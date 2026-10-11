@@ -603,14 +603,14 @@ Runtime upstream repositories now prefer a configured local `OfflineBundleReposi
 The bundle contract is intentionally narrow:
 
 - one private administrator-configured root;
-- `manifest.json` schema validation;
+- `manifest.json` schema and Ed25519 signature validation using the administrator-provisioned trusted key;
 - exact SHA-256 verification for every consumed file;
 - existing upstream-index schema/UUID/path/hash validation remains mandatory;
 - current/historical source paths are derived internally from validated commit/path values;
 - no arbitrary filesystem path is accepted from frontend input;
 - `ZTUM_OFFLINE_ONLY=1` converts every missing required bundle artifact into a fail-closed error instead of using network fallback.
 
-The bundle generator consumes a local canonical Zabbix Git checkout and validated upstream index. It verifies current raw YAML bytes against the index before packaging them.
+The bundle generator consumes a local canonical Zabbix Git checkout and validated upstream index. It verifies current raw YAML bytes against the index, records proven rename transitions, and signs the canonical manifest before packaging them.
 
 Historical bundle generation remains conservative: it may package only historical source paths proven by the same immutable/rename evidence rules; missing rename evidence stops or truncates generation rather than guessing.
 

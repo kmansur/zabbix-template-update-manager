@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ZTUM local-source installer — new installations only.
+# ZTUM local-source installer and controlled code maintenance.
 set -Eeuo pipefail
 umask 022
 
@@ -9,7 +9,9 @@ MODULES_DIR=""
 PHP_USER=""
 ZABBIX_VERSION=""
 DRY_RUN=0
+RUNTIME_CHECK=0
 UPGRADE=0
+REINSTALL=0
 ROLLBACK=""
 BACKUP_BASE="/var/backups/zabbix-template-update-manager"
 RUNTIME_BASE="/var/lib/zabbix-template-update-manager"
@@ -20,15 +22,21 @@ die() { printf '[ZTUM] ERROR: %s\n' "$*" >&2; exit 1; }
 usage() {
   cat <<'HELP'
 Usage: sudo bash install.sh [--check] [--modules-dir DIR] [--php-user USER]
+       sudo bash install.sh --runtime-check [--php-user USER]
        sudo bash install.sh --upgrade [--modules-dir DIR] [--php-user USER]
+       sudo bash install.sh --reinstall [--modules-dir DIR] [--php-user USER]
        sudo bash install.sh --rollback BACKUP_ID [--modules-dir DIR]
        bash install.sh --check [--modules-dir /path/to/modules] [--php-user USER]
 
 Installs from the local Git checkout, copying only runtime files.
 --check is read-only. Existing installations are never overwritten by install.
---upgrade makes a verified code backup, then replaces only frontend code.
+--upgrade requires a newer version and makes a verified code backup.
+--reinstall requires an identical version and different code, then makes the same
+verified backup and code-only replacement. Intended for controlled lab maintenance.
 --rollback restores a verified code backup by its local BACKUP_ID.
-Runtime data under /var/lib/zabbix-template-update-manager is untouched.
+Runtime data is preserved by code upgrade/rollback. On first install,
+private runtime directories are created/validated automatically.
+--runtime-check validates existing directories without changes.
 For Zabbix 7/8 use the frontend's actual modules directory.
 HELP
 }
@@ -37,14 +45,17 @@ while (($#)); do
     --modules-dir) (($# >= 2)) || die "Missing --modules-dir value"; MODULES_DIR="$2"; shift 2;;
     --php-user) (($# >= 2)) || die "Missing --php-user value"; PHP_USER="$2"; shift 2;;
     --check) DRY_RUN=1; shift;;
+    --runtime-check) RUNTIME_CHECK=1; shift;;
     --upgrade) UPGRADE=1; shift;;
+    --reinstall) REINSTALL=1; shift;;
     --rollback) (($# >= 2)) || die "Missing backup ID"; ROLLBACK="$2"; shift 2;;
     -h|--help) usage; exit 0;;
     *) die "Unknown argument: $1";;
   esac
 done
-((UPGRADE == 0 || DRY_RUN == 0)) || die "--upgrade and --check cannot be combined"
-[[ -z "$ROLLBACK" || ( "$UPGRADE" -eq 0 && "$DRY_RUN" -eq 0 ) ]] || die "--rollback cannot be combined with --upgrade/--check"
+if ((UPGRADE + REINSTALL + DRY_RUN + RUNTIME_CHECK > 1)) || { [[ -n "$ROLLBACK" ]] && ((UPGRADE + REINSTALL + DRY_RUN + RUNTIME_CHECK > 0)); }; then
+  die "Conflicting operation options"
+fi
 
 for file in Module.php manifest.json VERSION; do
   [[ -f "$SOURCE_DIR/$file" && ! -L "$SOURCE_DIR/$file" ]] || die "Missing or linked source file: $file"
@@ -53,7 +64,6 @@ for dir in actions assets src views; do
   [[ -d "$SOURCE_DIR/$dir" && ! -L "$SOURCE_DIR/$dir" ]] || die "Missing or linked source directory: $dir"
 done
 [[ -f "$SOURCE_DIR/assets/js/ztum-update-batch.js" && -f "$SOURCE_DIR/assets/js/ztum-install-batch.js" ]] || die "Missing registered JavaScript assets"
-[[ -f "$SOURCE_DIR/tools/ztum-runtime-setup.sh" ]] || die "Runtime setup helper is missing"
 if find "$SOURCE_DIR/actions" "$SOURCE_DIR/assets" "$SOURCE_DIR/src" "$SOURCE_DIR/views" -type l -print -quit | grep -q .; then
   die "Refusing symlinks inside runtime source directories"
 fi
@@ -66,6 +76,79 @@ if command -v php >/dev/null 2>&1; then
   ' "$SOURCE_DIR/manifest.json" "$SOURCE_DIR/VERSION" || die "Invalid manifest or VERSION mismatch"
 else
   die "PHP CLI is required to validate manifest.json"
+fi
+
+detect_php_user() {
+if [[ -z "$PHP_USER" ]]; then
+  files=()
+  shopt -s nullglob
+  files=(/etc/php/*/fpm/pool.d/*.conf /etc/php-fpm.d/*.conf /usr/local/etc/php-fpm.d/*.conf)
+  shopt -u nullglob
+  users=()
+  for f in "${files[@]}"; do
+    while IFS= read -r user; do [[ -n "$user" && "$user" != root ]] && users+=("$user"); done < <(
+      sed -nE 's/^[[:space:]]*user[[:space:]]*=[[:space:]]*([a-z_][a-z0-9_-]*).*$/\1/p' "$f")
+  done
+  if (("${#users[@]}")); then
+    mapfile -t users < <(printf '%s\n' "${users[@]}" | sort -u)
+  fi
+  (("${#users[@]}" == 1)) || die "PHP-FPM user ambiguous or unknown; provide --php-user USER"
+  PHP_USER="${users[0]}"
+fi
+id "$PHP_USER" >/dev/null 2>&1 || die "Unknown web runtime account: $PHP_USER"
+[[ "$PHP_USER" != root ]] || die "PHP-FPM runtime cannot be root"
+
+}
+
+# Runtime storage is private and is never removed or recursively chowned.
+runtime_dirs() {
+  printf '%s\n' "$RUNTIME_BASE" "$RUNTIME_BASE/backups" "$RUNTIME_BASE/offline" "$RUNTIME_BASE/locks" "$RUNTIME_BASE/batches" "$RUNTIME_BASE/cache"
+}
+check_runtime() {
+  local dir owner mode failed=0
+  while IFS= read -r dir; do
+    if [[ ! -d "$dir" || -L "$dir" ]]; then
+      log "FAIL runtime: missing/unsafe $dir"
+      failed=1
+      continue
+    fi
+    owner="$(stat -c '%U' "$dir")" || die "Unable to inspect runtime owner"
+    mode="$(stat -c '%a' "$dir")" || die "Unable to inspect runtime permissions"
+    if [[ "$owner" != "$PHP_USER" || "$mode" != "700" ]]; then
+      log "FAIL runtime: $dir (owner=$owner, mode=$mode; expected $PHP_USER:700)"
+      failed=1
+    else
+      log "OK runtime: $dir"
+    fi
+  done < <(runtime_dirs)
+  ((failed == 0)) || die "Runtime storage validation failed"
+  if ((EUID == 0)) && command -v runuser >/dev/null 2>&1; then
+    runuser -u "$PHP_USER" -- test -w "$RUNTIME_BASE/backups" || die "PHP-FPM cannot write backups"
+    runuser -u "$PHP_USER" -- test -w "$RUNTIME_BASE/cache" || die "PHP-FPM cannot write cache"
+  fi
+}
+prepare_runtime() {
+  ((EUID == 0)) || die "Runtime setup requires root"
+  local dir group
+  group="$(id -gn "$PHP_USER")"
+  while IFS= read -r dir; do
+    [[ ! -L "$dir" ]] || die "Runtime directory is a symlink: $dir"
+    [[ ! -e "$dir" || -d "$dir" ]] || die "Runtime path is not a directory: $dir"
+    if [[ -d "$dir" ]]; then
+      [[ "$(stat -c '%U' "$dir")" == "$PHP_USER" ]] || die "Unsafe owner of existing runtime directory: $dir"
+      chmod 0700 "$dir" || die "Cannot secure runtime directory: $dir"
+    else
+      install -d -o "$PHP_USER" -g "$group" -m 0700 "$dir" || die "Unable to create runtime directory: $dir"
+    fi
+  done < <(runtime_dirs)
+  check_runtime
+}
+
+if ((RUNTIME_CHECK)); then
+  detect_php_user
+  check_runtime
+  log "Runtime validation passed (read-only)."
+  exit 0
 fi
 
 if [[ -z "$MODULES_DIR" ]]; then
@@ -151,7 +234,11 @@ prepare_stage() {
   [[ -f "$stage/assets/js/ztum-update-batch.js" && -f "$stage/assets/js/ztum-install-batch.js" ]] || die "Staged assets missing"
 }
 do_upgrade_or_rollback() {
-  (( EUID == 0 )) || die "Upgrade/rollback requires root"
+  (( EUID == 0 )) || die "Upgrade/reinstall/rollback requires root"
+  if [[ -z "$ROLLBACK" ]]; then
+    detect_php_user
+    prepare_runtime
+  fi
   for tool in flock sha256sum stat mktemp; do command -v "$tool" >/dev/null || die "Missing tool: $tool"; done
   [[ -d "$TARGET" && ! -L "$TARGET" ]] || die "Existing installation required; refusing upgrade/rollback"
   [[ ! -L "$BACKUP_BASE" ]] || die "Unsafe backup root symlink"
@@ -185,8 +272,16 @@ do_upgrade_or_rollback() {
   else
     new_version="$(cat "$SOURCE_DIR/VERSION")"
     [[ -n "$current_version" ]] || die "Cannot identify installed version"
-    php -r 'exit(version_compare($argv[1],$argv[2], ">") ? 0 : 1);' "$new_version" "$current_version" || die "Upgrade requires a newer version (current: $current_version; source: $new_version)"
+    if ((REINSTALL)); then
+      [[ "$new_version" == "$current_version" ]] || die "Reinstall requires identical versions (current: $current_version; source: $new_version)"
+      log "Controlled same-version reinstall: $current_version"
+    else
+      php -r 'exit(version_compare($argv[1],$argv[2], ">") ? 0 : 1);' "$new_version" "$current_version" || die "Upgrade requires a newer version (current: $current_version; source: $new_version)"
+    fi
     prepare_stage "$SOURCE_DIR" "$stage"
+    if ((REINSTALL)); then
+      [[ "$(hash_tree "$TARGET")" != "$(hash_tree "$stage")" ]] || die "Reinstall refused: installed code is already identical to source"
+    fi
   fi
   stage_hash="$(hash_tree "$stage")" || die "Unable to hash staged files"
   [[ -n "$stage_hash" ]] || die "Empty staging inventory"
@@ -231,7 +326,7 @@ do_upgrade_or_rollback() {
   log "Private runtime state untouched. Confirm web UI, menu and PHP-FPM cache."
 }
 
-if ((UPGRADE)) || [[ -n "$ROLLBACK" ]]; then
+if ((UPGRADE || REINSTALL)) || [[ -n "$ROLLBACK" ]]; then
   do_upgrade_or_rollback
   exit 0
 fi
@@ -239,43 +334,26 @@ if [[ -e "$TARGET" || -L "$TARGET" ]]; then
   if ((DRY_RUN)); then
     log "Existing module: $TARGET"
     log "CHECK: installed directory detected; no files were changed."
+    log "Use --runtime-check to validate private runtime storage."
     exit 0
   fi
-  die "ZTUM already installed: $TARGET. Refusing overwrite; use --upgrade only after validation."
+  die "ZTUM already installed: $TARGET. Refusing overwrite; use --upgrade for a newer release or explicit --reinstall for same-version maintenance."
 fi
 
-if [[ -z "$PHP_USER" ]]; then
-  files=()
-  shopt -s nullglob
-  files=(/etc/php/*/fpm/pool.d/*.conf /etc/php-fpm.d/*.conf /usr/local/etc/php-fpm.d/*.conf)
-  shopt -u nullglob
-  users=()
-  for f in "${files[@]}"; do
-    while IFS= read -r user; do [[ -n "$user" && "$user" != root ]] && users+=("$user"); done < <(
-      sed -nE 's/^[[:space:]]*user[[:space:]]*=[[:space:]]*([a-z_][a-z0-9_-]*).*$/\1/p' "$f")
-  done
-  if (("${#users[@]}")); then
-    mapfile -t users < <(printf '%s\n' "${users[@]}" | sort -u)
-  fi
-  (("${#users[@]}" == 1)) || die "PHP-FPM user ambiguous or unknown; provide --php-user USER"
-  PHP_USER="${users[0]}"
-fi
-id "$PHP_USER" >/dev/null 2>&1 || die "Unknown web runtime account: $PHP_USER"
-[[ "$PHP_USER" != root ]] || die "PHP-FPM runtime cannot be root"
+detect_php_user
 
 log "Source: $SOURCE_DIR"
 log "Destination: $TARGET"
 log "PHP-FPM account: $PHP_USER"
 log "Runtime directory: $RUNTIME_BASE"
 if ((DRY_RUN)); then
-  log "CHECK: READY for a new installation. No files were changed."
+  log "CHECK: READY for a new installation. Runtime directories will be secured during install; no files changed."
   exit 0
 fi
 
 ((EUID == 0)) || die "Run as root for installation; use --check for read-only validation"
 # Protect user data: never remove, replace or chown the existing runtime tree wholesale.
-bash "$SOURCE_DIR/tools/ztum-runtime-setup.sh" --apply --user "$PHP_USER" --base "$RUNTIME_BASE"
-bash "$SOURCE_DIR/tools/ztum-runtime-setup.sh" --check --user "$PHP_USER" --base "$RUNTIME_BASE"
+prepare_runtime
 
 cleanup() { [[ -z "$STAGE" ]] || rm -rf -- "$STAGE"; }
 trap cleanup EXIT

@@ -6,11 +6,18 @@ import json
 import subprocess
 import sys
 import tempfile
+import base64
 from pathlib import Path
+
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 
 def run(*args: str, cwd: Path | None = None) -> subprocess.CompletedProcess:
-    return subprocess.run(args, cwd=cwd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    result = subprocess.run(args, cwd=cwd, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if result.returncode != 0:
+        raise RuntimeError(result.stderr.decode("utf-8", "replace"))
+    return result
 
 
 def main() -> int:
@@ -28,7 +35,7 @@ def main() -> int:
         source_path = Path("templates/os/linux/template_os_linux.yaml")
         target = repo / source_path
         target.parent.mkdir(parents=True)
-        target.write_text("zabbix_export:\n  version: '7.0'\n", encoding="utf-8")
+        target.write_bytes(b"zabbix_export:\n  version: '7.0'\n")
         run("git", "add", ".", cwd=repo)
         run("git", "commit", "-qm", "initial", cwd=repo)
         commit = run("git", "rev-parse", "HEAD", cwd=repo).stdout.decode().strip()
@@ -55,6 +62,13 @@ def main() -> int:
         index_file = tmp / "7.0.json"
         index_file.write_text(json.dumps(index), encoding="utf-8")
         output = tmp / "bundle"
+        signing_key = Ed25519PrivateKey.generate()
+        signing_key_path = tmp / "signing-key.pem"
+        signing_key_path.write_bytes(signing_key.private_bytes(
+            serialization.Encoding.PEM,
+            serialization.PrivateFormat.PKCS8,
+            serialization.NoEncryption(),
+        ))
 
         run(
             sys.executable,
@@ -65,10 +79,22 @@ def main() -> int:
             str(index_file),
             "--output",
             str(output),
+            "--signing-private-key",
+            str(signing_key_path),
+            "--key-id",
+            "test-key",
         )
 
         manifest = json.loads((output / "manifest.json").read_text())
         assert manifest["schema_version"] == 1
+        assert manifest["signature"]["schema"] == "ztum-offline-manifest-signature-v1"
+        assert manifest["signature"]["key_id"] == "test-key"
+        assert len(manifest["signature"]["signature"]) == 88
+        unsigned = {key: value for key, value in manifest.items() if key != "signature"}
+        signing_key.public_key().verify(
+            base64.b64decode(manifest["signature"]["signature"]),
+            (json.dumps(unsigned, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n").encode(),
+        )
         assert f"indexes/7.0.json" in manifest["files"]
         assert f"sources/{commit}/{source_path.as_posix()}" in manifest["files"]
         history_key = hashlib.sha256(source_path.as_posix().encode()).hexdigest()
@@ -76,6 +102,27 @@ def main() -> int:
         assert history_file.is_file()
         history = json.loads(history_file.read_text())
         assert history["commits"][0]["id"] == commit
+
+        renamed_path = Path("templates/os/linux/template_os_linux_renamed.yaml")
+        run("git", "mv", str(source_path), str(renamed_path), cwd=repo)
+        run("git", "commit", "-qm", "rename", cwd=repo)
+        renamed_commit = run("git", "rev-parse", "HEAD", cwd=repo).stdout.decode().strip()
+        renamed_raw = (repo / renamed_path).read_bytes()
+        renamed_index = dict(index)
+        renamed_index["source"] = dict(index["source"], commit=renamed_commit)
+        renamed_template = dict(index["templates"][uuid], paths=[renamed_path.as_posix()],
+                                sources=[{"path": renamed_path.as_posix(),
+                                          "sha256": hashlib.sha256(renamed_raw).hexdigest()}])
+        renamed_index["templates"] = {uuid: renamed_template}
+        renamed_index_file = tmp / "7.0-renamed.json"
+        renamed_index_file.write_text(json.dumps(renamed_index), encoding="utf-8")
+        renamed_output = tmp / "renamed-bundle"
+        run(sys.executable, str(tool), "--zabbix-repo", str(repo), "--index", str(renamed_index_file),
+            "--output", str(renamed_output), "--signing-private-key", str(signing_key_path), "--key-id", "test-key")
+        rename_key = renamed_output / "renames" / renamed_commit / f"{hashlib.sha256(renamed_path.as_posix().encode()).hexdigest()}.json"
+        assert rename_key.is_file()
+        rename_record = json.loads(rename_key.read_text())
+        assert rename_record["previous_path"] == source_path.as_posix()
 
     print("Offline bundle generator tests passed.")
     return 0

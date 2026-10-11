@@ -31,7 +31,9 @@ function removeBaselineCacheTree(string $path): void {
 	@rmdir($path);
 }
 
-$cacheDir = sys_get_temp_dir().DIRECTORY_SEPARATOR.'ztum-cache-test-'.getmypid().'-'.bin2hex(random_bytes(4));
+$testRoot = sys_get_temp_dir().DIRECTORY_SEPARATOR.'ztum-cache-test-'.getmypid().'-'.bin2hex(random_bytes(4));
+mkdir($testRoot, 0700);
+$cacheDir = $testRoot.DIRECTORY_SEPARATOR.'historical-baselines';
 $repository = new HistoricalBaselineCacheRepository($cacheDir);
 $path = 'templates/os/linux/template_os_linux.yaml';
 $currentCommit = str_repeat('a', 40);
@@ -74,6 +76,8 @@ try {
 	assertBaselineCache(false, $repository->store($path, $currentCommit, $uuid, $version, $vendor, $notFound), 'Negative baseline results must not be cached.');
 
 	$files = glob($cacheDir.DIRECTORY_SEPARATOR.'baseline-*.json') ?: [];
+	assertBaselineCache(0700, fileperms($cacheDir) & 0777, 'Baseline cache directory must be private.');
+	assertBaselineCache(0600, fileperms($files[0]) & 0777, 'Baseline cache data must be private.');
 	assertBaselineCache(1, count($files), 'Exactly one successful baseline record should exist.');
 
 	$record = json_decode((string) file_get_contents($files[0]), true);
@@ -95,7 +99,7 @@ try {
 	assertBaselineCache(true, $threw, 'Invalid template paths must fail closed.');
 }
 finally {
-	removeBaselineCacheTree($cacheDir);
+	removeBaselineCacheTree($testRoot);
 }
 
 echo "HistoricalBaselineCacheRepository tests passed.\n";

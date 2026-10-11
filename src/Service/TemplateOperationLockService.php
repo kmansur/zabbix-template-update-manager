@@ -21,6 +21,11 @@ final class TemplateOperationLockService {
 		$this->lockDir = $lockDir ?? ($configured !== ''
 			? $configured
 			: self::DEFAULT_LOCK_DIR);
+		if ($this->lockDir === '' || $this->lockDir[0] !== '/'
+				|| strpos($this->lockDir, "\0") !== false
+				|| preg_match('#(?:^|/)\\.\\.?(/|$)#', $this->lockDir)) {
+			throw new RuntimeStorageException('The controlled-operation lock directory must be a safe absolute path.');
+		}
 	}
 
 	public static function defaultDirectory(): string {

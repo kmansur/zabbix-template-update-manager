@@ -39,10 +39,10 @@ jobs:
             postgres_image: 'postgres:18-alpine'
 
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '24'
       - name: Install browser tooling
@@ -66,7 +66,7 @@ jobs:
     needs: runtime-smoke
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0
           ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}

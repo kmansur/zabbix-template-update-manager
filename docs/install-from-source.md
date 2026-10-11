@@ -1,6 +1,6 @@
 # Local Git checkout installation (Zabbix 7 and 8)
 
-**Status:** laboratory beta only; not a production approval. Without flags, the local-source installer is new-install-only; explicit `--upgrade` and `--rollback BACKUP_ID` operations are available for laboratory testing. The root-level `install.sh` is the only active installer; retired quickinstall scripts are not supported on `main`.
+**Status:** laboratory beta only; not a production approval. Without flags, the local-source installer is new-install-only; explicit `--upgrade`, `--reinstall` and `--rollback BACKUP_ID` operations are available for laboratory testing. The root-level `install.sh` is the only active installer; retired quickinstall scripts are not supported on `main`.
 
 ## Requirements
 
@@ -42,7 +42,7 @@ Zabbix 7 deployments may use `/usr/share/zabbix/modules`; the actual installatio
 1. Checks that the source contains `manifest.json`, `Module.php`, `VERSION`, `actions/`, `assets/`, `src/` and `views/`, and rejects source symlinks. It verifies that `manifest.json` agrees with `VERSION`.
 2. Resolves the actual Zabbix frontend directory and verifies version 7.x/8.x, stopping when verification is inconclusive; detects the PHP-FPM user or asks for `--php-user`.
 3. **Refuses to replace an existing installation**, including the development checkout currently deployed in the laboratories. In `--check` mode, existing installation is reported as a non-destructive diagnostic.
-4. Uses the existing `tools/ztum-runtime-setup.sh` helper to create/validate private `0700` runtime directories under `/var/lib/zabbix-template-update-manager/` for `backups`, `offline`, `locks` and `batches`. It does not reset or remove stored backup, policy, history or batch data.
+4. Uses integrated `install.sh` runtime setup to create/validate private `0700` directories under `/var/lib/zabbix-template-update-manager/` for `backups`, `offline`, `locks`, `batches` and `cache`. It does not reset or remove stored backup, policy, history or batch data.
 5. Stages and installs only `Module.php`, `manifest.json`, `VERSION`, `actions/`, `assets/`, `src/`, `views/` as root-owned, web-readable files (directories `0755`, files `0644`). Git metadata, test harnesses, scripts, docs and release machinery are not copied.
 6. Does not modify Nginx, Apache, PHP-FPM, the Zabbix database or template configuration and does not restart services.
 
@@ -53,13 +53,17 @@ In the Zabbix UI, sign in as **Super Admin**, open **Administration → General 
 ```bash
 sudo find /usr/share/zabbix/ui/modules/zabbix-template-update-manager \
   -maxdepth 1 -mindepth 1 -printf '%f\n' | sort
-sudo bash /usr/local/src/zabbix-template-update-manager/tools/ztum-runtime-setup.sh \
-  --check --user www-data
+sudo bash /usr/local/src/zabbix-template-update-manager/install.sh \
+  --runtime-check --php-user www-data
 ```
 
 The installed module root should contain only `Module.php`, `manifest.json`, `VERSION`, `actions`, `assets`, `src` and `views`. Private runtime state remains outside the web tree. No `.git`, `tests`, `tools`, or `docs` directory should be present inside the module.
 
-## Controlled upgrades and code rollback (new, experimental)
+## Controlled upgrade, same-version reinstall and code rollback (laboratory only)
+
+Use `sudo bash install.sh --reinstall` only to deploy changed code with an **identical** `VERSION` in a laboratory. The same root-private SHA-256 backup, atomic code replacement and rollback procedure applies. A reinstall refuses a different version and refuses identical installed/source files. Do not use it to bypass release versioning in production.
+
+## Upgrade and rollback precautions
 
 **Laboratory only:** `--upgrade` and `--rollback` have not yet passed disposable end-to-end failure injection. Do not use these operations on production until that validation is complete. Schedule a maintenance window, suspend ZTUM operations, verify no active batches or imports, and capture a separate backup of `/var/lib/zabbix-template-update-manager` and of the Zabbix database as appropriate before upgrading. A code rollback cannot reverse Zabbix template changes.
 

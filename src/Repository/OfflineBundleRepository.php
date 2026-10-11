@@ -12,6 +12,7 @@ final class OfflineBundleRepository {
 	private const MAX_INDEX_BYTES = 5242880;
 	private const MAX_SOURCE_BYTES = 10485760;
 	private const MAX_HISTORY_BYTES = 2097152;
+	private const SIGNATURE_SCHEMA = 'ztum-offline-manifest-signature-v1';
 
 	private ?string $rootDir;
 	private bool $offlineOnly;
@@ -108,6 +109,32 @@ final class OfflineBundleRepository {
 		];
 	}
 
+	public function readPreviousPath(string $commit, string $path): ?string {
+		$commit = strtolower(trim($commit));
+		if (preg_match('/^[a-f0-9]{40}$/', $commit) !== 1 || !UpstreamIndexRepository::isValidTemplatePath($path)) {
+			throw new RuntimeException('The offline upstream rename request is invalid.');
+		}
+		$relative = 'renames/'.$commit.'/'.hash('sha256', $path).'.json';
+		$content = $this->readVerified($relative, self::MAX_HISTORY_BYTES);
+		if ($content === null) {
+			return null;
+		}
+		try {
+			$data = json_decode($content, true, 128, JSON_THROW_ON_ERROR);
+		}
+		catch (JsonException $exception) {
+			throw new RuntimeException('The offline upstream rename record is not valid JSON.', 0, $exception);
+		}
+		$previous = is_array($data) ? (string) ($data['previous_path'] ?? '') : '';
+		if (!is_array($data) || ($data['schema_version'] ?? null) !== self::SCHEMA_VERSION
+				|| strtolower((string) ($data['commit'] ?? '')) !== $commit
+				|| ($data['path'] ?? null) !== $path
+				|| !UpstreamIndexRepository::isValidTemplatePath($previous)) {
+			throw new RuntimeException('The offline upstream rename record has an invalid structure.');
+		}
+		return $previous;
+	}
+
 	public function describe(): array {
 		return [
 			'configured' => $this->isConfigured(),
@@ -187,6 +214,8 @@ final class OfflineBundleRepository {
 			throw new RuntimeException('The offline bundle manifest has an invalid structure.');
 		}
 
+		$this->verifyManifestSignature($data);
+
 		$files = [];
 		foreach ($data['files'] as $relative => $sha256) {
 			if (!is_string($relative) || !self::isSafeRelativePath($relative)
@@ -199,6 +228,52 @@ final class OfflineBundleRepository {
 		$data['files'] = $files;
 		$this->manifest = $data;
 		return $data;
+	}
+
+	private function verifyManifestSignature(array $manifest): void {
+		$signature = $manifest['signature'] ?? null;
+		$keyId = trim((string) getenv('ZTUM_OFFLINE_BUNDLE_KEY_ID'));
+		$publicKey = trim((string) getenv('ZTUM_OFFLINE_BUNDLE_PUBLIC_KEY'));
+		if (!is_array($signature)
+				|| ($signature['schema'] ?? null) !== self::SIGNATURE_SCHEMA
+				|| ($signature['key_id'] ?? null) !== $keyId
+				|| preg_match('/^[A-Za-z0-9._-]{1,128}$/', $keyId) !== 1
+				|| !is_string($signature['signature'] ?? null)
+				|| $publicKey === ''
+				|| !function_exists('sodium_crypto_sign_verify_detached')) {
+			throw new RuntimeException('The offline bundle manifest has no usable trusted signature.');
+		}
+
+		$decodedSignature = base64_decode($signature['signature'], true);
+		$decodedKey = base64_decode($publicKey, true);
+		if (!is_string($decodedSignature) || strlen($decodedSignature) !== SODIUM_CRYPTO_SIGN_BYTES
+				|| !is_string($decodedKey) || strlen($decodedKey) !== SODIUM_CRYPTO_SIGN_PUBLICKEYBYTES) {
+			throw new RuntimeException('The offline bundle manifest signature or trusted key is invalid.');
+		}
+
+		$unsigned = $manifest;
+		unset($unsigned['signature']);
+		$this->sortManifestKeys($unsigned);
+		try {
+			$canonical = json_encode($unsigned, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+					| JSON_THROW_ON_ERROR)."\n";
+			if (!sodium_crypto_sign_verify_detached($decodedSignature, $canonical, $decodedKey)) {
+				throw new RuntimeException('The offline bundle manifest signature is invalid.');
+			}
+		}
+		catch (JsonException $exception) {
+			throw new RuntimeException('The offline bundle manifest cannot be canonicalized.', 0, $exception);
+		}
+	}
+
+	private function sortManifestKeys(array &$value): void {
+		ksort($value, SORT_STRING);
+		foreach ($value as &$child) {
+			if (is_array($child) && array_keys($child) !== range(0, count($child) - 1)) {
+				$this->sortManifestKeys($child);
+			}
+		}
+		unset($child);
 	}
 
 	private static function isSafeRelativePath(string $path): bool {

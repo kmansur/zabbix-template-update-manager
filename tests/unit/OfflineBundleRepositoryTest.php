@@ -11,6 +11,11 @@ require_once dirname(__DIR__, 2).'/src/Repository/OfflineBundleRepository.php';
 require_once dirname(__DIR__, 2).'/src/Repository/UpstreamTemplateSourceRepository.php';
 require_once dirname(__DIR__, 2).'/src/Repository/UpstreamTemplateHistoryRepository.php';
 
+if (!function_exists('sodium_crypto_sign_verify_detached')) {
+	echo "OfflineBundleRepository tests skipped: PHP sodium extension unavailable.\n";
+	exit(0);
+}
+
 function assertOffline($expected, $actual, string $message): void {
 	if ($expected !== $actual) {
 		fwrite(STDERR, $message."\nExpected: ".var_export($expected, true)."\nActual: ".var_export($actual, true)."\n");
@@ -64,13 +69,34 @@ foreach ($files as $relative => $content) {
 
 $manifest = [
 	'schema_version' => 1,
-	'generated_at' => gmdate('c'),
+	'generated_at' => '2026-01-01T00:00:00+00:00',
+	'generator' => 'tests',
 	'files' => []
 ];
 foreach ($files as $relative => $content) {
 	$manifest['files'][$relative] = hash('sha256', $content);
 }
+$manifest['signature'] = [
+	'schema' => 'ztum-offline-manifest-signature-v1',
+	'key_id' => 'test-key',
+	'signature' => '+xz+15RyTRvF7XDiOUaLpv72+wzIP2ryN9VVFv51IpGQlQNkgVIPzWrhROCRAZ3pV3fLlh62iZqUIJ3Si+O9Bw=='
+];
+putenv('ZTUM_OFFLINE_BUNDLE_KEY_ID=test-key');
+putenv('ZTUM_OFFLINE_BUNDLE_PUBLIC_KEY=22wH6Wak0aCzSfdiX8V8LRLkGEMS+JLKvHNyak7BvPM=');
 @mkdir($root, 0700, true);
+file_put_contents($root.DIRECTORY_SEPARATOR.'manifest.json', json_encode($manifest, JSON_UNESCAPED_SLASHES));
+
+$forgedManifest = $manifest;
+$forgedManifest['signature']['signature'] = 'A'.substr($forgedManifest['signature']['signature'], 1);
+file_put_contents($root.DIRECTORY_SEPARATOR.'manifest.json', json_encode($forgedManifest, JSON_UNESCAPED_SLASHES));
+$forgedRejected = false;
+try {
+	(new OfflineBundleRepository($root, true))->readIndex('7.0');
+}
+catch (RuntimeException $exception) {
+	$forgedRejected = str_contains($exception->getMessage(), 'signature');
+}
+assertOffline(true, $forgedRejected, 'Forged offline manifest signatures must fail closed.');
 file_put_contents($root.DIRECTORY_SEPARATOR.'manifest.json', json_encode($manifest, JSON_UNESCAPED_SLASHES));
 
 $bundle = new OfflineBundleRepository($root, true);
