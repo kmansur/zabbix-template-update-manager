@@ -51,4 +51,8 @@ assertSourceThrows(
 	'Invalid source paths must be rejected.'
 );
 
+$sourceRepositorySource = (string) file_get_contents(dirname(__DIR__, 2).'/src/Repository/UpstreamTemplateSourceRepository.php');
+assertSourceValue(true, str_contains($sourceRepositorySource, 'CURLOPT_FOLLOWLOCATION => false'), 'Raw source requests must not follow redirects.');
+assertSourceValue(true, str_contains($sourceRepositorySource, 'CURLOPT_MAXREDIRS => 0'), 'Raw source requests must reject redirect chains.');
+
 echo "UpstreamTemplateSourceRepository tests passed.\n";

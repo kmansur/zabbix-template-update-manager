@@ -86,4 +86,6 @@ assertHistory(true, str_contains($historyRepositorySource, 'privateHistoryCacheD
 assertHistory(true, str_contains($historyRepositorySource, 'HISTORY_REQUEST_TIMEOUT_SECONDS = 12'), 'History timeout must remain bounded.');
 assertHistory(true, str_contains($historyRepositorySource, 'bin2hex(random_bytes(12))'), 'History cache temporary name must be unpredictable.');
 assertHistory(true, str_contains($historyRepositorySource, 'umask(0077)'), 'History cache temporary file creation must be private.');
+assertHistory(true, str_contains($historyRepositorySource, 'CURLOPT_FOLLOWLOCATION => false'), 'History requests must not follow redirects.');
+assertHistory(true, str_contains($historyRepositorySource, 'CURLOPT_MAXREDIRS => 0'), 'History requests must reject redirect chains.');
 echo "UpstreamTemplateHistoryRepository tests passed.\n";

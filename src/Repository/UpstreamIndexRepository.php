@@ -448,8 +448,11 @@ final class UpstreamIndexRepository {
 
 		$content = @file_get_contents($url, false, $context, 0, self::MAX_INDEX_BYTES + 1);
 		$status = 0;
-		if (isset($http_response_header[0])
-				&& preg_match('#^HTTP/\S+\s+(\d{3})#', (string) $http_response_header[0], $matches) === 1) {
+		$headers = function_exists('http_get_last_response_headers')
+			? http_get_last_response_headers()
+			: ($http_response_header ?? []);
+		if (isset($headers[0])
+				&& preg_match('#^HTTP/\S+\s+(\d{3})#', (string) $headers[0], $matches) === 1) {
 			$status = (int) $matches[1];
 		}
 

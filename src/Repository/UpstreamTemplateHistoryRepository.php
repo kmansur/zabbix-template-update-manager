@@ -276,8 +276,11 @@ final class UpstreamTemplateHistoryRepository {
 			$tooLarge = false;
 			$options = [
 				CURLOPT_RETURNTRANSFER => false,
-				CURLOPT_FOLLOWLOCATION => true,
-				CURLOPT_MAXREDIRS => 3,
+				// Never follow redirects from the canonical history endpoint. A
+				// redirect can otherwise turn a trusted HTTPS request into an SSRF
+				// primitive before the final-host check runs.
+				CURLOPT_FOLLOWLOCATION => false,
+				CURLOPT_MAXREDIRS => 0,
 				CURLOPT_CONNECTTIMEOUT => 3,
 				CURLOPT_TIMEOUT => self::HISTORY_REQUEST_TIMEOUT_SECONDS,
 				CURLOPT_USERAGENT => ProjectVersion::userAgent(),
@@ -330,7 +333,15 @@ final class UpstreamTemplateHistoryRepository {
 		]);
 
 		$content = @file_get_contents($url, false, $context, 0, self::MAX_RESPONSE_BYTES + 1);
-		if (!is_string($content)) {
+		$headers = function_exists('http_get_last_response_headers')
+			? http_get_last_response_headers()
+			: ($http_response_header ?? []);
+		$status = 0;
+		if (isset($headers[0])
+				&& preg_match('#^HTTP/\S+\s+(\d{3})#', (string) $headers[0], $matches) === 1) {
+			$status = (int) $matches[1];
+		}
+		if (!is_string($content) || $status !== 200) {
 			throw new RuntimeException('Unable to retrieve upstream template history with the PHP stream client.');
 		}
 		if (strlen($content) > self::MAX_RESPONSE_BYTES) {

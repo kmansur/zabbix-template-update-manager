@@ -201,7 +201,15 @@ final class UpstreamTemplateSourceRepository {
 		]);
 
 		$content = @file_get_contents($url, false, $context, 0, self::MAX_SOURCE_BYTES + 1);
-		if (!is_string($content)) {
+		$headers = function_exists('http_get_last_response_headers')
+			? http_get_last_response_headers()
+			: ($http_response_header ?? []);
+		$status = 0;
+		if (isset($headers[0])
+				&& preg_match('#^HTTP/\S+\s+(\d{3})#', (string) $headers[0], $matches) === 1) {
+			$status = (int) $matches[1];
+		}
+		if (!is_string($content) || $status !== 200) {
 			throw new RuntimeException('Unable to retrieve the upstream template source with the PHP stream client.');
 		}
 		if (strlen($content) > self::MAX_SOURCE_BYTES) {
@@ -221,8 +229,11 @@ final class UpstreamTemplateSourceRepository {
 		$tooLarge = false;
 		$options = [
 			CURLOPT_RETURNTRANSFER => false,
-			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_MAXREDIRS => 3,
+			// Do not follow redirects from the canonical raw-source endpoint.
+			// The response host is checked below, but following first would allow
+			// a hostile redirect target to receive a server-side request.
+			CURLOPT_FOLLOWLOCATION => false,
+			CURLOPT_MAXREDIRS => 0,
 			CURLOPT_CONNECTTIMEOUT => 3,
 			CURLOPT_TIMEOUT => 5,
 			CURLOPT_USERAGENT => ProjectVersion::userAgent(),
