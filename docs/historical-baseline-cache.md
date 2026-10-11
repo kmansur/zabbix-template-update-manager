@@ -104,3 +104,25 @@ The report includes `rename_transitions` obtained from `git log --follow --find-
 A diagnostic report now records `missing_revisions`, `invalid_revisions`, `shallow_repository`, `truncated`, `distinct_vendor_versions` and `duplicate_vendor_versions`. A missing source path no longer stops enumeration of other reachable revisions; however **any gap remains visible and never upgrades the report to authoritative**. Invalid YAML and ambiguous UUID definitions are counted as invalid revisions instead of silently choosing a nearby baseline. CI covers both situations.
 
 The existing frontend is unchanged. In particular, this pipeline output is **not** written into the live ZTUM cache and may not authorize a template import.
+
+### Immutable object verification (offline-only)
+
+The diagnostic reporter can be verified by the companion tool:
+
+```sh
+python tools/verify_historical_candidate_diagnostic.py \\
+  --source-dir /path/to/official-zabbix-git-checkout \\
+  --report build/historical/acronis-diagnostic.json
+```
+
+It compares the declared SHA-256 for each candidate to the YAML bytes read from the pinned Git object and rejects altered fingerprints, invalid report identity and any attempt to set `authoritative` or `history_complete` to true. This is **local integrity only**, not publisher authentication: an attacker capable of replacing both the index and its upstream checkout is not excluded.
+
+### Requirements before publishing signed historical indexes
+
+1. Produce reproducible historical candidate manifests with fixed schema, sorted identities and stable serialization; reject shallow/truncated history, missing paths, unresolved renames and ambiguous UUID/version attribution.
+2. Define a separate offline signing identity and publish the corresponding **pinned public key with the ZTUM release**. Do not trust public keys downloaded from the same mutable index endpoint.
+3. Sign exactly the canonical manifest bytes and verify the detached signature and pinned key **before** any historical index can influence BASE/LOCAL/UPSTREAM decisions.
+4. Bind the signature to the expected Zabbix major/minor line, upstream source commit, template UUID and canonical paths; require repository identity and content hashes.
+5. Publish positive and negative tests for valid/expired or rotated keys, byte tampering, substitution, truncation, duplicate vendor-version candidates, renamed files and merge parents. Rotation requires a deliberate trusted module release or a signed delegation policy.
+
+Until then, the diagnostic artifacts are not read by the ZTUM frontend and cannot make updates eligible.
