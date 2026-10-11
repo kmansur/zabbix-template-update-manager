@@ -1,6 +1,6 @@
 # Critical-analysis remediation acceptance ledger
 
-Source: independent document `ZTUM-analise-critica.docx` (review of beta.38). This checklist tracks **evidence**, not implementation percentages. Last updated: 2026-10-10. Changes in draft PR #115 are not released; a passing developer CI is not an approval for production.
+Source: independent document `ZTUM-analise-critica.docx` (review of beta.38). This checklist tracks **evidence**, not implementation percentages. Last updated: 2026-10-11. Changes in draft PR #115 are not released; a passing developer CI is not an approval for production.
 
 | Original finding | Engineering state | Required evidence for closure |
 | --- | --- | --- |
