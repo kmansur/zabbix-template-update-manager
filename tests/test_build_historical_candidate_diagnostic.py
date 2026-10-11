@@ -42,6 +42,8 @@ class HistoricalCandidateDiagnosticTest(unittest.TestCase):
             self.assertEqual(["7.0-1", "7.0-0", "7.0-0"],
                              [x["vendor_version"] for x in report["candidates"]])
             self.assertEqual(3, len({x["raw_sha256"] for x in report["candidates"]}))
+            self.assertEqual(["7.0-0", "7.0-1"], report["distinct_vendor_versions"])
+            self.assertEqual(["7.0-0"], report["duplicate_vendor_versions"])
             report_short = build_report(repo, commit, PATH, UUID, 1)
             self.assertTrue(report_short["truncated"])
 
@@ -140,6 +142,7 @@ class HistoricalCandidateDiagnosticTest(unittest.TestCase):
             self.assertEqual(1, len(report["invalid_revisions"]))
             self.assertEqual(0, report["candidate_count"])
             self.assertFalse(report["authoritative"])
+            self.assertFalse(report["history_complete"])
 
     def test_rejects_bad_commit_and_path(self):
         with tempfile.TemporaryDirectory() as temporary:
