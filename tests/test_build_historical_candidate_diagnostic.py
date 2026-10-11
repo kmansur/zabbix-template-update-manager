@@ -113,9 +113,9 @@ class HistoricalCandidateDiagnosticTest(unittest.TestCase):
             p = repo / PATH
             p.parent.mkdir(parents=True)
             p.write_text(
-                "zabbix_export:\\n  templates:\\n"
-                f"    - uuid: {UUID}\\n      vendor:\\n"
-                "        name: Zabbix\\n        version: 7.0-0\\n"
+                "zabbix_export:\n  templates:\n"
+                f"    - uuid: {UUID}\n      vendor:\n"
+                "        name: Zabbix\n        version: 7.0-0\n"
             )
             run(repo, "add", ".")
             run(repo, "commit", "-qm", "added")
@@ -133,7 +133,7 @@ class HistoricalCandidateDiagnosticTest(unittest.TestCase):
             run(repo, "config", "user.email", "test@example.org")
             p = repo / PATH
             p.parent.mkdir(parents=True)
-            p.write_text("zabbix_export: [broken\\n")
+            p.write_text("zabbix_export: [broken\n")
             run(repo, "add", ".")
             run(repo, "commit", "-qm", "invalid source")
             report = build_report(repo, run(repo, "rev-parse", "HEAD"), PATH, UUID)
