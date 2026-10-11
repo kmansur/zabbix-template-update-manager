@@ -13,6 +13,8 @@ import re
 import subprocess
 from pathlib import Path
 
+import yaml
+
 SHA = re.compile(r"^[a-f0-9]{40}$")
 SHA256 = re.compile(r"^[a-f0-9]{64}$")
 UUID = re.compile(r"^[a-f0-9]{32}$")
@@ -91,6 +93,26 @@ def verify(report: dict, repo: Path) -> list[str]:
             continue
         if hashlib.sha256(raw).hexdigest() != fingerprint:
             errors.append(f"Candidate {index}: source fingerprint mismatch")
+        try:
+            document = yaml.safe_load(raw)
+            templates = document["zabbix_export"]["templates"]
+            if not isinstance(templates, list):
+                raise ValueError("invalid template collection")
+            matches = [
+                template for template in templates
+                if isinstance(template, dict) and
+                str(template.get("uuid", "")).lower().replace("-", "") == report.get("uuid")
+            ]
+            if len(matches) != 1:
+                raise ValueError("template UUID is absent or ambiguous")
+            vendor = matches[0].get("vendor")
+            if not isinstance(vendor, dict):
+                raise ValueError("vendor metadata is invalid")
+            if (candidate.get("vendor_name") != str(vendor.get("name", ""))
+                    or candidate.get("vendor_version") != str(vendor.get("version", ""))):
+                errors.append(f"Candidate {index}: vendor metadata differs from immutable YAML")
+        except (yaml.YAMLError, ValueError, TypeError, KeyError):
+            errors.append(f"Candidate {index}: immutable YAML identity cannot be verified")
     return errors
 
 
