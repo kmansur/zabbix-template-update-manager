@@ -52,8 +52,11 @@ RUNTIME_BASE="${RUNTIME_BASE%/}"
 find_module_dir() {
   local candidate
   for candidate in \
+    /usr/share/zabbix/ui/modules/zabbix-template-update-manager \
     /usr/share/zabbix/modules/zabbix-template-update-manager \
+    /usr/local/share/zabbix/ui/modules/zabbix-template-update-manager \
     /usr/local/share/zabbix/modules/zabbix-template-update-manager \
+    /var/www/zabbix/ui/modules/zabbix-template-update-manager \
     /var/www/zabbix/modules/zabbix-template-update-manager; do
     if [[ -f "$candidate/manifest.json" ]]; then
       printf '%s\n' "$candidate"
@@ -107,12 +110,26 @@ frontend_version() {
   local file line value
   shopt -s nullglob
   for file in \
+    /usr/share/zabbix/ui/include/defines.inc.php \
     /usr/share/zabbix/include/defines.inc.php \
+    /usr/local/share/zabbix/ui/include/defines.inc.php \
     /usr/local/share/zabbix/include/defines.inc.php \
+    /var/www/zabbix/ui/include/defines.inc.php \
     /var/www/zabbix/include/defines.inc.php; do
     [[ -f "$file" ]] || continue
-    line="$(grep -E "define\(['\"]ZABBIX_VERSION['\"]" "$file" 2>/dev/null | head -n1 || true)"
+    line="$(grep -E "define[[:space:]]*\([[:space:]]*['\"]ZABBIX_VERSION['\"]" "$file" 2>/dev/null | head -n1 || true)"
     value="$(printf '%s' "$line" | sed -nE "s/.*ZABBIX_VERSION['\"][[:space:]]*,[[:space:]]*['\"]([^'\"]+)['\"].*/\1/p")"
+    if [[ -n "$value" ]]; then
+      printf '%s\n' "$value"
+      shopt -u nullglob
+      return 0
+    fi
+
+    # Some packaged frontend generations expose the version as a constant
+    # instead of a define. Keep the parser restricted to the version symbol
+    # so the evidence report never scans arbitrary configuration contents.
+    line="$(grep -E "^[[:space:]]*(public[[:space:]]+)?const[[:space:]]+ZABBIX_VERSION[[:space:]]*=" "$file" 2>/dev/null | head -n1 || true)"
+    value="$(printf '%s' "$line" | sed -nE "s/.*ZABBIX_VERSION[[:space:]]*=[[:space:]]*['\"]([^'\"]+)['\"].*/\1/p")"
     if [[ -n "$value" ]]; then
       printf '%s\n' "$value"
       shopt -u nullglob
@@ -120,6 +137,24 @@ frontend_version() {
     fi
   done
   shopt -u nullglob
+
+  # Debian and RPM installations may keep the frontend version only in the
+  # package database. This is still safe metadata and is more reliable than
+  # guessing from a server binary version.
+  if command -v dpkg-query >/dev/null 2>&1; then
+    value="$(dpkg-query -W -f='${Version}' zabbix-frontend-php 2>/dev/null || true)"
+    if [[ -n "$value" && "$value" != "${Version}" ]]; then
+      printf '%s\n' "$value"
+      return 0
+    fi
+  fi
+  if command -v rpm >/dev/null 2>&1; then
+    value="$(rpm -q --qf '%{VERSION}-%{RELEASE}' zabbix-web 2>/dev/null || true)"
+    if [[ -n "$value" && "$value" != *"not installed"* ]]; then
+      printf '%s\n' "$value"
+      return 0
+    fi
+  fi
   return 1
 }
 
