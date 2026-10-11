@@ -112,6 +112,18 @@ def audit(report: dict, repo: Path, max_commits: int) -> list[str]:
             errors.append("Distinct historical YAML contents differ from the Git ancestry window")
     if bool(missing) != report.get("missing_history_path"):
         errors.append("Missing-path evidence inconsistent")
+    # Confirm the set of declared vendor versions and duplicates against
+    # the candidate entries, not merely the SHA inventory.
+    versions = [c.get("vendor_version") for c in candidates if isinstance(c, dict)]
+    if any(not isinstance(v, str) for v in versions):
+        errors.append("Invalid candidate vendor version")
+    else:
+        distinct = sorted(set(versions))
+        duplicated = sorted(v for v in distinct if versions.count(v) > 1)
+        if report.get("distinct_vendor_versions") != distinct:
+            errors.append("Distinct vendor-version inventory mismatch")
+        if report.get("duplicate_vendor_versions") != duplicated:
+            errors.append("Duplicate vendor-version inventory mismatch")
     if report.get("authoritative") is not False or report.get("history_complete") is not False:
         errors.append("Diagnostic authority flags must be false")
     return errors
