@@ -146,3 +146,22 @@ python tools/sign_historical_diagnostic.py verify \\
 ```
 
 Keep the private key outside the source tree and CI logs; **do not commit it or generate it on the Zabbix host**. No trusted public key is pinned in a released ZTUM frontend yet. A valid signature authenticates bytes under the supplied key; it **does not** prove the manifest is complete, authoritative, or even correctly attributable to an official Zabbix source. The existing immutable-object verifier and strict completeness checks are separate prerequisites. Signed diagnostic reports remain **ineligible for automatic template imports**.
+
+### Combined offline verification gate
+
+To avoid treating a valid Ed25519 signature as proof of correct Git history, use
+`tools/verify_signed_historical_diagnostic.py` before inspecting a report:
+
+```sh
+python tools/verify_signed_historical_diagnostic.py \\
+  --report build/historical/acronis-diagnostic.json \\
+  --signature build/historical/acronis-diagnostic.sig.json \\
+  --trusted-public-key /path/to/independently-trusted-public.pem \\
+  --key-id experimental-01 \\
+  --source-dir /path/to/official-zabbix-git-checkout
+```
+
+This command must pass **both** Ed25519 verification and immutable Git-object/
+ancestry checks, and fails on either problem. The accompanying regression test
+also checks a forged candidate hash that was re-signed with a valid key. The
+output always remains a **diagnostic**, never a frontend authorization.
