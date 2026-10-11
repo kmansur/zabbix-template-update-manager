@@ -23,6 +23,8 @@ def git(repo: Path, *args: str) -> str:
 
 def audit(report: dict, repo: Path, max_commits: int) -> list[str]:
     errors: list[str] = []
+    if not isinstance(report, dict):
+        return ["Report must be an object"]
     commit = report.get("source_commit")
     if not isinstance(commit, str) or not SHA.fullmatch(commit):
         return ["Invalid source commit"]
@@ -46,6 +48,14 @@ def audit(report: dict, repo: Path, max_commits: int) -> list[str]:
     invalid = report.get("invalid_revisions", [])
     if not isinstance(candidates, list) or not isinstance(missing, list) or not isinstance(invalid, list):
         return errors + ["Invalid candidate or evidence lists"]
+    if any(not isinstance(c, dict) for c in candidates) or any(
+        not isinstance(sha, str) or not SHA.fullmatch(sha) for sha in missing + invalid
+    ):
+        return errors + ["Invalid candidate or revision evidence"]
+    if any(not isinstance(c.get("commit"), str) or not SHA.fullmatch(c["commit"])
+           or not isinstance(c.get("raw_sha256"), str)
+           or not re.fullmatch(r"[a-f0-9]{64}", c["raw_sha256"]) for c in candidates):
+        return errors + ["Invalid candidate commit or fingerprint"]
     identities = [c.get("commit") for c in candidates if isinstance(c, dict)] + missing + invalid
     if any(not isinstance(sha, str) or sha not in window for sha in identities):
         errors.append("Report includes revisions outside pinned ancestry window")
@@ -56,8 +66,8 @@ def audit(report: dict, repo: Path, max_commits: int) -> list[str]:
     path = report.get("path")
     if not isinstance(path, str) or not path.startswith("templates/") or not path.endswith(".yaml") or any(
         component in ("", ".", "..") for component in path.split("/")
-    ):
-        errors.append("Invalid diagnostic path")
+    ) or "\\" in path or "\x00" in path:
+        return errors + ["Invalid diagnostic path"]
     else:
         actual_missing = []
         for revision in window:

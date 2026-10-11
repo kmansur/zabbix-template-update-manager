@@ -35,6 +35,22 @@ class CoverageAuditTest(unittest.TestCase):
                 git(repo, "commit", "-qm", description)
             report = build_report(repo, git(repo, "rev-parse", "HEAD"), PATH, UUID, 2)
             self.assertEqual([], audit(report, repo, 2))
+            for field, value in (
+                ("missing_revisions", [{}]), ("invalid_revisions", [[]]),
+                ("candidates", [None]),
+                ("path", "templates/../outside.yaml"),
+                ("path", "templates/bad\x00.yaml"),
+                ("path", "templates/bad\\path.yaml"),
+            ):
+                with self.subTest(field=field, value=value):
+                    malformed = copy.deepcopy(report)
+                    malformed[field] = value
+                    self.assertTrue(audit(malformed, repo, 2))
+            for field in ("commit", "raw_sha256"):
+                malformed = copy.deepcopy(report)
+                malformed["candidates"][0][field] = {}
+                self.assertTrue(audit(malformed, repo, 2))
+            self.assertTrue(audit([], repo, 2))
             # A truncated or rewritten candidate inventory cannot hide a
             # distinct source file even if its topological counts still match.
             changed = copy.deepcopy(report)

@@ -22,6 +22,8 @@ UUID = re.compile(r"^[a-f0-9]{32}$")
 
 def verify(report: dict, repo: Path) -> list[str]:
     errors = []
+    if not isinstance(report, dict):
+        return ["Report must be an object"]
     if report.get("schema_version") != 1 or report.get("purpose") != "diagnostic-only":
         errors.append("Unexpected schema/purpose")
     if report.get("authoritative") is not False or report.get("history_complete") is not False:
@@ -43,8 +45,8 @@ def verify(report: dict, repo: Path) -> list[str]:
     path = report.get("path", "")
     if not isinstance(path, str) or not path.startswith("templates/") or not path.endswith(".yaml") or any(
         item in ("", ".", "..") for item in path.split("/")
-    ):
-        errors.append("Invalid source path")
+    ) or "\\" in path or "\x00" in path:
+        return errors + ["Invalid source path"]
     candidates = report.get("candidates")
     if not isinstance(candidates, list):
         return errors + ["Candidates must be a list"]

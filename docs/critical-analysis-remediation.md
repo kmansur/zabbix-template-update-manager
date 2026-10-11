@@ -34,6 +34,12 @@ The draft offline scripts (`build_historical_candidate_diagnostic.py`, `verify_s
 
 **Production recommendation remains NO** until every mandatory gate above is verified. External test/soak evidence cannot be fulfilled solely by committing source code.
 
+## Draft diagnostic validation follow-up (2026-10-10)
+
+Regression coverage now distinguishes a forged truncation flag from a genuinely truncated Git ancestry window. Malformed revision entries, candidate fingerprints, NUL paths and backslash paths must return validation errors. These checks do not establish merge/rename completeness, publisher trust, or Zabbix field acceptance. The project-synced `sources/` directory was empty in the development session; the original DOCX could not be independently reread, so this follow-up uses this ledger and the repository as its available references.
+
+Validation for this follow-up: 209 PHP files passed syntax checks; manifest, version and controlled-write guards passed; all 90 PHP unit scripts passed on Debian; Python discovery passed 10 historical regression tests and the upstream-index/metadata checks. Standalone offline-bundle, coverage-aggregation, frontend-compatibility-checker and workflow tests also passed. Native Windows execution is not equivalent: its filesystem permissions and text newline conversion caused existing PHP cache and Python fixture failures. No real Zabbix field acceptance is claimed.
+
 ## Offline bundle authenticity caveat
 
 `src/Repository/OfflineBundleRepository.php` validates entries with SHA-256 from its local manifest; this provides corruption detection **only if the manifest is already trusted**. Replacing both a bundle and its unsigned manifest can evade hash checks. Local source/history bundle verification must never be described as cryptographic publisher authentication. The offline historical Ed25519 tools currently require explicitly supplied trust material and are not wired into the ZTUM module. Final closure requires a signed manifest anchored by a public key shipped with a trusted module release, plus negative field tests with a forged manifest and restricted egress.

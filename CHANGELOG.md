@@ -4,6 +4,11 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Reject malformed historical diagnostic revision entries, fingerprints and paths with explicit validation errors, including NUL and backslash paths, before unsafe Git argument handling or set operations.
+- Correct signed-history regression coverage: a forged truncation flag is rejected, while an actual bounded ancestry window remains a valid non-authoritative diagnostic.
+
 ### Added
 
 - Added per-template upstream vendor-version provenance metadata (`version_commit` / `version_date`) derived from the exact `vendor.version` YAML line, with previous-index reuse and shallow-history fallback.

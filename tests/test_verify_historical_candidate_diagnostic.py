@@ -33,6 +33,14 @@ class VerifyHistoricalDiagnosticTest(unittest.TestCase):
             git(repo, "commit", "-qm", "source")
             report = build_report(repo, git(repo, "rev-parse", "HEAD"), PATH, UUID)
             self.assertEqual([], verify(report, repo))
+            self.assertTrue(verify([], repo))
+            for path in (None, "templates/../outside.yaml", "templates/bad\x00.yaml",
+                         "templates/bad\\path.yaml"):
+                with self.subTest(path=path):
+                    malformed = copy.deepcopy(report)
+                    malformed["path"] = path
+                    malformed["candidates"][0]["path"] = path
+                    self.assertTrue(verify(malformed, repo))
 
             corrupted = copy.deepcopy(report)
             corrupted["candidates"][0]["raw_sha256"] = "0" * 64

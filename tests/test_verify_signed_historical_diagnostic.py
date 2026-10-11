@@ -52,9 +52,9 @@ class VerifySignedHistoricalDiagnosticTest(unittest.TestCase):
             incomplete = copy.deepcopy(report)
             incomplete["truncated"] = True
             signed_incomplete = sign(incomplete, private, "test-only")
-            self.assertEqual([], verify_signed_diagnostic(
+            self.assertTrue(any("Truncation flag" in error for error in verify_signed_diagnostic(
                 incomplete, signed_incomplete, public, "test-only", repo
-            ))
+            )))
             self.assertFalse(incomplete["history_complete"])
             self.assertFalse(incomplete["authoritative"])
 
@@ -86,6 +86,16 @@ class VerifySignedHistoricalDiagnosticTest(unittest.TestCase):
             unsigned_change["candidates"][0]["vendor_version"] = "7.0-1"
             self.assertTrue(any("signature" in error.lower() for error in
                                 verify_signed_diagnostic(unsigned_change, signed, public, "test-only", repo)))
+
+            # Actual bounded truncation is acceptable only as a diagnostic.
+            git(repo, "commit", "--allow-empty", "-qm", "second revision")
+            bounded = build_report(repo, git(repo, "rev-parse", "HEAD"), PATH, UUID, 1)
+            self.assertTrue(bounded["truncated"])
+            self.assertEqual([], verify_signed_diagnostic(
+                bounded, sign(bounded, private, "test-only"), public, "test-only", repo, 1
+            ))
+            self.assertFalse(bounded["history_complete"])
+            self.assertFalse(bounded["authoritative"])
 
 
 if __name__ == "__main__":
