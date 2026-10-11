@@ -126,3 +126,23 @@ It compares the declared SHA-256 for each candidate to the YAML bytes read from 
 5. Publish positive and negative tests for valid/expired or rotated keys, byte tampering, substitution, truncation, duplicate vendor-version candidates, renamed files and merge parents. Rotation requires a deliberate trusted module release or a signed delegation policy.
 
 Until then, the diagnostic artifacts are not read by the ZTUM frontend and cannot make updates eligible.
+
+### Experimental detached Ed25519 signing (publisher only)
+
+The offline `tools/sign_historical_diagnostic.py` script signs the **canonicalized diagnostic JSON bytes** (sorted JSON keys, compact separators, UTF-8, trailing newline). It accepts an explicit Ed25519 private PEM, key identifier and output location. The corresponding verifier accepts an **explicit, independently trusted public PEM** and expected key identifier:
+
+```sh
+python tools/sign_historical_diagnostic.py sign \\
+  --report build/historical/acronis-diagnostic.json \\
+  --private-key /secure/publisher-only/ed25519-private.pem \\
+  --key-id experimental-01 \\
+  --output build/historical/acronis-diagnostic.sig.json
+
+python tools/sign_historical_diagnostic.py verify \\
+  --report build/historical/acronis-diagnostic.json \\
+  --signature build/historical/acronis-diagnostic.sig.json \\
+  --trusted-public-key /path/to/independently-trusted-public.pem \\
+  --key-id experimental-01
+```
+
+Keep the private key outside the source tree and CI logs; **do not commit it or generate it on the Zabbix host**. No trusted public key is pinned in a released ZTUM frontend yet. A valid signature authenticates bytes under the supplied key; it **does not** prove the manifest is complete, authoritative, or even correctly attributable to an official Zabbix source. The existing immutable-object verifier and strict completeness checks are separate prerequisites. Signed diagnostic reports remain **ineligible for automatic template imports**.
