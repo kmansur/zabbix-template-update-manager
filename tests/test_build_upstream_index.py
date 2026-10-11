@@ -36,7 +36,7 @@ with tempfile.TemporaryDirectory() as tmp:
     root = Path(tmp)
     first_dir = root / "templates" / "os" / "linux"
     first_dir.mkdir(parents=True)
-    (first_dir / "template_os_linux.yaml").write_text(BASE_TEMPLATE, encoding="utf-8")
+    (first_dir / "template_os_linux.yaml").write_bytes(BASE_TEMPLATE.encode("utf-8"))
 
     index = module.build_index(
         source_dir=root,
@@ -68,7 +68,7 @@ with tempfile.TemporaryDirectory() as tmp:
 
     duplicate_dir = root / "templates" / "bundle" / "linux"
     duplicate_dir.mkdir(parents=True)
-    (duplicate_dir / "template_os_linux.yaml").write_text(BASE_TEMPLATE, encoding="utf-8")
+    (duplicate_dir / "template_os_linux.yaml").write_bytes(BASE_TEMPLATE.encode("utf-8"))
 
     merged = module.build_index(
         source_dir=root,
@@ -84,9 +84,8 @@ with tempfile.TemporaryDirectory() as tmp:
 
     variant_dir = root / "templates" / "variant" / "linux"
     variant_dir.mkdir(parents=True)
-    (variant_dir / "template_os_linux.yaml").write_text(
-        BASE_TEMPLATE.replace("Base definition", "Alternative definition"),
-        encoding="utf-8",
+    (variant_dir / "template_os_linux.yaml").write_bytes(
+        BASE_TEMPLATE.replace("Base definition", "Alternative definition").encode("utf-8")
     )
 
     variants = module.build_index(
@@ -102,9 +101,8 @@ with tempfile.TemporaryDirectory() as tmp:
 
     conflict_dir = root / "templates" / "conflict"
     conflict_dir.mkdir(parents=True)
-    (conflict_dir / "template_conflict.yaml").write_text(
-        BASE_TEMPLATE.replace("Linux by Zabbix agent", "Conflicting identity"),
-        encoding="utf-8",
+    (conflict_dir / "template_conflict.yaml").write_bytes(
+        BASE_TEMPLATE.replace("Linux by Zabbix agent", "Conflicting identity").encode("utf-8")
     )
 
     try:

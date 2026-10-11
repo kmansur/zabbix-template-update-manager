@@ -1,8 +1,20 @@
 # Project status — community beta validation
 
-Updated: 2026-10-10
+Updated: 2026-10-11
 
 This page separates implemented functionality, automated checks, operator-observed field results and outstanding release gates. It does not declare RC or production readiness.
+
+## 2026-10-11 — critical-analysis completion branch
+
+The branch `feat/critical-analysis-completion` contains the remaining repository-side hardening identified by the critical analysis:
+
+- upstream history and source downloads no longer follow HTTP redirects; stream fallbacks require an explicit HTTP 200 response;
+- PHP 8.4 response-header handling avoids the deprecated `$http_response_header` access when the modern header API is available;
+- offline bundles can be checked independently with `tools/verify_offline_bundle.py`, including signature, key identity, file hashes, exact file inventory and safe-path validation;
+- authoritative offline bundles can require complete historical coverage with `--require-complete-history` instead of silently accepting a truncated history window;
+- upstream-index fixtures write exact UTF-8 bytes so their fingerprints are deterministic on Windows and Linux.
+
+These changes are implementation evidence only. Real Zabbix 7/8 offline transfer, interruption recovery, concurrency, valid-token CSRF differentials, linked-host protection and independent security review remain field gates and are not closed by unit tests.
 
 ## 2026-10-10 PDCA — beta.62 release preparation
 
