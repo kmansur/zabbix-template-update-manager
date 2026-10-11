@@ -76,6 +76,28 @@ class HistoricalCandidateDiagnosticTest(unittest.TestCase):
             self.assertIn(side, [candidate["commit"] for candidate in report["candidates"]])
             self.assertEqual(3, len({candidate["raw_sha256"] for candidate in report["candidates"]}))
 
+    def test_rename_boundary_fails_closed(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary)
+            run(repo, "init", "-q")
+            run(repo, "config", "user.name", "Test")
+            run(repo, "config", "user.email", "test@example.org")
+            old = repo / "templates/os/linux/old.yaml"
+            old.parent.mkdir(parents=True)
+            old.write_text(
+                "zabbix_export:\n  version: '7.0'\\n  templates:\\n"
+                f"    - uuid: {UUID}\\n      vendor:\\n        name: Zabbix\\n"
+                "        version: 7.0-0\\n"
+            )
+            run(repo, "add", ".")
+            run(repo, "commit", "-qm", "original")
+            run(repo, "mv", "templates/os/linux/old.yaml", PATH)
+            run(repo, "commit", "-qm", "renamed")
+            report = build_report(repo, run(repo, "rev-parse", "HEAD"), PATH, UUID)
+            self.assertTrue(report["missing_history_path"])
+            self.assertFalse(report["history_complete"])
+            self.assertFalse(report["authoritative"])
+
     def test_rejects_bad_commit_and_path(self):
         with tempfile.TemporaryDirectory() as temporary:
             for commit, path in [("deadbeef", PATH), ("a" * 40, "../bad.yaml"),
