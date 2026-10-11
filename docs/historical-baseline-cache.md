@@ -183,3 +183,5 @@ Use `tools/audit_historical_revision_coverage.py --report <diagnostic.json> --so
 ### Distinct-content ancestry coverage
 
 The independent diagnostic audit now also recomputes the SHA-256 inventory of each distinct YAML file found in the bounded, pinned Git ancestry window. It requires the diagnostic candidates to match that inventory exactly, excluding revisions explicitly reported as invalid. Missing distinct file versions are an error even if the report advertises the expected commit count. This is useful detection, **not** proof of rename-aware semantic lineage or complete unbounded history. Production update authorization remains disabled.
+
+The independent historical audit additionally recomputes `distinct_vendor_versions` and `duplicate_vendor_versions` from candidate records. Altered inventories are rejected, including when candidate Git hashes themselves remain unchanged. This validates diagnostic consistency only, not a safe semantic BASE selection.
