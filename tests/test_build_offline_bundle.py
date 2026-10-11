@@ -23,6 +23,7 @@ def run(*args: str, cwd: Path | None = None) -> subprocess.CompletedProcess:
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     tool = root / "tools" / "build_offline_bundle.py"
+    verifier = root / "tools" / "verify_offline_bundle.py"
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)
@@ -103,6 +104,23 @@ def main() -> int:
         history = json.loads(history_file.read_text())
         assert history["commits"][0]["id"] == commit
 
+        public_key_path = tmp / "trusted-public-key.pem"
+        public_key_path.write_bytes(signing_key.public_key().public_bytes(
+            serialization.Encoding.PEM,
+            serialization.PublicFormat.SubjectPublicKeyInfo,
+        ))
+        run(sys.executable, str(verifier), "--bundle", str(output), "--public-key", str(public_key_path), "--key-id", "test-key")
+
+        source_file = output / "sources" / commit / source_path
+        source_file.write_bytes(source_file.read_bytes() + b"tampered\n")
+        tampered = subprocess.run(
+            [sys.executable, str(verifier), "--bundle", str(output), "--public-key", str(public_key_path), "--key-id", "test-key"],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        assert tampered.returncode != 0
+
         renamed_path = Path("templates/os/linux/template_os_linux_renamed.yaml")
         run("git", "mv", str(source_path), str(renamed_path), cwd=repo)
         run("git", "commit", "-qm", "rename", cwd=repo)
@@ -123,6 +141,32 @@ def main() -> int:
         assert rename_key.is_file()
         rename_record = json.loads(rename_key.read_text())
         assert rename_record["previous_path"] == source_path.as_posix()
+
+        incomplete_output = tmp / "incomplete-bundle"
+        incomplete = subprocess.run(
+            [
+                sys.executable,
+                str(tool),
+                "--zabbix-repo",
+                str(repo),
+                "--index",
+                str(renamed_index_file),
+                "--output",
+                str(incomplete_output),
+                "--signing-private-key",
+                str(signing_key_path),
+                "--key-id",
+                "test-key",
+                "--history-limit",
+                "1",
+                "--require-complete-history",
+            ],
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        assert incomplete.returncode != 0
+        assert b"exceeds --history-limit" in incomplete.stderr
 
     print("Offline bundle generator tests passed.")
     return 0

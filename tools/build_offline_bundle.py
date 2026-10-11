@@ -112,7 +112,15 @@ def current_sources(index: dict) -> dict[str, str]:
     return result
 
 
-def build_history(repo: Path, root: Path, commit: str, path: str, limit: int, manifest: dict[str, str]) -> None:
+def build_history(
+    repo: Path,
+    root: Path,
+    commit: str,
+    path: str,
+    limit: int,
+    manifest: dict[str, str],
+    require_complete: bool = False,
+) -> None:
     output = run_git(
         repo,
         "log",
@@ -129,6 +137,10 @@ def build_history(repo: Path, root: Path, commit: str, path: str, limit: int, ma
         raise RuntimeError(f"Invalid history commit returned for {path}")
 
     truncated = len(ids) > limit
+    if truncated and require_complete:
+        raise RuntimeError(
+            f"History for {path} exceeds --history-limit={limit}; refusing an incomplete bundle"
+        )
     ids = ids[:limit]
     records = []
     tracked_path = path
@@ -137,6 +149,10 @@ def build_history(repo: Path, root: Path, commit: str, path: str, limit: int, ma
         try:
             source = run_git(repo, "show", f"{item}:{tracked_path}")
         except RuntimeError:
+            if require_complete:
+                raise RuntimeError(
+                    f"History for {path} is incomplete at {item}; refusing an incomplete bundle"
+                ) from None
             truncated = True
             break
         source_path = tracked_path
@@ -181,6 +197,11 @@ def main() -> int:
     parser.add_argument("--index", required=True, action="append", type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--history-limit", type=int, default=MAX_HISTORY)
+    parser.add_argument(
+        "--require-complete-history",
+        action="store_true",
+        help="fail instead of packaging a truncated history record",
+    )
     parser.add_argument("--signing-private-key", required=True, type=Path)
     parser.add_argument("--key-id", required=True)
     args = parser.parse_args()
@@ -221,7 +242,15 @@ def main() -> int:
 
             key = (commit, path)
             if key not in processed_histories:
-                build_history(repo, output, commit, path, args.history_limit, manifest_files)
+                build_history(
+                    repo,
+                    output,
+                    commit,
+                    path,
+                    args.history_limit,
+                    manifest_files,
+                    args.require_complete_history,
+                )
                 processed_histories.add(key)
 
     manifest = {

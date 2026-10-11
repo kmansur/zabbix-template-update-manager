@@ -45,7 +45,28 @@ renames/<commit>/<sha256(path)>.json
 
 The generator validates current raw YAML bytes against the index before including them and refuses to create an unsigned bundle. Keep the private key on the connected build system only.
 
+Before transferring a bundle to the isolated frontend, verify it independently
+with the trusted public key. This checks the Ed25519 signature, every manifest
+hash, missing files, symlinks and unlisted files without loading the bundle in
+the Zabbix frontend:
+
+```bash
+python tools/verify_offline_bundle.py \
+  --bundle /tmp/ztum-offline \
+  --public-key /secure/ztum/offline-ed25519-public.pem \
+  --key-id ztum-offline-2026
+```
+
+The verifier must print `PASS` before the bundle is copied. A failed or
+tampered verification is a transfer failure and must not be bypassed.
+
 Historical bundle generation records exact Git rename transitions and fails closed on ambiguous merge-parent mappings. It never guesses a historical path.
+
+For a bundle intended to support an authoritative historical acceptance test,
+add `--require-complete-history`. The generator then refuses to produce a
+bundle whenever any requested path exceeds the selected history limit instead
+of silently marking that record truncated. Increase `--history-limit` only
+after reviewing the repository size and memory/time budget.
 
 ## Install on the isolated frontend
 
