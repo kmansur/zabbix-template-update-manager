@@ -35,6 +35,13 @@ class CoverageAuditTest(unittest.TestCase):
                 git(repo, "commit", "-qm", description)
             report = build_report(repo, git(repo, "rev-parse", "HEAD"), PATH, UUID, 2)
             self.assertEqual([], audit(report, repo, 2))
+            # A truncated or rewritten candidate inventory cannot hide a
+            # distinct source file even if its topological counts still match.
+            changed = copy.deepcopy(report)
+            changed["candidates"] = changed["candidates"][:1]
+            changed["candidate_count"] = len(changed["candidates"])
+            self.assertTrue(any("Distinct historical YAML contents" in e for e in
+                                audit(changed, repo, 2)))
             changed = copy.deepcopy(report)
             changed["scanned_commits"] = 3
             self.assertTrue(audit(changed, repo, 2))
