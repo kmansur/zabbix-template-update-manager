@@ -8,6 +8,7 @@ All notable changes to Template Update Manager will be documented in this file.
 
 - Reject malformed historical diagnostic revision entries, fingerprints and paths with explicit validation errors, including NUL and backslash paths, before unsafe Git argument handling or set operations.
 - Correct signed-history regression coverage: a forged truncation flag is rejected, while an actual bounded ancestry window remains a valid non-authoritative diagnostic.
+- Require Ed25519-signed offline bundle manifests, verify them before consuming bundle files, and record verified Git rename transitions for offline historical lookup.
 
 ### Added
 

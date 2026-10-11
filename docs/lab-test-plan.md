@@ -665,6 +665,8 @@ Configure:
 ```text
 ZTUM_OFFLINE_BUNDLE_DIR=/var/lib/zabbix-template-update-manager/offline
 ZTUM_OFFLINE_ONLY=1
+ZTUM_OFFLINE_BUNDLE_KEY_ID=ztum-offline-2026
+ZTUM_OFFLINE_BUNDLE_PUBLIC_KEY=<base64-raw-ed25519-public-key>
 ```
 
 Expected behavior:
@@ -673,6 +675,7 @@ Expected behavior:
 - catalog/comparison/preflight can use the bundle with network egress disabled;
 - the loaded index reports offline runtime state;
 - tampering one consumed bundle file causes SHA-256 verification failure and no network fallback;
+- tampering the manifest signature or replacing the bundle plus its unsigned/incorrect manifest is rejected before reads;
 - removing a required index/source/history artifact blocks the operation rather than using public endpoints;
 - controlled update/install safety gates remain unchanged.
 

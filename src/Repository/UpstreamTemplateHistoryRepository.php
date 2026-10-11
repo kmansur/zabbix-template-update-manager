@@ -109,8 +109,9 @@ final class UpstreamTemplateHistoryRepository {
 			throw new RuntimeException('The upstream historical rename commit is invalid.');
 		}
 
-		if ($this->offlineBundle->isOfflineOnly()) {
-			return null;
+		$offline = $this->offlineBundle->readPreviousPath($commit, $currentPath);
+		if ($offline !== null || $this->offlineBundle->isOfflineOnly()) {
+			return $offline;
 		}
 
 		return self::decodePreviousPath(

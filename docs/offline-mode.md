@@ -6,7 +6,7 @@ Template Update Manager can run without internet egress from the Zabbix frontend
 
 Offline mode does not relax identity or write gates.
 
-- the bundle has a SHA-256 manifest;
+- the bundle has an Ed25519-signed canonical manifest containing SHA-256 file hashes;
 - the upstream index is still schema/UUID/path/hash validated;
 - current source bytes are still checked against the per-path upstream index fingerprint;
 - history/source records are read only from internally constructed safe paths;
@@ -28,7 +28,9 @@ python tools/build_offline_bundle.py \
   --zabbix-repo /srv/git/zabbix \
   --index /tmp/indexes/7.0.json \
   --index /tmp/indexes/8.0.json \
-  --output /tmp/ztum-offline
+  --output /tmp/ztum-offline \
+  --signing-private-key /secure/ztum/offline-ed25519-private.pem \
+  --key-id ztum-offline-2026
 ```
 
 The output contains:
@@ -38,11 +40,12 @@ manifest.json
 indexes/<line>.json
 sources/<commit>/templates/.../*.yaml
 history/<commit>/<sha256(path)>.json
+renames/<commit>/<sha256(path)>.json
 ```
 
-The generator validates current raw YAML bytes against the index before including them.
+The generator validates current raw YAML bytes against the index before including them and refuses to create an unsigned bundle. Keep the private key on the connected build system only.
 
-Historical bundle generation intentionally stops when the current path can no longer be read at an older commit. That mirrors the current fail-closed rename limitation; it does not guess historical paths.
+Historical bundle generation records exact Git rename transitions and fails closed on ambiguous merge-parent mappings. It never guesses a historical path.
 
 ## Install on the isolated frontend
 
@@ -63,11 +66,14 @@ Then configure the PHP-FPM pool environment:
 ```ini
 env[ZTUM_OFFLINE_BUNDLE_DIR] = /var/lib/zabbix-template-update-manager/offline
 env[ZTUM_OFFLINE_ONLY] = 1
+env[ZTUM_OFFLINE_BUNDLE_KEY_ID] = ztum-offline-2026
+env[ZTUM_OFFLINE_BUNDLE_PUBLIC_KEY] = <base64-raw-ed25519-public-key>
 ```
 
 Reload PHP-FPM after changing the pool configuration.
 
 With offline-only mode enabled, an absent index/source/history record produces a blocked/error state instead of attempting internet access.
+If the trusted key, key ID or manifest signature is missing or invalid, the bundle is rejected before any index, source or history data is used.
 
 ## Hybrid mode
 

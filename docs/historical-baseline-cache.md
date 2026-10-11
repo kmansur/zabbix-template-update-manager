@@ -120,7 +120,7 @@ It compares the declared SHA-256 for each candidate to the YAML bytes read from 
 ### Requirements before publishing signed historical indexes
 
 1. Produce reproducible historical candidate manifests with fixed schema, sorted identities and stable serialization; reject shallow/truncated history, missing paths, unresolved renames and ambiguous UUID/version attribution.
-2. Define a separate offline signing identity and publish the corresponding **pinned public key with the ZTUM release**. Do not trust public keys downloaded from the same mutable index endpoint.
+2. Define a separate offline signing identity and provision the corresponding **trusted public key with the ZTUM installation** through `ZTUM_OFFLINE_BUNDLE_PUBLIC_KEY` and `ZTUM_OFFLINE_BUNDLE_KEY_ID`. Do not trust public keys downloaded from the same mutable index endpoint.
 3. Sign exactly the canonical manifest bytes and verify the detached signature and pinned key **before** any historical index can influence BASE/LOCAL/UPSTREAM decisions.
 4. Bind the signature to the expected Zabbix major/minor line, upstream source commit, template UUID and canonical paths; require repository identity and content hashes.
 5. Publish positive and negative tests for valid/expired or rotated keys, byte tampering, substitution, truncation, duplicate vendor-version candidates, renamed files and merge parents. Rotation requires a deliberate trusted module release or a signed delegation policy.
