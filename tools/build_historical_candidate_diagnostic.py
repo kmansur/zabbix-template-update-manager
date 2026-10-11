@@ -41,6 +41,8 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
     candidates = []
     seen_blobs = set()
     missing = False
+    missing_revisions = []
+    invalid_revisions = []
     # An ordinary rename can be followed for each reachable ancestor, but an
     # ambiguous rename or merge history must stay non-authoritative.
     tracked = path
@@ -50,22 +52,33 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
             raw = git(repo, "show", f"{revision}:{tracked}")
         except subprocess.CalledProcessError:
             missing = True
-            break
+            missing_revisions.append(revision)
+            continue
         raw_sha = hashlib.sha256(raw).hexdigest()
         if raw_sha in seen_blobs:
             continue
         seen_blobs.add(raw_sha)
-        doc = yaml.safe_load(raw)
-        templates = (doc or {}).get("zabbix_export", {}).get("templates", [])
+        try:
+            doc = yaml.safe_load(raw)
+        except yaml.YAMLError:
+            invalid_revisions.append(revision)
+            continue
+        if not isinstance(doc, dict) or not isinstance(doc.get("zabbix_export"), dict):
+            invalid_revisions.append(revision)
+            continue
+        templates = doc["zabbix_export"].get("templates")
         if not isinstance(templates, list):
-            raise ValueError("Invalid templates list")
+            invalid_revisions.append(revision)
+            continue
         matches = [t for t in templates if isinstance(t, dict) and
                    str(t.get("uuid", "")).lower().replace("-", "") == uuid]
         if len(matches) != 1:
-            raise ValueError("Missing or ambiguous template UUID in historical source")
+            invalid_revisions.append(revision)
+            continue
         vendor = matches[0].get("vendor") or {}
         if not isinstance(vendor, dict):
-            raise ValueError("Invalid vendor structure")
+            invalid_revisions.append(revision)
+            continue
         candidates.append({
             "commit": revision,
             "path": tracked,
@@ -100,9 +113,12 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
         "truncated": truncated,
         "shallow_repository": shallow_repository,
         "missing_history_path": missing,
+        "missing_revisions": missing_revisions,
+        "invalid_revisions": invalid_revisions,
         "rename_transitions": renames,
         "rename_tracking_authoritative": False,
         "history_complete": False,
+        "candidate_count": len(candidates),
         "limitation": "rename-history and version-boundary completeness not established",
         "candidates": candidates,
     }
