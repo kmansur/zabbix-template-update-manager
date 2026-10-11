@@ -46,6 +46,18 @@ def verify(report: dict, repo: Path) -> list[str]:
     candidates = report.get("candidates")
     if not isinstance(candidates, list):
         return errors + ["Candidates must be a list"]
+    if report.get("history_complete") is not False or report.get("authoritative") is not False:
+        errors.append("Report must remain non-authoritative")
+    for field in ("truncated", "shallow_repository", "missing_history_path"):
+        if type(report.get(field)) is not bool:
+            errors.append(f"Invalid diagnostic completeness field: {field}")
+    for field in ("missing_revisions", "invalid_revisions", "rename_transitions"):
+        if not isinstance(report.get(field), list):
+            errors.append(f"Invalid diagnostic evidence list: {field}")
+    if report.get("traversal") != "all-parents-topological-distinct-file-content":
+        errors.append("Unexpected history traversal algorithm")
+    if not isinstance(report.get("scanned_commits"), int) or report["scanned_commits"] < len(candidates):
+        errors.append("Invalid scanned revision count")
     if report.get("candidate_count") != len(candidates):
         errors.append("Candidate count mismatch")
     seen = set()
