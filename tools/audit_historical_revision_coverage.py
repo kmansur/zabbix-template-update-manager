@@ -49,6 +49,24 @@ def audit(report: dict, repo: Path, max_commits: int) -> list[str]:
         errors.append("Report includes revisions outside pinned ancestry window")
     if len(identities) != len(set(identities)):
         errors.append("A revision is reported more than once")
+    # A report may omit a path-missing revision without altering candidate hashes.
+    # Independently inspect every revision of the declared ancestry window.
+    path = report.get("path")
+    if not isinstance(path, str) or not path.startswith("templates/") or not path.endswith(".yaml") or any(
+        component in ("", ".", "..") for component in path.split("/")
+    ):
+        errors.append("Invalid diagnostic path")
+    else:
+        actual_missing = []
+        for revision in window:
+            exists = subprocess.run(
+                ["git", "-C", str(repo), "cat-file", "-e", f"{revision}:{path}"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
+            if exists.returncode != 0:
+                actual_missing.append(revision)
+        if set(actual_missing) != set(missing):
+            errors.append("Missing-path revisions differ from actual Git ancestry")
     if bool(missing) != report.get("missing_history_path"):
         errors.append("Missing-path evidence inconsistent")
     if report.get("authoritative") is not False or report.get("history_complete") is not False:
