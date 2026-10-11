@@ -95,6 +95,8 @@ class HistoricalCandidateDiagnosticTest(unittest.TestCase):
             run(repo, "commit", "-qm", "renamed")
             report = build_report(repo, run(repo, "rev-parse", "HEAD"), PATH, UUID)
             self.assertTrue(report["missing_history_path"])
+            self.assertFalse(report["rename_tracking_authoritative"])
+            self.assertIn({"from": "templates/os/linux/old.yaml", "to": PATH}, report["rename_transitions"])
             self.assertFalse(report["history_complete"])
             self.assertFalse(report["authoritative"])
 
