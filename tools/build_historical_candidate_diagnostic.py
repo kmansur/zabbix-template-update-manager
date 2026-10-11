@@ -29,7 +29,7 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
         raise ValueError("Expected lowercase immutable commit and template UUID")
     if not path.startswith("templates/") or not path.endswith(".yaml") or any(
         part in ("", ".", "..") for part in path.split("/")
-    ):
+    ) or "\\\" in path or "\\x00" in path:
         raise ValueError("Invalid templates/*.yaml path")
     resolved = git(repo, "rev-parse", "--verify", commit + "^{commit}").decode().strip()
     if resolved != commit:
@@ -119,6 +119,10 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
         "rename_tracking_authoritative": False,
         "history_complete": False,
         "candidate_count": len(candidates),
+        "distinct_vendor_versions": sorted({entry["vendor_version"] for entry in candidates}),
+        "duplicate_vendor_versions": sorted({version for version in
+            {entry["vendor_version"] for entry in candidates}
+            if sum(entry["vendor_version"] == version for entry in candidates) > 1}),
         "limitation": "rename-history and version-boundary completeness not established",
         "candidates": candidates,
     }
