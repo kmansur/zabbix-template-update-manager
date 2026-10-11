@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# ZTUM local-source installer — new installations only.
+# ZTUM local-source installer and controlled code maintenance.
 set -Eeuo pipefail
 umask 022
 
@@ -11,6 +11,7 @@ ZABBIX_VERSION=""
 DRY_RUN=0
 RUNTIME_CHECK=0
 UPGRADE=0
+REINSTALL=0
 ROLLBACK=""
 BACKUP_BASE="/var/backups/zabbix-template-update-manager"
 RUNTIME_BASE="/var/lib/zabbix-template-update-manager"
@@ -23,12 +24,15 @@ usage() {
 Usage: sudo bash install.sh [--check] [--modules-dir DIR] [--php-user USER]
        sudo bash install.sh --runtime-check [--php-user USER]
        sudo bash install.sh --upgrade [--modules-dir DIR] [--php-user USER]
+       sudo bash install.sh --reinstall [--modules-dir DIR] [--php-user USER]
        sudo bash install.sh --rollback BACKUP_ID [--modules-dir DIR]
        bash install.sh --check [--modules-dir /path/to/modules] [--php-user USER]
 
 Installs from the local Git checkout, copying only runtime files.
 --check is read-only. Existing installations are never overwritten by install.
---upgrade makes a verified code backup, then replaces only frontend code.
+--upgrade requires a newer version and makes a verified code backup.
+--reinstall requires an identical version and different code, then makes the same
+verified backup and code-only replacement. Intended for controlled lab maintenance.
 --rollback restores a verified code backup by its local BACKUP_ID.
 Runtime data is preserved by code upgrade/rollback. On first install,
 private runtime directories are created/validated automatically.
@@ -43,16 +47,15 @@ while (($#)); do
     --check) DRY_RUN=1; shift;;
     --runtime-check) RUNTIME_CHECK=1; shift;;
     --upgrade) UPGRADE=1; shift;;
+    --reinstall) REINSTALL=1; shift;;
     --rollback) (($# >= 2)) || die "Missing backup ID"; ROLLBACK="$2"; shift 2;;
     -h|--help) usage; exit 0;;
     *) die "Unknown argument: $1";;
   esac
 done
-((UPGRADE == 0 || DRY_RUN == 0)) || die "--upgrade and --check cannot be combined"
-if ((RUNTIME_CHECK)) && { ((DRY_RUN || UPGRADE)) || [[ -n "$ROLLBACK" ]]; }; then
-  die "Conflicting runtime-check options"
+if ((UPGRADE + REINSTALL + DRY_RUN + RUNTIME_CHECK > 1)) || { [[ -n "$ROLLBACK" ]] && ((UPGRADE + REINSTALL + DRY_RUN + RUNTIME_CHECK > 0)); }; then
+  die "Conflicting operation options"
 fi
-[[ -z "$ROLLBACK" || ( "$UPGRADE" -eq 0 && "$DRY_RUN" -eq 0 ) ]] || die "--rollback cannot be combined with --upgrade/--check"
 
 for file in Module.php manifest.json VERSION; do
   [[ -f "$SOURCE_DIR/$file" && ! -L "$SOURCE_DIR/$file" ]] || die "Missing or linked source file: $file"
@@ -231,7 +234,7 @@ prepare_stage() {
   [[ -f "$stage/assets/js/ztum-update-batch.js" && -f "$stage/assets/js/ztum-install-batch.js" ]] || die "Staged assets missing"
 }
 do_upgrade_or_rollback() {
-  (( EUID == 0 )) || die "Upgrade/rollback requires root"
+  (( EUID == 0 )) || die "Upgrade/reinstall/rollback requires root"
   if [[ -z "$ROLLBACK" ]]; then
     detect_php_user
     prepare_runtime
@@ -269,8 +272,16 @@ do_upgrade_or_rollback() {
   else
     new_version="$(cat "$SOURCE_DIR/VERSION")"
     [[ -n "$current_version" ]] || die "Cannot identify installed version"
-    php -r 'exit(version_compare($argv[1],$argv[2], ">") ? 0 : 1);' "$new_version" "$current_version" || die "Upgrade requires a newer version (current: $current_version; source: $new_version)"
+    if ((REINSTALL)); then
+      [[ "$new_version" == "$current_version" ]] || die "Reinstall requires identical versions (current: $current_version; source: $new_version)"
+      log "Controlled same-version reinstall: $current_version"
+    else
+      php -r 'exit(version_compare($argv[1],$argv[2], ">") ? 0 : 1);' "$new_version" "$current_version" || die "Upgrade requires a newer version (current: $current_version; source: $new_version)"
+    fi
     prepare_stage "$SOURCE_DIR" "$stage"
+    if ((REINSTALL)); then
+      [[ "$(hash_tree "$TARGET")" != "$(hash_tree "$stage")" ]] || die "Reinstall refused: installed code is already identical to source"
+    fi
   fi
   stage_hash="$(hash_tree "$stage")" || die "Unable to hash staged files"
   [[ -n "$stage_hash" ]] || die "Empty staging inventory"
@@ -315,7 +326,7 @@ do_upgrade_or_rollback() {
   log "Private runtime state untouched. Confirm web UI, menu and PHP-FPM cache."
 }
 
-if ((UPGRADE)) || [[ -n "$ROLLBACK" ]]; then
+if ((UPGRADE || REINSTALL)) || [[ -n "$ROLLBACK" ]]; then
   do_upgrade_or_rollback
   exit 0
 fi
@@ -326,7 +337,7 @@ if [[ -e "$TARGET" || -L "$TARGET" ]]; then
     log "Use --runtime-check to validate private runtime storage."
     exit 0
   fi
-  die "ZTUM already installed: $TARGET. Refusing overwrite; use --upgrade only after validation."
+  die "ZTUM already installed: $TARGET. Refusing overwrite; use --upgrade for a newer release or explicit --reinstall for same-version maintenance."
 fi
 
 detect_php_user
