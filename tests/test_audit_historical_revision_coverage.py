@@ -56,6 +56,12 @@ class CoverageAuditTest(unittest.TestCase):
             changed["missing_history_path"] = True
             self.assertTrue(any("Missing-path revisions differ" in e for e in audit(changed, repo, 2)))
             changed = copy.deepcopy(report)
+            withheld = changed["candidates"].pop()
+            changed["candidate_count"] = len(changed["candidates"])
+            changed["invalid_revisions"] = [withheld["commit"]]
+            self.assertTrue(any("marked invalid contains a valid" in e for e in
+                                audit(changed, repo, 2)))
+            changed = copy.deepcopy(report)
             changed["shallow_repository"] = True
             self.assertTrue(audit(changed, repo, 2))
 
