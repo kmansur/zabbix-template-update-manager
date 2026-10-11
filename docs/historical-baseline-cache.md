@@ -80,7 +80,7 @@ configuration.importcompare
 The comparison semantics do not change. The cache only avoids repeated canonical history/source retrieval for a baseline that was already proven by immutable identity.
 ## Pipeline candidate diagnostics (experimental)
 
-`tools/build_historical_candidate_diagnostic.py` generates a **non-authoritative** JSON report from an offline Git checkout. It records immutable commit IDs, per-file SHA-256 and vendor version candidates, including multiple bodies with an unchanged `vendor.version`. The tool traverses all reachable parents in topological order and retains distinct source bodies across merge parents. It explicitly exposes missing paths and truncated scanning; it **does not** prove rename tracking, version-boundary completeness or equivalence to canonical history and is **not** consumed by the Zabbix frontend. CI tests it against synthetic Git history.
+`tools/build_historical_candidate_diagnostic.py` generates a **non-authoritative** JSON report from an offline Git checkout. It records immutable commit IDs, per-file SHA-256 and vendor version candidates, including multiple bodies with an unchanged `vendor.version`. The tool traverses all reachable parents in topological order and retains distinct source bodies across merge parents. It explicitly exposes missing paths (including rename boundaries), shallow repositories and truncated scanning; it **does not** prove rename tracking, version-boundary completeness or equivalence to canonical history and is **not** consumed by the Zabbix frontend. CI tests it against synthetic Git history.
 
 Example (developer pipeline checkout, not Zabbix host):
 
