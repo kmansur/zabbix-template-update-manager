@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Build a NON-AUTHORITATIVE offline history candidate report.
 
-This tool is deliberately diagnostic: first-parent traversal does not prove all
-historical branches/renames. The frontend MUST NOT consume this report for
+This tool is deliberately diagnostic: traversing all reachable parents captures
+merge-parent variants but does not prove path-rename completeness or version boundaries. The frontend MUST NOT consume this report for
 automatic update authorization.
 """
 from __future__ import annotations
@@ -34,11 +34,11 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
     resolved = git(repo, "rev-parse", "--verify", commit + "^{commit}").decode().strip()
     if resolved != commit:
         raise ValueError("Commit does not resolve exactly")
-    parents = git(repo, "rev-list", "--first-parent", "--max-count", str(max_commits + 1), commit).decode().splitlines()
+    parents = git(repo, "rev-list", "--topo-order", "--max-count", str(max_commits + 1), commit).decode().splitlines()
     truncated = len(parents) > max_commits
     parents = parents[:max_commits]
     candidates = []
-    prior_blob = None
+    seen_blobs = set()
     missing = False
     for revision in parents:
         try:
@@ -47,9 +47,9 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
             missing = True
             break
         raw_sha = hashlib.sha256(raw).hexdigest()
-        if raw_sha == prior_blob:
+        if raw_sha in seen_blobs:
             continue
-        prior_blob = raw_sha
+        seen_blobs.add(raw_sha)
         doc = yaml.safe_load(raw)
         templates = (doc or {}).get("zabbix_export", {}).get("templates", [])
         if not isinstance(templates, list):
@@ -72,7 +72,7 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
         "schema_version": 1,
         "purpose": "diagnostic-only",
         "authoritative": False,
-        "traversal": "first-parent-file-content-changes",
+        "traversal": "all-parents-topological-distinct-file-content",
         "source_commit": commit,
         "path": path,
         "uuid": uuid,
