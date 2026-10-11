@@ -171,3 +171,9 @@ output always remains a **diagnostic**, never a frontend authorization.
 A signed report with `truncated: true`, `shallow_repository: true`, a missing source revision, or an unresolved rename may **pass diagnostic integrity verification**: that means only that the supplied report and available immutable objects are consistent. It is **not** proof that a historical baseline is complete. The verifier enforces the evidence-field schema, `authoritative: false`, `history_complete: false`, and the documented traversal identity.
 
 No ZTUM frontend code consumes these reports or converts their verification outcome into update eligibility. A future authoritative index needs a **separate, explicitly reviewed policy gate**: anchored trusted signing key, complete historical range, multi-parent and rename provenance, template UUID isolation, unambiguous semantic baseline comparison and negative field tests. An integrity-only PASS must never be displayed as an update-ready status.
+
+### Independent ancestry-window audit
+
+Use `tools/audit_historical_revision_coverage.py --report <diagnostic.json> --source-dir <official-git-checkout> --max-commits 150` to independently recalculate the topological Git revision window for the pinned commit. The audit rejects inconsistent revision counts, truncated or shallow flags, duplicate/out-of-window evidence, and missing-path accounting. CI exercises both valid and forged windows.
+
+**Limit:** unchanged file bodies may be omitted from candidate output, so matching this audit does not prove that every revision represents a distinct baseline or that rename histories were followed. The audit remains strictly **non-authoritative** and is not used to authorize Zabbix imports.
