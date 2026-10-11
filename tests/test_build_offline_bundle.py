@@ -6,6 +6,7 @@ import json
 import subprocess
 import sys
 import tempfile
+import base64
 from pathlib import Path
 
 from cryptography.hazmat.primitives import serialization
@@ -89,6 +90,11 @@ def main() -> int:
         assert manifest["signature"]["schema"] == "ztum-offline-manifest-signature-v1"
         assert manifest["signature"]["key_id"] == "test-key"
         assert len(manifest["signature"]["signature"]) == 88
+        unsigned = {key: value for key, value in manifest.items() if key != "signature"}
+        signing_key.public_key().verify(
+            base64.b64decode(manifest["signature"]["signature"]),
+            (json.dumps(unsigned, ensure_ascii=False, sort_keys=True, separators=(",", ":")) + "\n").encode(),
+        )
         assert f"indexes/7.0.json" in manifest["files"]
         assert f"sources/{commit}/{source_path.as_posix()}" in manifest["files"]
         history_key = hashlib.sha256(source_path.as_posix().encode()).hexdigest()
