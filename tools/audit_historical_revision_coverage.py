@@ -12,6 +12,8 @@ import re
 import subprocess
 from pathlib import Path
 
+import yaml
+
 SHA = re.compile(r"^[a-f0-9]{40}$")
 
 
@@ -65,6 +67,25 @@ def audit(report: dict, repo: Path, max_commits: int) -> list[str]:
             )
             if exists.returncode != 0:
                 actual_missing.append(revision)
+        # An attacker must not label a valid unique source as "invalid" to
+        # suppress its candidate fingerprint while keeping a signed report.
+        uuid = report.get("uuid")
+        for revision in invalid:
+            if not isinstance(revision, str) or revision not in window:
+                continue
+            try:
+                raw = subprocess.check_output(
+                    ["git", "-C", str(repo), "show", f"{revision}:{path}"],
+                    stderr=subprocess.DEVNULL
+                )
+                document = yaml.safe_load(raw)
+                templates = document["zabbix_export"]["templates"]
+                matches = [t for t in templates if isinstance(t, dict) and
+                           str(t.get("uuid", "")).lower().replace("-", "") == uuid]
+                if len(matches) == 1 and isinstance(matches[0].get("vendor") or {}, dict):
+                    errors.append("Revision marked invalid contains a valid template identity")
+            except (subprocess.CalledProcessError, yaml.YAMLError, KeyError, TypeError, ValueError):
+                pass
         if set(actual_missing) != set(missing):
             errors.append("Missing-path revisions differ from actual Git ancestry")
     # Every readable source revision must be accounted for by a candidate
