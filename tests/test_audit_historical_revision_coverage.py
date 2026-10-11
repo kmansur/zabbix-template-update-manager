@@ -45,6 +45,10 @@ class CoverageAuditTest(unittest.TestCase):
             changed["candidates"][0]["commit"] = "a" * 40
             self.assertTrue(audit(changed, repo, 2))
             changed = copy.deepcopy(report)
+            changed["missing_revisions"] = [changed["source_commit"]]
+            changed["missing_history_path"] = True
+            self.assertTrue(any("Missing-path revisions differ" in e for e in audit(changed, repo, 2)))
+            changed = copy.deepcopy(report)
             changed["shallow_repository"] = True
             self.assertTrue(audit(changed, repo, 2))
 
