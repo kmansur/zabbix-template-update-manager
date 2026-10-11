@@ -85,9 +85,9 @@ class HistoricalCandidateDiagnosticTest(unittest.TestCase):
             old = repo / "templates/os/linux/old.yaml"
             old.parent.mkdir(parents=True)
             old.write_text(
-                "zabbix_export:\n  version: '7.0'\\n  templates:\\n"
-                f"    - uuid: {UUID}\\n      vendor:\\n        name: Zabbix\\n"
-                "        version: 7.0-0\\n"
+                "zabbix_export:\n  version: '7.0'\n  templates:\n"
+                f"    - uuid: {UUID}\n      vendor:\n        name: Zabbix\n"
+                "        version: 7.0-0\n"
             )
             run(repo, "add", ".")
             run(repo, "commit", "-qm", "original")
