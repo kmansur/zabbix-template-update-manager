@@ -55,9 +55,9 @@ class HistoricalCandidateDiagnosticTest(unittest.TestCase):
             p.parent.mkdir(parents=True)
             def commit_version(description):
                 p.write_text(
-                    "zabbix_export:\\n  version: '7.0'\\n  templates:\\n"
-                    f"    - uuid: {UUID}\\n      vendor:\\n        name: Zabbix\\n"
-                    f"        version: 7.0-0\\n      description: {description}\\n"
+                    "zabbix_export:\n  version: '7.0'\n  templates:\n"
+                    f"    - uuid: {UUID}\n      vendor:\n        name: Zabbix\n"
+                    f"        version: 7.0-0\n      description: {description}\n"
                 )
                 run(repo, "add", PATH)
                 run(repo, "commit", "-qm", description)
