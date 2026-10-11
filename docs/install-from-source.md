@@ -1,6 +1,6 @@
 # Local Git checkout installation (Zabbix 7 and 8)
 
-**Status:** laboratory beta only; not a production approval. Without flags, the local-source installer is new-install-only; explicit `--upgrade` and `--rollback BACKUP_ID` operations are available for laboratory testing. The root-level `install.sh` is the only active installer; retired quickinstall scripts are not supported on `main`.
+**Status:** laboratory beta only; not a production approval. Without flags, the local-source installer is new-install-only; explicit `--upgrade`, `--reinstall` and `--rollback BACKUP_ID` operations are available for laboratory testing. The root-level `install.sh` is the only active installer; retired quickinstall scripts are not supported on `main`.
 
 ## Requirements
 
@@ -59,7 +59,11 @@ sudo bash /usr/local/src/zabbix-template-update-manager/install.sh \
 
 The installed module root should contain only `Module.php`, `manifest.json`, `VERSION`, `actions`, `assets`, `src` and `views`. Private runtime state remains outside the web tree. No `.git`, `tests`, `tools`, or `docs` directory should be present inside the module.
 
-## Controlled upgrades and code rollback (new, experimental)
+## Controlled upgrade, same-version reinstall and code rollback (laboratory only)
+
+Use `sudo bash install.sh --reinstall` only to deploy changed code with an **identical** `VERSION` in a laboratory. The same root-private SHA-256 backup, atomic code replacement and rollback procedure applies. A reinstall refuses a different version and refuses identical installed/source files. Do not use it to bypass release versioning in production.
+
+## Upgrade and rollback precautions
 
 **Laboratory only:** `--upgrade` and `--rollback` have not yet passed disposable end-to-end failure injection. Do not use these operations on production until that validation is complete. Schedule a maintenance window, suspend ZTUM operations, verify no active batches or imports, and capture a separate backup of `/var/lib/zabbix-template-update-manager` and of the Zabbix database as appropriate before upgrading. A code rollback cannot reverse Zabbix template changes.
 
