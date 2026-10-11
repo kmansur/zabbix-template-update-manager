@@ -47,6 +47,22 @@ class VerifySignedHistoricalDiagnosticTest(unittest.TestCase):
             signed_corrupt = sign(corrupt, private, "test-only")
             self.assertTrue(any("fingerprint mismatch" in error for error in
                                 verify_signed_diagnostic(corrupt, signed_corrupt, public, "test-only", repo)))
+            # Correctly signed evidence may still be incomplete; it must
+            # remain diagnostic, not an authorization for template imports.
+            incomplete = copy.deepcopy(report)
+            incomplete["truncated"] = True
+            signed_incomplete = sign(incomplete, private, "test-only")
+            self.assertEqual([], verify_signed_diagnostic(
+                incomplete, signed_incomplete, public, "test-only", repo
+            ))
+            self.assertFalse(incomplete["history_complete"])
+            self.assertFalse(incomplete["authoritative"])
+
+            corrupted_schema = copy.deepcopy(report)
+            corrupted_schema["missing_revisions"] = "ignored"
+            signed_schema = sign(corrupted_schema, private, "test-only")
+            self.assertTrue(any("evidence list" in error for error in
+                                verify_signed_diagnostic(corrupted_schema, signed_schema, public, "test-only", repo)))
             unsigned_change = copy.deepcopy(report)
             unsigned_change["candidates"][0]["vendor_version"] = "7.0-1"
             self.assertTrue(any("signature" in error.lower() for error in
