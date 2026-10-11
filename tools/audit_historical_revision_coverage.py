@@ -73,6 +73,8 @@ def audit(report: dict, repo: Path, max_commits: int) -> list[str]:
         import hashlib
         expected_hashes = set()
         for revision in window:
+            if revision in invalid:
+                continue
             try:
                 raw = subprocess.check_output(
                     ["git", "-C", str(repo), "show", f"{revision}:{path}"],
