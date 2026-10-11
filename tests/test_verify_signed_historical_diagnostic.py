@@ -70,6 +70,18 @@ class VerifySignedHistoricalDiagnosticTest(unittest.TestCase):
                                 verify_signed_diagnostic(
                                     forged_vendor, forged_signed, public, "test-only", repo
                                 )))
+            # Re-sign a plausible but incomplete inventory: the bounded
+            # ancestry audit must still reject missing historical content.
+            suppressed = copy.deepcopy(report)
+            suppressed["candidates"] = []
+            suppressed["candidate_count"] = 0
+            suppressed["distinct_vendor_versions"] = []
+            suppressed["duplicate_vendor_versions"] = []
+            suppressed_sig = sign(suppressed, private, "test-only")
+            self.assertTrue(any("Distinct historical YAML contents" in error for error in
+                                verify_signed_diagnostic(
+                                    suppressed, suppressed_sig, public, "test-only", repo
+                                )))
             unsigned_change = copy.deepcopy(report)
             unsigned_change["candidates"][0]["vendor_version"] = "7.0-1"
             self.assertTrue(any("signature" in error.lower() for error in
