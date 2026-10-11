@@ -45,6 +45,37 @@ class HistoricalCandidateDiagnosticTest(unittest.TestCase):
             report_short = build_report(repo, commit, PATH, UUID, 1)
             self.assertTrue(report_short["truncated"])
 
+    def test_merge_parent_variants_are_not_silently_discarded(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary)
+            run(repo, "init", "-q")
+            run(repo, "config", "user.name", "Test")
+            run(repo, "config", "user.email", "test@example.org")
+            p = repo / PATH
+            p.parent.mkdir(parents=True)
+            def commit_version(description):
+                p.write_text(
+                    "zabbix_export:\\n  version: '7.0'\\n  templates:\\n"
+                    f"    - uuid: {UUID}\\n      vendor:\\n        name: Zabbix\\n"
+                    f"        version: 7.0-0\\n      description: {description}\\n"
+                )
+                run(repo, "add", PATH)
+                run(repo, "commit", "-qm", description)
+            commit_version("root")
+            base = run(repo, "rev-parse", "HEAD")
+            run(repo, "checkout", "-qb", "side")
+            commit_version("side")
+            side = run(repo, "rev-parse", "HEAD")
+            run(repo, "checkout", "-q", "-b", "mainline", base)
+            commit_version("main")
+            run(repo, "merge", "-s", "ours", "--no-edit", "side")
+            head = run(repo, "rev-parse", "HEAD")
+            report = build_report(repo, head, PATH, UUID)
+            self.assertFalse(report["authoritative"])
+            self.assertEqual("all-parents-topological-distinct-file-content", report["traversal"])
+            self.assertIn(side, [candidate["commit"] for candidate in report["candidates"]])
+            self.assertEqual(3, len({candidate["raw_sha256"] for candidate in report["candidates"]}))
+
     def test_rejects_bad_commit_and_path(self):
         with tempfile.TemporaryDirectory() as temporary:
             for commit, path in [("deadbeef", PATH), ("a" * 40, "../bad.yaml"),
