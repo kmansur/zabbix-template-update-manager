@@ -78,3 +78,19 @@ configuration.importcompare
 ```
 
 The comparison semantics do not change. The cache only avoids repeated canonical history/source retrieval for a baseline that was already proven by immutable identity.
+## Pipeline candidate diagnostics (experimental)
+
+`tools/build_historical_candidate_diagnostic.py` generates a **non-authoritative** JSON report from an offline Git checkout. It records immutable commit IDs, per-file SHA-256 and vendor version candidates, including multiple bodies with an unchanged `vendor.version`. The tool traverses first-parent history and explicitly exposes missing paths and truncated scanning; it **does not** prove full merge/rename coverage and is **not** consumed by the Zabbix frontend. CI tests it against synthetic Git history.
+
+Example (developer pipeline checkout, not Zabbix host):
+
+```sh
+python tools/build_historical_candidate_diagnostic.py \
+  --source-dir /path/to/official-zabbix-git-checkout \
+  --commit <full-official-40-character-sha> \
+  --path templates/app/acronis/template_app_acronis_cyber_protect_cloud_http.yaml \
+  --uuid bf3107deff3a4aabab1e1c0ee71a3281 \
+  --output build/historical/acronis-diagnostic.json
+```
+
+No production release or automatic update decision may use this report. Before an authoritative index is enabled we must implement exhaustive merge/rename candidate coverage, schema and provenance validation, reproducibility checks, and a signed publisher trust chain (issue #116).
