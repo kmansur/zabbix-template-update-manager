@@ -29,7 +29,7 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
         raise ValueError("Expected lowercase immutable commit and template UUID")
     if not path.startswith("templates/") or not path.endswith(".yaml") or any(
         part in ("", ".", "..") for part in path.split("/")
-    ) or "\\\" in path or "\\x00" in path:
+    ) or chr(92) in path or chr(0) in path:
         raise ValueError("Invalid templates/*.yaml path")
     resolved = git(repo, "rev-parse", "--verify", commit + "^{commit}").decode().strip()
     if resolved != commit:
