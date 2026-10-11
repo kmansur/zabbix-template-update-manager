@@ -41,9 +41,13 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
     candidates = []
     seen_blobs = set()
     missing = False
+    # An ordinary rename can be followed for each reachable ancestor, but an
+    # ambiguous rename or merge history must stay non-authoritative.
+    tracked = path
+    renames = []
     for revision in parents:
         try:
-            raw = git(repo, "show", f"{revision}:{path}")
+            raw = git(repo, "show", f"{revision}:{tracked}")
         except subprocess.CalledProcessError:
             missing = True
             break
@@ -64,7 +68,7 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
             raise ValueError("Invalid vendor structure")
         candidates.append({
             "commit": revision,
-            "path": path,
+            "path": tracked,
             "raw_sha256": raw_sha,
             "vendor_name": str(vendor.get("name", "")),
             "vendor_version": str(vendor.get("version", "")),
@@ -81,6 +85,7 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
         "truncated": truncated,
         "shallow_repository": shallow_repository,
         "missing_history_path": missing,
+        "rename_transitions": renames,
         "history_complete": False,
         "limitation": "rename-history and version-boundary completeness not established",
         "candidates": candidates,
