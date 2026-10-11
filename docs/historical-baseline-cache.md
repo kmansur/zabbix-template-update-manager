@@ -98,3 +98,9 @@ No production release or automatic update decision may use this report. Before a
 ### Rename evidence (diagnostic only)
 
 The report includes `rename_transitions` obtained from `git log --follow --find-renames` and always sets `rename_tracking_authoritative: false` and `history_complete: false`. This provides clues when a YAML source moved, but **does not** resolve every merge-parent path or validate a complete historical candidate set. An unresolved file path remains `missing_history_path: true`; the consumer must not interpret the report as proof of a baseline or authorize writes.
+
+### Negative-evidence inventory
+
+A diagnostic report now records `missing_revisions`, `invalid_revisions`, `shallow_repository`, `truncated`, `distinct_vendor_versions` and `duplicate_vendor_versions`. A missing source path no longer stops enumeration of other reachable revisions; however **any gap remains visible and never upgrades the report to authoritative**. Invalid YAML and ambiguous UUID definitions are counted as invalid revisions instead of silently choosing a nearby baseline. CI covers both situations.
+
+The existing frontend is unchanged. In particular, this pipeline output is **not** written into the live ZTUM cache and may not authorize a template import.
