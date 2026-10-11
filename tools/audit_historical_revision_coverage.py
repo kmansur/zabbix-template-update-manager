@@ -67,6 +67,26 @@ def audit(report: dict, repo: Path, max_commits: int) -> list[str]:
                 actual_missing.append(revision)
         if set(actual_missing) != set(missing):
             errors.append("Missing-path revisions differ from actual Git ancestry")
+    # Every readable source revision must be accounted for by a candidate
+    # content hash. This checks content coverage independently of the builder.
+    if isinstance(path, str) and path.startswith("templates/") and path.endswith(".yaml"):
+        import hashlib
+        expected_hashes = set()
+        for revision in window:
+            try:
+                raw = subprocess.check_output(
+                    ["git", "-C", str(repo), "show", f"{revision}:{path}"],
+                    stderr=subprocess.DEVNULL
+                )
+            except subprocess.CalledProcessError:
+                continue
+            expected_hashes.add(hashlib.sha256(raw).hexdigest())
+        declared_hashes = {
+            candidate.get("raw_sha256") for candidate in candidates
+            if isinstance(candidate, dict)
+        }
+        if expected_hashes != declared_hashes:
+            errors.append("Distinct historical YAML contents differ from the Git ancestry window")
     if bool(missing) != report.get("missing_history_path"):
         errors.append("Missing-path evidence inconsistent")
     if report.get("authoritative") is not False or report.get("history_complete") is not False:
