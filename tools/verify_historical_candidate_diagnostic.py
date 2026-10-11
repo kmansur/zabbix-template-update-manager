@@ -28,6 +28,14 @@ def verify(report: dict, repo: Path) -> list[str]:
         errors.append("Rename evidence must not claim authority")
     if not SHA.fullmatch(str(report.get("source_commit", ""))):
         errors.append("Invalid pinned source commit")
+    source_commit = str(report.get("source_commit", ""))
+    if SHA.fullmatch(source_commit):
+        try:
+            checked = subprocess.check_output(["git", "-C", str(repo), "rev-parse", "--verify", source_commit + "^{commit}"], stderr=subprocess.DEVNULL).decode().strip()
+            if checked != source_commit:
+                errors.append("Source commit identity mismatch")
+        except subprocess.CalledProcessError:
+            errors.append("Pinned source commit unavailable")
     if not UUID.fullmatch(str(report.get("uuid", ""))):
         errors.append("Invalid template UUID")
     path = report.get("path", "")
@@ -54,6 +62,10 @@ def verify(report: dict, repo: Path) -> list[str]:
         if not isinstance(candidate_path, str) or candidate_path != path:
             errors.append(f"Candidate {index}: unexpected path")
             continue
+        if SHA.fullmatch(source_commit):
+            ancestry = subprocess.run(["git", "-C", str(repo), "merge-base", "--is-ancestor", sha, source_commit], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            if ancestry.returncode != 0:
+                errors.append(f"Candidate {index}: commit is not an ancestor of source")
         if sha in seen:
             errors.append(f"Candidate {index}: duplicated commit")
         seen.add(sha)
