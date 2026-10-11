@@ -100,6 +100,47 @@ class HistoricalCandidateDiagnosticTest(unittest.TestCase):
             self.assertFalse(report["history_complete"])
             self.assertFalse(report["authoritative"])
 
+    def test_missing_path_does_not_hide_other_branch_candidates(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary)
+            run(repo, "init", "-q")
+            run(repo, "config", "user.name", "Test")
+            run(repo, "config", "user.email", "test@example.org")
+            # Root revision has no template; the file appears later.
+            (repo / "README").write_text("initial")
+            run(repo, "add", ".")
+            run(repo, "commit", "-qm", "initial")
+            p = repo / PATH
+            p.parent.mkdir(parents=True)
+            p.write_text(
+                "zabbix_export:\\n  templates:\\n"
+                f"    - uuid: {UUID}\\n      vendor:\\n"
+                "        name: Zabbix\\n        version: 7.0-0\\n"
+            )
+            run(repo, "add", ".")
+            run(repo, "commit", "-qm", "added")
+            report = build_report(repo, run(repo, "rev-parse", "HEAD"), PATH, UUID)
+            self.assertTrue(report["missing_history_path"])
+            self.assertEqual(1, report["candidate_count"])
+            self.assertEqual(1, len(report["missing_revisions"]))
+            self.assertFalse(report["history_complete"])
+
+    def test_invalid_source_is_reported_as_incomplete(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary)
+            run(repo, "init", "-q")
+            run(repo, "config", "user.name", "Test")
+            run(repo, "config", "user.email", "test@example.org")
+            p = repo / PATH
+            p.parent.mkdir(parents=True)
+            p.write_text("zabbix_export: [broken\\n")
+            run(repo, "add", ".")
+            run(repo, "commit", "-qm", "invalid source")
+            report = build_report(repo, run(repo, "rev-parse", "HEAD"), PATH, UUID)
+            self.assertEqual(1, len(report["invalid_revisions"]))
+            self.assertEqual(0, report["candidate_count"])
+            self.assertFalse(report["authoritative"])
+
     def test_rejects_bad_commit_and_path(self):
         with tempfile.TemporaryDirectory() as temporary:
             for commit, path in [("deadbeef", PATH), ("a" * 40, "../bad.yaml"),
