@@ -46,6 +46,12 @@ class CoverageAuditTest(unittest.TestCase):
             changed["scanned_commits"] = 3
             self.assertTrue(audit(changed, repo, 2))
             changed = copy.deepcopy(report)
+            changed["distinct_vendor_versions"] = ["forged"]
+            self.assertTrue(any("vendor-version inventory mismatch" in e for e in audit(changed, repo, 2)))
+            changed = copy.deepcopy(report)
+            changed["duplicate_vendor_versions"] = ["forged"]
+            self.assertTrue(any("vendor-version inventory mismatch" in e for e in audit(changed, repo, 2)))
+            changed = copy.deepcopy(report)
             changed["truncated"] = False
             self.assertTrue(audit(changed, repo, 2))
             changed = copy.deepcopy(report)
