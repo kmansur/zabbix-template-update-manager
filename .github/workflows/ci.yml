@@ -128,6 +128,7 @@ jobs:
           python tests/test_build_upstream_index.py
           python -m unittest discover -s tests -p test_build_historical_candidate_diagnostic.py
           python -m unittest discover -s tests -p test_verify_historical_candidate_diagnostic.py
+          python -m unittest discover -s tests -p test_sign_historical_diagnostic.py
           python tests/test_enrich_upstream_version_metadata.py
           python tests/test_build_offline_bundle.py
           python tests/test_aggregate_coverage.py
