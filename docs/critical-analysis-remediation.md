@@ -5,7 +5,7 @@ Source: independent document `ZTUM-analise-critica.docx` (review of beta.38). Th
 | Original finding | Engineering state | Required evidence for closure |
 | --- | --- | --- |
 | HIGH: no open-source license | Addressed: AGPL-3.0-only LICENSE and repository metadata | Verify license in tagged archive and release page |
-| HIGH: frontend requires outbound internet | OPEN: offline bundle support and complete offline operation need controlled field proof; signed historical diagnostics are not consumed | On both Zabbix generations, deny outbound egress and demonstrate read-only inventory, verified offline source import, safe update, backup and rollback; document allowed network policy |
+| HIGH: frontend requires outbound internet | PARTIAL: `OfflineBundleRepository` supports local bundle/index/source/history reads with SHA-256 checks, but its manifest is not authenticated by a released pinned signing key; complete offline operation needs controlled field proof | On both Zabbix generations, deny outbound egress and demonstrate read-only inventory, verified offline source import, safe update, backup and rollback; document allowed network policy |
 | HIGH: architecture documentation stale | Updated architecture describes controlled writes | Independent audit of README/architecture/current actions against the exact release commit |
 | MEDIUM: insufficient independent adoption | OPEN | Third-party tester provides repeatable reports and negative failure cases; repo popularity is not a substitute |
 | MEDIUM: too-frequent prereleases | OPEN process gate | Freeze immutable RC, run defined soak period and publish regressions/change approvals; do not count rapid beta iterations as validation |
@@ -33,3 +33,7 @@ Source: independent document `ZTUM-analise-critica.docx` (review of beta.38). Th
 The draft offline scripts (`build_historical_candidate_diagnostic.py`, `verify_signed_historical_diagnostic.py`, and ancestry auditors) intentionally emit **non-authoritative** diagnostics; neither signed provenance nor successful hashes imply an eligible update. Do not remove their `authoritative: false` contract merely to make an acceptance checkbox green.
 
 **Production recommendation remains NO** until every mandatory gate above is verified. External test/soak evidence cannot be fulfilled solely by committing source code.
+
+## Offline bundle authenticity caveat
+
+`src/Repository/OfflineBundleRepository.php` validates entries with SHA-256 from its local manifest; this provides corruption detection **only if the manifest is already trusted**. Replacing both a bundle and its unsigned manifest can evade hash checks. Local source/history bundle verification must never be described as cryptographic publisher authentication. The offline historical Ed25519 tools currently require explicitly supplied trust material and are not wired into the ZTUM module. Final closure requires a signed manifest anchored by a public key shipped with a trusted module release, plus negative field tests with a forged manifest and restricted egress.
