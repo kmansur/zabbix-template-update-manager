@@ -94,3 +94,7 @@ python tools/build_historical_candidate_diagnostic.py \
 ```
 
 No production release or automatic update decision may use this report. Before an authoritative index is enabled we must implement exhaustive merge/rename candidate coverage, schema and provenance validation, reproducibility checks, and a signed publisher trust chain (issue #116).
+
+### Rename evidence (diagnostic only)
+
+The report includes `rename_transitions` obtained from `git log --follow --find-renames` and always sets `rename_tracking_authoritative: false` and `history_complete: false`. This provides clues when a YAML source moved, but **does not** resolve every merge-parent path or validate a complete historical candidate set. An unresolved file path remains `missing_history_path: true`; the consumer must not interpret the report as proof of a baseline or authorize writes.
