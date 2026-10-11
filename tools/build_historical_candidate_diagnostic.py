@@ -35,6 +35,7 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
     if resolved != commit:
         raise ValueError("Commit does not resolve exactly")
     parents = git(repo, "rev-list", "--topo-order", "--max-count", str(max_commits + 1), commit).decode().splitlines()
+    shallow_repository = git(repo, "rev-parse", "--is-shallow-repository").decode().strip() == "true"
     truncated = len(parents) > max_commits
     parents = parents[:max_commits]
     candidates = []
@@ -78,7 +79,10 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
         "uuid": uuid,
         "scanned_commits": len(parents),
         "truncated": truncated,
+        "shallow_repository": shallow_repository,
         "missing_history_path": missing,
+        "history_complete": False,
+        "limitation": "rename-history and version-boundary completeness not established",
         "candidates": candidates,
     }
 
