@@ -34,7 +34,7 @@ The cache contains no local template state, credentials or Zabbix secrets.
 
 ## Integrity and permissions
 
-Runtime cache files are stored below the same private temporary project directory used by the upstream index cache, under a `historical-baselines` subdirectory.
+Runtime cache files are stored in `/var/lib/zabbix-template-update-manager/cache/historical-baselines`, under the private runtime directory provisioned by `install.sh`; there is no fallback to `/tmp`.
 
 Safety rules:
 
