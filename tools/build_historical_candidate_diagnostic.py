@@ -73,6 +73,21 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
             "vendor_name": str(vendor.get("name", "")),
             "vendor_version": str(vendor.get("version", "")),
         })
+    # Advisory only: --follow can reveal a linear rename chain, but does not
+    # prove that every reachable merge parent used the same previous path.
+    follow_lines = git(
+        repo, "log", "--follow", "--find-renames", "--format=%H",
+        "--name-status", commit, "--", path
+    ).decode("utf-8", "replace").splitlines()
+    for line in follow_lines:
+        fields = line.split("\t")
+        if len(fields) == 3 and re.fullmatch(r"R[0-9]{1,3}", fields[0]):
+            old_path, new_path = fields[1:]
+            if (old_path.startswith("templates/") and old_path.endswith(".yaml")
+                    and new_path.startswith("templates/") and new_path.endswith(".yaml")
+                    and ".." not in old_path.split("/")
+                    and ".." not in new_path.split("/")):
+                renames.append({"from": old_path, "to": new_path})
     return {
         "schema_version": 1,
         "purpose": "diagnostic-only",
@@ -86,6 +101,7 @@ def build_report(repo: Path, commit: str, path: str, uuid: str, max_commits: int
         "shallow_repository": shallow_repository,
         "missing_history_path": missing,
         "rename_transitions": renames,
+        "rename_tracking_authoritative": False,
         "history_complete": False,
         "limitation": "rename-history and version-boundary completeness not established",
         "candidates": candidates,
