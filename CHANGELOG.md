@@ -20,6 +20,10 @@ All notable changes to Template Update Manager will be documented in this file.
 - Restricted custom lock directories to safe absolute paths.
 - Updated Super Admin permission and confidential rollback artifact documentation.
 
+### Historical index pipeline (diagnostic only)
+
+- Added an offline candidate report generator and synthetic Git-history regression tests. The resulting JSON explicitly marks itself non-authoritative and is not consumed by the frontend; merge/rename completeness and signed index trust remain prerequisites to use.
+
 ### Security and validation
 
 - Pinned first-party GitHub Actions to immutable full commit SHAs and enforced the policy in the workflow contract test.
