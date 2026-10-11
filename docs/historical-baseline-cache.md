@@ -179,3 +179,7 @@ Use `tools/audit_historical_revision_coverage.py --report <diagnostic.json> --so
 **Limit:** unchanged file bodies may be omitted from candidate output, so matching this audit does not prove that every revision represents a distinct baseline or that rename histories were followed. The audit remains strictly **non-authoritative** and is not used to authorize Zabbix imports.
 
 **Additional negative gate (PR #115):** the independent revision audit now enumerates every commit in the declared ancestry window and checks Git object-path existence against `missing_revisions`, rather than trusting the report's claimed missing-path evidence. Incorrect/missing evidence fails validation even if report metadata were re-signed. This remains a bounded diagnostic audit, not a declaration of historical baseline completeness.
+
+### Distinct-content ancestry coverage
+
+The independent diagnostic audit now also recomputes the SHA-256 inventory of each distinct YAML file found in the bounded, pinned Git ancestry window. It requires the diagnostic candidates to match that inventory exactly, excluding revisions explicitly reported as invalid. Missing distinct file versions are an error even if the report advertises the expected commit count. This is useful detection, **not** proof of rename-aware semantic lineage or complete unbounded history. Production update authorization remains disabled.
