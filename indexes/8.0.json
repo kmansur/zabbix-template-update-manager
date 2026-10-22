@@ -2,9 +2,9 @@
   "schema_version": 1,
   "source": {
     "line": "8.0",
-    "ref": "8.0.0rc1",
-    "commit": "dd0d9c26a3ad7b394eebaaedb46446f7c9983547",
-    "commit_date": "2026-10-01T11:38:51+03:00",
+    "ref": "8.0.0rc2",
+    "commit": "f3e1632e2ec69db28e54af815c72201e15155e14",
+    "commit_date": "2026-10-21T10:58:39+03:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
@@ -460,21 +460,21 @@
       "name": "Kubernetes Node by HTTP",
       "technical_name": "Kubernetes Node by HTTP",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-0",
+      "vendor_version": "8.0-1",
       "paths": [
         "templates/app/kubernetes_cluster_http/template_kubernetes_cluster.yaml"
       ],
       "content_sha256s": [
-        "e63a1096f4a8e25bb6e5f77432502398f3951a4897660927dd177fe0cbcbe8ad"
+        "46798ff0d5684653e813b9b2ab3c8f1eecc7ef46fd22497c289d11938074c9fa"
       ],
       "sources": [
         {
           "path": "templates/app/kubernetes_cluster_http/template_kubernetes_cluster.yaml",
-          "sha256": "f965acc31a5b17a22f4c5e526ebe56e1a1522757fb44d9ecad973e0d64badce9"
+          "sha256": "381387062c667528a5b87865dc4bd1d1f96a668ebf19accc0648b80496d8d629"
         }
       ],
-      "version_commit": "fbe336ebf0a5cb15ea095e27cc7377db7c1793e5",
-      "version_date": "2026-04-23T13:58:23+02:00"
+      "version_commit": "f6b598da5eadc97d31840d3db25e53441be295e9",
+      "version_date": "2026-10-19T15:10:09+03:00"
     },
     "0f6889282f6048e2b1370e569e578985": {
       "uuid": "0f6889282f6048e2b1370e569e578985",
@@ -2560,21 +2560,21 @@
       "name": "Proxmox VE by HTTP",
       "technical_name": "Proxmox VE by HTTP",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-5",
+      "vendor_version": "8.0-6",
       "paths": [
         "templates/app/proxmox/http/template_app_proxmox.yaml"
       ],
       "content_sha256s": [
-        "587d8ac1d4e307499ce5e73ed0cfc4f413c610baa66cb6a4ef21dbeca446896c"
+        "5d2a7d3c8ec598c0cd9f1b9bcec96f37cc0a4c73a0d076503267089a840c96a0"
       ],
       "sources": [
         {
           "path": "templates/app/proxmox/http/template_app_proxmox.yaml",
-          "sha256": "754c9ec27b4cf91a4cd772f813b86b99edb11b540410b65fa8020252c37c741a"
+          "sha256": "a25b8eb580ab4fab561c77cfa8204292e0e86be4773062cdcb0f8a4f2094a281"
         }
       ],
-      "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
-      "version_date": "2026-08-13T11:58:33+02:00"
+      "version_commit": "2d9713a1478a698650dae77629fa582a0cc975af",
+      "version_date": "2026-10-16T11:19:40+03:00"
     },
     "49c77ce207f8478da53e761526d6eca5": {
       "uuid": "49c77ce207f8478da53e761526d6eca5",
@@ -2686,21 +2686,21 @@
       "name": "Linux by SNMP",
       "technical_name": "Linux by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-4",
+      "vendor_version": "8.0-5",
       "paths": [
         "templates/os/linux_snmp/template_os_linux_snmp.yaml"
       ],
       "content_sha256s": [
-        "a37d2a7976c45aea5c00c04877210fb98da3b256e65fc9387c3aa4cbe632c688"
+        "2c76c48978ea0b7e9a01eeac8652f3f27bf5782d7900b53b8b1fbe75249e73c3"
       ],
       "sources": [
         {
           "path": "templates/os/linux_snmp/template_os_linux_snmp.yaml",
-          "sha256": "ae9f6ee9927fe0025e1d24c86039ea9822028eeef45183a4c3893d46f22bc963"
+          "sha256": "c330a7a60b846b1a46b9e5a8ba291e84b43d5e475f7b4c1bbf0a30830fe7be27"
         }
       ],
-      "version_commit": "9816c368e090cf52dec2413eaa8a3333fd6fd0ad",
-      "version_date": "2026-08-14T13:02:49+03:00"
+      "version_commit": "2d99ae1d468da9b4bb202eed0a275b5772193be6",
+      "version_date": "2026-10-14T11:09:59+02:00"
     },
     "4e1e9372a5fe4297936210bc4fc4b1c0": {
       "uuid": "4e1e9372a5fe4297936210bc4fc4b1c0",
@@ -3583,7 +3583,7 @@
       "sources": [
         {
           "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
-          "sha256": "af0d3057a4f67633d6583040db1afa9f3bf0b3432a4e641ccaa59be202a7f641"
+          "sha256": "41a03c7a41d5d80c19244cd4bdb603750a453c08d40e20dc47533246dbb5f303"
         }
       ],
       "version_commit": "8db2ca3a19fd19bcb2f0cb63953673a72733adf9",
@@ -4029,7 +4029,7 @@
       "sources": [
         {
           "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
-          "sha256": "af0d3057a4f67633d6583040db1afa9f3bf0b3432a4e641ccaa59be202a7f641"
+          "sha256": "41a03c7a41d5d80c19244cd4bdb603750a453c08d40e20dc47533246dbb5f303"
         }
       ],
       "version_commit": "8db2ca3a19fd19bcb2f0cb63953673a72733adf9",
@@ -4880,21 +4880,21 @@
       "name": "Kubernetes Cluster by HTTP",
       "technical_name": "Kubernetes Cluster by HTTP",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-2",
+      "vendor_version": "8.0-3",
       "paths": [
         "templates/app/kubernetes_cluster_http/template_kubernetes_cluster.yaml"
       ],
       "content_sha256s": [
-        "1be395ff949cc31909f68ffe4a8d2e9c9fc800cf884a16020630e779e9889107"
+        "205448ad8d062fcf204307edbb7badb0dc82d837665de2a89585b58c9e9e7a79"
       ],
       "sources": [
         {
           "path": "templates/app/kubernetes_cluster_http/template_kubernetes_cluster.yaml",
-          "sha256": "f965acc31a5b17a22f4c5e526ebe56e1a1522757fb44d9ecad973e0d64badce9"
+          "sha256": "381387062c667528a5b87865dc4bd1d1f96a668ebf19accc0648b80496d8d629"
         }
       ],
-      "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
-      "version_date": "2026-08-13T11:58:33+02:00"
+      "version_commit": "f6b598da5eadc97d31840d3db25e53441be295e9",
+      "version_date": "2026-10-19T15:10:09+03:00"
     },
     "90ac276995294a6aa88462c032d2ddaf": {
       "uuid": "90ac276995294a6aa88462c032d2ddaf",
@@ -6371,21 +6371,21 @@
       "name": "Podman by HTTP",
       "technical_name": "Podman by HTTP",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-2",
+      "vendor_version": "8.0-3",
       "paths": [
         "templates/app/podman/podman_http/template_app_podman_http.yaml"
       ],
       "content_sha256s": [
-        "1d3b9d43d27a8a3cc2bd64509b1ca47e56f8d223508271967a9a01595279e2c8"
+        "04bfe56fc989ecd3d9a497e01639976f40ebef9f145a918e8f9d18be034950c4"
       ],
       "sources": [
         {
           "path": "templates/app/podman/podman_http/template_app_podman_http.yaml",
-          "sha256": "577053ab42ef63e29d077bbbf55032c0909261592f0751b5d78476f6152f1775"
+          "sha256": "c34adfa4d90d26fdfc6cfd6183290ecf003981041c0868d447be1fef91f737b9"
         }
       ],
-      "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
-      "version_date": "2026-08-13T11:58:33+02:00"
+      "version_commit": "2d9713a1478a698650dae77629fa582a0cc975af",
+      "version_date": "2026-10-16T11:19:40+03:00"
     },
     "c9e1acd3ae4a427ab39724b6bcaf839e": {
       "uuid": "c9e1acd3ae4a427ab39724b6bcaf839e",
@@ -6717,7 +6717,7 @@
       "sources": [
         {
           "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
-          "sha256": "af0d3057a4f67633d6583040db1afa9f3bf0b3432a4e641ccaa59be202a7f641"
+          "sha256": "41a03c7a41d5d80c19244cd4bdb603750a453c08d40e20dc47533246dbb5f303"
         }
       ],
       "version_commit": "8db2ca3a19fd19bcb2f0cb63953673a72733adf9",
@@ -7169,21 +7169,21 @@
       "name": "Zabbix server health",
       "technical_name": "Zabbix server health",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-4",
+      "vendor_version": "8.0-5",
       "paths": [
         "templates/app/zabbix_server/template_app_zabbix_server.yaml"
       ],
       "content_sha256s": [
-        "ed625bd9e800a5f219406a64e78850150b0d1aaa89c39c3f3e578eef5c760bd1"
+        "04c91fb9456c73082dfb65ae758f037d7452d5cfbb5d301abc533210022754f1"
       ],
       "sources": [
         {
           "path": "templates/app/zabbix_server/template_app_zabbix_server.yaml",
-          "sha256": "af0d3057a4f67633d6583040db1afa9f3bf0b3432a4e641ccaa59be202a7f641"
+          "sha256": "41a03c7a41d5d80c19244cd4bdb603750a453c08d40e20dc47533246dbb5f303"
         }
       ],
-      "version_commit": "8db2ca3a19fd19bcb2f0cb63953673a72733adf9",
-      "version_date": "2026-09-23T13:05:13+02:00"
+      "version_commit": "93b6245fe0b1f99be988916277b9e92b5a41babb",
+      "version_date": "2026-10-20T15:39:13+03:00"
     },
     "e518b1340ce44d7389d2cc7c304a97b4": {
       "uuid": "e518b1340ce44d7389d2cc7c304a97b4",
