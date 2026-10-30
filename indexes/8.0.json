@@ -2,9 +2,9 @@
   "schema_version": 1,
   "source": {
     "line": "8.0",
-    "ref": "8.0.0rc2",
-    "commit": "f3e1632e2ec69db28e54af815c72201e15155e14",
-    "commit_date": "2026-10-21T10:58:39+03:00",
+    "ref": "8.0.0rc3",
+    "commit": "090f06dc325f1629c5cdc2bb3354a184e15e55d4",
+    "commit_date": "2026-10-29T11:05:34+02:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
