@@ -2,9 +2,9 @@
   "schema_version": 1,
   "source": {
     "line": "8.0",
-    "ref": "8.0.0rc3",
-    "commit": "090f06dc325f1629c5cdc2bb3354a184e15e55d4",
-    "commit_date": "2026-10-29T11:05:34+02:00",
+    "ref": "release/8.0",
+    "commit": "1e3fddab7e0e2e193670326c5b459f3a1aac8dc7",
+    "commit_date": "2026-11-05T12:23:42+02:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
@@ -4271,21 +4271,21 @@
       "name": "Generic OpenTelemetry by OTLP",
       "technical_name": "Generic OpenTelemetry by OTLP",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-0",
+      "vendor_version": "8.0-1",
       "paths": [
         "templates/app/otlp/template_app_overview_otlp.yaml"
       ],
       "content_sha256s": [
-        "7bdc144cb15b0d26e21c1caeb126f53ec3c36dfc9ba8517e7aa69c5bf4d9bdf5"
+        "63c65b2783370171c1ee2589db3e9a1375ee95ae5cd05f5407280dfea9709c46"
       ],
       "sources": [
         {
           "path": "templates/app/otlp/template_app_overview_otlp.yaml",
-          "sha256": "9aac389932ee040fd320b28990f3c5a356121187b526a0684d6338126160ebc4"
+          "sha256": "208d930c74116429aa9dffcaa45e69a552acac64f9423ce322e9a477d5ba4026"
         }
       ],
-      "version_commit": "2be408e8b8c982ae040749f52f6de3b75e8d33ab",
-      "version_date": "2026-09-24T08:55:42+03:00"
+      "version_commit": "0becfe15f149144e4f8ee3ab6a7feee19c42e8e8",
+      "version_date": "2026-11-03T14:28:35+01:00"
     },
     "81aa8c5ab5594f77a2b26fb7f5094048": {
       "uuid": "81aa8c5ab5594f77a2b26fb7f5094048",
@@ -4418,21 +4418,21 @@
       "name": "Proxmox VE by OTLP",
       "technical_name": "Proxmox VE by OTLP",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-0",
+      "vendor_version": "8.0-1",
       "paths": [
         "templates/app/proxmox/otlp/template_app_proxmox_otlp.yaml"
       ],
       "content_sha256s": [
-        "6cda981f52bc9f286e3facc1ab002b674e82529dc2d4ecd8170060388ad547c6"
+        "964db36b3b53073617f325b4342b9ca7409f07f31abc45c86622cf76b1923186"
       ],
       "sources": [
         {
           "path": "templates/app/proxmox/otlp/template_app_proxmox_otlp.yaml",
-          "sha256": "046717940ce8b4eb3ad0b676e0a9de2e4622c0f1cf4a1298efbfdb7033474290"
+          "sha256": "7e808a78b7ef0b4f3eccfcdd4ebccc0f83e17e3d633cc4ad3d564906e5e408c8"
         }
       ],
-      "version_commit": "2be408e8b8c982ae040749f52f6de3b75e8d33ab",
-      "version_date": "2026-09-24T08:55:42+03:00"
+      "version_commit": "0becfe15f149144e4f8ee3ab6a7feee19c42e8e8",
+      "version_date": "2026-11-03T14:28:35+01:00"
     },
     "86702e8bc514434e8c914d50c206cb94": {
       "uuid": "86702e8bc514434e8c914d50c206cb94",
@@ -5657,21 +5657,21 @@
       "name": "Envoy Proxy by OTLP",
       "technical_name": "Envoy Proxy by OTLP",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-0",
+      "vendor_version": "8.0-1",
       "paths": [
         "templates/app/envoy_proxy_otlp/template_app_envoy_proxy_otlp.yaml"
       ],
       "content_sha256s": [
-        "e88adea0d05eb667da6f834a84840892c1ebb399cbcaff38dfe4264295c7a3da"
+        "93bced658be2b26d7dc9d28c77837027cf3625691b084d1f3f31782f69ce48b5"
       ],
       "sources": [
         {
           "path": "templates/app/envoy_proxy_otlp/template_app_envoy_proxy_otlp.yaml",
-          "sha256": "a295f217cbf44d8c48c51c23efdf694a784bfc2ac464739b5dad894cd255df12"
+          "sha256": "6eba9cd8df3e6c88c83d5eab8a36a9f07e1bf83c971de809d16dd47c112575e4"
         }
       ],
-      "version_commit": "2be408e8b8c982ae040749f52f6de3b75e8d33ab",
-      "version_date": "2026-09-24T08:55:42+03:00"
+      "version_commit": "0becfe15f149144e4f8ee3ab6a7feee19c42e8e8",
+      "version_date": "2026-11-03T14:28:35+01:00"
     },
     "b1fd823d262042e08291313f72be9452": {
       "uuid": "b1fd823d262042e08291313f72be9452",
@@ -5741,21 +5741,21 @@
       "name": "OpenRouter traces by OTLP",
       "technical_name": "OpenRouter traces by OTLP",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-0",
+      "vendor_version": "8.0-1",
       "paths": [
         "templates/app/openrouter/otlp/template_app_openrouter_otlp.yaml"
       ],
       "content_sha256s": [
-        "fb1730583fbd2b974fa1afea935187707dcf713724b390e2be2aa014475454ca"
+        "20d5abf0149d8ee247eb753b91ae41309f433dd666bbcb331ea9751080fcb95a"
       ],
       "sources": [
         {
           "path": "templates/app/openrouter/otlp/template_app_openrouter_otlp.yaml",
-          "sha256": "c8ac9f804445ebd04b5f9a7184757966bf77eeac7d6a257b9de4a6277b61a7a6"
+          "sha256": "ae648d77e2657ba85641e16c9d39f8b451286382749f2a084e0b11464eecf97a"
         }
       ],
-      "version_commit": "2be408e8b8c982ae040749f52f6de3b75e8d33ab",
-      "version_date": "2026-09-24T08:55:42+03:00"
+      "version_commit": "0becfe15f149144e4f8ee3ab6a7feee19c42e8e8",
+      "version_date": "2026-11-03T14:28:35+01:00"
     },
     "b43a7c5f1d1d43d28e2eb8f0a9f6f16f": {
       "uuid": "b43a7c5f1d1d43d28e2eb8f0a9f6f16f",
