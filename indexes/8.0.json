@@ -3,13 +3,13 @@
   "source": {
     "line": "8.0",
     "ref": "release/8.0",
-    "commit": "498bf259dfb1876a71bb8c462a69711c0a1f8984",
-    "commit_date": "2026-11-10T11:54:19+01:00",
+    "commit": "b409f2df09c9610b41317e36c1b4579efcbbf794",
+    "commit_date": "2026-11-11T11:53:38+02:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
   "statistics": {
-    "templates": 390,
+    "templates": 391,
     "duplicate_uuid_definitions": 2,
     "content_variant_uuids": 0
   },
@@ -297,12 +297,12 @@
         "templates/app/kubernetes_http/kubernetes_state_http/template_kubernetes_state.yaml"
       ],
       "content_sha256s": [
-        "8adf7407b928fc7f32ae8f8f240d154b0fa5fbe98d57439ba4540e2ad1861b8c"
+        "99910a219f439ec7cb05e3f9329afc72a4f2701d19b2de85c635dd384b13ce3d"
       ],
       "sources": [
         {
           "path": "templates/app/kubernetes_http/kubernetes_state_http/template_kubernetes_state.yaml",
-          "sha256": "6a46c2da5c858c30aa4a5e747e167007c1acc03033d68a6b50f3910ff27ec7cd"
+          "sha256": "5c2b090209fe519c6f5a70fcbc5f6749e54b57489741bb96e3768a0d68db4e1b"
         }
       ],
       "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
@@ -470,7 +470,7 @@
       "sources": [
         {
           "path": "templates/app/kubernetes_cluster_http/template_kubernetes_cluster.yaml",
-          "sha256": "381387062c667528a5b87865dc4bd1d1f96a668ebf19accc0648b80496d8d629"
+          "sha256": "1712a5637789b6c76f4b83899711b6f4e56c4654698198249dc3334688f58b47"
         }
       ],
       "version_commit": "f6b598da5eadc97d31840d3db25e53441be295e9",
@@ -643,6 +643,27 @@
       ],
       "version_commit": "3c3b653ce59c1abc226e940c30e1a3f48f7973ce",
       "version_date": "2026-08-06T19:06:15+02:00"
+    },
+    "16954abf2ce848828d1f1ec9a5c65009": {
+      "uuid": "16954abf2ce848828d1f1ec9a5c65009",
+      "name": "GCP Security by HTTP",
+      "technical_name": "GCP Security by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "8.0-0",
+      "paths": [
+        "templates/cloud/gcp/template_cloud_gcp_http.yaml"
+      ],
+      "content_sha256s": [
+        "6cd45baec245b4dcfb40bee38233afe901f5105184eea7d4cbd616d2a1cc963b"
+      ],
+      "sources": [
+        {
+          "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
+        }
+      ],
+      "version_commit": "f08f308693031eb0e5c1415938cf87263a63c0ab",
+      "version_date": "2026-11-10T12:45:57+01:00"
     },
     "16f281aeb8904d3db8b66dda94611fcc": {
       "uuid": "16f281aeb8904d3db8b66dda94611fcc",
@@ -1940,7 +1961,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
@@ -2717,7 +2738,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "452e82e44ccdfacb152867006051753541ff6634",
@@ -2738,7 +2759,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "01165dc2d6041abd0462f79e6a9ec34c8c910aec",
@@ -2759,7 +2780,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "01165dc2d6041abd0462f79e6a9ec34c8c910aec",
@@ -2843,7 +2864,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
@@ -3032,7 +3053,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
@@ -3562,7 +3583,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
@@ -4885,12 +4906,12 @@
         "templates/app/kubernetes_cluster_http/template_kubernetes_cluster.yaml"
       ],
       "content_sha256s": [
-        "205448ad8d062fcf204307edbb7badb0dc82d837665de2a89585b58c9e9e7a79"
+        "fee5fe08526f454c4fd5c1599a8aba9afb49caa9816b29862cee522d58c89854"
       ],
       "sources": [
         {
           "path": "templates/app/kubernetes_cluster_http/template_kubernetes_cluster.yaml",
-          "sha256": "381387062c667528a5b87865dc4bd1d1f96a668ebf19accc0648b80496d8d629"
+          "sha256": "1712a5637789b6c76f4b83899711b6f4e56c4654698198249dc3334688f58b47"
         }
       ],
       "version_commit": "f6b598da5eadc97d31840d3db25e53441be295e9",
@@ -5100,7 +5121,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
@@ -5520,7 +5541,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "c8c13fe961820e7904ee200e20473eee4cd0f462",
@@ -5772,7 +5793,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
@@ -7347,7 +7368,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
@@ -7720,12 +7741,12 @@
         "templates/app/kubernetes_http/kubernetes_nodes_http/template_kubernetes_nodes.yaml"
       ],
       "content_sha256s": [
-        "7092a334e8d142c50a56257276e9c5ffc113a31c3685ecb1adcde99b50e36768"
+        "2681fc2f7d131dee3c3745e54acb037f15426cb2c0021cac956cb44411c4c636"
       ],
       "sources": [
         {
           "path": "templates/app/kubernetes_http/kubernetes_nodes_http/template_kubernetes_nodes.yaml",
-          "sha256": "1f2d427d39ecd9e8ff8d98fd73d19b6ba77d540f313b6da28447692dcd45d52a"
+          "sha256": "477d4ad6eb5c4f6a56beb0a2780be95b50c7e2768f6c2a8d4baf5c5447c4566c"
         }
       ],
       "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
@@ -7914,7 +7935,7 @@
       "sources": [
         {
           "path": "templates/cloud/gcp/template_cloud_gcp_http.yaml",
-          "sha256": "10d9a44f319ace4a6a706198dacd0b900a82f9db86c4b0079205e7c552d27b73"
+          "sha256": "34eeef81954b7184f4f71d4d3ef8e9f819aead85b04e04ec5ff4a47e2457c143"
         }
       ],
       "version_commit": "5e9b391d805e6f8a24c67157655ef8d2ab96f97c",
