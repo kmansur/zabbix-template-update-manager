@@ -3,8 +3,8 @@
   "source": {
     "line": "7.4",
     "ref": "release/7.4",
-    "commit": "1999a9a75721581eafe48443f475fc010097caac",
-    "commit_date": "2026-11-12T12:07:09+02:00",
+    "commit": "60e22c74e644f913d78b7a5f5edd6938309d1daa",
+    "commit_date": "2026-11-12T15:51:43+02:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
@@ -1489,21 +1489,21 @@
       "name": "Jenkins by HTTP",
       "technical_name": "Jenkins by HTTP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-1",
+      "vendor_version": "7.4-2",
       "paths": [
         "templates/app/jenkins/template_app_jenkins.yaml"
       ],
       "content_sha256s": [
-        "58096c5dc897ac6b523fb061bf75935c0d051e6a19d061092255e2fbee09a0b4"
+        "3954fcea68d2dd25641d0579af6311c4da4a60ab33be8f009f284587257fad42"
       ],
       "sources": [
         {
           "path": "templates/app/jenkins/template_app_jenkins.yaml",
-          "sha256": "b8e6b918da8fa814a4f5642f45cdd026e27503e43254a2fa93495362ecef67e8"
+          "sha256": "65d5b7fce0d69184a28778d84226da31ab2a96921ff35749f0c845d963e52a2c"
         }
       ],
-      "version_commit": "1893b9e55b7ce057fbcb945fbd427038802599f5",
-      "version_date": "2025-05-29T10:52:39+02:00"
+      "version_commit": "a446214709907f5875eb35f25804b75f52ab6a02",
+      "version_date": "2026-10-14T16:54:36+02:00"
     },
     "2f82248e411340429d390e8389850401": {
       "uuid": "2f82248e411340429d390e8389850401",
@@ -1972,21 +1972,21 @@
       "name": "DELL PowerEdge R660 by SNMP",
       "technical_name": "DELL PowerEdge R660 by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-3",
+      "vendor_version": "7.4-4",
       "paths": [
         "templates/server/dell/dell_r660_snmp/template_server_dell_r660_snmp.yaml"
       ],
       "content_sha256s": [
-        "ff7d6864be155c4d794a84e9a50702866e55a01481f01772628910d30fbea369"
+        "e6d44a69ffe3bf8371a413fb1789ea5e6bbb8605db66d8a3eb224563c4e2099a"
       ],
       "sources": [
         {
           "path": "templates/server/dell/dell_r660_snmp/template_server_dell_r660_snmp.yaml",
-          "sha256": "8e842c23ba72ad9c156cd11d2a68f57d76171769b75d9af30a0f8aaedfcf04b2"
+          "sha256": "f841f1fe6a32c225e1b0079fc573c4db100b2f06b920f5aeab677f90d25d5451"
         }
       ],
-      "version_commit": "f7bf24bb8034a490480865c01dad9cc7ae1647e1",
-      "version_date": "2026-08-07T12:07:24+02:00"
+      "version_commit": "453d255eded62b1d29302b7996c974974901631c",
+      "version_date": "2026-11-10T19:29:14+01:00"
     },
     "3bbfe42c78c74f04a2565431fbdd19e2": {
       "uuid": "3bbfe42c78c74f04a2565431fbdd19e2",
@@ -2203,21 +2203,21 @@
       "name": "DELL PowerEdge R750 by SNMP",
       "technical_name": "DELL PowerEdge R750 by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-3",
+      "vendor_version": "7.4-4",
       "paths": [
         "templates/server/dell/dell_r750_snmp/template_server_dell_r750_snmp.yaml"
       ],
       "content_sha256s": [
-        "1fdfc9704c074e88e77aafa1727ff1ad4981e3fb781beb4434d73a6fd6e71f01"
+        "d8f31a205101903a3def082e041a51cee20631f738a9bd80198b82bd2e0ec139"
       ],
       "sources": [
         {
           "path": "templates/server/dell/dell_r750_snmp/template_server_dell_r750_snmp.yaml",
-          "sha256": "ca594f77452ffcc406b86f340d71ec4df7905a00655d283b6122994f748b0fb6"
+          "sha256": "eb6e715f1b41c364cb51f666290294395c06e9a51bbcc50808bad5162c7192f3"
         }
       ],
-      "version_commit": "f7bf24bb8034a490480865c01dad9cc7ae1647e1",
-      "version_date": "2026-08-07T12:07:24+02:00"
+      "version_commit": "453d255eded62b1d29302b7996c974974901631c",
+      "version_date": "2026-11-10T19:29:14+01:00"
     },
     "42b18986c8b34c2d9c36f9cd00565bd5": {
       "uuid": "42b18986c8b34c2d9c36f9cd00565bd5",
@@ -2266,21 +2266,21 @@
       "name": "Dell iDRAC by SNMP",
       "technical_name": "Dell iDRAC by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-4",
+      "vendor_version": "7.4-5",
       "paths": [
         "templates/server/dell_idrac_snmp/template_server_dell_idrac_snmp.yaml"
       ],
       "content_sha256s": [
-        "7c8064f8c55b60daaa02c03b3148657c977607a901c56652f61cedf5453342e2"
+        "832eb28f53253cd91e1e7d2790f767cba4234eae270e82651e7739a912e398f6"
       ],
       "sources": [
         {
           "path": "templates/server/dell_idrac_snmp/template_server_dell_idrac_snmp.yaml",
-          "sha256": "050f1f5a2e9ab5e7d837ac9bbc4399f603c06d2f15d0aa27e3207e4481c93c16"
+          "sha256": "6cb2dc526b698e4aeeb30fb80161152c548cb0e31382db8233f2d187a050b54e"
         }
       ],
-      "version_commit": "f7bf24bb8034a490480865c01dad9cc7ae1647e1",
-      "version_date": "2026-08-07T12:07:24+02:00"
+      "version_commit": "453d255eded62b1d29302b7996c974974901631c",
+      "version_date": "2026-11-10T19:29:14+01:00"
     },
     "44990575121d4798b9e10520604c786c": {
       "uuid": "44990575121d4798b9e10520604c786c",
@@ -4691,21 +4691,21 @@
       "name": "DELL PowerEdge R740 by SNMP",
       "technical_name": "DELL PowerEdge R740 by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-4",
+      "vendor_version": "7.4-5",
       "paths": [
         "templates/server/dell/dell_r740_snmp/template_server_dell_r740_snmp.yaml"
       ],
       "content_sha256s": [
-        "8f752fd6d6fc357f023f610495cc9a9ae0889ec0198c817e61b429c1e05901cf"
+        "2a0b1736bfd3a69b3ec605f69858ec7f741b87443c7885605a28fcb85431c22c"
       ],
       "sources": [
         {
           "path": "templates/server/dell/dell_r740_snmp/template_server_dell_r740_snmp.yaml",
-          "sha256": "4c62058443b99f51345393ec449c5d267475160401d00b6590744bb323f958c5"
+          "sha256": "25758a48252f6f28d0b27e45589ba687ef78b66e4417f73cd63e15ae8b884a4f"
         }
       ],
-      "version_commit": "f7bf24bb8034a490480865c01dad9cc7ae1647e1",
-      "version_date": "2026-08-07T12:07:24+02:00"
+      "version_commit": "453d255eded62b1d29302b7996c974974901631c",
+      "version_date": "2026-11-10T19:29:14+01:00"
     },
     "a0e05ca631034676821b7e0e1ce25488": {
       "uuid": "a0e05ca631034676821b7e0e1ce25488",
@@ -6224,21 +6224,21 @@
       "name": "DELL PowerEdge R820 by SNMP",
       "technical_name": "DELL PowerEdge R820 by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-4",
+      "vendor_version": "7.4-5",
       "paths": [
         "templates/server/dell/dell_r820_snmp/template_server_dell_r820_snmp.yaml"
       ],
       "content_sha256s": [
-        "a42a6d9830b440f7f1be270cc76be935fdc4e4baee6eb95f25dc9ec21d5d865c"
+        "2260fb11969894559557c20aba4b76b274db66d2798c6bbc96efb4c594615fdc"
       ],
       "sources": [
         {
           "path": "templates/server/dell/dell_r820_snmp/template_server_dell_r820_snmp.yaml",
-          "sha256": "7b81e6e43b89285059edaf5812d0cb867c6b7d0a7482a6265e92d2570adfddd0"
+          "sha256": "bb2b11a92adde3aca8b0bfb4b3db163f6afdc06afc420ff0a75d7df6d7f524f9"
         }
       ],
-      "version_commit": "f7bf24bb8034a490480865c01dad9cc7ae1647e1",
-      "version_date": "2026-08-07T12:07:24+02:00"
+      "version_commit": "453d255eded62b1d29302b7996c974974901631c",
+      "version_date": "2026-11-10T19:29:14+01:00"
     },
     "d50f6dcfc3e44244a0fc9fd933607024": {
       "uuid": "d50f6dcfc3e44244a0fc9fd933607024",
@@ -7463,21 +7463,21 @@
       "name": "DELL PowerEdge R840 by SNMP",
       "technical_name": "DELL PowerEdge R840 by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-4",
+      "vendor_version": "7.4-5",
       "paths": [
         "templates/server/dell/dell_r840_snmp/template_server_dell_r840_snmp.yaml"
       ],
       "content_sha256s": [
-        "b461fda91c93bd2e142da8ea72ff25a5a90becfc97a18b0035c46fbe6d23cfc7"
+        "155809ed14a6c010279bd2fffd9115c02fe0e57eced818deab007e3f1f847d73"
       ],
       "sources": [
         {
           "path": "templates/server/dell/dell_r840_snmp/template_server_dell_r840_snmp.yaml",
-          "sha256": "76d3d84b2e861ccc9281c65fac8c284305705fc288266e12e012b45276980dce"
+          "sha256": "66dd9b9cec2b23fd706e10f6c9bac2fb2d1598736603eda6538cb278f436f049"
         }
       ],
-      "version_commit": "f7bf24bb8034a490480865c01dad9cc7ae1647e1",
-      "version_date": "2026-08-07T12:07:24+02:00"
+      "version_commit": "453d255eded62b1d29302b7996c974974901631c",
+      "version_date": "2026-11-10T19:29:14+01:00"
     },
     "fd36e0a231d343d38a95d1ed789584ca": {
       "uuid": "fd36e0a231d343d38a95d1ed789584ca",
@@ -7505,21 +7505,21 @@
       "name": "DELL PowerEdge R720 by SNMP",
       "technical_name": "DELL PowerEdge R720 by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.4-4",
+      "vendor_version": "7.4-5",
       "paths": [
         "templates/server/dell/dell_r720_snmp/template_server_dell_r720_snmp.yaml"
       ],
       "content_sha256s": [
-        "119a35cd016f9064a6eceb9a413902fd2975cabb5471bb7eefe2d11b028a897a"
+        "f8242b6f864b1499712d897291d89833f5ff1590b8bbcdf3f0139b563e052cc1"
       ],
       "sources": [
         {
           "path": "templates/server/dell/dell_r720_snmp/template_server_dell_r720_snmp.yaml",
-          "sha256": "bb3378d0e68a93b91e08930f78294095f0fba01d8cdb471326c36d35d4d76bff"
+          "sha256": "11a042ce563cf7a102f84c9bfcafcc74d119fae140d657a917009c37800126c1"
         }
       ],
-      "version_commit": "f7bf24bb8034a490480865c01dad9cc7ae1647e1",
-      "version_date": "2026-08-07T12:07:24+02:00"
+      "version_commit": "453d255eded62b1d29302b7996c974974901631c",
+      "version_date": "2026-11-10T19:29:14+01:00"
     },
     "fe7eb8b22ce84017b07bcab36e9032dc": {
       "uuid": "fe7eb8b22ce84017b07bcab36e9032dc",
