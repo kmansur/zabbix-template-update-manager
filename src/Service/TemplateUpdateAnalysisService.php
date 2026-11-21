@@ -742,7 +742,7 @@ final class TemplateUpdateAnalysisService {
 		}
 
 		if (strlen($message) > 400) {
-			$message = substr($message, 0, 399).'…';
+			$message = mb_strcut($message, 0, 399, 'UTF-8').'…';
 		}
 
 		return 'Diagnostic: '.$message;

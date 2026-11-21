@@ -59,6 +59,26 @@ try {
 		assertOperationHistory(true, $mode !== false && (($mode & 0777) === 0600), 'History file must be private mode 0600.');
 	}
 
+	// Regression: byte truncation of localized (pt_BR) messages must never split a
+	// multibyte character, otherwise JSON encoding rejects and silently drops the entry.
+	$localizedDetail = str_repeat('a', 511).'ção inválida: não foi possível importar.';
+	$utf8Entry = [
+		'id' => str_repeat('c', 32),
+		'created_at' => '2026-09-23T20:02:00Z',
+		'operation' => 'update',
+		'subject' => 'template-10002',
+		'status' => 'failed',
+		'write_performed' => false,
+		'actor_userid' => '1',
+		'detail' => $localizedDetail
+	];
+	$storedUtf8 = $repository->append($utf8Entry);
+	assertOperationHistory(true, strlen($storedUtf8['detail']) <= 512, 'Detail must stay within the byte bound.');
+	assertOperationHistory(1, preg_match('//u', $storedUtf8['detail']), 'Truncated detail must remain valid UTF-8.');
+	$latest = $repository->recent(1);
+	assertOperationHistory(str_repeat('c', 32), $latest[0]['id'] ?? null, 'Localized entry must be persisted, not dropped.');
+	assertOperationHistory($storedUtf8['detail'], $latest[0]['detail'] ?? null, 'Persisted detail must round-trip unchanged.');
+
 	file_put_contents($path, '{broken');
 	$thrown = false;
 	try {
@@ -68,6 +88,7 @@ try {
 		$thrown = true;
 	}
 	assertOperationHistory(true, $thrown, 'Malformed history storage must fail closed for reads.');
+
 }
 finally {
 	foreach (glob($dir.'/*') ?: [] as $file) {

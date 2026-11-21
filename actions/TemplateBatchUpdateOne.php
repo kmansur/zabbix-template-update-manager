@@ -110,8 +110,14 @@ class TemplateBatchUpdateOne extends CController {
 				: 'unexpected_error';
 			if ($batchStarted) {
 				try {
-					$terminal = $output['error_code'] === 'lock_contended' ? 'failed' : 'uncertain';
-					$batchRepo->finish($operationId, 'template-'.$templateId, $terminal, null, $output['error_code']);
+					if ($output['error_code'] === 'lock_contended') {
+						// Lock contention happens before preflight/import: no write was attempted,
+						// so the entry returns to pending and the same plan can be resumed.
+						$batchRepo->release($operationId, 'template-'.$templateId);
+					}
+					else {
+						$batchRepo->finish($operationId, 'template-'.$templateId, 'uncertain', null, $output['error_code']);
+					}
 				}
 				catch (Throwable $batchException) {
 					error_log('[Zabbix Template Update Manager] Unable to finalize persisted update batch state: '.$batchException->getMessage());

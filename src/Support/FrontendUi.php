@@ -61,7 +61,7 @@ final class FrontendUi {
 		$value = trim($value);
 		$display = $value === ''
 			? '—'
-			: (strlen($value) > $visibleLength ? substr($value, 0, $visibleLength).'…' : $value);
+			: (strlen($value) > $visibleLength ? mb_strcut($value, 0, $visibleLength, 'UTF-8').'…' : $value);
 
 		$span = new \CSpan($display);
 		if (defined('ZBX_STYLE_MONOSPACE_FONT')) {

@@ -357,7 +357,8 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 		if (/^[a-f0-9]{32}$/.test(stored)) {
 			try {
 				const existing = await requestBatchState(stored);
-				if (samePersistedPlan(existing, entries)) {
+				// An expired plan marked abandoned is never resumed; a new plan is created.
+				if (samePersistedPlan(existing, entries) && existing.status !== 'abandoned') {
 					if (existing.status === 'failed' || existing.status === 'uncertain') {
 						throw new Error(labels.execution_persisted_blocked);
 					}
@@ -369,7 +370,10 @@ window.ZTUMUpdateBatchInit = (config, labels) => {
 				}
 			}
 			catch (error) {
-				if (error?.message === labels.execution_persisted_blocked) {
+				// Blocked/uncertain and still-running persisted plans must stop here;
+				// only an unreadable or different stored plan may fall through to create.
+				if (error?.message === labels.execution_persisted_blocked
+						|| error?.message === labels.execution_persisted_running) {
 					throw error;
 				}
 			}

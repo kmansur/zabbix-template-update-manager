@@ -101,6 +101,9 @@ final class BatchOperationRepository {
 
 	public function begin(string $id, string $subject, string $evidence, string $expectedType, string $actorUserId): array {
 		return $this->mutate($id, function (array $state) use ($subject, $evidence, $expectedType, $actorUserId): array {
+			if (($state['status'] ?? null) === 'abandoned') {
+				throw new RuntimeException('Batch operation was abandoned and cannot be resumed; prepare a new batch.');
+			}
 			if (($state['type'] ?? null) !== $expectedType) {
 				throw new RuntimeException('Batch operation type does not match the requested write path.');
 			}
@@ -159,6 +162,37 @@ final class BatchOperationRepository {
 			else {
 				$state['status'] = $terminalState === 'uncertain' ? 'uncertain' : 'failed';
 			}
+			return $state;
+		});
+	}
+
+	/**
+	 * Return a running entry to pending when its write path never started.
+	 *
+	 * Only for failures proven to happen before any configuration write, such as
+	 * global lock contention. The persisted plan can then be resumed unchanged.
+	 */
+	public function release(string $id, string $subject): array {
+		return $this->mutate($id, function (array $state) use ($subject): array {
+			$index = $this->findEntry($state, $subject);
+			if (($state['entries'][$index]['state'] ?? null) !== 'running') {
+				throw new RuntimeException('Batch entry is not running.');
+			}
+
+			$state['entries'][$index]['state'] = 'pending';
+			$state['entries'][$index]['started_at'] = null;
+			$state['entries'][$index]['completed_at'] = null;
+			$state['entries'][$index]['result_status'] = null;
+			$state['entries'][$index]['error_code'] = null;
+
+			$anySucceeded = false;
+			foreach ($state['entries'] as $entry) {
+				if (($entry['state'] ?? null) === 'succeeded') {
+					$anySucceeded = true;
+					break;
+				}
+			}
+			$state['status'] = $anySucceeded ? 'running' : 'pending';
 			return $state;
 		});
 	}
@@ -316,11 +350,11 @@ final class BatchOperationRepository {
 			$id = basename($path, '.json');
 			if (preg_match('/^[a-f0-9]{32}$/', $id) !== 1 || is_link($path)) {
 				continue;
-		}
+			}
 			$mtime = filemtime($path);
 			if ($mtime === false || ($now - $mtime) < self::TERMINAL_RETENTION_SECONDS) {
 				continue;
-		}
+			}
 
 			try {
 				$state = $this->load($id);
@@ -328,30 +362,85 @@ final class BatchOperationRepository {
 			catch (RuntimeException $exception) {
 				// Preserve unreadable evidence for explicit operator investigation.
 				continue;
-		}
+			}
 
-			if (!in_array($state['status'] ?? null, ['completed', 'failed', 'uncertain'], true)) {
+			$status = $state['status'] ?? null;
+			if (!in_array($status, ['completed', 'failed', 'uncertain', 'abandoned'], true)) {
+				$interrupted = false;
+				foreach ($state['entries'] as $entry) {
+					if (is_array($entry) && ($entry['state'] ?? null) === 'running') {
+						$interrupted = true;
+						break;
+					}
+				}
+
+				if ($interrupted) {
+					// An interrupted write is never silently discarded: convert it to
+					// explicit uncertain evidence and keep it for a new retention window.
+					try {
+						$this->markStaleRunningUncertain($id);
+					}
+					catch (RuntimeException $exception) {
+						// Leave the evidence untouched when it cannot be converted.
+					}
+					continue;
+				}
+
+				// Pending/running plans with no in-flight entry were abandoned between
+				// request-bounded steps (closed tab, stopped browser). They are never
+				// deleted directly: first they become explicit terminal "abandoned"
+				// evidence, kept for one more retention window before pruning.
+				if (in_array($status, ['pending', 'running'], true)) {
+					try {
+						$this->markAbandoned($id);
+					}
+					catch (RuntimeException $exception) {
+						// Leave the evidence untouched when it cannot be converted.
+					}
+				}
 				continue;
-		}
+			}
 
-			$lockPath = $path.'.lock';
-			if (file_exists($lockPath)) {
-				$lock = fopen($lockPath, 'c+');
-				if (!is_resource($lock)) {
-					continue;
+			$this->deleteUnderLock($path);
+		}
+	}
+
+	private function markAbandoned(string $id): array {
+		return $this->mutate($id, function (array $state): array {
+			if (!in_array($state['status'] ?? null, ['pending', 'running'], true)) {
+				return $state;
+			}
+			foreach ($state['entries'] as $entry) {
+				if (is_array($entry) && ($entry['state'] ?? null) === 'running') {
+					throw new RuntimeException('Batch operation has an in-flight entry and cannot be abandoned.');
 				}
-				if (!flock($lock, LOCK_EX | LOCK_NB)) {
-					fclose($lock);
-					continue;
-				}
-				@unlink($path);
-				flock($lock, LOCK_UN);
+			}
+			$state['status'] = 'abandoned';
+			return $state;
+		});
+	}
+
+	private function deleteUnderLock(string $path): void {
+		$lockPath = $path.'.lock';
+		if (is_link($lockPath)) {
+			return;
+		}
+		if (file_exists($lockPath)) {
+			$lock = fopen($lockPath, 'c+');
+			if (!is_resource($lock)) {
+				return;
+			}
+			if (!flock($lock, LOCK_EX | LOCK_NB)) {
 				fclose($lock);
-				@unlink($lockPath);
+				return;
 			}
-			else {
-				@unlink($path);
-			}
+			@unlink($path);
+			flock($lock, LOCK_UN);
+			fclose($lock);
+			@unlink($lockPath);
+		}
+		else {
+			@unlink($path);
 		}
 	}
 
