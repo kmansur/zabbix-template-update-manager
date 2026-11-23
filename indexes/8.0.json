@@ -3,13 +3,13 @@
   "source": {
     "line": "8.0",
     "ref": "release/8.0",
-    "commit": "f554efc0a0c7b63bd4b7352f704fa40a06da0ffb",
-    "commit_date": "2026-11-20T20:55:54+02:00",
+    "commit": "dd8bd60a8ffcf94e2ff2bc4b3e0e6c9482d52172",
+    "commit_date": "2026-11-23T13:34:50+02:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
   "statistics": {
-    "templates": 391,
+    "templates": 393,
     "duplicate_uuid_definitions": 2,
     "content_variant_uuids": 0
   },
@@ -1441,6 +1441,27 @@
       ],
       "version_commit": "0121bae2fc49ab3d9aeac97aa5d690c139df26d9",
       "version_date": "2026-05-11T08:40:06+03:00"
+    },
+    "2c0b90207e31422a95558e005a635e92": {
+      "uuid": "2c0b90207e31422a95558e005a635e92",
+      "name": "OpenShift Cluster by HTTP",
+      "technical_name": "OpenShift Cluster by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "8.0-0",
+      "paths": [
+        "templates/app/openshift_cluster_http/template_openshift_cluster.yaml"
+      ],
+      "content_sha256s": [
+        "be48d3868d11df052415d1ee6538576288e2a4c516f74f1ddb76dd1af3d34d0c"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/openshift_cluster_http/template_openshift_cluster.yaml",
+          "sha256": "3b9885dc21e76052d89a7f9590216627671304ad238363d71aaf4ed5f7a66e6c"
+        }
+      ],
+      "version_commit": "2cdefe22c940804ef09f130c69d9bd36334cfd5f",
+      "version_date": "2026-11-16T08:59:28+01:00"
     },
     "2c96393f8f2945c1a9f03f86adf5eb57": {
       "uuid": "2c96393f8f2945c1a9f03f86adf5eb57",
@@ -3462,6 +3483,27 @@
       ],
       "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
       "version_date": "2026-08-13T11:58:33+02:00"
+    },
+    "65b190526c4b439ba208ee5b85ffbe45": {
+      "uuid": "65b190526c4b439ba208ee5b85ffbe45",
+      "name": "OpenShift Node by HTTP",
+      "technical_name": "OpenShift Node by HTTP",
+      "vendor_name": "Zabbix",
+      "vendor_version": "8.0-0",
+      "paths": [
+        "templates/app/openshift_cluster_http/template_openshift_cluster.yaml"
+      ],
+      "content_sha256s": [
+        "ea416903fc555ceb6023e77ae36eabaf83a535b594d3c34bf0f861e3410a8078"
+      ],
+      "sources": [
+        {
+          "path": "templates/app/openshift_cluster_http/template_openshift_cluster.yaml",
+          "sha256": "3b9885dc21e76052d89a7f9590216627671304ad238363d71aaf4ed5f7a66e6c"
+        }
+      ],
+      "version_commit": "2cdefe22c940804ef09f130c69d9bd36334cfd5f",
+      "version_date": "2026-11-16T08:59:28+01:00"
     },
     "67332e679035423f85090aa985947c36": {
       "uuid": "67332e679035423f85090aa985947c36",
