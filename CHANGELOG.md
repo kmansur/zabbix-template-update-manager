@@ -6,6 +6,15 @@ All notable changes to Template Update Manager will be documented in this file.
 
 ### Fixed
 
+- Batch resume guard: a stored update/install batch that still has a running entry now stops execution instead of silently creating a second batch plan for the same templates.
+- Abandoned batch plans (pending/running with no in-flight entry, e.g. a closed tab) no longer accumulate until the 200-file safety cap blocks all new batches: after the retention window they become explicit terminal `abandoned` evidence (never resumed) and are pruned one window later; expired in-flight entries become `uncertain` evidence instead.
+- Global lock contention during request-bounded batch execution returns the entry to `pending` (no write was attempted) so the same reviewed plan can be retried, instead of permanently blocking it as `failed`.
+- Byte-bounded text truncation is now UTF-8 safe (`mb_strcut`): localized messages (for example pt_BR import errors) no longer produce invalid UTF-8 that silently dropped operation-history entries or blanked UI messages.
+
+### Tests
+
+- Added batch repository regressions (abandoned/in-flight pruning, release on lock contention), an operation-history UTF-8 truncation regression and `tests/batch-resume-guard.test.cjs`; `node --test tests/*.test.cjs` now runs in CI.
+
 - Reject malformed historical diagnostic revision entries, fingerprints and paths with explicit validation errors, including NUL and backslash paths, before unsafe Git argument handling or set operations.
 - Correct signed-history regression coverage: a forged truncation flag is rejected, while an actual bounded ancestry window remains a valid non-authoritative diagnostic.
 - Require Ed25519-signed offline bundle manifests, verify them before consuming bundle files, and record verified Git rename transitions for offline historical lookup.

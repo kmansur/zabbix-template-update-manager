@@ -162,7 +162,8 @@ final class TemplateOperationHistoryRepository {
 		$directory = dirname($this->path);
 		$encoded = json_encode(
 			$state,
-			JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR
+			JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE
+				| JSON_THROW_ON_ERROR
 		);
 		if (!is_string($encoded) || strlen($encoded) > self::MAX_FILE_BYTES) {
 			throw new RuntimeException('Operation-history state exceeds the safe storage limit.');
@@ -293,6 +294,8 @@ final class TemplateOperationHistoryRepository {
 	private static function sanitize(string $value, int $maxLength): string {
 		$value = preg_replace('/[\x00-\x1F\x7F]+/', ' ', $value);
 		$value = is_string($value) ? trim(preg_replace('/\s+/', ' ', $value) ?? '') : '';
-		return strlen($value) > $maxLength ? substr($value, 0, $maxLength) : $value;
+		// Byte-bounded but UTF-8 safe: never split a multibyte character, which would
+		// make JSON_THROW_ON_ERROR reject the entry (e.g. localized pt_BR messages).
+		return strlen($value) > $maxLength ? mb_strcut($value, 0, $maxLength, 'UTF-8') : $value;
 	}
 }

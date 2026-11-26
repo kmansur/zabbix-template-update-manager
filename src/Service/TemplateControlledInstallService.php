@@ -116,6 +116,6 @@ final class TemplateControlledInstallService {
 	private static function sanitizeError(string $message): string {
 		$message = preg_replace('/[\r\n\t]+/', ' ', $message) ?? '';
 		$message = trim($message);
-		return strlen($message) > 600 ? substr($message, 0, 600).'…' : $message;
+		return strlen($message) > 600 ? mb_strcut($message, 0, 600, 'UTF-8').'…' : $message;
 	}
 }

@@ -339,6 +339,6 @@ class TemplateList extends CController {
 	private static function diagnosticMessage(Throwable $exception): string {
 		$message = trim($exception->getMessage());
 		$message = preg_replace('/[\r\n\t]+/', ' ', $message) ?? '';
-		return strlen($message) > 600 ? substr($message, 0, 600).'…' : $message;
+		return strlen($message) > 600 ? mb_strcut($message, 0, 600, 'UTF-8').'…' : $message;
 	}
 }

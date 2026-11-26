@@ -307,7 +307,7 @@ final class UpstreamIndexRepository {
 		}
 
 		$path = preg_replace('/[\x00-\x1F\x7F]+/', '?', $path) ?? '';
-		return strlen($path) > 220 ? substr($path, 0, 220).'…' : $path;
+		return strlen($path) > 220 ? mb_strcut($path, 0, 220, 'UTF-8').'…' : $path;
 	}
 
 	private function cacheFile(string $line): string {
@@ -473,6 +473,6 @@ final class UpstreamIndexRepository {
 	private function sanitizeTransportError(string $message): string {
 		$message = preg_replace('/[\r\n\t]+/', ' ', $message) ?? '';
 		$message = trim($message);
-		return strlen($message) > 300 ? substr($message, 0, 300).'…' : $message;
+		return strlen($message) > 300 ? mb_strcut($message, 0, 300, 'UTF-8').'…' : $message;
 	}
 }

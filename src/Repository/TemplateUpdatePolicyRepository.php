@@ -426,7 +426,7 @@ final class TemplateUpdatePolicyRepository {
 	private static function sanitizeMetadata(string $value, int $maxLength): string {
 		$value = preg_replace('/[\x00-\x1F\x7F]+/', ' ', $value);
 		$value = is_string($value) ? trim($value) : '';
-		return strlen($value) > $maxLength ? substr($value, 0, $maxLength) : $value;
+		return strlen($value) > $maxLength ? mb_strcut($value, 0, $maxLength, 'UTF-8') : $value;
 	}
 
 	private static function changedCount(array $before, array $after): int {

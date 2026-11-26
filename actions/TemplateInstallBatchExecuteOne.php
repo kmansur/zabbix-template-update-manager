@@ -98,8 +98,14 @@ class TemplateInstallBatchExecuteOne extends CController {
 				: 'unexpected_error';
 			if ($batchStarted) {
 				try {
-					$terminal = $output['error_code'] === 'lock_contended' ? 'failed' : 'uncertain';
-					$batchRepo->finish($operationId, 'uuid-'.$uuid, $terminal, null, $output['error_code']);
+					if ($output['error_code'] === 'lock_contended') {
+						// Lock contention happens before preflight/import: no write was attempted,
+						// so the entry returns to pending and the same plan can be resumed.
+						$batchRepo->release($operationId, 'uuid-'.$uuid);
+					}
+					else {
+						$batchRepo->finish($operationId, 'uuid-'.$uuid, 'uncertain', null, $output['error_code']);
+					}
 				}
 				catch (Throwable $batchException) {
 					error_log('[Zabbix Template Update Manager] Unable to finalize persisted install batch state: '.$batchException->getMessage());

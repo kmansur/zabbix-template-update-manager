@@ -262,7 +262,7 @@ final class TemplateBatchPlanService {
 			$message = preg_replace('/\s+/', ' ', trim((string) $analysis['comparison_error']));
 			$message = is_string($message) ? $message : '';
 			if (strlen($message) > 500) {
-				$message = substr($message, 0, 499).'…';
+				$message = mb_strcut($message, 0, 499, 'UTF-8').'…';
 			}
 			return $message !== '' ? 'comparison_error: '.$message : 'comparison_error';
 		}
