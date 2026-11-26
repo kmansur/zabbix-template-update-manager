@@ -3,8 +3,8 @@
   "source": {
     "line": "7.0",
     "ref": "release/7.0",
-    "commit": "e1f8827104a42e0520e1dc3cc69724606d0c5cc7",
-    "commit_date": "2026-11-25T13:18:40+02:00",
+    "commit": "2a76053fcdd7881279d0c121cd23e684328f99ed",
+    "commit_date": "2026-11-26T09:40:33+02:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
@@ -3998,21 +3998,21 @@
       "name": "Extreme EXOS by SNMP",
       "technical_name": "Extreme EXOS by SNMP",
       "vendor_name": "Zabbix",
-      "vendor_version": "7.0-3",
+      "vendor_version": "7.0-4",
       "paths": [
         "templates/net/extreme_snmp/template_net_extreme_snmp.yaml"
       ],
       "content_sha256s": [
-        "885a4044769fbc64b624cb9f9112711b22b1d7901062b1112e389b9794a81e5c"
+        "bb1c87214e139376c09aa97ad3d6c8206b7391d54451eb1d418e92d4b95b975a"
       ],
       "sources": [
         {
           "path": "templates/net/extreme_snmp/template_net_extreme_snmp.yaml",
-          "sha256": "f90c9537f23df3a802ad6d64d451711bc8a24eb5a63d2b48dce32cd1b0526805"
+          "sha256": "f46dc757e4797b45c5c96fea317934e19384df8f426abd63dfa5a3646c652623"
         }
       ],
-      "version_commit": "3c96d890154d75c5c9424cc14442918dc98581bd",
-      "version_date": "2026-09-09T12:29:56+02:00"
+      "version_commit": "1fd6d86c651d9f4754293da06472b20d6f91e0b5",
+      "version_date": "2026-11-16T18:51:50+01:00"
     },
     "86702e8bc514434e8c914d50c206cb94": {
       "uuid": "86702e8bc514434e8c914d50c206cb94",
