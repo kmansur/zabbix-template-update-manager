@@ -3,8 +3,8 @@
   "source": {
     "line": "8.0",
     "ref": "release/8.0",
-    "commit": "a72f21ea30554ecc7a3b0d354ccf38e620338e47",
-    "commit_date": "2026-11-26T10:32:14+02:00",
+    "commit": "cbd4e17ab06dd309ef159e9f6fa9f99f26633429",
+    "commit_date": "2026-11-27T11:13:33+02:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
@@ -3678,21 +3678,21 @@
       "name": "Claude API by HTTP",
       "technical_name": "Claude API by HTTP",
       "vendor_name": "Zabbix",
-      "vendor_version": "8.0-1",
+      "vendor_version": "8.0-2",
       "paths": [
         "templates/app/claude_api_http/template_app_claude_api_http.yaml"
       ],
       "content_sha256s": [
-        "052d815fa3faa51fd29ea22d7951c3f412d45c692fb8bbbb1d1f5f6dec3b154d"
+        "ab459ecafe33b3fd659da18efa8880b9392cb9729725507b71899a15d4452631"
       ],
       "sources": [
         {
           "path": "templates/app/claude_api_http/template_app_claude_api_http.yaml",
-          "sha256": "182debad4d96a1a526b88cb2c6a387f4d99183e887b46c359b2c5c7c13a71695"
+          "sha256": "f4aea3b01538b940eb5cd539a8a533b6ef6ab1b17f03eca21b44fc1687784f35"
         }
       ],
-      "version_commit": "df2ee2cb59b02421cca330cf4aaa1b3f4400dde8",
-      "version_date": "2026-08-13T11:58:33+02:00"
+      "version_commit": "f1b0666dc80f32302cc4aac8e0b3eb88326d2436",
+      "version_date": "2026-11-26T16:25:31+02:00"
     },
     "6ecfb7083ddf45f183ab4be50cfba37a": {
       "uuid": "6ecfb7083ddf45f183ab4be50cfba37a",
