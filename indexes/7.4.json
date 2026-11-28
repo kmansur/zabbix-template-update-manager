@@ -3,8 +3,8 @@
   "source": {
     "line": "7.4",
     "ref": "release/7.4",
-    "commit": "8de5a7868b5a32f89da0e0bc8f470a38bb5f130b",
-    "commit_date": "2026-11-27T13:32:03+02:00",
+    "commit": "8d3e8307566d8638b11b291abaf70fc2b2a6d851",
+    "commit_date": "2026-11-27T20:55:49+02:00",
     "canonical_repository": "https://git.zabbix.com/projects/ZBX/repos/zabbix/",
     "mirror_repository": "https://github.com/zabbix/zabbix"
   },
